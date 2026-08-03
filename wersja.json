@@ -1,6 +1,6 @@
 {
  "wersja": "1.1.7",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/a808df15b4d4b6ec5d48c40e2a94f3fd0a276775",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -524,5 +524,6 @@
   "bajtow": 13704509,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.7/biblioteki-1.1.7.zip",
   "znacznik": "76e405bfcd6d2a3d6566aac68586321675c59c41db9de44dce3bee4787ea6361"
- }
+ },
+ "commit": "a808df15b4d4b6ec5d48c40e2a94f3fd0a276775"
 }
