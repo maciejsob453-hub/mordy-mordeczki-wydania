@@ -4,8 +4,8 @@
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "812205b62fefcb6df37cf38afa4cf0aacc546f7d4052a8ec9067b6033d32bde7",
-   "bajtow": 504
+   "sha": "ca99f2e7c65ea9e1aefe1925683b320045a918f7f3dfd0d2700b236c8376530e",
+   "bajtow": 488
   },
   {
    "sciezka": "gra/kod/desktop.js",
@@ -14,8 +14,8 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "de36a21652a3f5d495ba46627351b3eecadea3d55b345b81380619c51f163e5c",
-   "bajtow": 496274
+   "sha": "37e2506e62df161a7046a3f580ffc37ac014c5d77c82f5d778b6afa310c4f2c7",
+   "bajtow": 488600
   },
   {
    "sciezka": "gra/obrazki/0051a52917ef.webp",
@@ -509,8 +509,8 @@
   },
   {
    "sciezka": "gra/wyglad/style.css",
-   "sha": "d79784d99bb14360369bf79d85b7552e52a5f07be608287d5005904cc33eaeaa",
-   "bajtow": 83114
+   "sha": "ae67ce78b062810512e8d094237856c412e971b05d4e648e4468441476e87512",
+   "bajtow": 82002
   }
  ],
  "exe": {
