@@ -1,0 +1,522 @@
+{
+ "wersja": "1.1.4",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
+ "pliki": [
+  {
+   "sciezka": "gra/index.html",
+   "sha": "812205b62fefcb6df37cf38afa4cf0aacc546f7d4052a8ec9067b6033d32bde7",
+   "bajtow": 504
+  },
+  {
+   "sciezka": "gra/kod/desktop.js",
+   "sha": "1d5abb08ad1161069e23309d60c7f3f59977347cc458ff65e2475bc43432a3af",
+   "bajtow": 8229
+  },
+  {
+   "sciezka": "gra/kod/game.js",
+   "sha": "de36a21652a3f5d495ba46627351b3eecadea3d55b345b81380619c51f163e5c",
+   "bajtow": 496274
+  },
+  {
+   "sciezka": "gra/obrazki/0051a52917ef.webp",
+   "sha": "e2a7bdf2fb03db497d1c90127c13d6f4597847c7fc536036d465f02746dd2441",
+   "bajtow": 920
+  },
+  {
+   "sciezka": "gra/obrazki/04774de77d36.webp",
+   "sha": "834076184a1f46c7026915badedaed1b919bb075dc54441db61c06128318c87c",
+   "bajtow": 2656
+  },
+  {
+   "sciezka": "gra/obrazki/07520c9d52a7.webp",
+   "sha": "b1e0484c46133db0373e339487ba1e2da524ecc9c4f7dbad0a2eef265a417c0f",
+   "bajtow": 3586
+  },
+  {
+   "sciezka": "gra/obrazki/0e9071fc2092.webp",
+   "sha": "6b3ad60630aad0b3c1c88ab181ca4a08fa5ab6124268151066c9d4cadcc635fc",
+   "bajtow": 2420
+  },
+  {
+   "sciezka": "gra/obrazki/10efbd4fb21b.webp",
+   "sha": "63ae946e412dd738c62d7b53c761f9ec533bb60d0ec5671f28bc08dd98e2d4a5",
+   "bajtow": 9244
+  },
+  {
+   "sciezka": "gra/obrazki/1189f2a85ea3.webp",
+   "sha": "beb2f427e38f4d796ee10e8d3bb90a2195b881ffb1490fc5ebf4f31a29c7cd7a",
+   "bajtow": 2022
+  },
+  {
+   "sciezka": "gra/obrazki/135df09bc351.webp",
+   "sha": "fad3f7996f33c13a5e41e2dba181ecec1faa3d09e9fa8ef47e6727c811fec0c0",
+   "bajtow": 2100
+  },
+  {
+   "sciezka": "gra/obrazki/16ca0d3b9eeb.webp",
+   "sha": "cae07589220280450b581f3beffb06f41c05f19d6896175c8665478a6e03b1d1",
+   "bajtow": 2696
+  },
+  {
+   "sciezka": "gra/obrazki/174141e9bca2.webp",
+   "sha": "83c1f4d01835c748860f8aaedd160eb141351f6b62c6300fc489b5b67cc34c74",
+   "bajtow": 1690
+  },
+  {
+   "sciezka": "gra/obrazki/1f63df863e7f.webp",
+   "sha": "da199bf056113866764f6ff669c9fccdc068449058f4a1f9831df45e97eaeb33",
+   "bajtow": 1652
+  },
+  {
+   "sciezka": "gra/obrazki/1fb954d6dd7c.webp",
+   "sha": "9256be7eade1f7ccf9f6010a452b35e9c84d8de22d3fac7ff3610c42e127abcf",
+   "bajtow": 4394
+  },
+  {
+   "sciezka": "gra/obrazki/20c8f32ecec2.webp",
+   "sha": "a9d3e84ffe7cb3058f7f14bd71fc706bdefc88ae387e6713d24b41aa9e93fe3c",
+   "bajtow": 3416
+  },
+  {
+   "sciezka": "gra/obrazki/28efd8279222.svg",
+   "sha": "ddd4cab3f9f65ebdb611371e8e653f46f2b0a8b4cdc1b6031f5018a08952b4bd",
+   "bajtow": 984
+  },
+  {
+   "sciezka": "gra/obrazki/2a9007517459.webp",
+   "sha": "bc114db8df5db60a0bb486bd45def7052cbce0a0207c96aaaf5f663f6456ec54",
+   "bajtow": 1790
+  },
+  {
+   "sciezka": "gra/obrazki/2d4de0deb7c1.webp",
+   "sha": "50b8f591d172e909adb50ca2e829e4e63ca73b02b61087e6962c281821a34d84",
+   "bajtow": 9634
+  },
+  {
+   "sciezka": "gra/obrazki/2edc2ee02c95.webp",
+   "sha": "db470f488c00d3f2a36d4ef1cf3585b792b2db7b5c2c6bc9da7549d689eb571b",
+   "bajtow": 2218
+  },
+  {
+   "sciezka": "gra/obrazki/2f39d1ecb2de.webp",
+   "sha": "8b0cba89353e6ab76fb6862294f70eea3b52af34d0c03cbf19cc29d0633aa2fe",
+   "bajtow": 2212
+  },
+  {
+   "sciezka": "gra/obrazki/2f9ecd9fa8cf.webp",
+   "sha": "ce0a2cb6e30c9c963f5b111ef6b550a3bccdbefbd751def6f0e07d8e103842de",
+   "bajtow": 3002
+  },
+  {
+   "sciezka": "gra/obrazki/30bcedf79997.webp",
+   "sha": "7f02d9ca86597b485f951c186a26fa700d72cc46f9798cd52efbcd7c9aaa6675",
+   "bajtow": 1202
+  },
+  {
+   "sciezka": "gra/obrazki/31bfab4a1110.webp",
+   "sha": "d9815f199660a6b4ebedd2f47807f9d860147676653b6313e4ad1d460b04374d",
+   "bajtow": 2468
+  },
+  {
+   "sciezka": "gra/obrazki/32a907831366.webp",
+   "sha": "0d275d85f00bc1f9ba7f3f7a35f46daec55694f9c191696a1118cd2ed90aff95",
+   "bajtow": 3560
+  },
+  {
+   "sciezka": "gra/obrazki/35a4cee441f9.webp",
+   "sha": "343b5bf6c820d37c2ed9c9356f7e34fc30ed6bc3da530b13bcc8e9adb47e4258",
+   "bajtow": 2808
+  },
+  {
+   "sciezka": "gra/obrazki/3c5f99631754.webp",
+   "sha": "fbbe4d652e4234662a79b44694d42afdc17c60a9cdf9323e2742d78d30c792d2",
+   "bajtow": 2798
+  },
+  {
+   "sciezka": "gra/obrazki/3d3332854d5f.webp",
+   "sha": "c870eb96b139295d0c1aa422a2537242197728c7a7d08eb1cbc4778e1d00adf9",
+   "bajtow": 1488
+  },
+  {
+   "sciezka": "gra/obrazki/3da3c7510fc8.webp",
+   "sha": "80fbee73dd9ee4023bcccac530491ae89abc61cf5bb641996a1a7937fb75abdb",
+   "bajtow": 2752
+  },
+  {
+   "sciezka": "gra/obrazki/3f26e28825a4.webp",
+   "sha": "332677e5f5e53431a6434a4c068c98befa34d11763d60ef61566e9c654240633",
+   "bajtow": 1244
+  },
+  {
+   "sciezka": "gra/obrazki/3f7e866b3355.webp",
+   "sha": "ffc11d627098fae773f275ced227896ed7985122a4b56ee03590eddc178a9391",
+   "bajtow": 1284
+  },
+  {
+   "sciezka": "gra/obrazki/40064ea5d3ff.webp",
+   "sha": "dcdaed08d62a9b318bda5e775580285df22a4d1151534acfdbfdc86d34803541",
+   "bajtow": 2566
+  },
+  {
+   "sciezka": "gra/obrazki/40c5466af2f5.png",
+   "sha": "7ab0d27a56a4703cecdc4ba635f6fc9733eeb86c70aad1f1cd3b5b8e70b71b4c",
+   "bajtow": 75458
+  },
+  {
+   "sciezka": "gra/obrazki/4205cad83b6b.webp",
+   "sha": "e0f2ae91bd9d224b0e6aa6a9ef36d1e330652e25edeed17dfe05d486143865ec",
+   "bajtow": 1780
+  },
+  {
+   "sciezka": "gra/obrazki/463d9208b9dd.webp",
+   "sha": "9dbe21a7724af8636c7de12ad8d891c658b56c847bedfb84168e125132e567e9",
+   "bajtow": 1804
+  },
+  {
+   "sciezka": "gra/obrazki/4aa32504feb8.webp",
+   "sha": "74153655825d6ac079fa901ddacf8bbcef95ef5763e60ef87f317284b959ca9a",
+   "bajtow": 2364
+  },
+  {
+   "sciezka": "gra/obrazki/4c15d82ceb7d.webp",
+   "sha": "d52761239a31b6550a9917acf77ed698b5c9dfdde2cb482b472a16f353c88ae7",
+   "bajtow": 3870
+  },
+  {
+   "sciezka": "gra/obrazki/505b87671205.webp",
+   "sha": "5b302e613d8af6d782e3623150a4c9420f86c37bc9eb3e75f02b8c5c8cd7d521",
+   "bajtow": 4446
+  },
+  {
+   "sciezka": "gra/obrazki/53820c7b8559.webp",
+   "sha": "5986fcc052a2a36cf83c464609b3971acd183e1c9a15e4aa1b27bb20a104f95a",
+   "bajtow": 1292
+  },
+  {
+   "sciezka": "gra/obrazki/5609cc4b3929.webp",
+   "sha": "8ff50a73234fef293104ec30b9707836e7f1ca54e832f5cb57b1eac8720f5004",
+   "bajtow": 3452
+  },
+  {
+   "sciezka": "gra/obrazki/5a6024fdfbc7.webp",
+   "sha": "b6a4a8300f04e394df09d138e189a9e2e9bb4994d0cc172078ec5d2aa6f6b243",
+   "bajtow": 1646
+  },
+  {
+   "sciezka": "gra/obrazki/5e6a47f7a1eb.webp",
+   "sha": "54e88419db217f4f5740cf61e6b95ff0f65f1d899563557a6788b4aa02b97a04",
+   "bajtow": 1910
+  },
+  {
+   "sciezka": "gra/obrazki/5ed581dc6fb1.webp",
+   "sha": "f3f2e1655cf99342591daedc330658e4d485e49edda021975b277e516d0a145e",
+   "bajtow": 6760
+  },
+  {
+   "sciezka": "gra/obrazki/62ff16ae5515.webp",
+   "sha": "34919a0cfc4307d4892c6862d2720cd00ad82a9afcb95453d12453f389f7bf53",
+   "bajtow": 3926
+  },
+  {
+   "sciezka": "gra/obrazki/65e60b12b9fe.webp",
+   "sha": "29058d1c19ec25eb85f7135b5065042b5b037858f2a2e2c5ed396e2482072d33",
+   "bajtow": 1730
+  },
+  {
+   "sciezka": "gra/obrazki/67887df61b8e.webp",
+   "sha": "2701c85a662ff76fcd8029620444144f471108493212fe35caadfc9646da210b",
+   "bajtow": 1794
+  },
+  {
+   "sciezka": "gra/obrazki/686628e32c75.webp",
+   "sha": "28f48afec0791a45b27c9e162159853991ae7840ba3630c2e00d9b3499aa9f01",
+   "bajtow": 2458
+  },
+  {
+   "sciezka": "gra/obrazki/720fb5e0b9e2.webp",
+   "sha": "ab01844d147983f8e19b38ee75a23d6b15b08a5c14c3dba4d836facc3f1b7b43",
+   "bajtow": 2356
+  },
+  {
+   "sciezka": "gra/obrazki/721a1f244511.webp",
+   "sha": "2bccdd62aeef01e5348f57fd044ea12a61ee8750f04182896aa7558af5a40e27",
+   "bajtow": 3522
+  },
+  {
+   "sciezka": "gra/obrazki/7a685e2ac353.webp",
+   "sha": "f069de098b53de0519d30120c54a0c5a0b4ef2e138402ce0e66631e8c1c50ab5",
+   "bajtow": 1676
+  },
+  {
+   "sciezka": "gra/obrazki/7b152588238a.webp",
+   "sha": "f291d507a0a73296951a441f09aff43c4955e2f31ae3a55293317a9feda59c97",
+   "bajtow": 2032
+  },
+  {
+   "sciezka": "gra/obrazki/7b7c4f192e6f.webp",
+   "sha": "76ef2d193b8a8dec382730ff19c09981fafbf9580851d538289f5aa3bc6e3c10",
+   "bajtow": 1716
+  },
+  {
+   "sciezka": "gra/obrazki/7f677d35a527.webp",
+   "sha": "fae261cb8e7986ef8575500db93422c55eed144ab578caae91e1588cc34948ac",
+   "bajtow": 780
+  },
+  {
+   "sciezka": "gra/obrazki/8220da0fe301.webp",
+   "sha": "ffb9cb21816dcc9ce6d9d31ce9405d2230626ad7f081b382af0e11dc02d84ef2",
+   "bajtow": 1796
+  },
+  {
+   "sciezka": "gra/obrazki/83dd46efd068.webp",
+   "sha": "37eafec5e52d90794ae4c04dc86badb41aa7e542a0a61f95894dc611c93c1198",
+   "bajtow": 3256
+  },
+  {
+   "sciezka": "gra/obrazki/89c9588432e9.webp",
+   "sha": "2133c6bace5916ad8cafb786b69f2a9bf97bd733ca4e5b86e03bb093e123672f",
+   "bajtow": 1852
+  },
+  {
+   "sciezka": "gra/obrazki/89ee38f6ab26.webp",
+   "sha": "f2e07ba44b3b53838c34bc59f8b463408af058814a310b6ab90c94b609c4a21b",
+   "bajtow": 3004
+  },
+  {
+   "sciezka": "gra/obrazki/947b2f454432.webp",
+   "sha": "0090c1618dd425d6b20c3d27445ffa05b60f95d181b9848ae587daab934dd32a",
+   "bajtow": 2996
+  },
+  {
+   "sciezka": "gra/obrazki/986e02aca71d.webp",
+   "sha": "bcfeb31c8a99f537eb992d33782965c55e9220b1bb9b7ff8b2646e6c1e4f64b1",
+   "bajtow": 1394
+  },
+  {
+   "sciezka": "gra/obrazki/989b5176e4a1.webp",
+   "sha": "5913efaeec65c048c84d7c4dc93a0a3f315430793c0ce48a2a3d653d8d72e464",
+   "bajtow": 1950
+  },
+  {
+   "sciezka": "gra/obrazki/9a313b752b8b.webp",
+   "sha": "597eb02716e9eb270eaac0fc844c2db7f2b73482bd4325f48be758f8e5ebc5dc",
+   "bajtow": 2938
+  },
+  {
+   "sciezka": "gra/obrazki/9c0a033d5ceb.webp",
+   "sha": "8086d8fba3a91184596143851d8e4e6c07abef17920f5f56dce001e51d8739ae",
+   "bajtow": 3520
+  },
+  {
+   "sciezka": "gra/obrazki/9d211aac5435.webp",
+   "sha": "d5bfe51eb263621723973264b67c5d070d01618c214e7608e72b13dbdc88880f",
+   "bajtow": 1962
+  },
+  {
+   "sciezka": "gra/obrazki/9e01fd9dbb40.webp",
+   "sha": "c15676e0f42d10637eb84316322b93a61e3eecd57b3ed08c750e93e054127067",
+   "bajtow": 2082
+  },
+  {
+   "sciezka": "gra/obrazki/a4d97f94288d.webp",
+   "sha": "f92f2d298d8072ab324ec5418d7aea1cf6e0e9886e5f15de34a24ba521f7a8fc",
+   "bajtow": 1778
+  },
+  {
+   "sciezka": "gra/obrazki/a5665e494ecf.webp",
+   "sha": "3ed8fd560be01f7b2de31a364dc1b1cd5b1ee47a9a8ae579f97b112f7dccd96f",
+   "bajtow": 2594
+  },
+  {
+   "sciezka": "gra/obrazki/a56a5574593a.webp",
+   "sha": "dc91227c2b4d4a93cd7dd86500396fe69ab5f1251e884d2103c837eac2f5cba0",
+   "bajtow": 4832
+  },
+  {
+   "sciezka": "gra/obrazki/ad479906048d.webp",
+   "sha": "82c46133264899c31c95803982f0c83ef92789de4a02fbcd3d5e1156ee95c0ab",
+   "bajtow": 2730
+  },
+  {
+   "sciezka": "gra/obrazki/adb43c8743c7.webp",
+   "sha": "90a0ce448180be5ae3ba759674eb27b88c2b78b18267136cfd80b90e63f8d750",
+   "bajtow": 4972
+  },
+  {
+   "sciezka": "gra/obrazki/ava-eniki.png",
+   "sha": "db24b9972fce968f7b4143fa453266a7e753797ffa462e0bc6bf26a5965e983b",
+   "bajtow": 46364
+  },
+  {
+   "sciezka": "gra/obrazki/ava-europejczyk.png",
+   "sha": "28ba0715be926e2ef1c4190de0b62901cf541dc2afbafa78e5f581874ce490f1",
+   "bajtow": 37688
+  },
+  {
+   "sciezka": "gra/obrazki/ava-ke-trab.png",
+   "sha": "cbc239f43318b907036cabcddca08249eedb7c56652d6fbc36ea39e54d1866fe",
+   "bajtow": 26829
+  },
+  {
+   "sciezka": "gra/obrazki/ava-miazga.png",
+   "sha": "346d38271a99b2088772a47b451eb17b780eaa56981241f4b996e1e09e803239",
+   "bajtow": 45622
+  },
+  {
+   "sciezka": "gra/obrazki/ava-ponczus.png",
+   "sha": "17863f5b7b9b456c0adc43ba6a94e942ff7078b70b6f34fba62574ba401e7dfd",
+   "bajtow": 42197
+  },
+  {
+   "sciezka": "gra/obrazki/b3d16b3de0ab.webp",
+   "sha": "b58e364c0714765ddb88a8b76321e5037b795c459d870aff5cb47bc11467e0f8",
+   "bajtow": 3752
+  },
+  {
+   "sciezka": "gra/obrazki/b536642cd5eb.webp",
+   "sha": "b2b84df7033387d39cf2d1a1702791b9fad1d9428ccf001d463e94e8cc38ef2a",
+   "bajtow": 1924
+  },
+  {
+   "sciezka": "gra/obrazki/b6a728b14b8b.png",
+   "sha": "3221573c244fa5e349cfd8c9ec17cfda1901b1bb34a42478c225a90631304121",
+   "bajtow": 29512
+  },
+  {
+   "sciezka": "gra/obrazki/b9fb8b09ea87.webp",
+   "sha": "bbec08b80f0468414826da8c65495b373e1e4a1796a71e757771c15b2e48bb19",
+   "bajtow": 1218
+  },
+  {
+   "sciezka": "gra/obrazki/bc8735f17d51.webp",
+   "sha": "a5c271050003b40e43e043328a7e165c254fafefc39fe2238a13640ed9154006",
+   "bajtow": 2472
+  },
+  {
+   "sciezka": "gra/obrazki/c23e96e64f3b.webp",
+   "sha": "1853b9cb9da39eb00af3949c4b7cb3a2f06e83c8ec86e93cdc4e3684915e254a",
+   "bajtow": 1884
+  },
+  {
+   "sciezka": "gra/obrazki/ca0230b99bb6.webp",
+   "sha": "7c780d67a9959f2bf40d0409c943adc3852b0e4af642924c961f02b0836284b2",
+   "bajtow": 826
+  },
+  {
+   "sciezka": "gra/obrazki/cfd70f7b77a6.webp",
+   "sha": "c9053ea3399b97e80aa9c64ea3e120a2fc51b419b77c7d5758703892bc5c7add",
+   "bajtow": 1428
+  },
+  {
+   "sciezka": "gra/obrazki/d2ed03874247.webp",
+   "sha": "2cc00b0c2dfa0d35c822401c51c5f6ec312e9f73d78c3ba43b4316cd9070665c",
+   "bajtow": 2166
+  },
+  {
+   "sciezka": "gra/obrazki/d99a6ee7b318.webp",
+   "sha": "b17d92cc7dd7606b7a75095ce96416b70c8e519ec1f279ee7be4ed5221a2af48",
+   "bajtow": 2112
+  },
+  {
+   "sciezka": "gra/obrazki/d9c43f30a1fa.webp",
+   "sha": "ae7ed9d4157b7a89165c461c83214afa6329e662bd4362a5051356d0facb8b06",
+   "bajtow": 2418
+  },
+  {
+   "sciezka": "gra/obrazki/da625bd66599.webp",
+   "sha": "f0b17eaaa935405776935497700a07248254fed5b4b579aa6001281168fb5f59",
+   "bajtow": 1558
+  },
+  {
+   "sciezka": "gra/obrazki/e452af74ed4c.webp",
+   "sha": "37cec29c0c0695098c18586220d4ac6a2ed7fee0b70f044671c9aa892d6ed0f3",
+   "bajtow": 1836
+  },
+  {
+   "sciezka": "gra/obrazki/e7cc40af1a7a.webp",
+   "sha": "57ffc78a1e89589537486e347d3c9efb16a193a7af8d4043690b594d82adfed2",
+   "bajtow": 1882
+  },
+  {
+   "sciezka": "gra/obrazki/ea8295d6fab4.webp",
+   "sha": "021875b3fce03862d09a5cee943d9ae4edbde4dbfb4a8b191715f9caf3687616",
+   "bajtow": 3280
+  },
+  {
+   "sciezka": "gra/obrazki/eb1ee0a9978d.webp",
+   "sha": "89465dba87fdd83473cb456a73906a3a63a34e02af0ee51aa92a978b7422f664",
+   "bajtow": 1900
+  },
+  {
+   "sciezka": "gra/obrazki/edd614e44a4d.webp",
+   "sha": "97a0a5a1add81780deb6a3377b17e07a3029dcc38db34a5c0e57bf32d99b0d81",
+   "bajtow": 1370
+  },
+  {
+   "sciezka": "gra/obrazki/eea9db03ef6b.webp",
+   "sha": "97b91909f87686fdf12c3b3baff83d3d3c64dbc1c576f1ab111917121d1cf147",
+   "bajtow": 2778
+  },
+  {
+   "sciezka": "gra/obrazki/f3c9da594c00.svg",
+   "sha": "29e3a1eae0a66cb16ce77424bd5ae889a2588dbf9c5d89a4cb320727058f7581",
+   "bajtow": 1605
+  },
+  {
+   "sciezka": "gra/obrazki/f450efa7026d.webp",
+   "sha": "6ef1222860ba934b16ee74a3e3ff66360de0da587117f5e885fcf399baec7cdc",
+   "bajtow": 1512
+  },
+  {
+   "sciezka": "gra/obrazki/f72e203052b7.webp",
+   "sha": "a82ebf6f59e2003fec85c8e5f96de0ff5af1d9c8509330bcc45a6c618720e9c0",
+   "bajtow": 2976
+  },
+  {
+   "sciezka": "gra/obrazki/ff0950f99292.webp",
+   "sha": "deb229ff3737889c174ceeba2be875b6f06bef1302e97e549a8d33111e6bc146",
+   "bajtow": 1392
+  },
+  {
+   "sciezka": "gra/obrazki/ikona-akcje.png",
+   "sha": "8d26076cfd3665626ce070bc535ae1eee8ae2a0f100a4aaa9a5e5b02511d893d",
+   "bajtow": 27360
+  },
+  {
+   "sciezka": "gra/obrazki/ikona-energia.png",
+   "sha": "4d5ef0a14654b5076d362714169f4c823ba0aef2d80318830f9ede62b48c3a93",
+   "bajtow": 17350
+  },
+  {
+   "sciezka": "gra/obrazki/ikona-kapital.png",
+   "sha": "4c0340969a6ed0b501f90530320d95544c1efab5680cfaef9c6f2b26836a78e0",
+   "bajtow": 24416
+  },
+  {
+   "sciezka": "gra/obrazki/ikona-sondaz.png",
+   "sha": "656e58b678262781553c5db54010351b6e8470b38ea3121a04f2daf960b3bc20",
+   "bajtow": 18317
+  },
+  {
+   "sciezka": "gra/obrazki/logo-p1612.png",
+   "sha": "106f05053702cab688b8ec9fb1a324ea831b2152d1071a0c5a7e8eccffb7e025",
+   "bajtow": 35843
+  },
+  {
+   "sciezka": "gra/wyglad/desktop.css",
+   "sha": "9d3e792efc13e82fb2b74facfd961f0ec2b32e53e5479a3974116b9414359a34",
+   "bajtow": 8024
+  },
+  {
+   "sciezka": "gra/wyglad/style.css",
+   "sha": "d79784d99bb14360369bf79d85b7552e52a5f07be608287d5005904cc33eaeaa",
+   "bajtow": 83114
+  }
+ ],
+ "exe": {
+  "nazwa": "Mordy Mordeczki.exe",
+  "sha": "3a9a8a362305289141ff81f41a4d48f128ffd69dfcf652ecf0cf09e89fc97e73",
+  "bajtow": 19298366,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.4/Mordy.Mordeczki.exe"
+ }
+}

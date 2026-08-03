@@ -1,0 +1,154 @@
+/* Styl warstwy desktopowej. Osobny plik, bo style.css jest generowany
+   z pliku gry i nadpisywany przy każdej nowej wersji.
+   Zmienne (--acc, --p2, --line...) pochodzą ze stylu gry. */
+
+/* ══════════ RUCH ══════════
+   Gra przerysowuje cały ekran przy każdej zmianie, więc animacje wejścia muszą
+   być krótkie — mają dać wrażenie płynności, a nie kazać czekać. Wszystko
+   wyłącza się, gdy system prosi o ograniczenie ruchu. */
+
+@keyframes wejscie { from { opacity: 0; transform: translateY(7px) } }
+@keyframes wejscieBok { from { opacity: 0; transform: translateX(-8px) } }
+@keyframes pojaw { from { opacity: 0 } }
+@keyframes oknoWjazd { from { opacity: 0; transform: translateY(14px) scale(.985) } }
+
+/* Całe karty i panele celowo NIE mają animacji wejścia: gra przerysowuje ekran
+   przy każdym kliknięciu, więc przy zmianie zakładki wjeżdżałby cały widok naraz
+   i to męczyło. Ruszają się tylko drobne kafle w środku. */
+
+.actgrid > .act, .lawgrid > .law, .resgrid > .resort, .agrid > .agent {
+  animation: wejscie .24s cubic-bezier(.2, .8, .3, 1) both;
+}
+.actgrid > .act:nth-child(2), .lawgrid > .law:nth-child(2), .resgrid > .resort:nth-child(2) { animation-delay: .03s }
+.actgrid > .act:nth-child(3), .lawgrid > .law:nth-child(3), .resgrid > .resort:nth-child(3) { animation-delay: .06s }
+.actgrid > .act:nth-child(4), .lawgrid > .law:nth-child(4), .resgrid > .resort:nth-child(4) { animation-delay: .09s }
+.actgrid > .act:nth-child(n+5), .lawgrid > .law:nth-child(n+5), .resgrid > .resort:nth-child(n+5) { animation-delay: .11s }
+
+.runoff, .campbar, .spentbar { animation: wejscieBok .28s cubic-bezier(.2, .8, .3, 1) both }
+.veil { animation: pojaw .16s ease both }
+.veil .mdl { animation: oknoWjazd .24s cubic-bezier(.2, .85, .3, 1) both }
+
+/* elementy, które reagują na kursor, robią to jednym rytmem */
+.act, .law, .resort, .lchip, .sterp, .cats button, .fx, .btn, .modecard, .opt {
+  transition: transform .15s cubic-bezier(.2, .8, .3, 1), box-shadow .15s ease,
+              border-color .15s ease, background .15s ease, color .15s ease, opacity .15s ease;
+}
+.btn:hover:not([disabled]) { transform: translateY(-1px) }
+.btn:active:not([disabled]) { transform: translateY(1px); transition-duration: .05s }
+.opt:hover:not([disabled]), .lchip:hover:not([disabled]) { transform: translateX(2px) }
+.resort:active:not([disabled]), .law:active:not([disabled]), .act:active:not(:disabled) {
+  transform: translateY(0) scale(.995); transition-duration: .05s;
+}
+.crest, .avaimg { transition: transform .18s cubic-bezier(.2, .8, .3, 1), box-shadow .18s ease }
+.resort:hover .avaimg, .lv:hover .crest { transform: scale(1.08) }
+
+/* ---- gra we dwoje ---- */
+#mpBar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9500;
+  display: flex; align-items: center; gap: 12px;
+  padding: 7px 16px; font-size: 13px;
+  background: rgba(12, 19, 13, .96); border-bottom: 1px solid var(--line, #27392a);
+  backdrop-filter: blur(8px); box-shadow: 0 6px 18px -12px #000;
+}
+#mpBar.twoja { border-bottom-color: var(--pos, #7fbe69); box-shadow: 0 0 24px -14px var(--pos, #7fbe69) }
+#mpBar.obca  { border-bottom-color: var(--dim2, #73846f); opacity: .92 }
+#mpBar b { color: var(--tx, #eef2e7) }
+#mpBar.obca b { color: var(--dim, #a3b49e) }
+#mpBar .mpkr {
+  font-family: var(--m, monospace); font-size: 9.5px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--acc, #d9ab45);
+  border: 1px solid var(--acc2, #8f7527); border-radius: 999px; padding: 2px 9px;
+}
+#mpBar .mpinfo { color: var(--dim, #a3b49e); font-size: 12.5px }
+#mpBar button { margin-left: auto }
+#mpBar button + button { margin-left: 6px }
+/* pasek zasłania panel gry, więc spycha całą stronę niżej */
+body:has(#mpBar) .wrap { padding-top: 40px }
+
+.mpkod { display: flex; gap: 8px; align-items: center; max-width: 640px; margin-top: 12px }
+.mpkod input { font-family: var(--m, monospace); font-size: 13px }
+.modecard.mpcard { border-color: var(--info, #5f9bd0) }
+.modecard.mpcard .mtag { color: var(--info, #5f9bd0) }
+
+/* sala sejmowa: miejsca zajmowane falą od lewej, kursor wyławia pojedyncze */
+@keyframes zajmij { from { opacity: 0; transform: scale(.4) } }
+.hemi .seat {
+  animation: zajmij .28s cubic-bezier(.2, .9, .3, 1) both;
+  animation-delay: var(--sd, 0ms);
+  transform-box: fill-box; transform-origin: center;
+  transition: opacity .15s ease;
+}
+.hemi:hover .seat { opacity: .3 }
+.hemi .seat:hover { opacity: 1 }
+.hemi:hover .seat.mine { opacity: 1 }
+.hemi .seat:hover circle:nth-child(2) { stroke: #fff; stroke-width: 2.6 }
+
+/* paski i liczby dochodzą do nowej wartości płynnie */
+.trk i, .mix i, .cbar i, .meter i { transition: width .45s cubic-bezier(.2, .8, .3, 1) }
+.rs b, .ubox b { transition: color .3s ease }
+
+/* Noc wyborcza przerysowuje ekran kilka razy na sekundę — płynne paski i wjazdy
+   nie mają wtedy szans dojść do końca i widać samo migotanie. */
+body.licze .trk i, body.licze .mix i, body.licze .cbar i, body.licze .meter i { transition: none }
+body.licze .act, body.licze .law, body.licze .resort, body.licze .agent,
+body.licze .hemi .seat, body.licze .runoff, body.licze .campbar { animation: none }
+
+@media (prefers-reduced-motion: reduce) {
+  .act, .law, .resort, .agent, .hemi .seat,
+  .runoff, .campbar, .spentbar, .veil, .veil .mdl { animation: none !important }
+  .trk i, .mix i, .cbar i, .meter i { transition: none }
+  .btn:hover:not([disabled]), .opt:hover:not([disabled]), .lchip:hover:not([disabled]) { transform: none }
+}
+
+/* Prawy dolny róg: na górze siedzi panel gry, po lewej karty boczne. */
+#dtBar {
+  position: fixed; bottom: 12px; right: 14px; z-index: 9000;
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px; border-radius: 9px;
+  background: rgba(22, 33, 23, .82); border: 1px solid var(--line, #27392a);
+  box-shadow: 0 8px 22px -12px rgba(0, 0, 0, .8);
+  backdrop-filter: blur(7px); opacity: .35; transition: opacity .18s;
+}
+#dtBar:hover { opacity: 1; }
+#dtBar button {
+  padding: 5px 10px; border-radius: 6px; font-size: 12px; line-height: 1.1;
+  color: var(--dim, #a3b49e); background: transparent; border: 1px solid transparent;
+}
+#dtBar button:hover { color: var(--tx, #eef2e7); background: rgba(217, 171, 69, .13); border-color: var(--line2, #3e5a42); }
+#dtBar .sep { width: 1px; height: 16px; margin: 0 3px; background: var(--line2, #3e5a42); }
+
+#dtToast {
+  position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+  z-index: 9100; display: flex; flex-direction: column; gap: 7px; align-items: center;
+  pointer-events: none;
+}
+.dtT {
+  padding: 9px 16px; border-radius: 8px; font-size: 13.5px;
+  color: var(--tx, #eef2e7); background: rgba(29, 43, 30, .96);
+  border: 1px solid var(--line2, #3e5a42); border-left: 3px solid var(--pos, #7fbe69);
+  box-shadow: 0 14px 34px -18px rgba(0, 0, 0, .9);
+  transition: opacity .4s, transform .4s;
+}
+.dtT.bad { border-left-color: var(--neg, #d5544a); }
+.dtT.out { opacity: 0; transform: translateY(7px); }
+
+#dtResume {
+  position: fixed; right: 18px; bottom: 62px; z-index: 9000;   /* nad paskiem narzędzi */
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 15px; border-radius: 11px; max-width: min(440px, calc(100vw - 36px));
+  background: rgba(29, 43, 30, .97); border: 1px solid var(--line2, #3e5a42);
+  border-top: 2px solid var(--acc, #d9ab45);
+  box-shadow: 0 26px 60px -26px rgba(0, 0, 0, .9);
+}
+#dtResume div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+#dtResume b { font-size: 14px; color: var(--tx, #eef2e7); }
+#dtResume span { font-size: 12px; color: var(--dim2, #73846f); }
+#dtResume button {
+  flex: none; padding: 7px 13px; border-radius: 7px; font-size: 12.5px; font-weight: 600;
+  color: #1a1408; background: linear-gradient(180deg, #f7e3aa, var(--acc, #d9ab45));
+}
+#dtResume button.ghost {
+  color: var(--dim, #a3b49e); background: transparent; border: 1px solid var(--line2, #3e5a42);
+  font-weight: 500;
+}
+#dtResume button:hover { filter: brightness(1.07); }
