@@ -3367,7 +3367,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.6';
+let WERSJA='1.1.7';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3378,6 +3378,11 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.7':{data:'4 sierpnia 2026', zmiany:[
+   'Launcher zakłada grze własny folder zamiast wysypywać pliki tam, gdzie sam leży.',
+   'Gra i jej biblioteki schodzą zawsze razem — koniec z błędem o brakującym python314.dll.',
+   'Gra nie rozpakowuje się już przy każdym starcie: wstaje szybciej i rzadziej wkurza antywirusy.',
+ ]},
  '1.1.6':{data:'4 sierpnia 2026', zmiany:[
    'Zapisy w sześciu miejscach: widzisz partię, kadencję, mandaty i datę każdej rozgrywki. Skrót Ctrl+Z.',
    'Autozapis chodzi osobno i nie zajmuje żadnego z tych miejsc.',
