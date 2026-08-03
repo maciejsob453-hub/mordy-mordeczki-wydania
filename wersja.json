@@ -1,6 +1,6 @@
 {
  "wersja": "1.1.7",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/a808df15b4d4b6ec5d48c40e2a94f3fd0a276775",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -520,10 +520,15 @@
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.7/Mordy.Mordeczki.exe"
  },
  "runtime": {
-  "sha": "b8be3beab881ae5e9e806f814f6726f6fb6130aa1a4dfa1a68fe8de4f47ddecf",
+  "sha": "0dee9eba58a8740b9b2ef40fbac01d04e056d0b8cec9ef9a5e24b7c62488fec7",
   "bajtow": 13704509,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.7/biblioteki-1.1.7.zip",
   "znacznik": "76e405bfcd6d2a3d6566aac68586321675c59c41db9de44dce3bee4787ea6361"
  },
- "commit": "a808df15b4d4b6ec5d48c40e2a94f3fd0a276775"
+ "launcher": {
+  "nazwa": "Mordy Mordeczki Launcher.exe",
+  "sha": "368bb8d606782141486baffb00919fa3ba649f6b47f6f4cb4b916820d806832c",
+  "bajtow": 12107330,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.7/Mordy.Mordeczki.Launcher.exe"
+ }
 }
