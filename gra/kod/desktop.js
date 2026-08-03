@@ -21,8 +21,9 @@ const G = () => (window.__game ? window.__game.G : null);
 const bar = document.createElement("div");
 bar.id = "dtBar";
 bar.innerHTML =
-  '<button data-a="save" title="Zapisz do pliku (Ctrl+S)">Zapisz</button>' +
-  '<button data-a="load" title="Wczytaj z pliku (Ctrl+O)">Wczytaj</button>' +
+  '<button data-a="sloty" title="Zapisy (Ctrl+Z)">Zapisy</button>' +
+  '<button data-a="save" title="Zapisz do pliku (Ctrl+S)">Do pliku</button>' +
+  '<button data-a="load" title="Wczytaj z pliku (Ctrl+O)">Z pliku</button>' +
   '<span class="sep"></span>' +
   '<button data-a="zoomout" title="Pomniejsz (Ctrl+-)">−</button>' +
   '<button data-a="zoomin" title="Powiększ (Ctrl++)">+</button>' +
@@ -62,6 +63,93 @@ function apply(raw) {
   } catch (e) {
     toast("Nie udało się wczytać: " + e.message, "bad");
   }
+}
+
+/* ---------- zapisy w slotach ---------- */
+
+/* Opis, po którym gracz pozna zapis na liście: kto, kiedy i jak mu idzie. */
+function opisStanu() {
+  const g = G();
+  if (!g) return {};
+  const p = g.p[g.me] || {};
+  return {
+    party: p.ab || "", partyName: p.n || "",
+    lead: (window.__game.leads ? window.__game.leads(p).join(" / ") : p.lead) || "",
+    term: g.term, week: g.week, seats: p.seats || 0, mem: p.mem || 0,
+  };
+}
+
+async function otworzSloty() {
+  const a = api();
+  if (!a) return toast("Zapisy w slotach działają tylko w aplikacji.", "bad");
+  const sloty = await a.sloty();
+  const graTrwa = !!G();
+
+  const stare = document.getElementById("dtSloty");
+  if (stare) stare.remove();
+
+  const box = document.createElement("div");
+  box.id = "dtSloty";
+  box.innerHTML =
+    '<div class="dtsOkno">' +
+    '<button class="dtsX" title="Zamknij">×</button>' +
+    '<div class="dtsH"><span>Zapisy gry</span><h2>Twoje rozgrywki</h2></div>' +
+    '<div class="dtsLista">' +
+    sloty.map((s) => {
+      if (s.pusty) {
+        return '<div class="dtsSlot pusty" data-nr="' + s.nr + '">' +
+          '<div class="dtsNr">' + s.nr + "</div>" +
+          '<div class="dtsOpis"><b>Wolne miejsce</b><span>' +
+          (graTrwa ? "Kliknij, żeby zapisać tu grę" : "Nic tu jeszcze nie ma") + "</span></div>" +
+          (graTrwa ? '<button class="dtsBtn" data-akcja="zapisz" data-nr="' + s.nr + '">Zapisz</button>' : "") +
+          "</div>";
+      }
+      return '<div class="dtsSlot" data-nr="' + s.nr + '">' +
+        '<div class="dtsNr">' + s.nr + "</div>" +
+        '<div class="dtsOpis"><b>' + (s.partyName || s.party) + "</b>" +
+        "<span>" + s.lead + " · kadencja " + s.term + ", tydzień " + s.week +
+        " · " + s.seats + " mand. · " + s.mem + " osób</span>" +
+        '<em>' + s.when + "</em></div>" +
+        '<div class="dtsAkcje">' +
+        '<button class="dtsBtn" data-akcja="wczytaj" data-nr="' + s.nr + '">Wczytaj</button>' +
+        (graTrwa ? '<button class="dtsBtn g" data-akcja="zapisz" data-nr="' + s.nr + '">Nadpisz</button>' : "") +
+        '<button class="dtsBtn x" data-akcja="usun" data-nr="' + s.nr + '">Usuń</button>' +
+        "</div></div>";
+    }).join("") +
+    "</div>" +
+    '<div class="dtsStopka">Autozapis chodzi osobno, co 20 sekund, i nie zajmuje żadnego z tych miejsc.</div>' +
+    "</div>";
+  document.body.appendChild(box);
+
+  const zamknij = () => box.remove();
+  box.querySelector(".dtsX").onclick = zamknij;
+  box.onclick = (e) => { if (e.target === box) zamknij(); };
+
+  box.querySelectorAll("[data-akcja]").forEach((b) => {
+    b.onclick = async (e) => {
+      e.stopPropagation();
+      const nr = +b.dataset.nr, akcja = b.dataset.akcja;
+      if (akcja === "zapisz") {
+        const c = code();
+        if (!c) return toast("Nie ma czego zapisywać — gra jeszcze nie ruszyła.", "bad");
+        await a.slot_zapisz(nr, c, opisStanu());
+        toast("<b>Zapisano</b> w miejscu " + nr + ".");
+        zamknij(); otworzSloty();
+      } else if (akcja === "wczytaj") {
+        const c = await a.slot_wczytaj(nr);
+        if (!c) return toast("To miejsce jest puste.", "bad");
+        zamknij(); apply(c);
+      } else if (akcja === "usun") {
+        await a.slot_usun(nr);
+        toast("Miejsce " + nr + " wyczyszczone.");
+        zamknij(); otworzSloty();
+      }
+    };
+  });
+  // kliknięcie w puste miejsce zapisuje bez celowania w mały przycisk
+  box.querySelectorAll(".dtsSlot.pusty").forEach((s) => {
+    s.onclick = () => { const b = s.querySelector('[data-akcja="zapisz"]'); if (b) b.click(); };
+  });
 }
 
 async function saveToFile() {
@@ -206,7 +294,8 @@ bar.addEventListener("click", (e) => {
   const b = e.target.closest("button");
   if (!b) return;
   const act = b.dataset.a;
-  if (act === "save") saveToFile();
+  if (act === "sloty") otworzSloty();
+  else if (act === "save") saveToFile();
   else if (act === "load") loadFromFile();
   else if (act === "zoomin") setZoom(zoom + 0.1);
   else if (act === "zoomout") setZoom(zoom - 0.1);
@@ -225,6 +314,7 @@ window.addEventListener("keydown", (e) => {
   const k = e.key.toLowerCase();
   if (k === "s") { e.preventDefault(); saveToFile(); }
   else if (k === "o") { e.preventDefault(); loadFromFile(); }
+  else if (k === "z") { e.preventDefault(); otworzSloty(); }
   else if (k === "+" || k === "=") { e.preventDefault(); setZoom(zoom + 0.1); }
   else if (k === "-") { e.preventDefault(); setZoom(zoom - 0.1); }
   else if (k === "0") { e.preventDefault(); setZoom(1); }

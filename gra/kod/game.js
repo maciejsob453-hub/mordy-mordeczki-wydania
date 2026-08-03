@@ -3367,7 +3367,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.5';
+let WERSJA='1.1.6';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3378,6 +3378,12 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.6':{data:'4 sierpnia 2026', zmiany:[
+   'Zapisy w sześciu miejscach: widzisz partię, kadencję, mandaty i datę każdej rozgrywki. Skrót Ctrl+Z.',
+   'Autozapis chodzi osobno i nie zajmuje żadnego z tych miejsc.',
+   'Launcher pobiera pliki ośmioma połączeniami naraz — aktualizacja schodzi w sekundy zamiast w minutę.',
+   'Nowy wygląd launchera: własny pasek postępu i widać, który plik akurat leci.',
+ ]},
  '1.1.4':{data:'3 sierpnia 2026', zmiany:[
    'Nabór to teraz układanka: składasz ogłoszenie z trzech kawałków, a liczy się dopasowanie do ludzi z kanału. Koniec z pisaniem w puste pole.',
    'Ustawy nie przechodzą już same z siebie — opozycja przestała firmować sukcesy rządu.',
