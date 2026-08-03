@@ -1,6 +1,6 @@
 {
  "wersja": "1.1.6",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/9113fe2cf1a21b286c56993e527d8f4457c0bf1e",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -515,9 +515,14 @@
  ],
  "exe": {
   "nazwa": "Mordy Mordeczki.exe",
-  "sha": "6d682dbd2649393f15969eae724ce45e0daa43053ea78ec3e1b731f55849899a",
-  "bajtow": 19299785,
+  "sha": "727185c3d4d241bab7979862b1fe606208a52fbce4ab71662ab5bea4e96ab521",
+  "bajtow": 6078101,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.6/Mordy.Mordeczki.exe"
  },
- "commit": "9113fe2cf1a21b286c56993e527d8f4457c0bf1e"
+ "runtime": {
+  "sha": "409ec6134f81329c7e0883e0572760357250f79c203eedad198808dad311538e",
+  "bajtow": 13704854,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.6/biblioteki-1.1.6.zip",
+  "znacznik": "a003f6d7316834a9a9ead9a22511889ae422cba8948f83b240b78c316b26b478"
+ }
 }
