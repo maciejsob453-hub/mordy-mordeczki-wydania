@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.4",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/66e7bd657963430d34a7bd56afd0e225de32c5d4",
+ "wersja": "1.1.5",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,7 +14,7 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "37e2506e62df161a7046a3f580ffc37ac014c5d77c82f5d778b6afa310c4f2c7",
+   "sha": "2eb455b2a9923a36512d8a98dd4f12024b30bad8b5afd7529d68a807fd2ddf1f",
    "bajtow": 488600
   },
   {
@@ -515,9 +515,8 @@
  ],
  "exe": {
   "nazwa": "Mordy Mordeczki.exe",
-  "sha": "3a9a8a362305289141ff81f41a4d48f128ffd69dfcf652ecf0cf09e89fc97e73",
-  "bajtow": 19298366,
-  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.4/Mordy.Mordeczki.exe"
- },
- "commit": "66e7bd657963430d34a7bd56afd0e225de32c5d4"
+  "sha": "f56cfc6f8fcda9b9daae153e99e8f428ddb80ec4682c83206ab192ae9d7c0de8",
+  "bajtow": 19298314,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.5/Mordy.Mordeczki.exe"
+ }
 }
