@@ -1134,8 +1134,8 @@ const A=[
   REG.forEach(r=>o.pres[r.id]=cl(o.pres[r.id]*.72));
   M(p,7);XP(10);
   return `<b>Sabotaż udany.</b> ${o.ab} traci sławę, aktywność i jedną trzecią obecności we wszystkich okręgach. Nikt nie wie, że to ty (ryzyko było ${Math.round(risk*100)}%).`}},
-{id:'odp',cat:'spe',n:'Regeneracja lidera',ap:1,kp:70,en:-36,
- d:'Lider znika na tydzień: wyjazd, cisza, brak odpowiedzi na DM. Wraca z energią, ale tydzień bez niego kosztuje partię majątek.',
+{id:'odp',cat:'spe',n:'Regeneracja lidera',ap:1,kp:0,en:-36,tydz2:1,
+ d:'Lider znika na chwilę i wraca z energią. Nic nie kosztuje, ale dwa razy w tygodniu to maksimum — po trzecim zniknięciu nikt by go już nie szukał.',
  f:(p)=>{p.act=cl(p.act-3);p.uni=cl(p.uni+2);return `${p.lead} odpoczął. <b>Energia +36</b>.`}},
 {id:'stery',cat:'spe',n:'Układ sterów',ap:1,kp:26,en:12,term1:1,
  d:'Ustalasz, ilu ludzi prowadzi partię: jeden, dwóch albo trzech, i kto to jest. Statystyki oraz cechy wrodzone liczą się wtedy jako średnia całego składu sterów. Raz na kadencję.',
@@ -1521,7 +1521,7 @@ function endWeek(){
   aiRekonstrukcja();       // a niewygodnego koalicjanta potrafi wyrzucić
   aiOpozycja();            // opozycja rozlicza rząd bez czekania na gracza
   histPush();SFX.week();
-  G.catUsed={};G.lastCharge=null;   // ostatnia decyzja przechodzi na kolejny tydzień, żeby kombinacje w ogóle działały
+  G.catUsed={};G.used2={};G.lastCharge=null;   // ostatnia decyzja przechodzi na kolejny tydzień, żeby kombinacje w ogóle działały
   // nastroje serwera dryfują tydzień po tygodniu, nikt nie wie, dokąd
   SID.forEach(g=>{G.mood[g]=cl(G.mood[g]+R(-.042,.042)+(1-G.mood[g])*.16,.76,1.26)});
   if(ch(.13)){const a=pick(SID);let b=pick(SID);while(b===a)b=pick(SID);
@@ -1615,14 +1615,9 @@ function drift(){
       }
     }
     // czasem zaplecze rezygnuje na dobre i wraca do bezpartyjnych, segment wg kompetencji
-    if(p.bench.length&&p.mem>1&&ch(cl(.05-(p.uni-50)/1400,.01,.09))){
-      const who=pick(p.bench), komp=L(who).komp;
-      const seg=komp>=80?'eli':'int';   // ktoś z twarzą i imieniem nigdy nie jest zwykłym serwerowiczem
-      p.comp[seg]>0?p.comp[seg]--:(p.comp.int>0?p.comp.int--:p.comp.eli--);
-      p.mem--;p.bench=p.bench.filter(x=>x!==who);
-      G.free[seg]=(G.free[seg]||0)+1;
-      if(k===G.me)say(`<b>${who} odchodzi z zaplecza</b> i wraca do bezpartyjnych. Trafi do puli ${sn(seg)}, ktoś inny może go jeszcze zwerbować.`,'bad');
-    }
+    /* Ludzie z zaplecza nie znikają już w powietrzu. Odejście bez powodu i bez
+       śladu w decyzjach było tylko podatkiem od pecha — kto ma odejść, ten odchodzi
+       do konkurencji (patrz aiTransfery), i wtedy widać dokąd i dlaczego. */
     // molochy: przy dużym, ustabilizowanym poparciu trzeba czasem poświęcić ludzi dla wizerunku, elita zostaje
     if(p.mem>150){
       const nadmiar=cl((p.mem-150)/300,0,1);
@@ -3812,7 +3807,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.23';
+let WERSJA='1.1.24';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3823,6 +3818,16 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.24':{data:'5 sierpnia 2026', zmiany:[
+   'Naprawiony błąd: ustawa z poprzedniej kadencji zostawała na biurku prezydenta i naliczała karę za zwłokę w sprawie, której nigdy nie widziałeś. Teraz projekt przepada wraz z końcem kadencji.',
+   'Zmęczenie władzą psuje też relacje — im dłużej rządzisz, tym gorzej reszta sceny na ciebie patrzy.',
+   'Składając rząd bez kogoś, kto ma mandaty, obrażasz go proporcjonalnie do jego siły. Wcześniej nikomu to nie przeszkadzało.',
+   'Ludzie z zaplecza nie znikają już bez śladu do bezpartyjnych. Odejść mogą do konkurencji — i wtedy widać dokąd.',
+   'Regeneracja lidera znów za darmo, ale najwyżej dwa razy w tygodniu.',
+   'Filtry decyzji zgadzają się z tym, co decyzja naprawdę robi — zniknęła jedność tam, gdzie jej już nie ma.',
+   'Wykres kondycji partii mniejszy, podpisy osi przestały na siebie zachodzić.',
+ ]},
+ 
  '1.1.23':{data:'5 sierpnia 2026', zmiany:[
    'Inflacja: im większy zapas kapitału trzymasz w kasie, tym drożej wychodzi każda decyzja. Przy grubym worku starczy na jedną akcję w tygodniu — kapitał ma pracować, nie leżeć.',
    'Jedności nie kupisz już żadną decyzją. Zostają debaty, a te niosą ze sobą kontrowersję.',
@@ -4596,11 +4601,11 @@ const AFX={
  wiec:['fame','pres'], kanwas:['pres'], spot:['fame','pres'], debata:['fame','risk'],
  luz:['pret','fame'], konsult:['pret','ctr'], werb:['ludzie','rel','risk'], przekw:['ludzie','cred'], kampania_prm:['ludzie','cred','uni'],
  memy:['fame','ctr'], manifest:['fame','cred','pres'],
- rekr:['ludzie'], trening:['lider'], szkol:['uni','lider'], statut:['uni','cred'],
+ rekr:['ludzie'], trening:['lider'], szkol:['lider','ludzie'], statut:['cred','prog'],
  czyst:['uni','ludzie','ctr'], zjazd:['uni','fame','ludzie'],
  wywiad:['fame','cred'], kulisy:['rel'], przepr:['rel','ctr'],
  podkup:['ludzie','ctr','risk'], admin:['ctr','risk'],
- zwrot:['prog'], nisza:['prog','uni'], otw:['prog','ludzie'], chlodzenie:['ctr','uni'], depret:['pret','prog'],
+ zwrot:['prog'], nisza:['prog','ludzie'], otw:['prog','ludzie'], chlodzenie:['ctr','pret'], depret:['pret','prog'],
  ustawa:['cred','fame'], oredzie:['fame','pres','ludzie'],
  dymisja:['rel','fame','risk'], zmianaMin:['rel','ctr'], rozwiaz:['risk','ctr'],
  wotum:['risk','fame'], oredzieP:['fame','cred','pres','ludzie'],
@@ -4636,13 +4641,16 @@ function actCards(list,fx){
     const usedT=(a.term1&&G.useTerm[a.id]);
     const noShame=a.shame&&!(G.shame&&G.shame>G.week);
     const catFull=a.cat!=='spe'&&(G.catUsed[a.cat]||0)>=1;
+    // decyzje z limitem tygodniowym (regeneracja): dwa razy i koniec
+    const limT=!!a.tydz2&&((G.used2&&G.used2[a.id])||0)>=2;
     const kpC=Math.round(a.kp*sizeF(me()).kp*inflacja());   // cena z uwzględnieniem inflacji
-    const ok=G.ap>=a.ap&&G.kp>=kpC&&(a.en<0||G.en>=a.en)&&!done&&!usedT&&!catFull&&!noShame&&!(a.id==='rekr'&&G.recCd>0);
+    const ok=G.ap>=a.ap&&G.kp>=kpC&&(a.en<0||G.en>=a.en)&&!done&&!usedT&&!limT&&!catFull&&!noShame&&!(a.id==='rekr'&&G.recCd>0);
     const col=CATCOL[a.cat]||'var(--line2)';
     const cb=G.lastAct&&COMBO.find(c=>c.a===G.lastAct&&c.b===a.id);
     const katN=(CATS.find(x=>x[0]===a.cat)||['',''])[1]||'Ta kategoria';
     const blok=done?'wykorzystane':usedT?'zużyte w tej kadencji'
       // blokuje kategoria, nie ta jedna decyzja — bez tego wygląda to na zepsuty przycisk
+      :limT?'wykorzystane dwa razy w tym tygodniu'
       :catFull?`nie ta decyzja — cała kategoria ${katN} zamknięta do przyszłego tygodnia`
       :noShame?'dostępne tylko tuż po wpadce':(a.id==='rekr'&&G.recCd>0)?`nabór wraca za ${G.recCd} ${pl(G.recCd,'tydzień','tygodnie','tygodni')}`
       :G.ap<a.ap?'za mało akcji':G.kp<kpC?'za mało kapitału':(a.en>0&&G.en<a.en)?'za mało energii':'';
@@ -4969,6 +4977,7 @@ function fire(a,t,r,s,tm){
   const limitStad=!!a.term1&&!G.useTerm[a.id], razStad=!!a.once&&!G.once[a.id];
   if(a.once)G.once[a.id]=1;
   if(a.term1)G.useTerm[a.id]=1;
+  if(a.tydz2){if(!G.used2)G.used2={};G.used2[a.id]=(G.used2[a.id]||0)+1}
   const f=fat(a.id);G.used[a.id]=(G.used[a.id]||0)+1;
   // limity zapisujemy razem z kosztem, żeby rezygnacja w oknie cofnęła jedno i drugie
   G.lastCharge={ap:a.ap,kp:Math.round(a.kp*kpMul),en:(a.en>0?a.en*enMul:a.en),id:a.id,cat:a.cat,
@@ -8053,6 +8062,17 @@ function tryGov(){
     `<p>Umowa kosztowałaby <b>${koszt}</b> kapitału, a masz <b>${Math.round(G.kp)}</b>.
      Zejdź z dopłatą albo zbierz więcej.</p>`,[{l:'Rozumiem',f:close}]);
   G.kp-=koszt;
+  /* Kto miał mandaty i nie dostał nic, ten to zapamięta — tym mocniej,
+     im więcej wnosił. Wcześniej można było ułożyć rząd i nikt się nie obrażał. */
+  const pominieci=alive().filter(k=>k!==G.me&&!govSel.includes(k)&&G.p[k].seats>0);
+  pominieci.forEach(k=>{
+    const waga=G.p[k].seats/Math.max(1,TOTAL_SEATS)*100;
+    const uraza=Math.round(cl(6+waga*1.1,4,26));
+    G.rel[k][G.me]=cl(G.rel[k][G.me]-uraza,-100,100);
+    G.rel[G.me][k]=cl(G.rel[G.me][k]-Math.round(uraza*.4),-100,100);
+  });
+  if(pominieci.length)say(`<b>${pominieci.length} ${pl(pominieci.length,'partia została','partie zostały','partii zostało')} poza rządem.</b> `
+    +`Najbardziej obrażeni: ${pominieci.slice().sort((a,b)=>G.p[b].seats-G.p[a].seats).slice(0,3).map(k=>G.p[k].ab).join(', ')}.`,'bad');
   const team=[G.me,...govSel];
   const pm=team.filter(k=>!pmBlocked(k)).sort((a,b)=>kingScore(b)-kingScore(a))[0]
     ||team.slice().sort((a,b)=>kingScore(b)-kingScore(a))[0];
@@ -8432,6 +8452,15 @@ function naliczZnuzenie(){
     if(hasHeg(k)&&d>0)d*=1.25;
     G.znuz[k]=cl((G.znuz[k]||0)+d,0,BAL.znuzenieSufit);
   });
+  /* Im dłużej ktoś rządzi, tym bardziej reszta ma go dość — nie tylko w sondażu,
+     ale i przy stole. Relacje osypują się tym szybciej, im większe zmęczenie. */
+  alive().forEach(k=>{
+    const z=G.znuz[k]||0;
+    if(z<18)return;
+    const spadek=z/26;
+    alive().forEach(x=>{if(x===k)return;
+      G.rel[x][k]=cl(G.rel[x][k]-spadek,-100,100)});
+  });
   const moje=G.znuz[G.me]||0;
   if(moje>=48&&(g&&g.parties.includes(G.me)))
     say(`<b>Serwer ma cię dość.</b> Rządzisz tak długo, że zmęczenie władzą zjada ci ${Math.round(moje/2.9)}% poparcia. Kadencja w opozycji by je zmyła.`,'bad');
@@ -8490,6 +8519,14 @@ function demografiaSerwera(){
   return d;
 }
 function startTerm(){
+  /* Zasada dyskontynuacji: projekt, którego stary sejm nie dokończył, przepada
+     razem z kadencją. Bez tego ustawa wisiała na biurku przez wybory, a prezydent
+     dostawał karę za zwłokę w sprawie, której nigdy nie widział. */
+  if(G.lawPend){
+    const zal=lawById(G.lawPend.id);
+    G.lawPend=null;
+    if(zal)say(`<b>${zal.n} przepada wraz z końcem kadencji.</b> Nowy sejm zaczyna z czystym biurkiem.`,'bad');
+  }
   memberFlow(); rotateBench();
   {const d=demografiaSerwera();
    if(d>0)say(`<b>Serwer rośnie.</b> Przez kadencję dołączyło ${d} ${pl(d,'osoba','osoby','osób')}.`,'good');
