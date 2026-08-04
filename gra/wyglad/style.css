@@ -1199,3 +1199,8 @@ table.t tr.me td:first-child{box-shadow:inset 3px 0 0 var(--acc)}
 .krebox{border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:var(--r2);
   background:var(--p1);padding:11px 13px;margin-bottom:10px}
 .krehd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+
+/* resort bez ministra, gdy premier ma kogo posadzic - ma sie rzucac w oczy */
+.resort.wolne{border-color:var(--neg);box-shadow:0 0 0 1px rgba(213,84,74,.35) inset;
+  animation:pulsRes 1.8s ease-in-out infinite}
+@keyframes pulsRes{0%,100%{border-color:var(--neg)}50%{border-color:rgba(213,84,74,.45)}}

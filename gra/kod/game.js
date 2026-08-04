@@ -416,7 +416,8 @@ const isLead=(p,n)=>leads(p).includes(n);
 const freeTot=()=>G.free.eli+G.free.int+G.free.ser;
 function enGain(){
   const p=me();
-  return Math.max(0, Math.round((BAL.energiaBaza+lead(G.me).wytrz/3.1+(p.uni-42)/4.4)*10)/10);
+  const bonusZagadki=(G.law&&G.law.zagadki)?4:0;   // cotygodniowe zagadki trzymają serwer w ruchu
+  return Math.max(0, Math.round((BAL.energiaBaza+lead(G.me).wytrz/3.1+(p.uni-42)/4.4+bonusZagadki)*10)/10);
 }
 const KING='Mordeczka';
 const MIES=['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
@@ -510,7 +511,8 @@ function shown(k,pct){ // wartość pokazywana w sondażu, nie prawdziwa
      przy dwóch procentach nikt nie pomyli się o pięć punktów, bo nie ma o co.
      Wcześniej szum był stały i mała partia oglądała u siebie okrągłe zero,
      mając realne 2,4% — wyglądało to jak zepsuta gra, a nie jak sondaż. */
-  const skala=cl(Math.sqrt(Math.max(0,pct)*Math.max(0,100-pct))/43.3,.18,1.25);
+  let skala=cl(Math.sqrt(Math.max(0,pct)*Math.max(0,100-pct))/43.3,.18,1.25);
+  if(G.law&&G.law.media)skala*=.6;   // ustawa medialna: sondaże robione rzetelniej, mniejszy błąd
   const wynik=pct+((G.noise&&G.noise[k])||0)*skala;
   return Math.max(pct*.35,wynik);   // realne poparcie nigdy nie znika z tabeli do zera
 }
@@ -922,14 +924,14 @@ const A=[
   return `Manifest: „${tm.n}”. Program przesunięty, wiarygodność w górę.`}},
 /* --- organizacja --- */
 {id:'rekr',cat:'org',n:'Nabór do partii',ap:1,kp:18,en:11,reg:1,
- d:'Piszesz ogłoszenie werbunkowe. Treść jest oceniana, banał nie przyciągnie nikogo. Raz na 3 tygodnie, maksymalnie 2 osoby.',
+ d:'Piszesz ogłoszenie werbunkowe. Treść jest oceniana, banał nie przyciągnie nikogo. Raz na 6 tygodni, maksymalnie 2 osoby.',
  f:(p,f,_,r)=>{openRecruit(r);return null}},
 {id:'trening',cat:'org',n:'Praca nad wizerunkiem lidera',ap:2,kp:30,en:15,
  d:'Podnosisz jedną z trzech cech przewodniczącego: charyzmę, kompetencję albo wytrzymałość. Powyżej 80 postępy są coraz mniejsze. Autorytetu tak nie podciągniesz, ten trzeba wywalczyć w debatach i wyborach.',
  f:()=>{openTrain();return null}},
 {id:'szkol',cat:'org',n:'Szkolenie kadr',ap:1,kp:13,en:7,
  d:'Aktywność i jedność w górę, a jedna osoba z zaplecza (albo sam przewodniczący) dostaje +1 do losowej cechy (charyzma, kompetencja albo wytrzymałość). Tylko jedna i tylko o jeden, ale to się kumuluje.',
- f:(p,f)=>{p.act=cl(p.act+R(6,10)*f);p.uni=cl(p.uni+4*f);p.cred=cl(p.cred+2);p.ctr=cl(p.ctr-3);
+ f:(p,f)=>{p.act=cl(p.act+R(6,10)*f);p.cred=cl(p.cred+3);p.ctr=cl(p.ctr-3);
   const pool=[...new Set(p.bench.concat([p.lead]))];
   const who=pick(pool), i=RI(0,2), nm=['charyzmę','kompetencję','wytrzymałość'][i];
   const cur=L(who);
@@ -941,15 +943,15 @@ const A=[
  d:'Porządkujesz struktury. Przy niskiej jedności to zaproszenie do rozłamu.',
  f:(p,f)=>{if(p.uni<40&&ch(.42)){const q=giveBackCap(p,Math.max(1,Math.round(p.mem*.16)));const l=q.eli+q.int+q.ser;p.uni=cl(p.uni-6);
    return `Reforma <b>wywołała rozłam</b>. Odchodzi ${l} ${pl(l,'osoba','osoby','osób')}.`}
-  const g=R(8,13)*f;p.uni=cl(p.uni+g);p.cred=cl(p.cred+4*f);return `Statut przyjęty. <b>Jedność +${Math.round(g)}</b>.`}},
+  const g=R(8,13)*f;p.cred=cl(p.cred+5*f);p.pret=cl(p.pret-4);return `Statut przyjęty. <b>Wiarygodność +${Math.round(g*.6)}</b>, mniej pretensjonalnie.`}},
 {id:'czyst',cat:'org',n:'Czystka w partii',ap:2,kp:0,en:16,
  d:'Jedność mocno w górę kosztem 10–22% składu. Pamiętaj, że liczba osób przekłada się wprost na głosy, to najdroższa jedność w grze.',
  f:(p,f)=>{const q=giveBackCap(p,Math.max(1,Math.round(p.mem*R(.10,.22))));const l=q.eli+q.int+q.ser;
-  p.uni=cl(p.uni+R(14,22));p.ctr=cl(p.ctr+10);p.cred=cl(p.cred-5);
+  p.ctr=cl(p.ctr+10);p.cred=cl(p.cred-5);p.act=cl(p.act+R(4,8));
   return `Wylatuje <b>${l} ${pl(l,'osoba','osoby','osób')}</b>, reszta trzyma szyk.`}},
 {id:'zjazd',cat:'org',n:'Zjazd partii',ap:2,kp:105,en:26,term1:1,
  d:'Najdroższa decyzja w grze i tylko raz na kadencję. Poza sławą, jednością i obecnością wszędzie daje trwałą przewagę wyborczą +9% do wyborów.',
- f:(p,f)=>{M(p,22);p.fame=cl(p.fame+R(12,19)*f);p.uni=cl(p.uni+16*f);p.act=cl(p.act+18*f);p.cred=cl(p.cred+8);
+ f:(p,f)=>{M(p,22);p.fame=cl(p.fame+R(12,19)*f);p.act=cl(p.act+18*f);p.cred=cl(p.cred+8);
   REG.forEach(r=>p.pres[r.id]=cl(p.pres[r.id]+20));
   p.rally=Math.min(2,(p.rally||0)+1);
   return `<b>Zjazd</b> przeszedł do serwerowej legendy. Przewaga wyborcza +${p.rally*9}% do końca kadencji.`}},
@@ -1132,8 +1134,8 @@ const A=[
   REG.forEach(r=>o.pres[r.id]=cl(o.pres[r.id]*.72));
   M(p,7);XP(10);
   return `<b>Sabotaż udany.</b> ${o.ab} traci sławę, aktywność i jedną trzecią obecności we wszystkich okręgach. Nikt nie wie, że to ty (ryzyko było ${Math.round(risk*100)}%).`}},
-{id:'odp',cat:'spe',n:'Regeneracja lidera',ap:1,kp:0,en:-36,
- d:'Lider znika na tydzień. Wraca z energią.',
+{id:'odp',cat:'spe',n:'Regeneracja lidera',ap:1,kp:70,en:-36,
+ d:'Lider znika na tydzień: wyjazd, cisza, brak odpowiedzi na DM. Wraca z energią, ale tydzień bez niego kosztuje partię majątek.',
  f:(p)=>{p.act=cl(p.act-3);p.uni=cl(p.uni+2);return `${p.lead} odpoczął. <b>Energia +36</b>.`}},
 {id:'stery',cat:'spe',n:'Układ sterów',ap:1,kp:26,en:12,term1:1,
  d:'Ustalasz, ilu ludzi prowadzi partię: jeden, dwóch albo trzech, i kto to jest. Statystyki oraz cechy wrodzone liczą się wtedy jako średnia całego składu sterów. Raz na kadencję.',
@@ -1378,6 +1380,11 @@ const EV=[
 
 /* ══════════ TURA ══════════ */
 function buildEvents(){
+  /* Nie w trakcie wyborów. Wydarzenie wskakujące w środek liczenia głosów albo
+     w dogrywkę prezydencką przerywa animację i wygląda jak błąd — a gracz i tak
+     nie ma wtedy czym na nie odpowiedzieć. */
+  if(G.phase==='elect'||G.phase==='result'||G.phase==='prez'||G.phase==='pmvote'
+     ||G.phase==='marszalek'||G.prez2||G.prezState)return [];
   const pool=EV.map(e=>({e,w:e.w()})).filter(x=>x.w>0);
   const n=ch(.14)?2:ch(.62)?1:0,q=[];
   for(let i=0;i<n;i++){
@@ -1390,7 +1397,37 @@ function buildEvents(){
   }
   return q;
 }
+/* Premier nie idzie dalej z pustymi krzesłami w rządzie.
+   Wcześniej dało się przeczekać całą kadencję bez ani jednego ministra i nic
+   z tego nie wynikało — teraz tydzień się nie kończy, dopóki rada nie jest obsadzona. */
+function pusteResorty(){
+  if(!G.gov||!G.pmOk||G.gov.pm!==G.me)return [];
+  radaInit();
+  const puste=RESORTY.filter(r=>!radaKto(r.id));
+  if(!puste.length)return [];
+  // jeśli nie ma kogo posadzić, nie ma czego wymagać — wakat jest wtedy stanem faktycznym
+  const zajeci=Object.values(G.rada);
+  const wolni=[G.me].concat((G.gov.parties||[]).filter(k=>k!==G.me))
+    .flatMap(k=>G.p[k]?roster(G.p[k]):[])
+    .filter(n=>!zajeci.includes(n));
+  return wolni.length?puste:[];
+}
 function endWeek(){
+  const puste=pusteResorty();
+  if(puste.length){
+    G.tab='premier';
+    SFX.bad();
+    modal('Kancelaria premiera','Rada ministrów niekompletna',
+      `<p>Jesteś premierem, a ${puste.length===RESORTY.length?'żaden resort nie ma ministra'
+        :`${puste.length} ${pl(puste.length,'resort stoi pusty','resorty stoją puste','resortów stoi pustych')}`}:
+       <b>${puste.map(r=>r.n).join(', ')}</b>.</p>
+       <p style="margin-top:10px">Sejm nie przejdzie do kolejnego tygodnia z niedokończonym gabinetem.
+       Obsadź krzesła w <b>Kancelarii premiera</b>. Masz jeszcze ludzi, których da się tam posadzić —
+       gdyby ich zabrakło, gra przestanie o to prosić.</p>`,
+      [{l:'Idę obsadzić rząd',f:()=>{close();G.tab='premier';render()}}]);
+    render();
+    return;
+  }
   const p=me();
   const dateFrom=gameDate();
   ustawPlany();
@@ -3775,7 +3812,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.22';
+let WERSJA='1.1.23';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3786,6 +3823,18 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.23':{data:'5 sierpnia 2026', zmiany:[
+   'Inflacja: im większy zapas kapitału trzymasz w kasie, tym drożej wychodzi każda decyzja. Przy grubym worku starczy na jedną akcję w tygodniu — kapitał ma pracować, nie leżeć.',
+   'Jedności nie kupisz już żadną decyzją. Zostają debaty, a te niosą ze sobą kontrowersję.',
+   'Nabór do partii raz na sześć tygodni zamiast co trzy.',
+   'Regeneracja lidera kosztuje 70 kapitału — tydzień bez przewodniczącego to majątek.',
+   'Premier nie przejdzie do kolejnego tygodnia z pustymi krzesłami w rządzie. Nieobsadzone resorty świecą na czerwono.',
+   'Po głosowaniu nad ustawą widzisz pełny wynik: kto jak zagłosował i o ile brakowało.',
+   'Ustawa wniesiona spoza rządu daje autorowi mniej, a premierowi i tak dopisuje zasługę — tak działa gabinet.',
+   'Ustawy wreszcie coś zmieniają: media dają dokładniejsze sondaże, sądy i kodeks schładzają kontrowersję, zagadki dokładają energii, Mordepedia ułatwia nabór.',
+   'Żadne wydarzenie nie wskoczy już w środek liczenia głosów ani dogrywki prezydenckiej.',
+   'Tako jest teraz potrzebny także do Alternatywy i Partii Republikańskiej. DPD dochodzi do Republikańskiej dopiero przez Partię Centrum.',
+ ]},
  '1.1.20':{data:'4 sierpnia 2026', zmiany:[
    'Launcher ma teraz zakładki: Gra, Mody i Kreator. Wszystko robisz w jednym oknie, bez wchodzenia do gry.',
    'Kreator scenariuszy wprost w launcherze: nazwa, autor, opis i dziesięć suwaków ustawiających stan serwera na starcie.',
@@ -4125,6 +4174,11 @@ function game(){
           <b style="color:${i.akt>1?'var(--pos)':i.akt<.7?'var(--neg)':'var(--acc)'}">×${i.akt.toFixed(2)}</b></div>
         ${i.urz?`<div class="l"><span>Dodatki z urzędów</span><b style="color:var(--acc)">+${i.urz.toFixed(1)}</b></div>`:''}
         <div class="tot"><span>Razem</span><b class="m" style="color:var(--acc)">+${i.total}</b></div>
+        ${inflacjaProc()>0?`<div class="l" style="border-top:1px solid var(--line);padding-top:6px;margin-top:6px">
+          <span style="color:var(--neg)">Inflacja (kapitał ponad ${INFLACJA_PROG})</span>
+          <b style="color:var(--neg)">decyzje +${inflacjaProc()}%</b></div>
+          <div style="color:var(--dim2);font-size:11.5px;margin-top:6px">Im większy zapas leży w kasie,
+          tym drożej wychodzi każda decyzja. Wydawaj, zamiast zbierać.</div>`:''}
         <div style="color:var(--dim2);font-size:11.5px;margin-top:7px">Elita płaci czternaście razy tyle co serwerowicz, ale przy martwej partii nie płaci nikt.</div>
       </div></div>`})()}
     ${(()=>{const eg=enGain(),ld=lead(G.me);return `<div class="rs tip">${ikona('energia')}
@@ -4561,13 +4615,28 @@ const CATCOL={kam:'#d9ab45',org:'#5f9bd0',dyp:'#7fbe69',bru:'#c04a3e',pro:'#b08f
   wla:'#c8952b',prem:'#e0b23c',prz:'#b08fd6',opo:'#b0674a',spe:'#75695b',prm:'#8e1e5e'};
 /* Kafle decyzji. Osobno, bo te same karty pokazują się i w Decyzjach,
    i w działach Premiera oraz Prezydenta. */
+/* ══════════ INFLACJA ══════════
+   Kapitał ma pracować, a nie leżeć. Kto zbiera i nie wydaje, ten napędza ceny:
+   im większa góra pieniędzy, tym drożej wychodzi każda decyzja. Przy naprawdę
+   grubym worku wystarczy na jedną akcję w tygodniu i tyle — trzymanie zapasu
+   przestaje być darmową strategią. */
+const INFLACJA_PROG = 120;      // do tego poziomu ceny są normalne
+const INFLACJA_MAKS = 2.6;      // wyżej niż tyle już nie rośnie
+function inflacja(){
+  if(!G||typeof G.kp!=='number')return 1;
+  const ponad=G.kp-INFLACJA_PROG;
+  if(ponad<=0)return 1;
+  return Math.min(INFLACJA_MAKS,1+ponad/260);
+}
+const inflacjaProc=()=>Math.round((inflacja()-1)*100);
+
 function actCards(list,fx){
   return list.map(a=>{
     const f=fat(a.id),done=a.once&&G.once[a.id];
     const usedT=(a.term1&&G.useTerm[a.id]);
     const noShame=a.shame&&!(G.shame&&G.shame>G.week);
     const catFull=a.cat!=='spe'&&(G.catUsed[a.cat]||0)>=1;
-    const kpC=Math.round(a.kp*sizeF(me()).kp);
+    const kpC=Math.round(a.kp*sizeF(me()).kp*inflacja());   // cena z uwzględnieniem inflacji
     const ok=G.ap>=a.ap&&G.kp>=kpC&&(a.en<0||G.en>=a.en)&&!done&&!usedT&&!catFull&&!noShame&&!(a.id==='rekr'&&G.recCd>0);
     const col=CATCOL[a.cat]||'var(--line2)';
     const cb=G.lastAct&&COMBO.find(c=>c.a===G.lastAct&&c.b===a.id);
@@ -4626,7 +4695,7 @@ function premierTab(){
     <span class="n">${obsadzone} z ${RESORTY.length}</span></div><div class="b">
     <div class="resgrid">${RESORTY.map(r=>{
       const kto=radaKto(r.id), kPart=kto?partiaOsoby(kto):null, swoj=kto&&swoi.includes(kto);
-      return `<button class="resort ${kto?'on':''} ${swoj?'swoj':''}" onclick="openResort('${r.id}')">
+      return `<button class="resort ${kto?'on':''} ${swoj?'swoj':''} ${!kto&&pusteResorty().length?'wolne':''}" onclick="openResort('${r.id}')">
         <div class="rnm">${r.n}</div>
         ${kto?`<div class="rkto">${ava(kto,kPart?G.p[kPart].c:'#666',26)}<div style="min-width:0">
             <b>${kto}</b><span>${swoj?'twoja partia':(kPart?G.p[kPart].ab:'bezpartyjny')}</span></div></div>`
@@ -4894,7 +4963,7 @@ function fire(a,t,r,s,tm){
   const cb=G.lastAct?COMBO.find(c=>c.a===G.lastAct&&c.b===a.id):null;
   const sf=sizeF(p0), tr=hasT;
   const enMul=(tr('twardziel')?.75:1)*sf.en*BAL.energiaMnoznik;
-  const kpMul=sf.kp*(hasT('strateg')?.82:1)*(hasLsd(G.me)?.80:1);
+  const kpMul=sf.kp*(hasT('strateg')?.82:1)*(hasLsd(G.me)?.80:1)*inflacja();
   G.ap-=a.ap;G.kp-=Math.round(a.kp*kpMul);G.en=cl(G.en-(a.en>0?a.en*enMul:a.en));
   // co było zużyte wcześniej, zostaje zużyte — rezygnacja cofa wyłącznie to, co pobrała ta decyzja
   const limitStad=!!a.term1&&!G.useTerm[a.id], razStad=!!a.once&&!G.once[a.id];
@@ -5292,6 +5361,7 @@ function naborPublikuj(){
     const p=me(),reg=NABOR.reg;
     const box=v.querySelector('#rb');
     const res=naborOcena(NABOR.wyb,reg);
+    if(G.law&&G.law.mordepedia)res.sc=Math.min(100,res.sc+8);   // Mordepedia: nowy wie, gdzie trafił
     if(res.ctr)p.ctr=cl(p.ctr+res.ctr);
     v.querySelector('.op').innerHTML='<button class="opt" disabled><b>Ogłoszenie poszło…</b><span></span></button>';
     // premia za obecność w kanale i charyzmę lidera
@@ -5310,7 +5380,7 @@ function naborPublikuj(){
     g=taken;
     p.act=cl(p.act+3);p.pres[reg]=cl(p.pres[reg]+8);
     if(g>=2)M(p,5); else if(g===0)M(p,-3);
-    G.recCd=hasT('sieciowiec')?2:(p.mem<12?2:3);
+    G.recCd=hasT('sieciowiec')?4:6;   // nabór to rzadkie wydarzenie, nie co drugi tydzień
     const opis=g?[got.eli?got.eli+' z elity':'',got.int?got.int+' z intelektualistów':'',got.ser?got.ser+' z serwerowiczów':''].filter(Boolean).join(', '):'nikt';
     say(`<b>Nabór w ${rn(reg)}.</b> Ocena ${res.sc}/100, dołącza ${opis}.`,g?'good':'bad');
     const col=eff>=76?'var(--pos)':eff>=52?'var(--acc)':'var(--neg)';
@@ -6328,12 +6398,28 @@ function rozstrzygnijUstawe(id,opcje,pm,mojGlos,relZmiana){
     sprawczosc(false,pm);
     if(G.przekupiony&&G.przekupiony.doTerm===G.term)G.przekupiony=null;
     say(`<b>${law.n}</b> od ${G.p[pm].ab} przepada w sejmie: za ${w.za}, przeciw ${w.przeciw}.`,'bad');
+    // po oddaniu głosu gracz ma zobaczyć, czym się to skończyło i kto jak głosował
+    if(mojGlos!==undefined)modal('Sejm','Ustawa nie przeszła',
+      `<p><b>${law.n}</b> ${G.p[pm]?'od '+G.p[pm].ab:''} przepada.</p>
+       <p style="margin-top:8px">Za <b>${w.za}</b>, przeciw <b>${w.przeciw}</b>,
+       wstrzymało się <b>${w.wstrzym}</b>. Do przejścia trzeba było <b>${w.potrzeba}</b>.</p>
+       ${panelGlosowania(w)}
+       <p style="margin-top:12px" class="dim">Twój głos: <b>${mojGlos==='za'?'za':mojGlos==='wstrzym'?'wstrzymanie się':'przeciw'}</b>.</p>`,
+      [{l:'Rozumiem',f:()=>{close();render()}}]);
     render();return;
   }
   sprawczosc(true,pm);
   if(G.przekupiony&&G.przekupiony.doTerm===G.term)G.przekupiony=null;
   G.lawPend={id,opcje:opcje||null,za:w.za,przeciw:w.przeciw,wstrzym:w.wstrzym,by:w.by,przez:pm,odTerm:G.term,odWeek:G.week};
   say(`<b>${law.n}</b> przechodzi przez sejm głosami ${w.za}:${w.przeciw}. Firmuje ją ${G.p[pm].ab}.`);
+  if(mojGlos!==undefined)modal('Sejm','Ustawa przeszła',
+    `<p><b>${law.n}</b> przechodzi. Firmuje ją <b>${G.p[pm]?G.p[pm].ab:'rząd'}</b>.</p>
+     <p style="margin-top:8px">Za <b>${w.za}</b>, przeciw <b>${w.przeciw}</b>,
+     wstrzymało się <b>${w.wstrzym}</b> przy progu <b>${w.potrzeba}</b>.</p>
+     ${panelGlosowania(w)}
+     <p style="margin-top:12px" class="dim">Twój głos: <b>${mojGlos==='za'?'za':mojGlos==='wstrzym'?'wstrzymanie się':'przeciw'}</b>.
+     ${hasPrez()?'Teraz decyzja należy do ciebie jako prezydenta.':'Ustawa idzie na biurko prezydenta.'}</p>`,
+    [{l:'Rozumiem',f:()=>{close();render()}}]);
   if(hasPrez()){
     // pałac twój: to ty decydujesz, więc nie rozstrzygamy tego za ciebie
     say('<b>Ustawa czeka na twój podpis.</b> Zajrzyj do działu Prezydent.','roy');
@@ -6429,9 +6515,25 @@ function signLaw(ok,cicho){
     // kto ustawę przepchnął, ten czerpie z niej najwięcej do końca rozgrywki
     if(!G.lawBy)G.lawBy={};
     if(pmK)G.lawBy[id]=pmK;
+    /* Ustawa wchodzi w życie za rządu, więc to rząd zbiera pochwały. Jeśli wniósł
+       ją ktoś spoza gabinetu, premier i tak wychodzi na tego, który „dowiózł” —
+       autor dostaje mniej niż ten, kto siedzi na fotelu. */
+    const szefRzadu=G.gov&&G.pmOk?G.gov.pm:null;
+    if(szefRzadu&&szefRzadu!==pmK&&G.p[szefRzadu]){
+      const s=G.p[szefRzadu];
+      s.fame=cl(s.fame+3);s.act=cl(s.act+1.5);M(s,4);
+      if(G.gov)G.gov.spraw=cl((G.gov.spraw||50)+4);
+      if(szefRzadu===G.me)
+        say(`<b>To twój rząd wprowadza ${law.n} w życie.</b> Ustawę wniósł kto inny, ale zasługę serwer zapisze tobie.`,'good');
+      else if(pmK===G.me)
+        say(`<b>${law.n} wchodzi w życie</b>, ale to premier ${G.p[szefRzadu].ab} zbiera z tego najwięcej. Tak działa rząd: wnosisz z ławy, chwali się gabinet.`,'bad');
+    }
     if(pmK&&G.p[pmK]){
       const q=G.p[pmK];
-      q.comp.ser++;q.mem++;q.act=cl(q.act+1);q.fame=cl(q.fame+2);
+      const wRzadzie=!!(G.gov&&G.gov.parties.includes(pmK));
+      // spoza koalicji ustawa daje autorowi wyraźnie mniej — nie masz z czego jej wyegzekwować
+      const mnoznik=wRzadzie?1:.45;
+      q.comp.ser++;q.mem++;q.act=cl(q.act+1*mnoznik);q.fame=cl(q.fame+2*mnoznik);
       if(id==='kodeks')q.ctr=cl(q.ctr-4);
       if(id==='mordepedia')q.fame=cl(q.fame+10);
       if(id==='man'){   // dwóch intelektualistów awansuje do elity
@@ -6532,6 +6634,10 @@ function applyGoals(){
 }
 function goalDrift(k){
   const p=G.p[k];
+  // sądy administracyjne: awantury rozstrzyga się formalnie, więc emocje szybciej siadają
+  if(G.law&&G.law.sady)p.ctr=cl(p.ctr-1.1);
+  // kodeks karny: za ostre teksty są konsekwencje, cała scena pilnuje się bardziej
+  if(G.law&&G.law.kodeks)p.ctr=cl(p.ctr-.7);
   if(p.adsMode){p.uni=cl(p.uni-2.6);p.fame=cl(p.fame+2.8);p.act=cl(p.act+1.2);p.ctr=cl(p.ctr+1.1)}
   /* Cele partyjne przestają być maszynką do jedności. Darmowa zgoda w partii
      działała jak trwały bonus do wyniku niezależnie od tego, co gracz robił;
@@ -6553,14 +6659,18 @@ function goalDrift(k){
     alive().forEach(x=>{if(x!==k&&G.rel[k])G.rel[k][x]=cl(G.rel[k][x]+1,-100,100)})}
 }
 const GOALS={
+ /* DPD nie skacze prosto do Republikańskiej — najpierw musi przejść przez Centrum.
+    Dwie drogi z jednej partii (Kazikmistrz i Centrum) mają być wyborem, a nie
+    skrótem do najsilniejszego celu w grze. */
  republika:{n:'Pod błyskiem niebieskiej chwały',for:['PPP','PLR','PKD','DPD'],logo:'REP',bots:0,
+  avail:()=>G.me!=='DPD'||hasCen(G.me),
   what:'Odtwarzasz Partię Republikańską. Stare barwy, stare gwiazdy, twój szyld, a pozostałe partie z tym samym celem wchłaniasz razem z ludźmi i mandatami.',
   req:[
    {t:'Przychylność Króla co najmniej 50',v:()=>Math.round(kingFav(G.me))+' / 50',ok:()=>kingFav(G.me)>=50},
    {t:'Co najmniej 150 osób w partii',v:()=>me().mem+' / 150',ok:()=>me().mem>=150},
-   {t:'Kaziu, Europejczyk, Eniki i Ponczus w partii',
-    v:()=>{const o=roster(me());return ['Kaziu','Europejczyk','Eniki','Ponczus'].filter(n=>o.includes(n)).length+' / 4'},
-    ok:()=>{const o=roster(me());return ['Kaziu','Europejczyk','Eniki','Ponczus'].every(n=>o.includes(n))}},
+   {t:'Kaziu, Europejczyk, Eniki, Ponczus i Tako w partii',
+    v:()=>{const o=roster(me());return ['Kaziu','Europejczyk','Eniki','Ponczus','Tako'].filter(n=>o.includes(n)).length+' / 5'},
+    ok:()=>{const o=roster(me());return ['Kaziu','Europejczyk','Eniki','Ponczus','Tako'].every(n=>o.includes(n))}},
    {t:'Twoja partia ma obecnie premiera albo prezydenta',v:()=>isPM()?'premier':hasPrez()?'prezydent':'brak',ok:()=>isPM()||hasPrez()},
    {t:'Aktywność partii co najmniej 50',v:()=>Math.round(me().act)+' / 50',ok:()=>me().act>=50},
    {t:'Co najmniej 5 elit w składzie',v:()=>me().comp.eli+' / 5',ok:()=>me().comp.eli>=5},
@@ -6672,8 +6782,8 @@ const GOALS={
   what:'Zbierasz pod jednym szyldem wszystkich, którzy mają dość nowinek, i robisz z tego maszynę do zbierania kapitału. Loof, Tortex i Kaziu w jednym składzie, jeden z nich na czele.',
   req:[
    {t:'Co najmniej 30 osób w partii',v:()=>me().mem+' / 30',ok:()=>me().mem>=30},
-   {t:'loof, Tortex i Kaziu w składzie partii',v:()=>{const o=ownPool(G.me);return ['loof','Tortex','Kaziu'].filter(n=>o.includes(n)).length+' / 3'},
-    ok:()=>{const o=ownPool(G.me);return ['loof','Tortex','Kaziu'].every(n=>o.includes(n))}},
+   {t:'loof, Tortex, Kaziu i Tako w składzie partii',v:()=>{const o=ownPool(G.me);return ['loof','Tortex','Kaziu','Tako'].filter(n=>o.includes(n)).length+' / 4'},
+    ok:()=>{const o=ownPool(G.me);return ['loof','Tortex','Kaziu','Tako'].every(n=>o.includes(n))}},
    {t:'Jeden z nich przewodzi partii',v:()=>me().lead,ok:()=>['loof','Tortex','Kaziu'].includes(me().lead)},
   ],
   cons:['Jedność leci na pysk i dalej spada co tydzień, ale sława rośnie równie szybko.',
@@ -8759,7 +8869,7 @@ Object.assign(window,{start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,m
   setTab:k=>{G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
   signAgent,agentCost,agentFree,AGENTS,render,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
-window.__game={openDym,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
+window.__game={openDym,pusteResorty,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
   zawiedzeniKoalicjanci,demografiaSerwera,SERVER,SERVER_MAX,AGENTS,mogeZglosic,rozwiazChance,radaKto,RESORTY,pmOsoba,pmOsoby,leads,roster,
   aiTransfery,aiOpozycja,aiObsadzRade,aiRekonstrukcja,znuzenie,hegemon,resortyPartii,leadWybrany,aiPlan,ustawPlany,
   rozliczenieKadencji,sprawdzZapis,doganianie,repChetni,BAL,saveCode,loadCode,
@@ -8769,7 +8879,7 @@ window.__game={openDym,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministe
   openPrzekupstwo,przekupSzansa,sprawczosc,zwlokaPrezydenta,ZWLOKA_MAX,
   newGame,endWeek,runElection,tally,allocate,aiGov,startTerm,startPM,doPMVote,pmFailForward,
   localScore,openRecruit,openTrain,collapseGov,makeBlocs,prezPool,drawFrom,giveBack,purge,eliteRisk,ratio,syncCoal,prezDone,makeNoise,XP,
-  giveBackCap,prezRound1,prezRound2,runRunoff,memberFlow,prezWait,prezPush,openPush,crownPrez,hemi,pmBlocked,rotateBench,AVA,TEM,INNATE,conflictOf,buyTrait,buyStat,traitsOf,xpOs,xpPula,COMBO,ostatniWynik,hasCen,hasHeg,LOGOS,applyGoals,checkDeath,isPMperson,isPrezPerson,income,EV,wotumChance,prezGo,A,fire,me,topSeg,sejmVote,setGov,PID,REG,SEG,SID,BASE,COAL,LP,LEAD,THR,
+  giveBackCap,prezRound1,prezRound2,runRunoff,memberFlow,prezWait,prezPush,openPush,crownPrez,hemi,pmBlocked,rotateBench,AVA,TEM,INNATE,conflictOf,buyTrait,buyStat,inflacja,inflacjaProc,INFLACJA_PROG,traitsOf,xpOs,xpPula,COMBO,ostatniWynik,hasCen,hasHeg,LOGOS,applyGoals,checkDeath,isPMperson,isPrezPerson,income,EV,wotumChance,prezGo,A,fire,me,topSeg,sejmVote,setGov,PID,REG,SEG,SID,BASE,COAL,LP,LEAD,THR,
   TOPUP,DIST_SEATS,TOTAL_SEATS,MAJ,accepts,thrFor,
   radar,feed,runDateAnim,gameDate,dateStr,mapTab,actTab,pollTab,partieTab,sejmTab,leadTab,kingTab,sidebar,setup,pmScreen,prezScreen,marScreen,startMar,marContinue,marDeclare,isMar,isWice,isMarPerson,ownPool,bestRep,runRace,raceScore,results,TRAITS,sizeF,shown,enGain,pickMain,kingScore,kingFactors,kingFav,allBlocs,addRegion,delRegion,rebalanceSeats,isLead,lead,L,innAll,GOALS,openStery,sterySet,steryTog,steryOk,creditsBox,AUTORZY,WERSJA,
   LAWS,lawVote,proposeLaw,signLaw,applyLaw,lawDone,lawIntake,lawsPending,lawsToSign,startLaw,

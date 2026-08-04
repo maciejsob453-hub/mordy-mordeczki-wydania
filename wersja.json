@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.22",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/feda123daa9e2cfd20fabeda68469147d4dcdb07",
+ "wersja": "1.1.23",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,8 +14,8 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "8bb2e777ef6a2a53a2c3ec42b8cbaf06d9bed47c75187546b60765816bca1342",
-   "bajtow": 558391
+   "sha": "acad829c9940d6fb9f28f15cd643382be283d981c8eaebd545979e1bb1c7af31",
+   "bajtow": 566228
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -549,8 +549,8 @@
   },
   {
    "sciezka": "gra/wyglad/style.css",
-   "sha": "6e67d850208391f9dcd555dada4d5508589e2138f91155579e2b06078ab05b68",
-   "bajtow": 87119
+   "sha": "786edf6551ca448958fadf25ac5c49dad9bc73a32fe89f287ff3b984e8b92492",
+   "bajtow": 87422
   }
  ],
  "exe": {
@@ -560,16 +560,15 @@
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.18/Mordy.Mordeczki.exe"
  },
  "runtime": {
-  "sha": "8a74f22dabf6a0a0b9cf1f85eff0ea812ecb309722305fc6c3a90aea05979c23",
-  "bajtow": 13703758,
-  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.22/biblioteki-1.1.22.zip",
-  "znacznik": "1b6aecc29d6b1c2cf00b951af406c6773e16e29e9313350ecac06ca19e9850eb"
+  "sha": "4b1977ee928cab3d5895cc8165acecf70b55fc8999577e55d4c64208736944da",
+  "bajtow": 13703617,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.23/biblioteki-1.1.23.zip",
+  "znacznik": "03e7724d6517cb08aeff7f738476d09f79e0b5ce7b3c38f9375436a92f888b24"
  },
  "launcher": {
   "nazwa": "Mordy Mordeczki Launcher.exe",
   "sha": "771e518561de93bb1338155c6782f37b93b7739913a429f3e0b4f3e1aa7ddc05",
   "bajtow": 12146589,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.21/Mordy.Mordeczki.Launcher.exe"
- },
- "commit": "feda123daa9e2cfd20fabeda68469147d4dcdb07"
+ }
 }
