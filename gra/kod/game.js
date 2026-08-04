@@ -3719,7 +3719,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.18';
+let WERSJA='1.1.19';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3730,6 +3730,10 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.19':{data:'4 sierpnia 2026', zmiany:[
+   'Mody i scenariusze masz teraz w launcherze: osobny ekran z listą wgranych, wgrywaniem plikiem i usuwaniem.',
+   'Launcher przyjmuje pojedyncze pliki modów i całe paczki zip naraz — wskazujesz plik i tyle.',
+ ]},
  '1.1.18':{data:'4 sierpnia 2026', zmiany:[
    'Mody i własne scenariusze. W kreatorze ustawiasz, jak ma wyglądać serwer na starcie, i zapisujesz to jako plik — swój scenariusz pojawia się na liście obok wbudowanych.',
    'Plik moda możesz wysłać komuś innemu. Wrzuca go u siebie do katalogu modów i gra w dokładnie to samo.',
