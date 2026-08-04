@@ -41,6 +41,10 @@ const BAL={
   udzialTwardego:      .72,    // niżej = skład mniej decyduje, gra mniej o rekrutację
   wykladnikSkladu:     .78,    // niżej = malejące zwroty z wielkości są ostrzejsze
 
+  // jak mocno jedność przekłada się na wynik wyborczy
+  jednoscBaza:         .64,    // wyżej = kiepska jedność mniej boli
+  jednoscDzielnik:     175,    // wyżej = wysoka jedność mniej daje
+
   // przewaga urzędu — im wyżej, tym mocniejsza spirala zwycięzcy
   premierGlosy:        1.12,
   prezydentGlosy:      1.08,
@@ -76,7 +80,7 @@ const esc=s=>String(s).replace(/'/g,"\\'");
 
 /* ══════════ LIDERZY ══════════ */
 /* [charyzma, kompetencja, wytrzymałość, autorytet] */
-const AVA={"Prawe Jąderko": "obrazki/32a907831366.webp", "Vengeance": "obrazki/d9c43f30a1fa.webp", "Korzeń": "obrazki/edd614e44a4d.webp", "Maciej Starszy": "obrazki/7f677d35a527.webp", "bizantyjczyk": "obrazki/3f26e28825a4.webp", "Jangcy": "obrazki/3c5f99631754.webp", "Zomowiec z Sejmu": "obrazki/5a6024fdfbc7.webp", "Wojtaszko": "obrazki/463d9208b9dd.webp", "Pan Hod_Dog": "obrazki/16ca0d3b9eeb.webp", "Plawik": "obrazki/35a4cee441f9.webp", "Lager": "obrazki/5e6a47f7a1eb.webp", "Peterdeus": "obrazki/c23e96e64f3b.webp", "Sulejman": "obrazki/986e02aca71d.webp", "Aryati": "obrazki/947b2f454432.webp", "kisielek48": "obrazki/3d3332854d5f.webp", "Bartek": "obrazki/989b5176e4a1.webp", "cargrzybov": "obrazki/30bcedf79997.webp", "Fazmiś": "obrazki/0e9071fc2092.webp", "impir": "obrazki/135df09bc351.webp", "inwid": "obrazki/7b152588238a.webp", "Maciek": "obrazki/4aa32504feb8.webp", "Kromka": "obrazki/9d211aac5435.webp", "Tortex": "obrazki/53820c7b8559.webp", "Kaziu": "obrazki/8220da0fe301.webp", "its.r3dz0l.eq": "obrazki/b9fb8b09ea87.webp", "kenzo": "obrazki/eb1ee0a9978d.webp", "bluetes33": "obrazki/f450efa7026d.webp", "Kocur": "obrazki/ea8295d6fab4.webp", "Gustaw": "obrazki/2a9007517459.webp", "Antoniopl": "obrazki/1189f2a85ea3.webp", "warrior": "obrazki/2f39d1ecb2de.webp", "alan": "obrazki/da625bd66599.webp", "Śledzik": "obrazki/65e60b12b9fe.webp", "Serty": "obrazki/ff0950f99292.webp", "Heraquik": "obrazki/67887df61b8e.webp", "balon": "obrazki/e7cc40af1a7a.webp", "Wiktor z Aeterny": "obrazki/d2ed03874247.webp", "Góra": "obrazki/4205cad83b6b.webp", "Klabar": "obrazki/b536642cd5eb.webp", "Bober": "obrazki/83dd46efd068.webp", "Oli": "obrazki/7a685e2ac353.webp", "loof": "obrazki/3f7e866b3355.webp", "Mnem": "obrazki/e452af74ed4c.webp", "Mietek Nocul": "obrazki/89ee38f6ab26.webp", "Prjonnek": "obrazki/cfd70f7b77a6.webp", "Jugen": "obrazki/9e01fd9dbb40.webp", "mentos": "obrazki/d99a6ee7b318.webp", "ekologiaball": "obrazki/ad479906048d.webp", "Franzon": "obrazki/a4d97f94288d.webp", "Prewencjusz": "obrazki/2edc2ee02c95.webp", "Włóczykij": "obrazki/721a1f244511.webp", "Rax": "obrazki/7b7c4f192e6f.webp", "Supernes": "obrazki/eea9db03ef6b.webp", "Sirius": "obrazki/bc8735f17d51.webp", "x_avi": "obrazki/89c9588432e9.webp", "Garibaldi": "obrazki/b3d16b3de0ab.webp", "Silesia": "obrazki/ca0230b99bb6.webp", "Animu Player": "obrazki/9c0a033d5ceb.webp", "Mordeczka": "obrazki/0051a52917ef.webp","Delex":"obrazki/40c5466af2f5.png","Pablo":"obrazki/b6a728b14b8b.png","Europejczyk":"obrazki/ava-europejczyk.png","Eniki":"obrazki/ava-eniki.png","Ponczus":"obrazki/ava-ponczus.png","ke_Trab":"obrazki/ava-ke-trab.png","Miazga":"obrazki/ava-miazga.png"};
+const AVA={"Prawe Jąderko": "obrazki/32a907831366.webp", "Vengeance": "obrazki/d9c43f30a1fa.webp", "Korzeń": "obrazki/edd614e44a4d.webp", "Maciej Starszy": "obrazki/7f677d35a527.webp", "bizantyjczyk": "obrazki/3f26e28825a4.webp", "Jangcy": "obrazki/3c5f99631754.webp", "Zomowiec z Sejmu": "obrazki/5a6024fdfbc7.webp", "Wojtaszko": "obrazki/463d9208b9dd.webp", "Pan Hod_Dog": "obrazki/16ca0d3b9eeb.webp", "Plawik": "obrazki/35a4cee441f9.webp", "Lager": "obrazki/5e6a47f7a1eb.webp", "Peterdeus": "obrazki/c23e96e64f3b.webp", "Sulejman": "obrazki/986e02aca71d.webp", "Aryati": "obrazki/947b2f454432.webp", "kisielek48": "obrazki/3d3332854d5f.webp", "Bartek": "obrazki/989b5176e4a1.webp", "cargrzybov": "obrazki/30bcedf79997.webp", "Fazmiś": "obrazki/0e9071fc2092.webp", "impir": "obrazki/135df09bc351.webp", "inwid": "obrazki/7b152588238a.webp", "Maciek": "obrazki/4aa32504feb8.webp", "Kromka": "obrazki/9d211aac5435.webp", "Tortex": "obrazki/53820c7b8559.webp", "Kaziu": "obrazki/8220da0fe301.webp", "its.r3dz0l.eq": "obrazki/b9fb8b09ea87.webp", "kenzo": "obrazki/eb1ee0a9978d.webp", "bluetes33": "obrazki/f450efa7026d.webp", "Kocur": "obrazki/ea8295d6fab4.webp", "Gustaw": "obrazki/2a9007517459.webp", "Antoniopl": "obrazki/1189f2a85ea3.webp", "warrior": "obrazki/2f39d1ecb2de.webp", "alan": "obrazki/da625bd66599.webp", "Śledzik": "obrazki/65e60b12b9fe.webp", "Serty": "obrazki/ff0950f99292.webp", "Heraquik": "obrazki/67887df61b8e.webp", "balon": "obrazki/e7cc40af1a7a.webp", "Wiktor z Aeterny": "obrazki/d2ed03874247.webp", "Góra": "obrazki/4205cad83b6b.webp", "Klabar": "obrazki/b536642cd5eb.webp", "Bober": "obrazki/83dd46efd068.webp", "Oli": "obrazki/7a685e2ac353.webp", "loof": "obrazki/3f7e866b3355.webp", "Mnem": "obrazki/e452af74ed4c.webp", "Mietek Nocul": "obrazki/89ee38f6ab26.webp", "Prjonnek": "obrazki/cfd70f7b77a6.webp", "Jugen": "obrazki/9e01fd9dbb40.webp", "mentos": "obrazki/d99a6ee7b318.webp", "ekologiaball": "obrazki/ad479906048d.webp", "Franzon": "obrazki/a4d97f94288d.webp", "Prewencjusz": "obrazki/2edc2ee02c95.webp", "Włóczykij": "obrazki/721a1f244511.webp", "Rax": "obrazki/7b7c4f192e6f.webp", "Supernes": "obrazki/eea9db03ef6b.webp", "Sirius": "obrazki/bc8735f17d51.webp", "x_avi": "obrazki/89c9588432e9.webp", "Garibaldi": "obrazki/b3d16b3de0ab.webp", "Silesia": "obrazki/ca0230b99bb6.webp", "Animu Player": "obrazki/9c0a033d5ceb.webp", "Mordeczka": "obrazki/0051a52917ef.webp","Delex":"obrazki/40c5466af2f5.png","Pablo":"obrazki/b6a728b14b8b.png","Europejczyk":"obrazki/ava-europejczyk.png","Eniki":"obrazki/ava-eniki.png","Ponczus":"obrazki/ava-ponczus.png","ke_Trab":"obrazki/ava-ke-trab.png","Miazga":"obrazki/ava-miazga.png","Tako":"obrazki/ava-tako.webp"};
 const TRAITS=[
  {id:'mowca',n:'Mówca',cost:55,d:'Wiece i orędzia dają o 35% więcej sławy.'},
  {id:'negocjator',n:'Negocjator',cost:62,excl:['showman'],d:'+10 do skłonności partii w negocjacjach koalicyjnych, rozmowy kuluarowe o połowę skuteczniejsze.'},
@@ -162,6 +166,7 @@ const LEAD={
  'its.r3dz0l.eq':[44,50,48,70],
  'Miazga':[46,42,50,44], 'Delex':[82,40,38,36],
  'Europejczyk':[58,64,52,62], 'Eniki':[64,44,58,46], 'Ponczus':[50,48,62,44],
+ 'Tako':[46,74,58,52],   // intelektualista: głowa tak, estrada nie
  'ke_Trab':[60,74,56,64],
 };
 const AGENTS=[
@@ -178,6 +183,7 @@ const AGENTS=[
  {n:'Europejczyk',      seg:'ser',kp:22,d:'Mówi o serwerze tak, jakby to była izba wyższa, i nikt nie ma odwagi mu przerwać. Maniery z portretu.'},
  {n:'Eniki',            seg:'ser',kp:20,d:'Żartuje z wszystkiego, łącznie z sobą, i przez to nikt nie zauważa, że siedzi na każdym głosowaniu.'},
  {n:'Ponczus',          seg:'ser',kp:20,d:'Patrzy w okno, pisze raz na tydzień i zawsze trafia w sedno. Cierpliwość zamiast aktywności.'},
+ {n:'Tako',             seg:'int',kp:56,d:'Wygląda jak coś, co wyszło z sennego koszmaru, a pisze jak profesor. Bezpartyjny z wyboru i bez zamiaru, żeby to zmienić — chyba że ktoś zaproponuje coś naprawdę środkowego.'},
 ];
 const agentFree=n=>!(G&&G.agents&&G.agents[n]);
 function agentCost(n,k){const a=AGENTS.find(x=>x.n===n);if(!a)return 0;
@@ -381,7 +387,7 @@ const me=()=>G.p[G.me];
 /* Znaczki zasobów. Wstawiane i w panelu, i w zdaniach w rodzaju „wydaj kapitał”,
    żeby ta sama rzecz zawsze wyglądała tak samo. Grafiki leżą w obrazki/ikona-*.png;
    gdy któregoś brakuje, zostaje sam napis i nic się nie sypie. */
-const IKONY={akcje:'akcje',kapital:'kapital',energia:'energia',sondaz:'sondaz'};
+const IKONY={akcje:'akcje',kapital:'kapital',energia:'energia',sondaz:'sondaz',mandat:'mandat'};
 const ikona=(id,kl)=>IKONY[id]?`<i class="ic ic-${IKONY[id]}${kl?' '+kl:''}" aria-hidden="true"></i>`:'';
 /* Pełny skład imienny partii: przewodniczący, współprzewodniczący, twarze i ławka.
    Lider musi być wpisany osobno, bo obejmując stery znika z ławki, a jeśli nie
@@ -619,7 +625,11 @@ function score(k,r,s){
   let v=Math.pow(a,1.32)*p.pull;
   v*=(0.44+p.fame/135);
   v*=(0.64+p.cred/200);
-  v*=(0.46+p.uni/115);
+  /* Jedność liczy się, ale przestaje być najważniejsza. Wcześniej rozpięta była
+     od 0,46 do 1,33 — czyli mocniej niż sława i aktywność razem wzięte — więc
+     wystarczyło pilnować jednego suwaka, żeby wygrywać wybory. Teraz waży mniej
+     niż to, co partia realnie robi na serwerze. */
+  v*=(BAL.jednoscBaza+p.uni/BAL.jednoscDzielnik);
   v*=(0.50+p.act/125);
   v*=(0.52+ld.char/140);
   v*=(1+(p.mom||0)/150);
@@ -1423,9 +1433,10 @@ function endWeek(){
   }
   G.en=cl(G.en+enGain());
   Object.keys(G.used).forEach(k=>{if(ch(.42))G.used[k]=Math.max(0,G.used[k]-1)});
+  // Tygodniowy ruch jest drobny i tylko uzupełnia to, co naprawdę liczy się przy
+  // rozliczeniu kadencji — patrz demografiaSerwera().
   const total=PID.reduce((a,k)=>a+G.p[k].mem,0)+freeTot();
-  if(total<SERVER_MAX){G.free.ser+=RI(0,2);if(ch(.28))G.free.int+=1;if(ch(.08))G.free.eli+=1}
-  else if(ch(.35))G.free.ser+=1;
+  if(total<SERVER_MAX&&ch(.45)){G.free.ser+=RI(0,1);if(ch(.16))G.free.int+=1}
   G.prev=snap();
   if(G.ap>=G.apMax){   // tydzień bez jednej decyzji to tydzień stracony
     p.fame=cl(p.fame-1.8);p.act=cl(p.act-2.5);M(p,-4);p.uni=cl(p.uni-1);
@@ -3436,7 +3447,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.10';
+let WERSJA='1.1.11';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3447,6 +3458,16 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.11':{data:'4 sierpnia 2026', zmiany:[
+   'Nowa zakładka „Partie”: cała scena na jednym ekranie — kto rządzi, ile ma, w jakim jest stanie i jak cię znosi.',
+   'Serwer wreszcie naprawdę żyje. Ludzie dołączają po dobrej kadencji i odchodzą po awanturach — liczby się zmieniają, a nie tylko komunikaty.',
+   'Koalicjanci liczą krzesła. Zgarnij całą radę ministrów dla siebie, a partie bez resortu ci to zapamiętają.',
+   'Jedność waży mniej niż dotąd — o wyniku decyduje bardziej to, co partia realnie robi.',
+   'Tako dołącza do serwera jako bezpartyjny intelektualista. Bez niego nie ma Partii Centrum.',
+   'Mandaty dostały własną ikonę, logo Perspektywicznej wreszcie na środku.',
+   'Koniec z ucinanymi napisami pod salą sejmową i w kondycji partii.',
+   'Kronika wróciła pod Przewodnictwo, a ciasny panel nad nią zniknął.',
+ ]},
  '1.1.10':{data:'4 sierpnia 2026', zmiany:[
    'Do gry wchodzi muzyka z serwera. „Nie pucuj mi petardy” wita cię przy starcie PPP.',
    '„Pax Mathiae” leci, kiedy wybory wygrywa partia Maćka.',
@@ -3781,7 +3802,7 @@ function game(){
     </div></div>`:''}
   <div class="nav">
     ${(()=>{const nv=[['mapa','Mapa okręgów'],['akcje','Decyzje'+(G.ap?`<span class="badge">${G.ap}</span>`:'')],
-       ['lider','Lider'+(leads(G.p[G.me]).some(n=>xpOs(n)>=35)?'<span class="badge">!</span>':'')],['krol','Król'+(kingFav(G.me)<0?'<span class="badge">!</span>':'')],['sondaz','Sondaż']];
+       ['lider','Lider'+(leads(G.p[G.me]).some(n=>xpOs(n)>=35)?'<span class="badge">!</span>':'')],['krol','Król'+(kingFav(G.me)<0?'<span class="badge">!</span>':'')],['partie','Partie'],['sondaz','Sondaż']];
       const mg=myGoals();
       if(mg.length)nv.push(['cele',(mg.length>1?'Cele partyjne':'Cel partyjny')+(goalReady()?'<span class="badge">!</span>':'')]);
       // urzędy mają własne działy zamiast kategorii schowanych w decyzjach
@@ -3792,7 +3813,7 @@ function game(){
   </div>
   <div class="layout">
     <div style="display:flex;flex-direction:column;gap:14px">${sidebar(p,q)}</div>
-    <div>${G.tab==='mapa'?kurier()+mapTab(q,AL):G.tab==='akcje'?actTab():G.tab==='sondaz'?pollTab(q,AL)
+    <div>${G.tab==='mapa'?kurier()+mapTab(q,AL):G.tab==='akcje'?actTab():G.tab==='partie'?partieTab(q,AL):G.tab==='sondaz'?pollTab(q,AL)
       :G.tab==='cele'?goalTab():G.tab==='lider'?leadTab():G.tab==='krol'?kingTab()
       :G.tab==='premier'?premierTab():G.tab==='prezydent'?prezydentTab():sejmTab()}</div>
   </div>`;
@@ -3817,31 +3838,65 @@ function radar(p){
         font-size="9.5" font-family="ui-monospace,monospace" fill="var(--dim2)" letter-spacing=".04em">${x[0].toUpperCase()}</text>`}).join('')}
   </svg>`;
 }
-/* Najważniejsze liczby o partii w jednym kaflu, na samej górze kolumny.
-   Wcześniej, żeby sprawdzić liczbę ludzi albo stan zaplecza, trzeba było
-   przewinąć pół strony, a kronika leżała jeszcze niżej — pod sześcioma kartami. */
-function panelPartii(p){
-  const bench=roster(p);
-  const kafel=(l,v,c)=>`<div class="ppz"><b style="color:${c}">${Math.round(v)}</b><span>${l}</span></div>`;
-  return `<div class="card ppanel"><div class="h"><h3>${p.ab} w skrócie</h3>
-    <span class="n">kadencja ${G.term} · tydzień ${G.week}</span></div><div class="b">
-    <div class="ppgrid">
-      ${kafel('mandatów',p.seats,'var(--acc)')}
-      ${kafel('osób',p.mem,'var(--tx)')}
-      ${kafel('zaplecze',bench.length,'var(--tx)')}
-      ${kafel('sława',p.fame,'var(--acc)')}
-      ${kafel('wiarygodność',p.cred,'var(--info)')}
-      ${kafel('jedność',p.uni,'var(--pos)')}
-      ${kafel('aktywność',p.act,'#9b7fd4')}
-      ${kafel('kontrowersja',p.ctr,p.ctr>=70?'var(--neg)':'var(--dim)')}
-    </div>
-    <div class="pprow">
-      <span title="akcje">${ikona('akcje','mini')}<b>${G.ap}/${G.apMax}</b></span>
-      <span title="kapitał">${ikona('kapital','mini')}<b>${Math.round(G.kp)}</b></span>
-      <span title="energia">${ikona('energia','mini')}<b>${Math.round(G.en)}</b></span>
-      <span class="ppld">${leads(p).join(' / ')}</span>
-    </div>
-  </div></div>`;
+/* ---- zakładka „Partie” ----
+   Cała scena polityczna na jednym ekranie: kto rządzi, kto ile ma, w jakim jest
+   stanie i jak się do ciebie odnosi. Wcześniej te informacje były rozsypane po
+   kartach w bocznej kolumnie i po sondażu, a nad kroniką stał ciasny kafelek,
+   w którym i tak nic się nie mieściło. */
+function partieTab(q,AL){
+  const g=G.gov;
+  const proc=k=>q&&q.total?q.res[k].tot/q.total*100:0;
+  const rzad=alive().sort((a,b)=>proc(b)-proc(a));
+  const pasek=(v,c,max)=>`<div class="ptrk"><i style="width:${cl(v/(max||100)*100)}%;background:${c}"></i></div>`;
+  const stan=p=>{
+    // jedna etykieta, która mówi wprost, jak partia stoi
+    if(p.ctr>=90)return ['paraliż','neg'];
+    if(p.fame<=12&&p.act<=12)return ['na wylocie','neg'];
+    if(p.uni<32)return ['rozłam w drodze','neg'];
+    if(p.mom>12)return ['rośnie','pos'];
+    if(p.mom<-12)return ['traci grunt','neg'];
+    if(p.uni>=70&&p.cred>=60)return ['stabilna','pos'];
+    return ['spokojnie',''];
+  };
+  return `<div class="card"><div class="h"><h3>Partie na serwerze</h3>
+    <span class="n">${rzad.length} ${pl(rzad.length,'partia','partie','partii')} · kadencja ${G.term}</span></div>
+    <div class="b partie">
+    ${rzad.map(k=>{
+      const p=G.p[k],moja=k===G.me,[et,kl]=stan(p);
+      const rola=g&&g.parties.includes(k)?(g.pm===k?'premier':'koalicja')
+        :p.seats?'opozycja':'poza sejmem';
+      const rel=moja?null:Math.round(G.rel[G.me][k]);
+      const co=p.coal&&CO()[p.coal]?CO()[p.coal]:null;
+      return `<div class="pkarta${moja?' moja':''}">
+        <div class="pgl">
+          ${crest(k,'m')}
+          <div class="pnaz">
+            <b>${p.n}</b>
+            <span class="dim">${leads(p).join(' / ')||p.lead}</span>
+          </div>
+          <div class="ptagi">
+            ${moja?'<span class="pill pos">twoja partia</span>':''}
+            <span class="pill${rola==='premier'?' pos':rola==='poza sejmem'?' neg':''}">${rola}</span>
+            ${G.prez&&G.prez.party===k?'<span class="pill roy">prezydent</span>':''}
+            ${co?`<span class="pill" style="border-color:${co.c||'var(--line2)'}">lista ${p.coal}</span>`:''}
+            <span class="pill ${kl}">${et}</span>
+          </div>
+        </div>
+        <div class="pliczby">
+          <div class="pl"><b>${fmt(shown(k,proc(k)))}<em>%</em></b><span>poparcie</span></div>
+          <div class="pl"><b>${p.seats}</b><span>${pl(p.seats,'mandat','mandaty','mandatów')}</span></div>
+          <div class="pl"><b>${p.mem}</b><span>${pl(p.mem,'osoba','osoby','osób')}</span></div>
+          ${moja?'':`<div class="pl"><b style="color:${rel<0?'var(--neg)':rel>30?'var(--pos)':'var(--tx)'}">${rel>0?'+':''}${rel}</b><span>relacje</span></div>`}
+        </div>
+        <div class="pstan">
+          <div class="ps"><span>sława</span>${pasek(p.fame,'var(--acc)')}<b>${Math.round(p.fame)}</b></div>
+          <div class="ps"><span>wiarygodność</span>${pasek(p.cred,'var(--info)')}<b>${Math.round(p.cred)}</b></div>
+          <div class="ps"><span>jedność</span>${pasek(p.uni,'var(--pos)')}<b>${Math.round(p.uni)}</b></div>
+          <div class="ps"><span>aktywność</span>${pasek(p.act,'#9b7fd4')}<b>${Math.round(p.act)}</b></div>
+          <div class="ps"><span>kontrowersja</span>${pasek(p.ctr,p.ctr>=70?'var(--neg)':'var(--dim2)')}<b>${Math.round(p.ctr)}</b></div>
+        </div>
+      </div>`}).join('')}
+    </div></div>`;
 }
 function sidebar(p,q){
   const b=(l,v,c,k)=>{const d=G.prev?v-G.prev[k]:0;
@@ -3851,8 +3906,6 @@ function sidebar(p,q){
   const ld=lead(G.me),used=PID.reduce((a,k)=>a+G.p[k].mem,0);
   const benchAll=roster(p),swapCands=benchAll.filter(x=>!isLead(p,x));
   return `
-  ${panelPartii(p)}
-  ${feed()}
   <div class="card lead"><div class="h"><h3>Przewodnictwo</h3>
     <span class="n">${leads(p).length===1?'jednoosobowe':leads(p).length===2?'dwuosobowe':'trzyosobowe'}</span></div><div class="b">
     <div class="leadbox">${leadAva(G.me,44)}<div style="min-width:0">
@@ -3867,6 +3920,7 @@ function sidebar(p,q){
     <div class="hint">${leads(p).length>1?'Statystyki to średnia całego składu sterów. ':''}Kto prowadzi partię, ustawiasz
       w <b>Decyzjach → Specjalne → Układ sterów</b>${G.useTerm.stery?' <span class="bad">(zużyte w tej kadencji)</span>':''}.</div>
   </div></div>
+  ${feed()}
   <div class="card skl"><div class="h"><h3>Skład partii</h3><span class="n">${p.mem} ${pl(p.mem,'osoba','osoby','osób')}</span></div><div class="b">
     <div style="display:flex;height:11px;border-radius:4px;overflow:hidden;margin-bottom:10px">
       ${SEG.map(s=>`<i style="display:block;height:100%;width:${p.mem?p.comp[s.id]/p.mem*100:0}%;background:${s.c}"></i>`).join('')}</div>
@@ -3919,11 +3973,15 @@ function sidebar(p,q){
       <span>prestiż <b style="color:var(--tx)">${G.prest}</b></span></div>
     ${p.marg?`<div style="margin-top:10px"><span class="pill neg">marginalizacja −25%</span></div>`:''}
   </div></div>
-    <div class="card"><div class="h"><h3>Serwer</h3><span class="n">${SERVER}</span></div><div class="b">
+    ${(()=>{
+      // Prawdziwy stan serwera, a nie stała z początku gry: ludzie przychodzą i odchodzą
+      const ludzie=used+freeTot(), zmiana=ludzie-SERVER;
+      return `<div class="card"><div class="h"><h3>Serwer</h3>
+      <span class="n">${ludzie} ${zmiana?`<span style="color:${zmiana>0?'var(--pos)':'var(--neg)'}">${zmiana>0?'+':''}${zmiana}</span>`:''}</span></div><div class="b">
     <div class="st"><div class="l"><span>W partiach</span><b class="m">${used}</b></div>
-      <div class="trk"><i style="width:${used/SERVER*100}%;background:var(--acc)"></i></div></div>
+      <div class="trk"><i style="width:${cl(used/Math.max(1,ludzie)*100)}%;background:var(--acc)"></i></div></div>
     <div class="st" style="margin:0"><div class="l"><span>Niezrzeszonych</span><b class="m">${freeTot()}</b></div>
-      <div class="trk"><i style="width:${freeTot()/SERVER*100}%;background:var(--pos)"></i></div></div>
+      <div class="trk"><i style="width:${cl(freeTot()/Math.max(1,ludzie)*100)}%;background:var(--pos)"></i></div></div>`})()}
     <div style="display:flex;gap:10px;margin-top:9px;font-family:var(--m);font-size:11px;color:var(--dim)">
       ${SEG.map(s=>`<span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${s.c};margin-right:4px"></i>${G.free[s.id]}</span>`).join('')}</div>
   </div></div>
@@ -3964,8 +4022,8 @@ function hemi(order,w,mode){
       pts.push({t,r,ri})}});
   pts.sort((a,b)=>a.t-b.t||a.ri-b.ri);
 
-  // niższy podpis pod salą: wykres zajmował więcej miejsca, niż potrzebował
-  const H=Math.round(Rmax+rad+44), cy=Math.round(Rmax+rad+12);
+  // Podpisy przeniosły się pod wykres, więc samo SVG nie potrzebuje już zapasu na dole.
+  const H=Math.round(Rmax+rad+18), cy=Math.round(Rmax+rad+12);
   const colOf=k=>{if(mode==='bloc'){const b=blocOf(k);if(b)return b.color}return G.p[k].c};
   const uid='h'+Math.random().toString(36).slice(2,7);
 
@@ -4034,13 +4092,16 @@ function hemi(order,w,mode){
       font-size="27" font-weight="700" font-family="ui-monospace,monospace">${moje}</text>
     <text x="${cx}" y="${cy-15}" text-anchor="middle" fill="var(--dim2)" font-size="10"
       font-family="ui-monospace,monospace" letter-spacing=".14em">TWOICH MANDATÓW</text>
-    <text x="${cx}" y="${cy+22}" text-anchor="middle" fill="var(--dim2)" font-size="11.5"
-      font-family="ui-monospace,monospace">${n} mandatów · większość ${MAJ}${
-      mRzad>0?` · <tspan fill="var(--pos)">rząd ${mRzad}</tspan>`:''}</text>
-    ${mRzad>0?`<text x="${cx}" y="${cy+38}" text-anchor="middle" font-size="11"
-      font-family="ui-monospace,monospace" fill="${mRzad>=MAJ?'var(--pos)':'var(--neg)'}">${
-      mRzad>=MAJ?'rząd ma większość':'rząd mniejszościowy, brakuje '+(MAJ-mRzad)}</text>`:''}
-  </svg>`;
+  </svg>
+  <!-- Podpisy wyszły z SVG do zwykłego paska: wewnątrz wykresu nie mieściły się
+       w jego wysokości i dłuższe komunikaty były po prostu ucinane w połowie. -->
+  <div class="hemipod">
+    <span><b>${n}</b> ${pl(n,'mandat','mandaty','mandatów')}</span>
+    <span>większość <b>${MAJ}</b></span>
+    ${mRzad>0?`<span>rząd <b style="color:var(--pos)">${mRzad}</b></span>
+      <span class="hemistan ${mRzad>=MAJ?'ok':'zle'}">${
+        mRzad>=MAJ?'rząd ma większość':`rząd mniejszościowy, brakuje ${MAJ-mRzad}`}</span>`:''}
+  </div>`;
 }
 function hexPts(cx,cy,r){const a=[];for(let i=0;i<6;i++){const t=(Math.PI/180)*(60*i-90);
   a.push((cx+r*Math.cos(t)).toFixed(1)+','+(cy+r*Math.sin(t)).toFixed(1))}return a.join(' ')}
@@ -5158,9 +5219,17 @@ function openResort(id){
   if(radaKto(id))opcje.push({l:'Zostawiam wakat',s:`${radaKto(id)} odchodzi z rządu`,f:()=>obsadz(id,null,null)});
   opcje.push({l:'Jednak nie',s:'Nic nie zmieniasz',f:close});
 
+  // ilu koalicjantów zostało dotąd z pustymi rękami — żeby nie było niespodzianki
+  const g2=G.gov;
+  const bezResortu=(g2&&G.pmOk&&g2.pm===G.me)
+    ? g2.parties.filter(k=>k!==G.me&&G.p[k]&&!G.p[k].dead
+        &&!RESORTY.some(r=>{const n=radaKto(r.id);return n&&partiaOsoby(n)===k})) : [];
   modal('Rada ministrów',res.n,
     `<p>${res.d}</p><p>Ministra z własnej partii widać w twojej sławie. Oddany koalicjantowi
-     resort kupuje ci przychylność jego partii, ale pracuje na jej konto.</p>`,opcje,close);
+     resort kupuje ci przychylność jego partii, ale pracuje na jej konto.</p>
+     ${bezResortu.length?`<p class="dim" style="font-size:12.5px">Bez resortu w koalicji:
+       <b>${bezResortu.map(k=>`${G.p[k].ab} (${G.p[k].seats} ${pl(G.p[k].seats,'mandat','mandaty','mandatów')})`).join(', ')}</b>.
+       Jeśli zgarniesz całą radę dla siebie, policzą krzesła i to odbije się na relacjach.</p>`:''}`,opcje,close);
 }
 function obsadz(id,nick,zPartii){
   radaInit();
@@ -5191,12 +5260,51 @@ function obsadz(id,nick,zPartii){
     }else{
       me().fame=cl(me().fame+3);me().act=cl(me().act+2);
       say(`<b>${nick}</b> z twojej partii obejmuje resort: ${res.n}. Sława w górę.`,'good');
+      zawiedzeniKoalicjanci();
     }
   }else{
     delete G.rada[id];delete G.radaOd[id];
     say(`Resort ${res.n} zostaje bez ministra.`,'bad');
   }
   close();render();
+}
+
+/* Koalicjant, który wniósł mandaty, a nie dostał nic, zaczyna liczyć krzesła.
+   Wcześniej dało się obsadzić całą radę własnymi ludźmi i nikt nie mrugnął —
+   koalicja była listą nazwisk, a nie układem, który trzeba obsługiwać. */
+function zawiedzeniKoalicjanci(){
+  const g=G.gov;
+  if(!g||!G.pmOk||g.pm!==G.me)return;
+  const partnerzy=g.parties.filter(k=>k!==G.me&&G.p[k]&&!G.p[k].dead);
+  if(!partnerzy.length)return;
+  const obsadzone=RESORTY.filter(r=>radaKto(r.id));
+  if(obsadzone.length<2)return;            // przy jednym resorcie nie ma o co kruszyć kopii
+
+  const mojeK=obsadzone.filter(r=>{const n=radaKto(r.id);return roster(me()).includes(n)}).length;
+  const udzial=mojeK/obsadzone.length;
+  if(udzial<.75)return;                    // zwykły podział łupów nikogo nie dziwi
+
+  const mandKoal=g.parties.reduce((a,k)=>a+G.p[k].seats,0)||1;
+  const urazeni=[];
+  partnerzy.forEach(k=>{
+    const maResort=RESORTY.some(r=>{const n=radaKto(r.id);return n&&partiaOsoby(n)===k});
+    if(maResort)return;
+    // im większy wkład w koalicję, tym większa uraza: mały przystawka to co innego
+    // niż partia, bez której nie byłoby większości
+    const waga=G.p[k].seats/mandKoal;
+    const zlosc=Math.round(cl(3+waga*26+(udzial>=1?4:0),3,20));
+    G.rel[k][G.me]=cl(G.rel[k][G.me]-zlosc,-100,100);
+    G.rel[G.me][k]=cl(G.rel[G.me][k]-Math.round(zlosc*.4),-100,100);
+    G.p[k].mom=cl((G.p[k].mom||0)-3,-35,42);
+    urazeni.push({k,zlosc});
+  });
+  if(!urazeni.length)return;
+
+  APPR(-Math.min(9,2+urazeni.length*2));
+  me().ctr=cl(me().ctr+3);
+  const naj=urazeni.sort((a,b)=>b.zlosc-a.zlosc);
+  say(`<b>Koalicjanci liczą krzesła.</b> ${udzial>=1?'Cała rada ministrów':'Prawie cała rada'} jest twoja,
+    a ${naj.map(x=>`${G.p[x.k].ab} (−${x.zlosc})`).join(', ')} ${pl(naj.length,'wyszedł','wyszli','wyszli')} z niczym.`,'bad');
 }
 
 /* Cena działacza. Kto ma lepsze statystyki, tego trudniej przeciągnąć — i drożej.
@@ -5875,7 +5983,7 @@ function applyGoals(){
   if(hasLib2(G.me)){const p=G.p[G.me];if(p.fame<50)p.fame=50}
   // Centrum stoi jednością, hegemon sławą — obie podłogi są celowo niższe
   // niż przy republice, żeby te cele nie robiły z partii pomnika.
-  if(hasCen(G.me)){const p=G.p[G.me];if(p.uni<45)p.uni=45}
+  if(hasCen(G.me)){const p=G.p[G.me];if(p.uni<38)p.uni=38}
   if(hasHeg(G.me)){const p=G.p[G.me];if(p.fame<65)p.fame=65}
 }
 function goalDrift(k){
@@ -5887,7 +5995,9 @@ function goalDrift(k){
   if(p.robMode){p.uni=cl(p.uni+1.8);p.ctr=cl(p.ctr+1.2)}
   if(p.rom12Mode){p.uni=cl(p.uni+2);p.ctr=cl(p.ctr-1)}
   // Centrum: spokojnie i po środku — niewiele, ale co tydzień i w dobrą stronę
-  if(p.cenMode){p.uni=cl(p.uni+1.6);p.cred=cl(p.cred+.8);p.ctr=cl(p.ctr-.9);p.pret=cl(p.pret-.6)}
+  // Centrum stoi spokojem i wiarygodnością, a nie samą jednością — dlatego
+  // przyrost jedności jest tu wyraźnie mniejszy niż w pierwszej wersji celu
+  if(p.cenMode){p.uni=cl(p.uni+.9);p.cred=cl(p.cred+1.1);p.ctr=cl(p.ctr-1.1);p.pret=cl(p.pret-.8);p.act=cl(p.act+.7)}
   // Hegemon rośnie, ale sam swoim rozmiarem drażni resztę sceny
   if(p.hegMode){p.fame=cl(p.fame+2.2);p.act=cl(p.act+1.4);
     alive().forEach(x=>{if(x!==k&&G.rel[x])G.rel[x][k]=cl(G.rel[x][k]-.7,-100,100)})}
@@ -5946,25 +6056,26 @@ const GOALS={
  /* Wynik ostatnich wyborów. Przed pierwszymi nie ma czego czytać, więc cele
     z takim warunkiem po prostu jeszcze nie są spełnione. */
  centrum:{n:'Ani w lewo, ani w prawo',for:['DPD'],logo:'CEN',bots:0,
-  what:'Przestajesz się tłumaczyć jednym i drugim skrzydłem. Tortex, Kaziu i balon pod jednym szyldem, a serwer dostaje partię, która nie obiecuje rewolucji — tylko że będzie.',
+  what:'Przestajesz się tłumaczyć jednym i drugim skrzydłem. Tako, Kaziu i balon pod jednym szyldem, a serwer dostaje partię, która nie obiecuje rewolucji — tylko że będzie.',
   req:[
    {t:'Co najmniej 15 osób w partii',v:()=>me().mem+' / 15',ok:()=>me().mem>=15},
-   {t:'Tortex, Kaziu i balon w partii',
-    v:()=>{const o=roster(me());return ['Tortex','Kaziu','balon'].filter(n=>o.includes(n)).length+' / 3'},
-    ok:()=>{const o=roster(me());return ['Tortex','Kaziu','balon'].every(n=>o.includes(n))}},
+   // Tako siedzi wśród bezpartyjnych — trzeba go najpierw ściągnąć decyzją „Werbunek”
+   {t:'Tako, Kaziu i balon w partii',
+    v:()=>{const o=roster(me());return ['Tako','Kaziu','balon'].filter(n=>o.includes(n)).length+' / 3'},
+    ok:()=>{const o=roster(me());return ['Tako','Kaziu','balon'].every(n=>o.includes(n))}},
    {t:'Co najmniej 10% w ostatnich wyborach',
     v:()=>ostatniWynik()===null?'jeszcze nie było wyborów':fmt(ostatniWynik())+'% / 10%',
     ok:()=>(ostatniWynik()||0)>=10},
    {t:'Dopiero od trzeciej kadencji',v:()=>'kadencja '+G.term+' / 3+',ok:()=>G.term>=3},
   ],
   cons:['Partia występuje odtąd jako Partia Centrum.',
-   'Jedność rośnie o 1,6 tygodniowo i nigdy nie spada poniżej 45.',
-   'Wiarygodność rośnie o 0,8, kontrowersja i pretensjonalność powoli schodzą.',
+   'Wiarygodność rośnie o 1,1 tygodniowo, aktywność o 0,7, a kontrowersja i pretensjonalność powoli schodzą.',
+   'Jedność rośnie o 0,9 tygodniowo i nie spada poniżej 38 — wystarczy, żeby partia się trzymała, za mało, żeby wygrywać samą zgodą.',
    'Dyplomacja łatwiejsza: koalicjanci schodzą z wymaganiami o 8.',
    'Na koniec kadencji dochodzi trochę więcej ludzi — środek przyciąga niezdecydowanych.',
    'Droga do Partii Republikańskiej pozostaje otwarta.'],
   run(){const p=me();p.n='Partia Centrum';p.ab='PC';p.c='#1f7f86';p.logo='CEN';p.cenMode=1;
-   p.uni=cl(p.uni+12);p.cred=cl(p.cred+6);p.pret=cl(p.pret-8);M(p,10);
+   p.uni=cl(p.uni+7);p.cred=cl(p.cred+8);p.pret=cl(p.pret-8);p.act=cl(p.act+5);M(p,10);
    say('<b>Ani w lewo, ani w prawo.</b> Partia Centrum wchodzi na scenę i po raz pierwszy od dawna nikt nie wie, na kogo się obrazić.','roy')}},
  hegemon:{n:'Hegemon Perspektywiczny',for:['NP'],logo:'HEG',bots:0,
   what:'Nowa Perspektywa przestaje być jedną z partii i staje się punktem odniesienia dla całego serwera. Jugen, Prewencjusz i kisielek48 w jednym składzie, urząd w ręku i kasa w skarbcu.',
@@ -7600,8 +7711,64 @@ function naliczZnuzenie(){
   if(moje>=48&&(g&&g.parties.includes(G.me)))
     say(`<b>Serwer ma cię dość.</b> Rządzisz tak długo, że zmęczenie władzą zjada ci ${Math.round(moje/2.9)}% poparcia. Kadencja w opozycji by je zmyła.`,'bad');
 }
+/* ---- demografia serwera ----
+   Serwer żyje własnym życiem: przy dobrej kadencji ludzie się schodzą, przy
+   awanturach cicho znikają. Wcześniej pula rosła po parę osób co tydzień
+   niezależnie od wszystkiego, więc komunikaty o napływie były pustą obietnicą —
+   liczba na pasku stała w miejscu, cokolwiek się działo.
+
+   Zwraca zmianę liczby ludzi na serwerze (na plus albo na minus). */
+function demografiaSerwera(){
+  const zywe=alive();
+  if(!zywe.length)return 0;
+  const sr=f=>zywe.reduce((a,k)=>a+f(G.p[k]),0)/zywe.length;
+  const fame=sr(p=>p.fame), akt=sr(p=>p.act), ktr=sr(p=>p.ctr), jed=sr(p=>p.uni);
+
+  // Co ciągnie ludzi na serwer, a co ich z niego wypycha
+  let ruch=(fame-44)/10 + (akt-44)/9 - (ktr-36)/8 + (jed-48)/22;
+  ruch+=((G.turnout||.85)-.82)*14;              // wysoka frekwencja to znak, że tu się dzieje
+  if(!G.gov)ruch-=3.5;                          // kadencja bez rządu odstrasza
+  else if(G.gov.minority)ruch-=1.4;
+  if(G.p[G.me].ctr>=80)ruch-=1.6;               // twoje własne awantury też się liczą
+  ruch+=R(-2.2,2.2);                            // reszta to przypadek
+
+  const ludzie=PID.reduce((a,k)=>a+G.p[k].mem,0)+freeTot();
+  // im ciaśniej na serwerze, tym trudniej o kolejnych chętnych
+  if(ruch>0)ruch*=cl(1-(ludzie-SERVER)/(SERVER_MAX-SERVER),.15,1);
+  let d=Math.round(cl(ruch,-16,14));
+  if(d>0)d=Math.min(d,Math.max(0,SERVER_MAX-ludzie));
+  if(d<0)d=-Math.min(-d,Math.max(0,ludzie-120));   // serwer nie wymiera do zera
+  if(!d)return 0;
+
+  if(d>0){
+    // nowi trafiają do puli niezrzeszonych: głównie serwerowicze, elita rzadko
+    let zostalo=d;
+    const eli=ch(.18)?1:0, int=Math.round(zostalo*.22);
+    G.free.eli+=eli;zostalo-=eli;
+    G.free.int+=int;zostalo-=int;
+    G.free.ser+=Math.max(0,zostalo);
+  }else{
+    // Odchodzą najpierw ci, którzy nigdzie nie zdążyli wsiąknąć. Dopiero gdy pula
+    // wolnych się skończy, ubytek zaczynają odczuwać same partie.
+    let brak=-d;
+    ['ser','int','eli'].forEach(s=>{
+      const z=Math.min(brak,G.free[s]||0);G.free[s]-=z;brak-=z;
+    });
+    while(brak>0){
+      const duze=alive().filter(k=>G.p[k].mem>1).sort((a,b)=>G.p[b].mem-G.p[a].mem);
+      if(!duze.length)break;
+      const k=duze[0],p=G.p[k],s=p.comp.ser>0?'ser':p.comp.int>0?'int':'eli';
+      if(p.comp[s]<1)break;
+      p.comp[s]--;p.mem--;brak--;
+    }
+  }
+  return d;
+}
 function startTerm(){
   memberFlow(); rotateBench();
+  {const d=demografiaSerwera();
+   if(d>0)say(`<b>Serwer rośnie.</b> Przez kadencję dołączyło ${d} ${pl(d,'osoba','osoby','osób')}.`,'good');
+   else if(d<0)say(`<b>Serwer się wykrusza.</b> Przez kadencję ubyło ${-d} ${pl(-d,'osoba','osoby','osób')}.`,'bad');}
   // Sejm bez ustaw przez sześć kadencji z rzędu przestaje być traktowany serio.
   // Liczy się tylko czas, w którym naprawdę mogłeś je składać, czyli z fotelem premiera.
   if(isPM()){
@@ -7964,7 +8131,8 @@ Object.assign(window,{start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,m
   setTab:k=>{G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
   signAgent,agentCost,agentFree,AGENTS,render,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
-window.__game={openDym,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,mogeZglosic,rozwiazChance,radaKto,RESORTY,pmOsoba,pmOsoby,leads,roster,
+window.__game={openDym,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
+  zawiedzeniKoalicjanci,demografiaSerwera,SERVER,SERVER_MAX,AGENTS,mogeZglosic,rozwiazChance,radaKto,RESORTY,pmOsoba,pmOsoby,leads,roster,
   aiTransfery,aiOpozycja,aiObsadzRade,aiRekonstrukcja,znuzenie,hegemon,resortyPartii,leadWybrany,aiPlan,ustawPlany,
   rozliczenieKadencji,sprawdzZapis,doganianie,repChetni,BAL,saveCode,loadCode,
   PATCHNOTE,patchDoPokazania,pokazPatch,ustawWersje,get WERSJA(){return WERSJA},
@@ -7974,7 +8142,7 @@ window.__game={openDym,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministe
   giveBackCap,prezRound1,prezRound2,runRunoff,memberFlow,prezWait,prezPush,openPush,crownPrez,hemi,pmBlocked,rotateBench,AVA,TEM,INNATE,conflictOf,buyTrait,buyStat,traitsOf,xpOs,xpPula,leadWybrany,COMBO,ostatniWynik,hasCen,hasHeg,LOGOS,applyGoals,checkDeath,isPMperson,isPrezPerson,income,EV,wotumChance,
   prezRound1,prezGo,A,fire,me,topSeg,sejmVote,setGov,PID,REG,SEG,SID,BASE,COAL,LP,LEAD,THR,
   TOPUP,DIST_SEATS,TOTAL_SEATS,MAJ,accepts,thrFor,
-  radar,feed,runDateAnim,gameDate,dateStr,mapTab,actTab,pollTab,sejmTab,leadTab,kingTab,sidebar,setup,pmScreen,prezScreen,marScreen,startMar,marContinue,marDeclare,isMar,isWice,isMarPerson,ownPool,bestRep,runRace,raceScore,results,TRAITS,sizeF,shown,enGain,pickMain,kingScore,kingFactors,kingFav,saveCode,loadCode,allBlocs,addRegion,delRegion,rebalanceSeats,
+  radar,feed,runDateAnim,gameDate,dateStr,mapTab,actTab,pollTab,partieTab,sejmTab,leadTab,kingTab,sidebar,setup,pmScreen,prezScreen,marScreen,startMar,marContinue,marDeclare,isMar,isWice,isMarPerson,ownPool,bestRep,runRace,raceScore,results,TRAITS,sizeF,shown,enGain,pickMain,kingScore,kingFactors,kingFav,saveCode,loadCode,allBlocs,addRegion,delRegion,rebalanceSeats,
   roster,leads,isLead,lead,L,innAll,GOALS,openStery,sterySet,steryTog,steryOk,creditsBox,AUTORZY,WERSJA,
   LAWS,lawVote,proposeLaw,signLaw,applyLaw,lawDone,lawIntake,lawsPending,lawsToSign,startLaw,
   LAWPAR,lawEdytowalna,lawParams,radykalnosc,aiProposeLaw,openEdycja,rozstrzygnijUstawe,

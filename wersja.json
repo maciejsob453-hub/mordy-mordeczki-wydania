@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.10",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/3f68d9f82e3815d9956c006fac9a604813038adb",
+ "wersja": "1.1.11",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,8 +14,8 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "4e08b2ed63b3fb145e1bfdb2d17f6bf7343d2427e97d3e449f013874ff66f91e",
-   "bajtow": 509218
+   "sha": "f496e085e15a4a1771eb2612bd18fe5b6924617e0c0d89d1531f59503efc47c4",
+   "bajtow": 519218
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -383,6 +383,11 @@
    "bajtow": 42197
   },
   {
+   "sciezka": "gra/obrazki/ava-tako.webp",
+   "sha": "00afb6da94cf0fb5e3cfe19738da1bf9943298d954763d82c46c1049a67e7b26",
+   "bajtow": 8742
+  },
+  {
    "sciezka": "gra/obrazki/b3d16b3de0ab.webp",
    "sha": "b58e364c0714765ddb88a8b76321e5037b795c459d870aff5cb47bc11467e0f8",
    "bajtow": 3752
@@ -508,19 +513,24 @@
    "bajtow": 24416
   },
   {
+   "sciezka": "gra/obrazki/ikona-mandat.png",
+   "sha": "8a5c3a012c6d1802728d43310c2c54c285149e701a981e23884fde346981ac56",
+   "bajtow": 21930
+  },
+  {
    "sciezka": "gra/obrazki/ikona-sondaz.png",
    "sha": "656e58b678262781553c5db54010351b6e8470b38ea3121a04f2daf960b3bc20",
    "bajtow": 18317
   },
   {
    "sciezka": "gra/obrazki/logo-centrum.webp",
-   "sha": "b7a60e3e3ea3b89994baf58e29d3958fd859a71ddc95ab84201a82c3053f7bbf",
-   "bajtow": 54258
+   "sha": "cc4647ea6666fa5bde82c8fed009c66a7abec144db1f45feeebd2b31eca6b932",
+   "bajtow": 53866
   },
   {
    "sciezka": "gra/obrazki/logo-hegemon.webp",
-   "sha": "4d6d878602cdf434589c16ecc8fe1db6a87aac0650dfd81e418553b23677d6a6",
-   "bajtow": 74840
+   "sha": "6077c899641b2cced760f3dbbe234756ad42fc2685966eba8bd822150f5844df",
+   "bajtow": 134454
   },
   {
    "sciezka": "gra/obrazki/logo-p1612.png",
@@ -534,8 +544,8 @@
   },
   {
    "sciezka": "gra/wyglad/style.css",
-   "sha": "9c90abc0f55b56a59ff518aac49cfaf3c79fd27d65d1ed48de4603531013c053",
-   "bajtow": 82833
+   "sha": "5df239424255ab0baddddd46130381a5254dc73b367067b151899d1a2bb9c363",
+   "bajtow": 84615
   }
  ],
  "exe": {
@@ -555,6 +565,5 @@
   "sha": "368bb8d606782141486baffb00919fa3ba649f6b47f6f4cb4b916820d806832c",
   "bajtow": 12107330,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.7/Mordy.Mordeczki.Launcher.exe"
- },
- "commit": "3f68d9f82e3815d9956c006fac9a604813038adb"
+ }
 }
