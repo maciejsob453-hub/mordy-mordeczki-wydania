@@ -1,0 +1,127 @@
+/* ═══════════════════════════════════════════════════════════
+   REDESIGN — warstwa nadrzędna
+   Osobny plik, wczytywany po style.css. Trzymamy go obok, a nie w środku,
+   żeby dało się porównać jedno z drugim i w razie czego cofnąć jedną linijką
+   w index.html. Nic tu nie dotyka logiki gry — wyłącznie wygląd.
+   ═══════════════════════════════════════════════════════════ */
+
+:root{
+  /* Rytm: wszystkie odstępy są wielokrotnością jednej wartości. Wcześniej
+     marginesy były dobierane na oko i każdy panel oddychał inaczej. */
+  --o1:4px; --o2:8px; --o3:12px; --o4:18px; --o5:26px; --o6:38px;
+
+  /* Skala typograficzna zamiast przypadkowych rozmiarów w kilkunastu miejscach */
+  --t-mini:10.5px; --t-male:12px; --t-drobne:13px; --t-baza:14.5px;
+  --t-duze:17px; --t-naglowek:21px; --t-tytul:30px;
+
+  /* Cienie: mniej rozmycia, więcej kontaktu z tłem — panele mają leżeć,
+     a nie unosić się nad ekranem */
+  --sh1:0 1px 2px rgba(0,0,0,.45);
+  --sh2:0 8px 22px -14px rgba(0,0,0,.75), 0 2px 5px -2px rgba(0,0,0,.5);
+  --sh3:0 26px 60px -22px rgba(0,0,0,.85), 0 5px 14px -5px rgba(0,0,0,.6);
+}
+
+body{font-size:var(--t-baza);line-height:1.62}
+
+/* ---- typografia: jedna hierarchia zamiast trzech ---- */
+h1{font-size:var(--t-tytul);letter-spacing:.004em}
+h2{font-size:var(--t-naglowek)}
+h3{font-size:var(--t-duze);letter-spacing:-.005em}
+h4{font-size:var(--t-baza);letter-spacing:-.004em}
+
+/* ---- karta: spokojniejsza rama, wyraźniejszy nagłówek ---- */
+.card{
+  border-radius:var(--r3);
+  border-color:var(--line);
+  background:
+    linear-gradient(180deg, rgba(216,168,62,.035), transparent 120px),
+    linear-gradient(180deg,var(--p2),var(--p1) 38%);
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset, var(--sh2);
+}
+.card>.h{
+  padding:var(--o3) var(--o4);
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,.022), transparent);
+}
+.card>.h h3{font-size:var(--t-drobne);letter-spacing:.13em;text-transform:uppercase;
+  color:var(--acc);font-family:var(--m);font-weight:600}
+.card>.h .n{font-size:var(--t-male);color:var(--dim2)}
+.card>.b{padding:var(--o4)}
+
+/* naroża zostają, ale mniej krzyczą */
+.card::before,.card::after{opacity:.34}
+
+/* ---- przyciski: widać, który jest główny ---- */
+.btn{
+  border-radius:var(--r2);
+  padding:9px 17px;
+  font-weight:600;
+  letter-spacing:.005em;
+  transition:background .14s, border-color .14s, transform .1s;
+}
+.btn:active{transform:translateY(1px)}
+.btn.sm{padding:6px 12px;font-size:var(--t-male)}
+
+/* ---- decyzje: kafle mają wyglądać jak karty do zagrania ---- */
+.act{
+  border-radius:var(--r3);
+  padding:var(--o3) var(--o4) var(--o3);
+  transition:border-color .14s, background .14s, transform .1s;
+}
+.act:not([disabled]):hover{transform:translateY(-1px)}
+.act h4{font-size:var(--t-baza);margin-bottom:2px}
+.act .dd{font-size:var(--t-drobne);line-height:1.5;color:var(--dim)}
+.act .c{gap:5px;margin-top:var(--o3)}
+.cst{font-size:var(--t-mini);padding:3px 7px;border-radius:var(--r1)}
+
+/* ---- paski statystyk: cieńsze, spokojniejsze ---- */
+.trk{height:5px;border-radius:3px;background:#0a0f0a}
+.trk i{border-radius:3px;transition:width .35s cubic-bezier(.2,.7,.3,1)}
+.st{margin-bottom:var(--o3)}
+.st .l{font-size:var(--t-drobne);margin-bottom:5px}
+
+/* ---- tabele i listy: rytm zamiast ścisku ---- */
+table{font-size:var(--t-drobne)}
+th{font-size:var(--t-mini);letter-spacing:.1em;text-transform:uppercase;color:var(--dim2);
+  font-family:var(--m);font-weight:600;padding:var(--o2) var(--o3)}
+td{padding:var(--o2) var(--o3);border-top:1px solid var(--line)}
+tr:hover td{background:rgba(255,255,255,.018)}
+
+/* ---- pigułki: jednolita wysokość i kontrast ---- */
+.pill{font-size:var(--t-mini);padding:3px 9px;border-radius:999px;
+  letter-spacing:.02em;font-weight:600}
+
+/* ---- okna: więcej powietrza, mniej ramek ---- */
+.mdl{border-radius:var(--r4);box-shadow:var(--sh3)}
+.mdl .bd{padding:var(--o5) var(--o5) var(--o4)}
+.mdl .op{padding:0 var(--o5) var(--o5);gap:var(--o2)}
+.opt{border-radius:var(--r2);padding:var(--o3) var(--o4);transition:border-color .14s,background .14s}
+.opt b{font-size:var(--t-baza)}
+.opt span{font-size:var(--t-male);color:var(--dim2)}
+
+/* ---- nawigacja: aktywna zakładka ma być oczywista ---- */
+.nav button{padding:10px 2px;font-size:var(--t-drobne);letter-spacing:.01em}
+.nav button.on{color:var(--acc)}
+
+/* ---- notki i podpowiedzi ---- */
+.note{font-size:var(--t-drobne);line-height:1.55;border-radius:var(--r2);
+  padding:var(--o3) var(--o4)}
+.dim{color:var(--dim)}
+.sterlab{font-size:var(--t-mini);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dim2);font-family:var(--m);margin-bottom:var(--o2)}
+
+/* ---- kondycja partii: wykres i podpisy przestają się tłoczyć ---- */
+.radar{max-width:186px;margin:0 auto var(--o2)}
+
+/* ---- skład i zaplecze ---- */
+.benchgrid{gap:var(--o2)}
+.bperson{border-radius:var(--r2);padding:var(--o2)}
+.bperson span{font-size:var(--t-mini)}
+
+/* ---- pasek górny: mniej krzykliwy, bardziej czytelny ---- */
+.hud{padding:var(--o4) var(--o5)}
+.rs .rv b{font-size:var(--t-duze)}
+.rs .rv span{font-size:var(--t-mini);letter-spacing:.06em;text-transform:uppercase;color:var(--dim2)}
+
+/* ---- ogólne wygładzenie przejść ---- */
+button,.act,.opt,.card,.pill{transition-timing-function:cubic-bezier(.2,.7,.3,1)}

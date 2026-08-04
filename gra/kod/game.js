@@ -3812,7 +3812,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.26';
+let WERSJA='1.1.27';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3823,6 +3823,13 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.27':{data:'5 sierpnia 2026', zmiany:[
+   'Pierwszy etap nowego wygladu: jedna skala wielkosci pisma i jeden rytm odstepow zamiast wartosci dobieranych na oko w kilkunastu miejscach.',
+   'Karty maja spokojniejsza rame i wyrazniejszy naglowek, kafle decyzji czytaja sie jak karty do zagrania.',
+   'Tabele, listy, pigulki i okna dostaly wiecej powietrza i jednolita wysokosc.',
+   'Wykres kondycji partii mniejszy - podpisy osi przestaly na siebie zachodzic.',
+ ]},
+
  '1.1.26':{data:'5 sierpnia 2026', zmiany:[
    'Weto nie marnuje juz calej kadencji. Podejscie do ustawy zuzywa sie dopiero po rozstrzygnieciu sprawy, a nie w chwili zlozenia projektu.',
    'Sejm moze odrzucic weto prezydenta wiekszoscia trzech piatych. Palac przestal byc instancja, od ktorej nie ma odwolania.',
