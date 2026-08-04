@@ -36,9 +36,14 @@ const BAL={
   znuzenieSufit:       72,
   znuzenieSilaSondaz:  290,    // mniejszy dzielnik = mocniej bije po sondażu
   znuzenieSilaTwardy:  165,
+  // ile z pełnej dawki liczy się w pierwszej, drugiej, trzeciej… kadencji u władzy
+  znuzenieNarost:      [.45,.75,1,1.2,1.35],
 
   // ile wyniku bierze się ze składu partii, a ile z kampanii, obecności i sławy
-  udzialTwardego:      .72,    // niżej = skład mniej decyduje, gra mniej o rekrutację
+  udzialTwardego:      .62,    // niżej = skład mniej decyduje, gra mniej o rekrutację
+  // nawet twardy elektorat trzeba zmobilizować: ile daje sama liczba ludzi, a ile aktywność
+  twardyAktywnosc:     .62,
+  twardyAktywnoscDziel: 145,
   wykladnikSkladu:     .78,    // niżej = malejące zwroty z wielkości są ostrzejsze
 
   // jak mocno jedność przekłada się na wynik wyborczy
@@ -630,7 +635,8 @@ function score(k,r,s){
      wystarczyło pilnować jednego suwaka, żeby wygrywać wybory. Teraz waży mniej
      niż to, co partia realnie robi na serwerze. */
   v*=(BAL.jednoscBaza+p.uni/BAL.jednoscDzielnik);
-  v*=(0.50+p.act/125);
+  // aktywność waży więcej niż wcześniej: partia, która nic nie robi, ma to widzieć w sondażu
+  v*=(0.38+p.act/100);
   v*=(0.52+ld.char/140);
   v*=(1+(p.mom||0)/150);
   v*=moodOf(s.id);
@@ -667,6 +673,10 @@ function tally(){
     if(G.gov&&G.gov.parties.includes(k)&&G.gov.pm!==k)m*=BAL.koalicjaGlosy;
     if(G.p[k].ctr>=90)m*=.5;   // paraliż kontrowersji zjada połowę twardego elektoratu
     m*=(1-znuzenie(k)/BAL.znuzenieSilaTwardy);    // zmęczenie władzą zniechęca nawet własnych
+    /* Nawet własni ludzie muszą mieć po co wyjść do urn. Martwa partia nie dowozi
+       swoich: wcześniej twardy elektorat zależał wyłącznie od liczby nazwisk, więc
+       dało się nic nie robić przez całą kadencję i nie stracić ani punktu. */
+    m*=cl(BAL.twardyAktywnosc+G.p[k].act/BAL.twardyAktywnoscDziel,.55,1.25);
     /* Malejące zwroty z wielkości. W małej partii pracuje przy wyborach praktycznie
        każdy; w wielkiej połowa nazwisk to martwe dusze, które nikogo nie przyprowadzą.
        Bez tego skład przekładał się na głosy wprost i partia, która raz urosła,
@@ -1396,11 +1406,32 @@ function endWeek(){
       else if(G.gov.appr<38){q.fame=cl(q.fame-.8);M(q,-1)}
       if(k===G.gov.pm){q.fame=cl(q.fame+2.6);q.act=cl(q.act+1.2);M(q,1.2)}});
   } else {
-    alive().forEach(k=>{const q=G.p[k];q.act=cl(q.act-1.8);q.uni=cl(q.uni-1.1);M(q,-1.5)});
-    G.kp=Math.max(0,G.kp-4);
-    if(ch(.35))say('<b>Serwer bez rządu.</b> Kanały cichną, ludzie odpływają, nikt nic nie ustala.','bad');
+    /* Kryzys rządowy narasta. Pierwszy tydzień bez gabinetu to jeszcze normalne
+       targi, ale każdy kolejny kosztuje coraz więcej: serwer przestaje wierzyć,
+       że ktokolwiek to poskłada. Wcześniej brak rządu był praktycznie darmowy
+       i dało się przeczekać całą kadencję bez premiera. */
+    G.bezRzadu=(G.bezRzadu||0)+1;
+    const t=G.bezRzadu, sila=Math.min(3.4,1+(t-1)*.55);
+    alive().forEach(k=>{const q=G.p[k];
+      q.act=cl(q.act-1.8*sila);q.uni=cl(q.uni-1.1*sila);M(q,-1.5*sila);
+      if(t>=3)q.cred=cl(q.cred-.9*(sila-1));      // nikt nie wierzy klasie politycznej
+    });
+    G.kp=Math.max(0,G.kp-Math.round(4*sila));
+    // przy przeciągającym się paraliżu ludzie zaczynają wychodzić z partii
+    if(t>=4&&ch(.30+Math.min(.4,(t-4)*.09))){
+      const poszli=giveBackCap(me(),1), ilu=poszli.eli+poszli.int+poszli.ser;
+      if(ilu)say(`<b>Kryzys rządowy, tydzień ${t}.</b> Ludzie mają dość patrzenia na pusty gabinet — odchodzi ${ilu}.`,'bad');
+    }
+    if(t===1)say('<b>Serwer bez rządu.</b> Kanały cichną, nikt nic nie ustala.','bad');
+    else if(t===3)say('<b>Trzeci tydzień bez rządu.</b> Aktywność i jedność lecą we wszystkich partiach, kasa wycieka szybciej.','bad');
+    else if(t>=5&&ch(.5))say(`<b>Paraliż władzy: ${t} tydzień bez gabinetu.</b> Serwer przestaje traktować sejm poważnie.`,'bad');
+    else if(ch(.35))say('<b>Serwer bez rządu.</b> Kanały cichną, ludzie odpływają, nikt nic nie ustala.','bad');
   }
-  G.week++;
+  /* Dwunasty tydzień jest ostatnim. Po jego rozegraniu idziemy prosto do kampanii
+     finałowej i do urn — wcześniej licznik szedł do trzynastu i gra pokazywała
+     „13 z 12”, czyli tydzień, którego w kadencji nie ma. */
+  const tydzienPrzed=G.week, ostatniTydzien=G.week>=G.weeks;
+  if(!ostatniTydzien)G.week++;
   dateAnim={from:dateFrom,to:gameDate()};
   G.apMax=apBase();G.ap=G.apMax;
   G.sztab=G.sztabMax=5+Math.floor(p.mem/22);
@@ -1442,7 +1473,7 @@ function endWeek(){
     p.fame=cl(p.fame-1.8);p.act=cl(p.act-2.5);M(p,-4);p.uni=cl(p.uni-1);
     say('<b>Tydzień bez ruchu.</b> Kanały partii milczały, sondaż to odnotuje.','bad');
   }
-  if(G.actedWeek===G.term+'-'+(G.week-1))G.streak=(G.streak||0)+1;
+  if(G.actedWeek===G.term+'-'+tydzienPrzed)G.streak=(G.streak||0)+1;
   else G.streak=0;
   if(G.recCd>0)G.recCd--;
   aiProposeLaw();          // premier sterowany przez komputer też składa projekty
@@ -1471,7 +1502,7 @@ function endWeek(){
     }
     else if(p.ctr>=70)say(`<b>Kontrowersja ${Math.round(p.ctr)}/100.</b> Przy 90 partia wpada w paraliż: sondaż na pół, kapitał na minus, ludzie wychodzą.`,'bad');
     else if(p.fame<=9&&p.act<=9)say(`<b>${p.lead} ma dość.</b> Sława ${Math.round(p.fame)}, aktywność ${Math.round(p.act)}, o partii nikt już nie pamięta. Rozwiązać cię nikt nie rozwiąże, ale tak się nie wygrywa wyborów.`,'bad');
-    if(G.week>G.weeks)G.phase='finalcamp';
+    if(ostatniTydzien)G.phase='finalcamp';
     else if(G.prez2&&G.week>=G.prez2.week){runRunoff();return}
     else if(G.week===6&&G.term%2===0&&(!G.prez||G.term>=G.prez.until)){G.phase='prez';G.prezState=null}
   }
@@ -2031,6 +2062,8 @@ function setGov(team,pm,appr){
      w rodzaju odwoływania ministra, którego nie ma. */
   G.gov={parties:team,pm,appr,minority:tot<MAJ?1:0};
   G.rada={};                                  // nowy rząd zaczyna od pustych krzeseł
+  G.radaOd={};
+  G.bezRzadu=0;                               // kryzys rządowy się skończył, licznik kar wraca do zera
 }
 /* Ile ministerstw realnie obsadziła dana partia. */
 function resortyPartii(k){
@@ -3447,7 +3480,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.11';
+let WERSJA='1.1.12';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3458,6 +3491,18 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.12':{data:'4 sierpnia 2026', zmiany:[
+   'Kadencja ma dokładnie dwanaście tygodni. Koniec z „13 z 12” — po ostatnim tygodniu idziesz prosto do urn.',
+   'Wejście w Układ sterów i wycofanie się nie zabiera już limitu na kadencję ani akcji. Limit zużywa się dopiero, gdy coś zatwierdzisz.',
+   'Sejm rozpatruje jeden projekt ustawy tygodniowo. Zasada „raz na kadencję” dla każdej ustawy zostaje bez zmian.',
+   'Brak rządu wreszcie boli i boli coraz bardziej z każdym tygodniem kryzysu — spada aktywność, jedność, wiarygodność i kasa, a po czterech tygodniach ludzie zaczynają odchodzić.',
+   'Sondaże mocniej zależą od tego, co robisz. Nawet własny elektorat trzeba zmobilizować: martwa partia nie dowozi swoich do urn.',
+   'Zmęczenie władzą uderza łagodniej po pierwszej kadencji i narasta dopiero przy kolejnych.',
+   'Partie finansują kampanię z tego, co mają na koncie, a nie tylko z tygodniowego przychodu. Duże budżety dają malejące zwroty.',
+   'Cele partyjne dają wyraźnie mniej jedności, a więcej wiarygodności i aktywności. Sama zgoda w partii przestaje wygrywać wybory.',
+   'Zakładka Partie przebudowana: twoje zaplecze na wierzchu, reszta sceny jednym czytelnym spisem zamiast ściany pasków.',
+   'Nabór: kawałki ogłoszenia wyśrodkowane, z licznikiem postępu i czytelniejszym układem.',
+ ]},
  '1.1.11':{data:'4 sierpnia 2026', zmiany:[
    'Nowa zakładka „Partie”: cała scena na jednym ekranie — kto rządzi, ile ma, w jakim jest stanie i jak cię znosi.',
    'Serwer wreszcie naprawdę żyje. Ludzie dołączają po dobrej kadencji i odchodzą po awanturach — liczby się zmieniają, a nie tylko komunikaty.',
@@ -3847,7 +3892,6 @@ function partieTab(q,AL){
   const g=G.gov;
   const proc=k=>q&&q.total?q.res[k].tot/q.total*100:0;
   const rzad=alive().sort((a,b)=>proc(b)-proc(a));
-  const pasek=(v,c,max)=>`<div class="ptrk"><i style="width:${cl(v/(max||100)*100)}%;background:${c}"></i></div>`;
   const stan=p=>{
     // jedna etykieta, która mówi wprost, jak partia stoi
     if(p.ctr>=90)return ['paraliż','neg'];
@@ -3858,45 +3902,63 @@ function partieTab(q,AL){
     if(p.uni>=70&&p.cred>=60)return ['stabilna','pos'];
     return ['spokojnie',''];
   };
-  return `<div class="card"><div class="h"><h3>Partie na serwerze</h3>
-    <span class="n">${rzad.length} ${pl(rzad.length,'partia','partie','partii')} · kadencja ${G.term}</span></div>
-    <div class="b partie">
-    ${rzad.map(k=>{
-      const p=G.p[k],moja=k===G.me,[et,kl]=stan(p);
-      const rola=g&&g.parties.includes(k)?(g.pm===k?'premier':'koalicja')
-        :p.seats?'opozycja':'poza sejmem';
-      const rel=moja?null:Math.round(G.rel[G.me][k]);
+  const rola=k=>g&&g.parties.includes(k)?(g.pm===k?'premier':'koalicja')
+    :G.p[k].seats?'opozycja':'poza sejmem';
+  const moja=G.p[G.me], zaplecze=roster(moja);
+
+  /* Najpierw własne podwórko: kto jest w partii i jak stoi organizacyjnie.
+     Reszta sceny idzie niżej jednym czytelnym spisem — wcześniej każda z trzynastu
+     partii dostawała własną kartę z pięcioma paskami i całość była ścianą wykresów,
+     przez którą nie dało się niczego znaleźć. */
+  const kafel=(l,v,c)=>`<div class="ppz"><b style="color:${c||'var(--tx)'}">${v}</b><span>${l}</span></div>`;
+  const mojaKarta=`<div class="card"><div class="h"><h3>${moja.n}</h3>
+    <span class="n">${leads(moja).join(' / ')} · ${rola(G.me)}</span></div><div class="b">
+    <div class="ppgrid">
+      ${kafel('poparcie',fmt(shown(G.me,proc(G.me)))+'%','var(--acc)')}
+      ${kafel('mandaty',moja.seats,'var(--acc)')}
+      ${kafel('ludzie',moja.mem)}
+      ${kafel('zaplecze',zaplecze.length)}
+      ${kafel('sława',Math.round(moja.fame),'var(--acc)')}
+      ${kafel('wiarygodność',Math.round(moja.cred),'var(--info)')}
+      ${kafel('jedność',Math.round(moja.uni),'var(--pos)')}
+      ${kafel('kontrowersja',Math.round(moja.ctr),moja.ctr>=70?'var(--neg)':'var(--dim)')}
+    </div>
+    <div class="sterlab" style="margin-top:16px">Zaplecze — ${zaplecze.length} ${pl(zaplecze.length,'osoba','osoby','osób')}</div>
+    <div class="benchgrid">
+      ${zaplecze.map(n=>`<div class="bperson ${isLead(moja,n)?'lead':''}" title="${esc(n)}${isLead(moja,n)?' — przewodnictwo':''}">
+        ${ava(n,moja.c,34)}<span>${n}</span></div>`).join('')
+        ||'<span class="dim">Nikogo poza przewodniczącym.</span>'}
+    </div>
+    <div class="pskl">
+      ${SEG.map(s=>`<span><i style="background:${s.c}"></i>${s.n} <b>${moja.comp[s.id]}</b></span>`).join('')}
+    </div>
+  </div></div>`;
+
+  const reszta=rzad.filter(k=>k!==G.me);
+  return mojaKarta+`<div class="card" style="margin-top:14px"><div class="h"><h3>Pozostałe partie</h3>
+    <span class="n">${reszta.length} ${pl(reszta.length,'partia','partie','partii')} · kadencja ${G.term}</span></div>
+    <div class="b"><div class="ptab">
+    ${reszta.map(k=>{
+      const p=G.p[k],[et,kl]=stan(p);
+      const rel=Math.round(G.rel[G.me][k]);
       const co=p.coal&&CO()[p.coal]?CO()[p.coal]:null;
-      return `<div class="pkarta${moja?' moja':''}">
-        <div class="pgl">
-          ${crest(k,'m')}
-          <div class="pnaz">
-            <b>${p.n}</b>
-            <span class="dim">${leads(p).join(' / ')||p.lead}</span>
-          </div>
-          <div class="ptagi">
-            ${moja?'<span class="pill pos">twoja partia</span>':''}
-            <span class="pill${rola==='premier'?' pos':rola==='poza sejmem'?' neg':''}">${rola}</span>
-            ${G.prez&&G.prez.party===k?'<span class="pill roy">prezydent</span>':''}
-            ${co?`<span class="pill" style="border-color:${co.c||'var(--line2)'}">lista ${p.coal}</span>`:''}
-            <span class="pill ${kl}">${et}</span>
-          </div>
+      const r=rola(k);
+      return `<div class="prow">
+        <div class="pgodlo">${crest(k,'s')}</div>
+        <div class="pkto">
+          <b>${p.ab}</b>
+          <span class="dim">${leads(p).join(' / ')||p.lead}</span>
         </div>
-        <div class="pliczby">
-          <div class="pl"><b>${fmt(shown(k,proc(k)))}<em>%</em></b><span>poparcie</span></div>
-          <div class="pl"><b>${p.seats}</b><span>${pl(p.seats,'mandat','mandaty','mandatów')}</span></div>
-          <div class="pl"><b>${p.mem}</b><span>${pl(p.mem,'osoba','osoby','osób')}</span></div>
-          ${moja?'':`<div class="pl"><b style="color:${rel<0?'var(--neg)':rel>30?'var(--pos)':'var(--tx)'}">${rel>0?'+':''}${rel}</b><span>relacje</span></div>`}
-        </div>
-        <div class="pstan">
-          <div class="ps"><span>sława</span>${pasek(p.fame,'var(--acc)')}<b>${Math.round(p.fame)}</b></div>
-          <div class="ps"><span>wiarygodność</span>${pasek(p.cred,'var(--info)')}<b>${Math.round(p.cred)}</b></div>
-          <div class="ps"><span>jedność</span>${pasek(p.uni,'var(--pos)')}<b>${Math.round(p.uni)}</b></div>
-          <div class="ps"><span>aktywność</span>${pasek(p.act,'#9b7fd4')}<b>${Math.round(p.act)}</b></div>
-          <div class="ps"><span>kontrowersja</span>${pasek(p.ctr,p.ctr>=70?'var(--neg)':'var(--dim2)')}<b>${Math.round(p.ctr)}</b></div>
+        <div class="pwyn"><b>${fmt(shown(k,proc(k)))}%</b><span>${p.seats} ${pl(p.seats,'mandat','mandaty','mandatów')} · ${p.mem} ${pl(p.mem,'os.','os.','os.')}</span></div>
+        <div class="prel"><b style="color:${rel<0?'var(--neg)':rel>30?'var(--pos)':'var(--dim)'}">${rel>0?'+':''}${rel}</b><span>relacje</span></div>
+        <div class="ptagi">
+          <span class="pill${r==='premier'?' pos':r==='poza sejmem'?' neg':''}">${r}</span>
+          ${G.prez&&G.prez.party===k?'<span class="pill roy">prezydent</span>':''}
+          ${co?`<span class="pill" style="border-color:${co.c||'var(--line2)'}">${p.coal}</span>`:''}
+          <span class="pill ${kl}">${et}</span>
         </div>
       </div>`}).join('')}
-    </div></div>`;
+    </div></div></div>`;
 }
 function sidebar(p,q){
   const b=(l,v,c,k)=>{const d=G.prev?v-G.prev[k]:0;
@@ -4294,11 +4356,16 @@ function lawsCard(){
       <span>Sejm: za ${G.lawPend.za}, przeciw ${G.lawPend.przeciw}. Dopóki nie zapadnie decyzja, nie zgłosisz kolejnej.</span>
     </div>`:''}
     <div class="note" style="margin:${pend?'14px 0':'0 0 14px'}">Każda ustawa wchodzi w życie na stałe i działa do końca rozgrywki.
-    Za przegłosowaną dostajesz <b>+1 osobę, +1 aktywność i +2 sławy</b>. Jedno podejście do każdej ustawy na kadencję.</div>
+    Za przegłosowaną dostajesz <b>+1 osobę, +1 aktywność i +2 sławy</b>. Jedno podejście do każdej ustawy na kadencję,
+    a sejm rozpatruje <b>jeden projekt tygodniowo</b>.</div>
+    ${ustawaWTymTygodniu()?`<div class="spentbar"><b>Sejm ma już projekt na ten tydzień.</b>
+      Kolejny złożysz po naciśnięciu <b>Kolejny tydzień</b>. Limit „raz na kadencję” dla każdej ustawy zostaje bez zmian.</div>`:''}
     <div class="lawgrid">${LAWS.map(l=>{
       const w=lawDone(l.id), proba=G.lawTerm[l.id], edyt=lawEdytowalna(l.id);
-      const mozna=isPM()&&!proba&&!G.lawPend&&(!w||edyt);
+      const zajete=ustawaWTymTygodniu();
+      const mozna=isPM()&&!proba&&!G.lawPend&&!zajete&&(!w||edyt);
       const stan=proba?'próbowane w tej kadencji':G.lawPend?'najpierw dokończ poprzednią'
+        :zajete?'sejm ma już projekt na ten tydzień'
         :w?(edyt?'w mocy — można poprawić':'w mocy'):'do zgłoszenia';
       const nastawy=(w&&edyt)?lawParams(l.id):null;
       return `<button class="law ${w?'on':''}" ${mozna?'':'disabled'} onclick="startLaw('${l.id}')">
@@ -4322,9 +4389,19 @@ function mogeZglosic(id){
   if(isPM())return true;
   return !!(l.resort&&mojeResorty().includes(l.resort));
 }
+/* Sejm rozpatruje jeden projekt tygodniowo. Każda ustawa z osobna ma nadal swoje
+   jedno podejście na kadencję — ten limit tylko rozkłada je w czasie, żeby nie
+   dało się w jednym tygodniu przepchnąć całego programu naraz. */
+const ustawaWTymTygodniu=()=>G.lawWeek===G.term+'-'+G.week;
 function startLaw(id){
   const l=lawById(id);if(!l||!mogeZglosic(id)||G.lawPend||G.lawTerm[id])return;
   if(lawDone(id)&&!lawEdytowalna(id))return;
+  if(ustawaWTymTygodniu())return modal('Sejm','Laska marszałkowska zajęta',
+    `<p>Sejm rozpatruje w tygodniu <b>jeden</b> projekt, a ten tydzień jest już zajęty.
+     Wróć do <b>${l.n}</b> w przyszłym tygodniu.</p>
+     <p class="dim">Każda ustawa i tak ma tylko jedno podejście na kadencję — chodzi o to,
+     żeby nie dało się przepchnąć całego programu w jeden wieczór.</p>`,
+    [{l:'Rozumiem',f:close}],close);
   if(lawEdytowalna(id))return openEdycja(id);
   const w=lawVote(id);   // podgląd nastrojów, zanim gracz zdecyduje
   modal('Sejm',l.n,
@@ -4522,10 +4599,14 @@ function fire(a,t,r,s,tm){
   const enMul=(tr('twardziel')?.75:1)*sf.en*BAL.energiaMnoznik;
   const kpMul=sf.kp*(hasT('strateg')?.82:1)*(hasLsd(G.me)?.70:1);
   G.ap-=a.ap;G.kp-=Math.round(a.kp*kpMul);G.en=cl(G.en-(a.en>0?a.en*enMul:a.en));
+  // co było zużyte wcześniej, zostaje zużyte — rezygnacja cofa wyłącznie to, co pobrała ta decyzja
+  const limitStad=!!a.term1&&!G.useTerm[a.id], razStad=!!a.once&&!G.once[a.id];
   if(a.once)G.once[a.id]=1;
   if(a.term1)G.useTerm[a.id]=1;
   const f=fat(a.id);G.used[a.id]=(G.used[a.id]||0)+1;
-  G.lastCharge={ap:a.ap,kp:Math.round(a.kp*kpMul),en:(a.en>0?a.en*enMul:a.en),id:a.id,cat:a.cat};
+  // limity zapisujemy razem z kosztem, żeby rezygnacja w oknie cofnęła jedno i drugie
+  G.lastCharge={ap:a.ap,kp:Math.round(a.kp*kpMul),en:(a.en>0?a.en*enMul:a.en),id:a.id,cat:a.cat,
+                term1:limitStad,once:razStad};
   const msg=a.f(me(),f,t,r,s,tm);
   if(msg)G.lastCharge=null;
   const p=me();
@@ -4588,6 +4669,11 @@ function actBack(){   // rezygnacja w oknie decyzji oddaje to, co pobrała sama 
   if(c){G.ap+=c.ap;G.kp+=c.kp;G.en=cl(G.en+c.en);
     if(G.used[c.id])G.used[c.id]--;
     if(G.catUsed[c.cat])G.catUsed[c.cat]--;
+    /* Limit „raz na kadencję” zużywa się dopiero wtedy, gdy gracz naprawdę coś
+       zatwierdzi. Wcześniej wystarczyło zajrzeć w zmianę przewodniczącego
+       i wycofać się, żeby stracić ją na całą kadencję. */
+    if(c.term1)delete G.useTerm[c.id];
+    if(c.once)delete G.once[c.id];
     if(G.lastAct===c.id)G.lastAct=null;
     G.lastCharge=null}
   pend=null;close();render();
@@ -4770,7 +4856,8 @@ function naborRys(){
     <p>Składasz ogłoszenie na kanał <b>${rn(reg)}</b>. Siedzą tu głównie
       ${SID.filter(s=>r.mix[s]>=.2).map(s=>`${sn(s)} ${Math.round(r.mix[s]*100)}%`).join(', ')}.
       Wybierz <b>trzy</b> kawałki — liczy się, czy trafiają w tych ludzi.</p>
-    <div class="sterlab">Wybrano ${NABOR.wyb.length} z 3</div>
+    <div class="naborkrok"><span>Kawałki ogłoszenia</span>
+      <b class="${NABOR.wyb.length===3?'gotowe':''}">${NABOR.wyb.length} z 3</b></div>
     <div class="klocki">${KLOCKI.map(k=>{
       const on=NABOR.wyb.includes(k.id), pelno=!on&&NABOR.wyb.length>=3;
       return `<button class="klocek ${on?'on':''}" ${pelno?'disabled':''} onclick="naborTog('${k.id}')">
@@ -4959,16 +5046,18 @@ function steryOk(){
 
 function openLead(){
   const p=me(),cur=lead(G.me);
+  /* Wszystkie ślepe zaułki oddają akcję: skoro nic się nie wydarzyło,
+     gracz nie ma za co płacić ani tracić limitu na kadencję. */
   if(G.me==='PPP'&&sitActive('kraniecPPP'))return modal('Przewodnictwo','Jeszcze nie teraz',
     `<p>Lager wciąż formalnie prowadzi partię i nikt nie odważy się tego ruszyć, dopóki sytuacja
-     <b>Kraniec PPP</b> się nie rozstrzygnie. Wtedy sam zdecydujesz, co dalej.</p>`,[{l:'Rozumiem',f:close}]);
+     <b>Kraniec PPP</b> się nie rozstrzygnie. Wtedy sam zdecydujesz, co dalej.</p>`,[{l:'Rozumiem',f:actBack}],actBack);
   if(G.useTerm.lider)return modal('Przewodnictwo','Już raz w tej kadencji',
     `<p>Partia zmieniła przewodniczącego w tej kadencji. Kolejna roszada możliwa dopiero po wyborach ,
-     ludzie nie zniosą drugiej zmiany w ciągu kilku tygodni.</p>`,[{l:'Rozumiem',f:close}]);
+     ludzie nie zniosą drugiej zmiany w ciągu kilku tygodni.</p>`,[{l:'Rozumiem',f:actBack}],actBack);
   const cands=roster(p).filter(x=>!isLead(p,x));
   if(!cands.length&&!p.lead2)return modal('Przewodnictwo','Nie ma kim zastąpić',
     `<p>W ${p.n} nie ma nikogo, kto mógłby przejąć stery. ${p.lead} rządzi, dopóki nie odejdzie sam.</p>`,
-    [{l:'Rozumiem',f:close}]);
+    [{l:'Rozumiem',f:actBack}],actBack);
   const st=x=>`charyzma ${x.char} · kompetencja ${x.komp} · wytrzymałość ${x.wytrz} · autorytet ${x.autor}`;
   const traitsTxt=innAll(G.me).map(t=>`★ ${t.n}`).join(' · ');
   const opts=cands.map(c=>{const x=L(c),better=x.avg>cur.avg;
@@ -5006,12 +5095,13 @@ function openLead(){
     opts.push({l:'Ustanawiam współprzewodnictwo',s:`Wybierz, kto dołączy do sterów obok ${p.lead}`,
       f:()=>{close();openCoLead()}});
   }
-  opts.push({l:'Zostawiam jak jest',s:'Nie tracisz akcji ani kapitału',f:close});
+  // rezygnacja musi iść przez actBack, inaczej gracz płaci akcją i traci limit kadencji za samo zajrzenie
+  opts.push({l:'Zostawiam jak jest',s:'Nie tracisz akcji ani kapitału',f:actBack});
   modal('Przewodnictwo',`Kto poprowadzi ${p.ab}?`,
     `<p>Obecnie: <b style="color:var(--tx)">${p.lead}${p.lead2?' / '+p.lead2:''}</b>, ${st(cur)}.${traitsTxt?` <span style="color:var(--acc)">${traitsTxt}</span>`:''}</p>
      <p>Zmiana wchodzi w życie natychmiast i wpływa na wszystko: regenerację energii, ryzyko gafy w wywiadzie,
      wynik debat, tempo rekrutacji i jedność partii.</p>`,
-    opts)}
+    opts,actBack)}
 function openCoLead(){
   const p=me();
   const cands=roster(p).filter(x=>x!==p.lead);
@@ -5669,7 +5759,9 @@ function proposeLaw(id,opcje){
   const law=lawById(id);
   if(!law||!mogeZglosic(id)||G.lawPend||G.lawTerm[id])return;
   if(lawDone(id)&&!lawEdytowalna(id))return;        // bez pokręteł nie ma czego poprawiać
+  if(ustawaWTymTygodniu())return;                   // jeden projekt na tydzień
   G.lawTerm[id]=1;                                  // jedno podejście na kadencję
+  G.lawWeek=G.term+'-'+G.week;                      // laska marszałkowska zajęta do końca tygodnia
   const w=lawVote(id,opcje);
   close();
   if(!w.ok){
@@ -5983,21 +6075,24 @@ function applyGoals(){
   if(hasLib2(G.me)){const p=G.p[G.me];if(p.fame<50)p.fame=50}
   // Centrum stoi jednością, hegemon sławą — obie podłogi są celowo niższe
   // niż przy republice, żeby te cele nie robiły z partii pomnika.
-  if(hasCen(G.me)){const p=G.p[G.me];if(p.uni<38)p.uni=38}
+  // podłoga jedności trzyma Centrum przy życiu, ale nie wygrywa mu już wyborów
+  if(hasCen(G.me)){const p=G.p[G.me];if(p.uni<30)p.uni=30}
   if(hasHeg(G.me)){const p=G.p[G.me];if(p.fame<65)p.fame=65}
 }
 function goalDrift(k){
   const p=G.p[k];
   if(p.adsMode){p.uni=cl(p.uni-2.6);p.fame=cl(p.fame+2.8);p.act=cl(p.act+1.2);p.ctr=cl(p.ctr+1.1)}
-  if(p.horMode){p.act=cl(p.act+3.6);p.uni=cl(p.uni+2.2);p.cred=cl(p.cred+.6)}
+  /* Cele partyjne przestają być maszynką do jedności. Darmowa zgoda w partii
+     działała jak trwały bonus do wyniku niezależnie od tego, co gracz robił;
+     teraz każdy cel daje jej wyraźnie mniej, a w zamian mocniej wspiera to,
+     co widać na serwerze — aktywność, wiarygodność i obecność. */
+  if(p.horMode){p.act=cl(p.act+4.1);p.uni=cl(p.uni+1.3);p.cred=cl(p.cred+.9)}
   if(p.lib2Mode)p.uni=cl(p.uni-1.6);
   if(p.postMode)p.act=cl(p.act+3.2);
-  if(p.robMode){p.uni=cl(p.uni+1.8);p.ctr=cl(p.ctr+1.2)}
-  if(p.rom12Mode){p.uni=cl(p.uni+2);p.ctr=cl(p.ctr-1)}
-  // Centrum: spokojnie i po środku — niewiele, ale co tydzień i w dobrą stronę
-  // Centrum stoi spokojem i wiarygodnością, a nie samą jednością — dlatego
-  // przyrost jedności jest tu wyraźnie mniejszy niż w pierwszej wersji celu
-  if(p.cenMode){p.uni=cl(p.uni+.9);p.cred=cl(p.cred+1.1);p.ctr=cl(p.ctr-1.1);p.pret=cl(p.pret-.8);p.act=cl(p.act+.7)}
+  if(p.robMode){p.uni=cl(p.uni+1.0);p.act=cl(p.act+1.1);p.ctr=cl(p.ctr+1.2)}
+  if(p.rom12Mode){p.uni=cl(p.uni+1.2);p.cred=cl(p.cred+.7);p.ctr=cl(p.ctr-1)}
+  // Centrum stoi spokojem i wiarygodnością, a nie samą jednością
+  if(p.cenMode){p.uni=cl(p.uni+.45);p.cred=cl(p.cred+1.3);p.ctr=cl(p.ctr-1.1);p.pret=cl(p.pret-.8);p.act=cl(p.act+1.0)}
   // Hegemon rośnie, ale sam swoim rozmiarem drażni resztę sceny
   if(p.hegMode){p.fame=cl(p.fame+2.2);p.act=cl(p.act+1.4);
     alive().forEach(x=>{if(x!==k&&G.rel[x])G.rel[x][k]=cl(G.rel[x][k]-.7,-100,100)})}
@@ -6069,8 +6164,8 @@ const GOALS={
    {t:'Dopiero od trzeciej kadencji',v:()=>'kadencja '+G.term+' / 3+',ok:()=>G.term>=3},
   ],
   cons:['Partia występuje odtąd jako Partia Centrum.',
-   'Wiarygodność rośnie o 1,1 tygodniowo, aktywność o 0,7, a kontrowersja i pretensjonalność powoli schodzą.',
-   'Jedność rośnie o 0,9 tygodniowo i nie spada poniżej 38 — wystarczy, żeby partia się trzymała, za mało, żeby wygrywać samą zgodą.',
+   'Wiarygodność rośnie o 1,3 tygodniowo, aktywność o 1,0, a kontrowersja i pretensjonalność powoli schodzą.',
+   'Jedność rośnie o 0,45 tygodniowo i nie spada poniżej 30 — tyle, żeby partia się trzymała, za mało, żeby wygrywać samą zgodą.',
    'Dyplomacja łatwiejsza: koalicjanci schodzą z wymaganiami o 8.',
    'Na koniec kadencji dochodzi trochę więcej ludzi — środek przyciąga niezdecydowanych.',
    'Droga do Partii Republikańskiej pozostaje otwarta.'],
@@ -7032,7 +7127,13 @@ function campInit(){
     // Zdesperowani na końcu stawki sypią wszystkim, co mają.
     const q=G.p[k], c=charOf(k);
     const przod=alive().filter(x=>G.p[x].seats>q.seats).length<=2;
-    const amt=Math.round(cl(income(k).total*R(2.4,4.6)*(przod?1:1.25),12,120));
+    /* Kampanię finansuje się z tego, co partia ma na koncie, a nie tylko z pensji
+       za bieżący tydzień. Wcześniej boty dochodziły do maksymalnego banku i szły
+       do wyborów, nie ruszając ani grosza — wykładały tyle, ile im akurat wpadło. */
+    const bank=Math.max(0,q.bank||0);
+    const zBanku=bank*R(.30,.60)*(przod?.85:1.2);   // zdesperowani sypią wszystkim, co mają
+    const amt=Math.round(cl(income(k).total*R(2.4,4.6)*(przod?1:1.25)+zBanku,12,260));
+    q.bank=Math.max(0,bank-zBanku);                  // kasa naprawdę schodzi z konta
     // Plakat pod charakter i sytuację: awanturnik uderza, wiarygodny pokazuje program,
     // a ten bez rozpoznawalności stawia na twarz lidera.
     const wagi=[
@@ -7044,7 +7145,8 @@ function campInit(){
     const suma=wagi.reduce((a,x)=>a+Math.max(0,x[1]),0);
     let los=Math.random()*suma, wybor='ludzie';
     for(const [id,w] of wagi){los-=Math.max(0,w);if(los<=0){wybor=id;break}}
-    const ps=POSTERS.find(x=>x.id===wybor)||POSTERS[2], scale=amt/50;
+    // malejące zwroty: dwa razy większy budżet nie daje dwa razy większej kampanii
+    const ps=POSTERS.find(x=>x.id===wybor)||POSTERS[2], scale=Math.sqrt(amt/50);
     G.camp.contrib[k]=amt;G.camp.poster[k]=ps.id;
     G.p[k].fame=cl(G.p[k].fame+ps.fame*7*scale);
     G.p[k].cred=cl(G.p[k].cred+ps.cred*7*scale);
@@ -7124,7 +7226,7 @@ function runFinalCamp(v){
     G.kp-=v;
     // gracz wykłada sam kapitał — bez wybierania plakatu; efekt jak przy spokojnej,
     // rzeczowej kampanii, żeby kwota decydowała zamiast rzutu na rodzaj plakatu
-    const scale=v/50;
+    const scale=Math.sqrt(v/50);   // te same malejące zwroty, co u botów
     p.fame=cl(p.fame+7*scale);p.cred=cl(p.cred+7*scale);p.ctr=cl(p.ctr+1.4*scale);
     G.camp.contrib[G.me]=v;G.camp.poster[G.me]='ludzie';
     say(`<b>Finałowa kampania.</b> ${p.lead} wykłada ${v} kapitału.`,'good');
@@ -7703,6 +7805,16 @@ function naliczZnuzenie(){
     if(premier)d=BAL.znuzeniePremier;
     else if(wRzadzie)d=BAL.znuzenieKoalicja;
     else d=BAL.znuzenieOpozycja;      // opozycja odpoczywa w oczach serwera
+    /* Pierwsza kadencja u władzy jest tania — nikt nie ma dość rządu, który dopiero
+       zaczął. Dopiero kolejne bolą coraz mocniej. Wcześniej każda kadencja liczyła
+       się tak samo i już po pierwszej znikało kilkanaście procent poparcia. */
+    if(!G.znuzKad)G.znuzKad={};
+    if(d>0){
+      G.znuzKad[k]=(G.znuzKad[k]||0)+1;
+      d*=BAL.znuzenieNarost[Math.min(BAL.znuzenieNarost.length-1,G.znuzKad[k]-1)];
+    }else{
+      G.znuzKad[k]=Math.max(0,(G.znuzKad[k]||0)-1);   // odpoczynek zmywa też staż
+    }
     // hegemonowi serwer liczy każdą kadencję surowiej — to cena bycia punktem odniesienia
     if(hasHeg(k)&&d>0)d*=1.25;
     G.znuz[k]=cl((G.znuz[k]||0)+d,0,BAL.znuzenieSufit);

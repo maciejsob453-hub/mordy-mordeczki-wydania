@@ -426,30 +426,33 @@ body.bez-ikon .ic{display:none}
 .hemistan.zle{color:var(--neg)}
 
 /* ---- zakładka „Partie”: cała scena polityczna, jedna karta na ugrupowanie ---- */
-.partie{display:flex;flex-direction:column;gap:11px}
-.pkarta{border:1px solid var(--line);border-radius:var(--r3);background:var(--p1);
-  padding:12px 14px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);
-  gap:12px 18px;align-items:center}
-.pkarta.moja{border-color:rgba(216,168,62,.55);
-  background:linear-gradient(180deg,rgba(216,168,62,.07),var(--p1) 60%)}
-.pgl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center;min-width:0}
-.pnaz{min-width:0}
-.pnaz b{display:block;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
-.pnaz span{display:block;font-size:12px;overflow-wrap:anywhere}
-.ptagi{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px}
-.pliczby{display:grid;grid-template-columns:repeat(auto-fit,minmax(58px,1fr));gap:8px;min-width:0}
-.pl{text-align:center;min-width:0}
-.pl b{display:block;font-family:var(--m);font-size:17px;line-height:1.1}
-.pl b em{font-style:normal;font-size:11px;opacity:.7;margin-left:1px}
-.pl span{display:block;font-size:10px;color:var(--dim2);overflow-wrap:anywhere}
-.pstan{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));
-  gap:5px 16px;border-top:1px solid var(--line);padding-top:10px}
-.ps{display:grid;grid-template-columns:88px 1fr 30px;align-items:center;gap:8px;
-  font-size:11.5px;color:var(--dim)}
-.ps b{font-family:var(--m);font-size:11.5px;color:var(--tx);text-align:right}
-.ptrk{height:5px;border-radius:3px;background:#0d120e;overflow:hidden}
-.ptrk i{display:block;height:100%;border-radius:3px}
-@media(max-width:900px){.pkarta{grid-template-columns:1fr}}
+/* ---- zakładka Partie: własne zaplecze u góry, reszta sceny jednym spisem ---- */
+.pskl{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;padding-top:11px;
+  border-top:1px solid var(--line);font-size:12px;color:var(--dim)}
+.pskl span{display:flex;align-items:center;gap:6px}
+.pskl i{width:9px;height:9px;border-radius:2px;flex:none}
+.pskl b{color:var(--tx);font-family:var(--m)}
+
+.ptab{display:flex;flex-direction:column}
+.prow{display:grid;grid-template-columns:auto minmax(96px,1.1fr) minmax(104px,.9fr) auto minmax(0,1.3fr);
+  gap:12px;align-items:center;padding:9px 2px;border-bottom:1px solid var(--line)}
+.prow:last-child{border-bottom:0}
+.pgodlo{display:flex;align-items:center}
+.pkto{min-width:0}
+.pkto b{display:block;font-size:14px;line-height:1.2}
+.pkto span{display:block;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pwyn{min-width:0;text-align:right}
+.pwyn b{display:block;font-family:var(--m);font-size:15px;line-height:1.15}
+.pwyn span{display:block;font-size:10.5px;color:var(--dim2);white-space:nowrap}
+.prel{text-align:right;min-width:44px}
+.prel b{display:block;font-family:var(--m);font-size:14px;line-height:1.15}
+.prel span{display:block;font-size:10px;color:var(--dim2)}
+.ptagi{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}
+@media(max-width:900px){
+  .prow{grid-template-columns:auto minmax(0,1fr) auto;gap:8px}
+  .prel{display:none}
+  .ptagi{grid-column:1/-1;justify-content:flex-start}
+}
 /* ---- panele: rama, ornament w rogach, akcent zależny od rodzaju karty ---- */
 .card{position:relative;border:1px solid var(--line);border-radius:var(--r3);overflow:hidden;
   --kolor:var(--acc);
@@ -718,14 +721,25 @@ body.bez-ikon .ic{display:none}
 .sejmgrid>.card{margin-bottom:0}
 
 /* ---- nabór: układanie ogłoszenia z kawałków ---- */
-.klocki{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:7px;margin-bottom:13px}
-.klocek{text-align:left;padding:10px 12px;border-radius:var(--r2);background:var(--p2);
+/* Ośmiu kawałków nie da się ułożyć w równe rzędy przy każdej szerokości okna,
+   więc zamiast siatki idzie elastyczny rząd wyśrodkowany — ostatnia linijka
+   zostaje na środku, a nie dosunięta do lewej krawędzi. */
+.klocki{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:16px}
+.klocek{flex:1 1 208px;max-width:300px;min-width:0;
+  text-align:left;padding:11px 13px;border-radius:var(--r2);background:var(--p2);
   border:1px solid var(--line);border-left:3px solid var(--line2);transition:.13s}
 .klocek:hover:not([disabled]){border-color:var(--line2);border-left-color:var(--acc);transform:translateY(-1px)}
 .klocek.on{border-color:var(--acc);border-left-color:var(--acc);background:rgba(216,168,62,.12)}
 .klocek[disabled]{opacity:.34}
 .klocek b{display:block;font-size:12.5px;color:var(--tx);margin-bottom:3px}
 .klocek span{display:block;font-size:11.5px;line-height:1.45;color:var(--dim2)}
+/* nagłówek kroku: od razu widać, ile kawałków jeszcze brakuje */
+.naborkrok{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  margin:16px 0 9px;padding-bottom:7px;border-bottom:1px solid var(--line)}
+.naborkrok span{font-family:var(--m);font-size:9.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--dim2)}
+.naborkrok b{font-family:var(--m);font-size:13px;color:var(--dim)}
+.naborkrok b.gotowe{color:var(--pos)}
 .podglad{padding:12px 14px;border-radius:var(--r2);background:rgba(0,0,0,.26);
   border:1px solid var(--line);border-left:3px solid var(--info);margin-bottom:12px}
 .podglad .k{font-family:var(--m);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
