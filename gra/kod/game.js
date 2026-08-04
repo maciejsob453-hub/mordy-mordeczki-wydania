@@ -6,7 +6,7 @@
    ═══════════════════════════════════════════════════════════ */
 (function(){
 "use strict";
-const LOGOS = {"PKR": "obrazki/2d4de0deb7c1.webp", "WP": "obrazki/10efbd4fb21b.webp", "LSD": "obrazki/62ff16ae5515.webp", "KAN": "obrazki/28efd8279222.svg", "HAND": "obrazki/f3c9da594c00.svg", "POST": "obrazki/adb43c8743c7.webp", "LIB": "obrazki/5609cc4b3929.webp", "ALT": "obrazki/1fb954d6dd7c.webp", "ADS": "obrazki/a5665e494ecf.webp", "HMO": "obrazki/3da3c7510fc8.webp", "SS": "obrazki/5ed581dc6fb1.webp", "REP": "obrazki/a56a5574593a.webp", "PD": "obrazki/505b87671205.webp", "PPP": "obrazki/9a313b752b8b.webp", "ZHM": "obrazki/07520c9d52a7.webp", "NP": "obrazki/686628e32c75.webp", "ROM": "obrazki/f72e203052b7.webp", "NBR": "obrazki/20c8f32ecec2.webp", "FD": "obrazki/1f63df863e7f.webp", "KK": "obrazki/40064ea5d3ff.webp", "PKD": "obrazki/174141e9bca2.webp", "PLR": "obrazki/2f9ecd9fa8cf.webp", "ChPC": "obrazki/4c15d82ceb7d.webp", "DPD": "obrazki/04774de77d36.webp", "POJ": "obrazki/31bfab4a1110.webp", "PP": "obrazki/720fb5e0b9e2.webp", "P1612": "obrazki/logo-p1612.png"};
+const LOGOS = {"PKR": "obrazki/2d4de0deb7c1.webp", "WP": "obrazki/10efbd4fb21b.webp", "LSD": "obrazki/62ff16ae5515.webp", "KAN": "obrazki/28efd8279222.svg", "HAND": "obrazki/f3c9da594c00.svg", "POST": "obrazki/adb43c8743c7.webp", "LIB": "obrazki/5609cc4b3929.webp", "ALT": "obrazki/1fb954d6dd7c.webp", "ADS": "obrazki/a5665e494ecf.webp", "HMO": "obrazki/3da3c7510fc8.webp", "SS": "obrazki/5ed581dc6fb1.webp", "REP": "obrazki/a56a5574593a.webp", "PD": "obrazki/505b87671205.webp", "PPP": "obrazki/9a313b752b8b.webp", "ZHM": "obrazki/07520c9d52a7.webp", "NP": "obrazki/686628e32c75.webp", "ROM": "obrazki/f72e203052b7.webp", "NBR": "obrazki/20c8f32ecec2.webp", "FD": "obrazki/1f63df863e7f.webp", "KK": "obrazki/40064ea5d3ff.webp", "PKD": "obrazki/174141e9bca2.webp", "PLR": "obrazki/2f9ecd9fa8cf.webp", "ChPC": "obrazki/4c15d82ceb7d.webp", "DPD": "obrazki/04774de77d36.webp", "POJ": "obrazki/31bfab4a1110.webp", "PP": "obrazki/720fb5e0b9e2.webp", "P1612": "obrazki/logo-p1612.png", "CEN": "obrazki/logo-centrum.webp", "HEG": "obrazki/logo-hegemon.webp"};
 
 /* ══════════ POKRĘTŁA TRUDNOŚCI ══════════
    Wszystko, czym realnie stroi się grę, siedzi tutaj. Wcześniej te liczby były
@@ -215,9 +215,10 @@ function aiAgents(){
 const LP={
  PPP:{main:['Lager'],bench:['kenzo','bluetes33','Kocur','Gustaw','Antoniopl','x_avi','Garibaldi','Pablo']},
  KK:{main:['Peterdeus'],bench:['warrior','alan','Śledzik','Serty','Animu Player']},
- FD:{main:['loof'],bench:['Heraquik','balon','Wiktor z Aeterny','Góra','Klabar','Bober','Oli','Mietek Nocul']},
- PLR:{main:['Sulejman','Aryati'],bench:['Prjonnek']},
- NP:{main:['kisielek48'],bench:['Jugen','mentos','ekologiaball','Franzon','Prewencjusz','Silesia']},
+ FD:{main:['loof'],bench:['Heraquik','Wiktor z Aeterny','Góra','Klabar','Bober','Oli','Mietek Nocul']},
+ PLR:{main:['Sulejman','Aryati'],bench:['Prjonnek','balon']},
+ // its.r3dz0l.eq przyszedł z rozwiązanej Chrześcijańskiej Partii Cesarskiej razem z mandatem
+ NP:{main:['kisielek48'],bench:['Jugen','mentos','ekologiaball','Franzon','Prewencjusz','Silesia','its.r3dz0l.eq']},
  PKD:{main:['Bartek'],bench:['Ignacy']},
  ROM:{main:['cargrzybov'],bench:[]},
  PP:{main:['Fazmiś'],bench:['Włóczykij','Rax']},
@@ -225,7 +226,6 @@ const LP={
  NBR:{main:['Maciek'],bench:['Supernes']},
  ZHM:{main:['Kromka'],bench:[]},
  DPD:{main:['Tortex','Kaziu'],bench:['Sirius']},
- ChPC:{main:['its.r3dz0l.eq'],bench:[]},
  SS:{main:['Vengeance'],bench:['Mnem']},
 };
 const DUO_START=['PLR','POJ','DPD'];   // te partie startują ze współprzewodnictwem
@@ -367,11 +367,6 @@ const BASE={
    aff:{eli:3,int:7,ser:4}, comp0:[0,2,2],
    blurb:'Świeża, rozsądna i konsekwentnie przemilczana przez cały serwer. Cztery mandaty w rządzie kisielka mimo to.',
    flaw:'Marginalizacja: −25% do odbioru, dopóki nie przebijesz się debatą albo skandalem.'},
- ChPC:{n:'Chrześcijańska Partia Cesarska',ab:'ChPC',c:'#1f3864',founded:'22.07.2026',pull:4.147,
-   fame:12,cred:40,uni:70,act:20,ctr:15,pret:40,mem:1,pot:34,diff:5,
-   aff:{eli:6,int:5,ser:1}, comp0:[0,1,0],
-   blurb:'Jeden członek, jedno logo, jedna wizja. Cesarstwo się samo nie odbuduje.',
-   flaw:'Jedna osoba na stanie i pusta ławka. Wszystko robisz sam.'},
  SS  :{n:'Stronnictwo Reisei',ab:'SS',c:'#d489a2',founded:'26.07.2026',pull:2.300,
    fame:64,cred:62,uni:86,act:55,ctr:10,pret:42,mem:2,pot:90,diff:2,
    aff:{eli:5,int:5,ser:5}, comp0:[0,2,0],
@@ -466,7 +461,7 @@ function income(k){
   const podnies=u&&domyslne?1.2:1;
   // Przewagi się nakładają, ale nie mnożą bez końca: najmocniejsza działa w pełni,
   // każda kolejna już tylko w części. Inaczej trzy bonusy dawały ośmiokrotność bazy.
-  const bonusy=[(hasAds(k||G.me)?2.1:1),podnies].filter(x=>x>1).sort((a,b)=>b-a);
+  const bonusy=[(hasAds(k||G.me)?2.1:1),(hasHeg(k||G.me)?1.45:1),podnies].filter(x=>x>1).sort((a,b)=>b-a);
   const mnoznik=bonusy.reduce((a,x,i)=>a*(i?1+(x-1)*.45:x),1);
   // Ustawa o podatkach: przy progresji bogaty skład dokłada się za resztę,
   // przy stawce równej każdy płaci tyle samo, co zawsze.
@@ -552,7 +547,7 @@ function newGame(id){
   say(`Kadencja 1. Do wyborów ${G.weeks} tygodni. Prezydentem jest <b>${G.prez.lead}</b> (${G.p[G.prez.party].ab}).`,'roy');
   seedSeats();
   // rząd zastany: Front Socjaldemokracji plus wszystkie partie pozakoalicyjne, premier kisielek48
-  const team=['NP','FD','DPD','PLR','POJ','NBR','SS','ChPC','PP'].filter(k=>G.p[k]&&G.p[k].seats>0);
+  const team=['NP','FD','DPD','PLR','POJ','NBR','SS','PP'].filter(k=>G.p[k]&&G.p[k].seats>0);
   const st=team.reduce((a,k)=>a+G.p[k].seats,0);
   setGov(team,'NP',RI(56,64)); G.gov.minority=st<MAJ?1:0; G.pmOk=true; G.gov.pmLead=pmOsoba('NP')||G.p.NP.lead;
   // rząd przecina listy wyborcze, więc nie jest blokiem: HM, FS i HPI zostają na swoim miejscu
@@ -560,7 +555,8 @@ function newGame(id){
   PID.forEach(k=>G.p[k].coal=coalOf(k));
   say('<b>Rząd zastany:</b> kisielek48 premierem, dziewięć partii, '+st+' z '+TOTAL_SEATS+' mandatów. Monarchiści po raz pierwszy poza gabinetem.','roy');
 }
-const START_SEATS={PPP:7,KK:4,ROM:1,FD:7,NP:7,PLR:3,PKD:1,PP:1,POJ:1,NBR:1,ZHM:1,DPD:4,ChPC:1,SS:1};
+// mandat po rozwiązanej ChPC przeszedł razem z jej posłem do Nowej Perspektywy
+const START_SEATS={PPP:7,KK:4,ROM:1,FD:7,NP:8,PLR:3,PKD:1,PP:1,POJ:1,NBR:1,ZHM:1,DPD:4,SS:1};
 function seedSeats(){
   // sejm zastany: rząd kisielka48 ma 26 z 40, monarchiści idą w opozycję
   const s=Object.assign({},START_SEATS);
@@ -1569,7 +1565,7 @@ const CHAR={
  PLR :{agr:.40,bud:.80},  NP  :{agr:.35,bud:.85},  PKD :{agr:.30,bud:.70},
  ROM :{agr:.60,bud:.60},  PP  :{agr:.50,bud:.75},  POJ :{agr:.78,bud:.50},
  NBR :{agr:.45,bud:.65},  ZHM :{agr:.35,bud:.65},  DPD :{agr:.35,bud:.72},
- ChPC:{agr:.30,bud:.60},  SS  :{agr:.35,bud:.90},
+ SS  :{agr:.35,bud:.90},
 };
 const charOf=k=>CHAR[k]||{agr:.5,bud:.7};
 
@@ -1969,6 +1965,8 @@ function accepts(k,bonus=0){
   if(hasLib(G.me))bonus+=10;
   if(hasLib2(G.me))bonus+=18;
   if(hasPer(G.me))bonus+=20;
+  if(hasCen(G.me))bonus+=8;      // ze środkiem każdemu jest po drodze
+  if(hasHeg(G.me))bonus-=10;     // z hegemonem nikt nie chce iść pod rękę
   if(G.wojna)bonus-=14;
   if(goalDone('demokraci')&&isLead(me(),'loof'))bonus+=12;
   if(isLead(me(),'Sulejman'))bonus+=(G.p[k].seats<=4?20:-12);   // z niszowymi łatwo, z gigantami pod górkę
@@ -3404,7 +3402,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.8';
+let WERSJA='1.1.9';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3415,6 +3413,14 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.9':{data:'4 sierpnia 2026', zmiany:[
+   'Naprawiony launcher: aktualizacja nie kończy się już komunikatem o uszkodzonych bibliotekach.',
+   'Nowy cel dla DPD — „Ani w lewo, ani w prawo”: zbierasz Tortexa, Kaziu i balona i zakładasz Partię Centrum.',
+   'Nowy cel dla Nowej Perspektywy — „Hegemon Perspektywiczny”: pięć kadencji, urząd, pięćdziesiąt osób i pełna kasa. Reszta sceny cię za to znienawidzi.',
+   'Balon przechodzi do PLR, a Chrześcijańska Partia Cesarska znika ze sceny — jej poseł i mandat trafiają do Nowej Perspektywy.',
+   'Przycisk „Menu” na pasku gry: wyjście do menu nie chowa się już w oknie zapisu.',
+   'Wymagania celów mówią jednym głosem: wszędzie „w partii”, nigdzie „w zapleczu”.',
+ ]},
  '1.1.8':{data:'4 sierpnia 2026', zmiany:[
    'Koniec z pustym sejmem. Sejm mógł podnieść próg wyborczy tak wysoko, że nie przeskakiwał go nikt — teraz próg ustępuje, a mandaty zawsze mają właściciela.',
    'Koalicje wreszcie się opłacają: mandaty należą się liście i dzielą między wszystkie partie, także te bez własnych pięciu procent.',
@@ -3712,6 +3718,8 @@ function game(){
       <button class="sndbtn" onclick="toggleMute()" title="${G.mute?'Włącz dźwięk':'Wycisz'}">${G.mute?'♪̸':'♪'}</button>
       <div class="datechip" key="${G.term}-${G.week}"><b>${dateStr(gameDate())}</b><span>K${G.term} · tydzień ${G.week} z ${G.weeks}</span></div>
       <button class="btn g sm" onclick="openSave()" title="Zapis i wczytanie">Zapis</button>
+      <!-- wyjście do menu siedziało wcześniej dopiero w oknie zapisu i nikt go tam nie szukał -->
+      <button class="btn g sm" onclick="doLobby()" title="Wyjście do menu głównego">Menu</button>
       ${G.phase==='finalcamp'
         ? `<button class="btn tura" onclick="closeFinalCamp()">Otwieram urny →</button>`
         : `<button class="btn tura" onclick="endWeek()">${G.week>=G.weeks?'Do wyborów →':'Kolejny tydzień →'}</button>`}
@@ -5798,6 +5806,13 @@ function repChetni(){
   return ['PPP','PLR','PKD','DPD'].filter(k=>k!==G.me&&G.p[k]&&!G.p[k].dead&&G.rel[k][G.me]>=55);
 }
 /* ---- cele partyjne ---- */
+/* Wynik twojej partii w ostatnich wyborach. Zanim padły pierwsze, nie ma czego
+   czytać — zwracamy null, żeby warunek pokazał to wprost zamiast udawać zero. */
+function ostatniWynik(){
+  if(!G||!G.hist||!G.hist.length)return null;
+  const h=G.hist[G.hist.length-1];
+  return typeof h.pct==='number'?h.pct:null;
+}
 const hasAds=k=>!!(G&&G.p[k]&&G.p[k].adsMode);
 const hasHor=k=>!!(G&&G.p[k]&&G.p[k].horMode);
 const hasLib=k=>!!(G&&G.p[k]&&G.p[k].libMode);
@@ -5807,14 +5822,20 @@ const hasLsd=k=>!!(G&&G.p[k]&&G.p[k].lsdMode);
 const hasKan=k=>!!(G&&G.p[k]&&G.p[k].kanMode);
 const hasRob=k=>!!(G&&G.p[k]&&G.p[k].robMode);
 const hasPer=k=>!!(G&&G.p[k]&&G.p[k].perMode);
+const hasCen=k=>!!(G&&G.p[k]&&G.p[k].cenMode);
+const hasHeg=k=>!!(G&&G.p[k]&&G.p[k].hegMode);
 function apBase(){
-  return Math.max(1, 3+(isPM()?1:0)+(hasPrez()?1:0)+(hasAds(G.me)?2:0)-(hasHor(G.me)?1:0));
+  return Math.max(1, 3+(isPM()?1:0)+(hasPrez()?1:0)+(hasAds(G.me)?2:0)+(hasHeg(G.me)?1:0)-(hasHor(G.me)?1:0));
 }
 function applyGoals(){
   if(!G)return;
   if(!G.goals)G.goals={};
   if(G.goals.republika){const p=G.p[G.me];if(p.fame<70)p.fame=70}
   if(hasLib2(G.me)){const p=G.p[G.me];if(p.fame<50)p.fame=50}
+  // Centrum stoi jednością, hegemon sławą — obie podłogi są celowo niższe
+  // niż przy republice, żeby te cele nie robiły z partii pomnika.
+  if(hasCen(G.me)){const p=G.p[G.me];if(p.uni<45)p.uni=45}
+  if(hasHeg(G.me)){const p=G.p[G.me];if(p.fame<65)p.fame=65}
 }
 function goalDrift(k){
   const p=G.p[k];
@@ -5824,6 +5845,11 @@ function goalDrift(k){
   if(p.postMode)p.act=cl(p.act+3.2);
   if(p.robMode){p.uni=cl(p.uni+1.8);p.ctr=cl(p.ctr+1.2)}
   if(p.rom12Mode){p.uni=cl(p.uni+2);p.ctr=cl(p.ctr-1)}
+  // Centrum: spokojnie i po środku — niewiele, ale co tydzień i w dobrą stronę
+  if(p.cenMode){p.uni=cl(p.uni+1.6);p.cred=cl(p.cred+.8);p.ctr=cl(p.ctr-.9);p.pret=cl(p.pret-.6)}
+  // Hegemon rośnie, ale sam swoim rozmiarem drażni resztę sceny
+  if(p.hegMode){p.fame=cl(p.fame+2.2);p.act=cl(p.act+1.4);
+    alive().forEach(x=>{if(x!==k&&G.rel[x])G.rel[x][k]=cl(G.rel[x][k]-.7,-100,100)})}
   if(p.perMode){p.cred=cl(Math.max(55,p.cred+1.4));p.ctr=cl(p.ctr+.8);
     alive().forEach(x=>{if(x!==k&&G.rel[k])G.rel[k][x]=cl(G.rel[k][x]+1,-100,100)})}
 }
@@ -5875,6 +5901,55 @@ const GOALS={
    if(chetni.length)say(`<b>Zjednoczenie.</b> ${chetni.map(k=>G.p[k].ab).join(', ')} ${pl(chetni.length,'wchodzi','wchodzą','wchodzą')} pod niebieski sztandar: ${os} ${pl(os,'osoba','osoby','osób')} i ${mn} ${pl(mn,'mandat','mandaty','mandatów')}.`,'roy');
    if(oporni.length)say(`<b>${oporni.map(k=>G.p[k].ab).join(', ')} ${pl(oporni.length,'odmawia','odmawiają','odmawiają')}.</b> Zostają na scenie, tracą po kilku ludzi i zapamiętują ci to na długo.`,'bad');
    say('<b>Pod błyskiem niebieskiej chwały.</b> Partia Republikańska wraca na serwer, a prowadzisz ją ty.','roy')}},
+ /* Wynik ostatnich wyborów. Przed pierwszymi nie ma czego czytać, więc cele
+    z takim warunkiem po prostu jeszcze nie są spełnione. */
+ centrum:{n:'Ani w lewo, ani w prawo',for:['DPD'],logo:'CEN',bots:0,
+  what:'Przestajesz się tłumaczyć jednym i drugim skrzydłem. Tortex, Kaziu i balon pod jednym szyldem, a serwer dostaje partię, która nie obiecuje rewolucji — tylko że będzie.',
+  req:[
+   {t:'Co najmniej 15 osób w partii',v:()=>me().mem+' / 15',ok:()=>me().mem>=15},
+   {t:'Tortex, Kaziu i balon w partii',
+    v:()=>{const o=roster(me());return ['Tortex','Kaziu','balon'].filter(n=>o.includes(n)).length+' / 3'},
+    ok:()=>{const o=roster(me());return ['Tortex','Kaziu','balon'].every(n=>o.includes(n))}},
+   {t:'Co najmniej 10% w ostatnich wyborach',
+    v:()=>ostatniWynik()===null?'jeszcze nie było wyborów':fmt(ostatniWynik())+'% / 10%',
+    ok:()=>(ostatniWynik()||0)>=10},
+   {t:'Dopiero od trzeciej kadencji',v:()=>'kadencja '+G.term+' / 3+',ok:()=>G.term>=3},
+  ],
+  cons:['Partia występuje odtąd jako Partia Centrum.',
+   'Jedność rośnie o 1,6 tygodniowo i nigdy nie spada poniżej 45.',
+   'Wiarygodność rośnie o 0,8, kontrowersja i pretensjonalność powoli schodzą.',
+   'Dyplomacja łatwiejsza: koalicjanci schodzą z wymaganiami o 8.',
+   'Na koniec kadencji dochodzi trochę więcej ludzi — środek przyciąga niezdecydowanych.',
+   'Droga do Partii Republikańskiej pozostaje otwarta.'],
+  run(){const p=me();p.n='Partia Centrum';p.ab='PC';p.c='#1f7f86';p.logo='CEN';p.cenMode=1;
+   p.uni=cl(p.uni+12);p.cred=cl(p.cred+6);p.pret=cl(p.pret-8);M(p,10);
+   say('<b>Ani w lewo, ani w prawo.</b> Partia Centrum wchodzi na scenę i po raz pierwszy od dawna nikt nie wie, na kogo się obrazić.','roy')}},
+ hegemon:{n:'Hegemon Perspektywiczny',for:['NP'],logo:'HEG',bots:0,
+  what:'Nowa Perspektywa przestaje być jedną z partii i staje się punktem odniesienia dla całego serwera. Jugen, Prewencjusz i kisielek48 w jednym składzie, urząd w ręku i kasa w skarbcu.',
+  req:[
+   {t:'Co najmniej 50 osób w partii',v:()=>me().mem+' / 50',ok:()=>me().mem>=50},
+   {t:'Twoja partia ma obecnie premiera albo prezydenta',v:()=>isPM()?'premier':hasPrez()?'prezydent':'brak',ok:()=>isPM()||hasPrez()},
+   {t:'Powyżej 25% w ostatnich wyborach',
+    v:()=>ostatniWynik()===null?'jeszcze nie było wyborów':fmt(ostatniWynik())+'% / >25%',
+    ok:()=>(ostatniWynik()||0)>25},
+   {t:'Dopiero od piątej kadencji',v:()=>'kadencja '+G.term+' / 5+',ok:()=>G.term>=5},
+   {t:'Jugen, Prewencjusz i kisielek48 w partii',
+    v:()=>{const o=roster(me());return ['Jugen','Prewencjusz','kisielek48'].filter(n=>o.includes(n)).length+' / 3'},
+    ok:()=>{const o=roster(me());return ['Jugen','Prewencjusz','kisielek48'].every(n=>o.includes(n))}},
+   {t:'Ponad 500 kapitału w kasie',v:()=>Math.round(G.kp)+' / >500',ok:()=>G.kp>500},
+  ],
+  cons:['Partia występuje odtąd jako Hegemonia Perspektywiczna.',
+   'Sława rośnie o 2,2 tygodniowo i nigdy nie spada poniżej 65.',
+   'Jedna dodatkowa akcja w każdym tygodniu.',
+   'Składki wyższe o 45% — skarbiec pracuje na ciebie.',
+   'Ale hegemona nikt nie lubi: wszystkie partie tracą do ciebie 15 relacji od ręki i po 0,7 tygodniowo.',
+   'Zmęczenie serwera władzą narasta o jedną czwartą szybciej.'],
+  run(){const p=me();p.n='Hegemonia Perspektywiczna';p.ab='HP';p.c='#c8952b';p.logo='HEG';p.hegMode=1;
+   p.fame=Math.max(p.fame,65);p.uni=cl(p.uni+10);p.cred=cl(p.cred+8);M(p,20);
+   alive().forEach(k=>{if(k===G.me)return;
+     G.rel[G.me][k]=cl(G.rel[G.me][k]-15,-100,100);G.rel[k][G.me]=cl(G.rel[k][G.me]-15,-100,100)});
+   G.apMax=apBase();G.ap=Math.max(G.ap,1);
+   say('<b>Hegemon Perspektywiczny.</b> Nowa Perspektywa przestaje być partią, a zaczyna być pogodą na serwerze. Reszta sceny właśnie zrozumiała, że gra o drugie miejsce.','roy')}},
  demokraci:{n:'Oryginał zawsze będzie lepszy',for:['FD'],logo:'PD',bots:0,
   what:'Przywracasz Partię Demokratyczną. Front kończy udawanie, że jest czymś nowym.',
   req:[
@@ -5883,8 +5958,8 @@ const GOALS={
    {t:'Dopiero po pierwszej kadencji',v:()=>'kadencja '+G.term+' / 2+',ok:()=>G.term>=2},
   ],
   cons:['loof traci „Zawsze ma rację i zawsze to powie” i dostaje „Memento potęgi demokratów”: +12 do dyplomacji koalicyjnej i ×1,25 do decyzji kampanii (tylko kampanii).',
-   'Wraca elitarny Plawik: +1 do elity, ląduje w zapleczu.',
-   'Za nim przychodzi ke_Trab: +1 do intelektualistów, też do zaplecza.',
+   'Wraca elitarny Plawik: +1 do elity, dopisuje się do partii.',
+   'Za nim przychodzi ke_Trab: +1 do intelektualistów, też do partii.',
    'Front występuje odtąd jako Partia Demokratyczna.'],
   run(){const p=me();p.n='Partia Demokratyczna';p.ab='PD';p.c='#7aa842';p.logo='PD';p.demMode=1;
    p.comp.eli+=1;p.mem+=1;if(!p.bench.includes('Plawik'))p.bench.push('Plawik');
@@ -5914,7 +5989,7 @@ const GOALS={
   req:[
    {t:'Co najmniej 30 osób w partii',v:()=>me().mem+' / 30',ok:()=>me().mem>=30},
    {t:'Aryati w składzie partii',v:()=>ownPool(G.me).includes('Aryati')?'jest':'brak',ok:()=>ownPool(G.me).includes('Aryati')},
-   {t:'Pan Hod_Dog w zapleczu partii',v:()=>me().bench.includes('Pan Hod_Dog')?'jest':'brak',ok:()=>me().bench.includes('Pan Hod_Dog')},
+   {t:'Pan Hod_Dog w partii',v:()=>roster(me()).includes('Pan Hod_Dog')?'jest':'brak',ok:()=>roster(me()).includes('Pan Hod_Dog')},
   ],
   cons:['Partia występuje odtąd jako Partia Liberalna, z żółtą różą w herbie.',
    'Pretensjonalność spada o 18, sława rośnie o 12, wiarygodność o 8.',
@@ -5959,8 +6034,8 @@ const GOALS={
   what:'Postępowcy przestają być partią, a stają się aparatem: własna szkoła kadr, własna kasa i orędzia, których serwer nie umie zignorować.',
   req:[
    {t:'Co najmniej 50 osób w partii',v:()=>me().mem+' / 50',ok:()=>me().mem>=50},
-   {t:'Aryati i Kaziu w zapleczu',v:()=>['Aryati','Kaziu'].filter(n=>me().bench.includes(n)).length+' / 2',
-    ok:()=>['Aryati','Kaziu'].every(n=>me().bench.includes(n))},
+   {t:'Aryati i Kaziu w partii',v:()=>{const o=roster(me());return ['Aryati','Kaziu'].filter(n=>o.includes(n)).length+' / 2'},
+    ok:()=>{const o=roster(me());return ['Aryati','Kaziu'].every(n=>o.includes(n))}},
    {t:'Twoja partia ma premiera',v:()=>isPM()?'premier':'brak',ok:()=>isPM()},
   ],
   cons:['Partia występuje odtąd jako Lewicowy Sojusz Demokratyczny.',
@@ -6103,6 +6178,8 @@ const IDENT_BRAND={
  lsdMode:{n:'Lewicowy Sojusz Demokratyczny',ab:'LSD',c:'#8e1e5e',logo:'LSD'},
  horMode:{n:'Horyzont Monarchistyczny',ab:'HM',c:'#c9a227',logo:'HMO'},
  rom12Mode:{n:'Polska 1612',ab:'1612',c:'#8c3b2a',logo:'P1612'},
+ cenMode:{n:'Partia Centrum',ab:'PC',c:'#1f7f86',logo:'CEN'},
+ hegMode:{n:'Hegemonia Perspektywiczna',ab:'HP',c:'#c8952b',logo:'HEG'},
 };
 const myIdentities=()=>{const p=G&&G.p[G.me];return p?Object.keys(IDENT_BRAND).filter(m=>p[m]):[]};
 function switchIdentity(mode){
@@ -7413,6 +7490,7 @@ function memberFlow(){
     else if(p.mem>40)n=Math.min(n,Math.max(0,2-Math.floor((p.mem-40)/8)));
     if(p.lib2Mode)n=Math.round(n*1.25)+1;  // liberalne skrzydło ciągnie ludzi samo z siebie
     if(p.postMode)n=Math.round(n*1.5)+1;   // Postępowcy werbują szybciej niż ktokolwiek
+    if(p.cenMode&&n>0)n+=1;                // środek zgarnia niezdecydowanych, ale bez fajerwerków
     if(k===G.me&&n>0)n=Math.min(n+1,4);    // gracz ma lekką przewagę, ale z twardym sufitem
     if(freeTot()<60)n=Math.min(n,1);        // pusta pula hamuje wszystkich
     // najpierw to, co obiecały decyzje z kadencji
@@ -7472,6 +7550,8 @@ function naliczZnuzenie(){
     if(premier)d=BAL.znuzeniePremier;
     else if(wRzadzie)d=BAL.znuzenieKoalicja;
     else d=BAL.znuzenieOpozycja;      // opozycja odpoczywa w oczach serwera
+    // hegemonowi serwer liczy każdą kadencję surowiej — to cena bycia punktem odniesienia
+    if(hasHeg(k)&&d>0)d*=1.25;
     G.znuz[k]=cl((G.znuz[k]||0)+d,0,BAL.znuzenieSufit);
   });
   const moje=G.znuz[G.me]||0;
@@ -7833,7 +7913,7 @@ function dead(){
     <div style="margin-top:24px"><button class="btn" onclick="newRun()">Od nowa</button></div></div>`}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{start,pickParty,danina,openSave,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openLead,openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,
@@ -7849,7 +7929,7 @@ window.__game={openDym,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministe
   naborOcena,panelGlosowania,KLOCKI,openKanaly,
   newGame,endWeek,runElection,tally,allocate,aiGov,startTerm,startPM,doPMVote,pmFailForward,
   localScore,openRecruit,openTrain,collapseGov,makeBlocs,prezPool,drawFrom,giveBack,purge,eliteRisk,ratio,syncCoal,prezDone,makeNoise,XP,
-  giveBackCap,prezRound1,prezRound2,runRunoff,memberFlow,prezWait,prezPush,openPush,crownPrez,hemi,pmBlocked,rotateBench,AVA,TEM,INNATE,conflictOf,buyTrait,buyStat,traitsOf,xpOs,xpPula,leadWybrany,COMBO,checkDeath,isPMperson,isPrezPerson,income,EV,wotumChance,
+  giveBackCap,prezRound1,prezRound2,runRunoff,memberFlow,prezWait,prezPush,openPush,crownPrez,hemi,pmBlocked,rotateBench,AVA,TEM,INNATE,conflictOf,buyTrait,buyStat,traitsOf,xpOs,xpPula,leadWybrany,COMBO,ostatniWynik,hasCen,hasHeg,LOGOS,applyGoals,checkDeath,isPMperson,isPrezPerson,income,EV,wotumChance,
   prezRound1,prezGo,A,fire,me,topSeg,sejmVote,setGov,PID,REG,SEG,SID,BASE,COAL,LP,LEAD,THR,
   TOPUP,DIST_SEATS,TOTAL_SEATS,MAJ,accepts,thrFor,
   radar,feed,runDateAnim,gameDate,dateStr,mapTab,actTab,pollTab,sejmTab,leadTab,kingTab,sidebar,setup,pmScreen,prezScreen,marScreen,startMar,marContinue,marDeclare,isMar,isWice,isMarPerson,ownPool,bestRep,runRace,raceScore,results,TRAITS,sizeF,shown,enGain,pickMain,kingScore,kingFactors,kingFav,saveCode,loadCode,allBlocs,addRegion,delRegion,rebalanceSeats,

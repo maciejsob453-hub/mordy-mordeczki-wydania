@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.8",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/49acc73472f5db01eb19cd9a3438127dfdb636cc",
+ "wersja": "1.1.9",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,8 +14,8 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "cfd64fcda51bea05c63f2627b879e3d5a32b84bd978c713841d0e2fa96014ab9",
-   "bajtow": 500841
+   "sha": "048c1376ac21847d39f17f1412981ec4107dfad8849bec5e5270fc36dd78d5dc",
+   "bajtow": 507225
   },
   {
    "sciezka": "gra/obrazki/0051a52917ef.webp",
@@ -498,6 +498,16 @@
    "bajtow": 18317
   },
   {
+   "sciezka": "gra/obrazki/logo-centrum.webp",
+   "sha": "b7a60e3e3ea3b89994baf58e29d3958fd859a71ddc95ab84201a82c3053f7bbf",
+   "bajtow": 54258
+  },
+  {
+   "sciezka": "gra/obrazki/logo-hegemon.webp",
+   "sha": "4d6d878602cdf434589c16ecc8fe1db6a87aac0650dfd81e418553b23677d6a6",
+   "bajtow": 74840
+  },
+  {
    "sciezka": "gra/obrazki/logo-p1612.png",
    "sha": "106f05053702cab688b8ec9fb1a324ea831b2152d1071a0c5a7e8eccffb7e025",
    "bajtow": 35843
@@ -530,6 +540,5 @@
   "sha": "368bb8d606782141486baffb00919fa3ba649f6b47f6f4cb4b916820d806832c",
   "bajtow": 12107330,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.7/Mordy.Mordeczki.Launcher.exe"
- },
- "commit": "49acc73472f5db01eb19cd9a3438127dfdb636cc"
+ }
 }
