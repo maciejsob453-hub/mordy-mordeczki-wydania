@@ -3521,7 +3521,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.15';
+let WERSJA='1.1.16';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3532,6 +3532,9 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.16':{data:'4 sierpnia 2026', zmiany:[
+   'Aktualizacja nie otwiera już dwóch okien gry naraz. Launcher odblokowywał przycisk pół sekundy przed startem gry i dało się kliknąć drugi raz.',
+ ]},
  '1.1.15':{data:'4 sierpnia 2026', zmiany:[
    'Wywiad to teraz minigra: trzy pytania, a właściwa odpowiedź zależy od sytuacji twojej partii. Wygrana daje sławę i wiarygodność bez kontrowersji, przegrana — aferę.',
    'Zamiast wycieku screenów i szitpostu wchodzi Doniesienie do administracji: raz na kadencję, 10% szans na rozwiązanie cudzej partii, a przy porażce ogromna kontrowersja. Boty tego nie mają.',
