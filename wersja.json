@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.9",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/f691596ff673464ba5549750ddeb8c862947d1f9",
+ "wersja": "1.1.10",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,8 +14,23 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "048c1376ac21847d39f17f1412981ec4107dfad8849bec5e5270fc36dd78d5dc",
-   "bajtow": 507225
+   "sha": "4e08b2ed63b3fb145e1bfdb2d17f6bf7343d2427e97d3e449f013874ff66f91e",
+   "bajtow": 509218
+  },
+  {
+   "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
+   "sha": "8deab50f9f1fdf37017d8d405b0ae641521ceb57a0632d967a6fa4a1c248975d",
+   "bajtow": 744608
+  },
+  {
+   "sciezka": "gra/muzyka/nie-pucuj-petardy.mp3",
+   "sha": "339d3d7b149af888bb282fdd454ae48883a263aa16367b984256f24dcfb9acc7",
+   "bajtow": 744609
+  },
+  {
+   "sciezka": "gra/muzyka/pax-mathiae.mp3",
+   "sha": "b8af88b7671107948dba921297638c531edcb7e704cd22876d654c532e3690fa",
+   "bajtow": 3692834
   },
   {
    "sciezka": "gra/obrazki/0051a52917ef.webp",
@@ -540,6 +555,5 @@
   "sha": "368bb8d606782141486baffb00919fa3ba649f6b47f6f4cb4b916820d806832c",
   "bajtow": 12107330,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.7/Mordy.Mordeczki.Launcher.exe"
- },
- "commit": "f691596ff673464ba5549750ddeb8c862947d1f9"
+ }
 }

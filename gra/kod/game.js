@@ -1953,6 +1953,10 @@ function runElection(){
   startNight();
   say(`<b>Wybory.</b> Zdobywasz ${G.p[G.me].seats} ${pl(G.p[G.me].seats,'mandat','mandaty','mandatów')}.`,
       G.p[G.me].seats>0?'good':'bad');
+  /* Pax Mathiae leci, kiedy wybory wygrywa partia Maćka — obojętnie, czy prowadzi
+     ją gracz, czy komputer. Wygrana to najwięcej mandatów, a nie sam udział. */
+  {const naj=alive().reduce((a,k)=>a===null||G.p[k].seats>G.p[a].seats?k:a,null);
+   if(naj&&G.p[naj].seats>0&&isLead(G.p[naj],'Maciek'))graj('pax');}
   render();
 }
 function accepts(k,bonus=0){
@@ -2837,7 +2841,37 @@ const SFX={
   elect:()=>seq([[392,.22,'triangle',.05],[523,.22,'triangle',.05],[659,.22,'triangle',.05],[784,.42,'triangle',.05]],130),
   gong:()=>seq([[196,.5,'sine',.06],[294,.4,'sine',.04]],40),
 };
-function toggleMute(){G.mute=!G.mute;if(!G.mute)SFX.ok();render()}
+/* ---- muzyka ----
+   Kawałki z serwera, każdy przypisany do jednej chwili w grze. Grają cicho i
+   pojedynczo: druga piosenka przerywa pierwszą, zamiast nakładać się na nią.
+   Przycisk wyciszania ucina wszystko, łącznie z tym, co akurat leci. */
+const MUZYKA={
+  petarda:{plik:'muzyka/nie-pucuj-petardy.mp3',glos:.22},
+  pax:    {plik:'muzyka/pax-mathiae.mp3',      glos:.20},
+  dyktator:{plik:'muzyka/dyktator-i-krol.mp3', glos:.22},
+};
+let GRA_TERAZ=null;
+const coGra=()=>GRA_TERAZ?String(GRA_TERAZ.src||'').split('/').pop():null;
+function stopMuzyka(){
+  if(!GRA_TERAZ)return;
+  try{GRA_TERAZ.pause();GRA_TERAZ.currentTime=0}catch(e){}
+  GRA_TERAZ=null;
+}
+function graj(id){
+  const m=MUZYKA[id];
+  if(!m||!sndOn()||typeof Audio==='undefined')return;
+  stopMuzyka();
+  try{
+    const a=new Audio(m.plik);
+    a.volume=m.glos;                       // cicho — to tło, nie koncert
+    a.onended=()=>{if(GRA_TERAZ===a)GRA_TERAZ=null};
+    // przeglądarka potrafi odmówić odtwarzania, zanim gracz cokolwiek kliknie
+    const p=a.play();
+    if(p&&p.catch)p.catch(()=>{if(GRA_TERAZ===a)GRA_TERAZ=null});
+    GRA_TERAZ=a;
+  }catch(e){}
+}
+function toggleMute(){G.mute=!G.mute;if(G.mute)stopMuzyka();else SFX.ok();render()}
 /* ---- cząstki ---- */
 function burst(kolor,ile,mocno){
   if(typeof document==='undefined'||!document.body)return;
@@ -3402,7 +3436,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.9';
+let WERSJA='1.1.10';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3413,6 +3447,12 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.10':{data:'4 sierpnia 2026', zmiany:[
+   'Do gry wchodzi muzyka z serwera. „Nie pucuj mi petardy” wita cię przy starcie PPP.',
+   '„Pax Mathiae” leci, kiedy wybory wygrywa partia Maćka.',
+   '„Dyktator i Król” gra przy powrocie Partii Republikańskiej.',
+   'Wszystko cicho i pod jednym przyciskiem — wyciszenie ucina też to, co akurat leci.',
+ ]},
  '1.1.9':{data:'4 sierpnia 2026', zmiany:[
    'Naprawiony launcher: aktualizacja nie kończy się już komunikatem o uszkodzonych bibliotekach.',
    'Nowy cel dla DPD — „Ani w lewo, ani w prawo”: zbierasz Tortexa, Kaziu i balona i zakładasz Partię Centrum.',
@@ -3649,6 +3689,7 @@ function start(k){
   newGame(k);
   if(SCENSEL&&SCEN[SCENSEL]){G.scen=SCENSEL;try{SCEN[SCENSEL].apply()}catch(e){}}
   histPush();SFX.gong();render();
+  if(k==='PPP')graj('petarda');   // hymn Partii Pana Prezesa na powitanie
 }
 function tryLoadFromSetup(){
   const el=document.getElementById('loadCodeInp');
@@ -5900,6 +5941,7 @@ const GOALS={
    });
    if(chetni.length)say(`<b>Zjednoczenie.</b> ${chetni.map(k=>G.p[k].ab).join(', ')} ${pl(chetni.length,'wchodzi','wchodzą','wchodzą')} pod niebieski sztandar: ${os} ${pl(os,'osoba','osoby','osób')} i ${mn} ${pl(mn,'mandat','mandaty','mandatów')}.`,'roy');
    if(oporni.length)say(`<b>${oporni.map(k=>G.p[k].ab).join(', ')} ${pl(oporni.length,'odmawia','odmawiają','odmawiają')}.</b> Zostają na scenie, tracą po kilku ludzi i zapamiętują ci to na długo.`,'bad');
+   graj('dyktator');
    say('<b>Pod błyskiem niebieskiej chwały.</b> Partia Republikańska wraca na serwer, a prowadzisz ją ty.','roy')}},
  /* Wynik ostatnich wyborów. Przed pierwszymi nie ma czego czytać, więc cele
     z takim warunkiem po prostu jeszcze nie są spełnione. */
@@ -7921,7 +7963,7 @@ Object.assign(window,{start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,m
   closeFinalCamp,runFinalCamp,openEdycja,edytSet,edytOk,
   setTab:k=>{G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
   signAgent,agentCost,agentFree,AGENTS,render,
-  setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,burst,shake,histChart,histPush,SFX,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
+  setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.__game={openDym,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,mogeZglosic,rozwiazChance,radaKto,RESORTY,pmOsoba,pmOsoby,leads,roster,
   aiTransfery,aiOpozycja,aiObsadzRade,aiRekonstrukcja,znuzenie,hegemon,resortyPartii,leadWybrany,aiPlan,ustawPlany,
   rozliczenieKadencji,sprawdzZapis,doganianie,repChetni,BAL,saveCode,loadCode,
