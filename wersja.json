@@ -1,6 +1,6 @@
 {
  "wersja": "1.1.21",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/81f95a12be2c7b992c7cd31c0e76efa93002fed5",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -570,5 +570,6 @@
   "sha": "771e518561de93bb1338155c6782f37b93b7739913a429f3e0b4f3e1aa7ddc05",
   "bajtow": 12146589,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.21/Mordy.Mordeczki.Launcher.exe"
- }
+ },
+ "commit": "81f95a12be2c7b992c7cd31c0e76efa93002fed5"
 }
