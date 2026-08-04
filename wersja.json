@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.7",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/cc5351af8b658bfeed7f6b50372927bc4f93127a",
+ "wersja": "1.1.8",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,8 +14,8 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "f4706ea5c16e11da0a610a65ad0316a5a252a9b2fe6a857834a348f951816e97",
-   "bajtow": 489373
+   "sha": "cfd64fcda51bea05c63f2627b879e3d5a32b84bd978c713841d0e2fa96014ab9",
+   "bajtow": 500841
   },
   {
    "sciezka": "gra/obrazki/0051a52917ef.webp",
@@ -509,20 +509,20 @@
   },
   {
    "sciezka": "gra/wyglad/style.css",
-   "sha": "ae67ce78b062810512e8d094237856c412e971b05d4e648e4468441476e87512",
-   "bajtow": 82002
+   "sha": "9c90abc0f55b56a59ff518aac49cfaf3c79fd27d65d1ed48de4603531013c053",
+   "bajtow": 82833
   }
  ],
  "exe": {
   "nazwa": "Mordy Mordeczki.exe",
   "sha": "2676675bcce5ff484a4289b8b826e3be2f718fd7864845c6b356cbbecca8fe30",
   "bajtow": 6078101,
-  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.7/Mordy.Mordeczki.exe"
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.8/Mordy.Mordeczki.exe"
  },
  "runtime": {
   "sha": "0dee9eba58a8740b9b2ef40fbac01d04e056d0b8cec9ef9a5e24b7c62488fec7",
   "bajtow": 13704509,
-  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.7/biblioteki-1.1.7.zip",
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.8/biblioteki-1.1.8.zip",
   "znacznik": "76e405bfcd6d2a3d6566aac68586321675c59c41db9de44dce3bee4787ea6361"
  },
  "launcher": {
@@ -530,6 +530,5 @@
   "sha": "368bb8d606782141486baffb00919fa3ba649f6b47f6f4cb4b916820d806832c",
   "bajtow": 12107330,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.7/Mordy.Mordeczki.Launcher.exe"
- },
- "commit": "cc5351af8b658bfeed7f6b50372927bc4f93127a"
+ }
 }
