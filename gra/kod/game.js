@@ -1,4 +1,4 @@
-/* ═══════════════════════════════════════════════════════════
+﻿/* ═══════════════════════════════════════════════════════════
    MORDY MORDECZKI — SEJM
    Roleplay polityczny na serwerze Mordy Mordeczki.
 
@@ -14,9 +14,13 @@ const LOGOS = {"PKR": "obrazki/2d4de0deb7c1.webp", "WP": "obrazki/10efbd4fb21b.w
    Każda pozycja ma opisane, co się stanie, gdy ją ruszysz. */
 const BAL={
   // ile obecności w kanale zostaje z tygodnia na tydzień (mniej = trzeba częściej wracać)
-  zanikObecnosci:      .906,
-  zanikObecnosciKanal: .936,   // partia z celem „Kanał w końcu żyje”
-  zanikObecnosciRob:   .928,   // Partia Kolektywnych Robotników
+  /* Obecność zanika w każdym z ośmiu okręgów naraz, a odbudować da się ją jedną
+     decyzją kampanijną tygodniowo (kategoria ma limit). Przy 0,906 dawało to
+     twardy sufit w okolicach 25/100 — nie dało się zbudować obecności, choćby
+     grać co tydzień. Wolniejszy zanik podnosi ten sufit, nie znosząc go. */
+  zanikObecnosci:      .935,
+  zanikObecnosciKanal: .955,   // partia z celem „Kanał w końcu żyje”
+  zanikObecnosciRob:   .949,   // Partia Kolektywnych Robotników
 
   // powtarzanie tej samej decyzji: ile traci za każde użycie i gdzie jest dno
   zmeczenieKrok:       .21,
@@ -765,7 +769,6 @@ function allocate(res,total){
   }
   return {out,L:Ls,byReg,topup};
 }
-function l0(out,l){return l.m.reduce((a,k)=>a+out[k],0)}
 function leader(rid,res){let b=null,v=-1;alive().forEach(k=>{if(res[k].reg[rid]>v){v=res[k].reg[rid];b=k}});return b}
 
 /* ══════════ GŁOSOWANIA W SEJMIE ══════════ */
@@ -1394,6 +1397,7 @@ function endWeek(){
   const dateFrom=gameDate();
   ustawPlany();
   ai();drift();aiGoals();aiAgents();aiTransfery();sitTick();
+  sprzatnijRade();   // po transferach i odejściach rada musi zgadzać się ze składami partii
   if(isEraNiestab()&&!G.eraNiestab){G.eraNiestab=1;
     say('<b>Era niestabilności.</b> Grudniowo-styczniowy chaos na serwerze ułatwia podbieranie ludzi z innych partii, i tobie, i botom. Potrwa do końca stycznia.','roy');}
   else if(!isEraNiestab()&&G.eraNiestab===1){G.eraNiestab=2;
@@ -1495,7 +1499,7 @@ function endWeek(){
     if(p.ctr>=90){
       // partia w paraliżu: sondaż na pół, kasa wycieka, ludzie uciekają
       const ucieklo=giveBackCap(p,2), n=ucieklo.eli+ucieklo.int+ucieklo.ser;
-      G.kp-=Math.round(8+p.mem*.35);
+      G.kp=Math.max(0,G.kp-Math.round(8+p.mem*.35));   // kasa może się skończyć, ale nie zejść pod zero
       p.fame=cl(p.fame-3);p.act=cl(p.act-3);p.uni=cl(p.uni-3);
       say(`<b>Paraliż: kontrowersja ${Math.round(p.ctr)}/100.</b> Sondaż liczony na pół, z kasy ucieka ${Math.round(8+p.mem*.35)} kapitału`
         +(n?`, odchodzi ${n} ${pl(n,'osoba','osoby','osób')}`:'')+'. Schłodź to, zanim zostanie sam szyld.','bad');
@@ -2182,6 +2186,16 @@ function nextCandidate(){
     pr.lista=alive().filter(x=>G.p[x].seats>0&&!pmBlocked(x)).sort((a,b)=>kingScore(b)-kingScore(a));
     say(`<b>Sejm wyczerpał listę kandydatów.</b> Runda ${pr.round}: głosowania zaczynają się od nowa.`,'bad');
   }
+  /* Skrajny przypadek: w izbie nie ma nikogo, kogo dałoby się zgłosić — wszyscy
+     albo bez mandatów, albo wykluczeni. Wcześniej procedura szła dalej z pustym
+     kandydatem i ekran wyboru premiera wywracał się na odwołaniu do partii,
+     której nie ma. Teraz Król po prostu rozwiązuje izbę i wracamy do kampanii. */
+  if(!pr.lista.length){
+    say('<b>Nie ma kogo zgłosić na premiera.</b> Król Mordeczka rozwiązuje sejm, idziemy do przedterminowych wyborów.','roy');
+    G.gov=null;G.pmOk=false;G.pmProc=null;G.bloc=null;
+    G.phase='camp';G.week=G.weeks;
+    return;
+  }
   if(pr.round===1){
     pr.by='Zezwolenie Króla Mordeczki';
     pr.cand=pr.lista[0]||null; pr.choose=false;
@@ -2231,20 +2245,10 @@ function doPMVote(cand,myVote){
   render();
 }
 function pmFailForward(){
+  /* Był tu wariant, w którym Król powoływał rząd mniejszościowy zamiast pozwolić
+     sejmowi szukać dalej. Leżał wyłączony na sztywno i tak został — usunięty,
+     bo kryzys rządowy ma teraz własne, narastające koszty i sam się rozstrzyga. */
   const pr=G.pmProc;
-  if(false){
-    // Król nie rozwiązuje sejmu, powołuje rząd mniejszościowy z najsilniejszego ugrupowania
-    const rank=alive().filter(k=>G.p[k].seats>0).sort((a,b)=>G.p[b].seats-G.p[a].seats);
-    const pm=rank[0];
-    if(!pm){say('<b>Sejm bez mandatów.</b> Przedterminowe wybory.','bad');
-      G.gov=null;G.pmOk=false;G.term++;G.week=1;G.weeks=6;G.phase='camp';render();return}
-    setGov([pm],pm,RI(28,38));
-    G.gov.minority=1;G.gov.royal=1;G.pmOk=true;G.gov.pmLead=pmOsoba(pm)||G.p[pm].lead;
-    if(pm===G.me){G.prest+=6;M(me(),4)}
-    say(`<b>Król Mordeczka powołuje rząd mniejszościowy ${G.p[pm].lead}</b> (${G.p[pm].ab}). Bez większości i bez mandatu, do pierwszego wotum.`,'roy');
-    pr.vote={yes:0,no:0,abst:TOTAL_SEATS,by:Object.fromEntries(alive().map(k=>[k,0])),pass:true,royal:1};
-    pr.cand=pm;makeBlocs();render();return;
-  }
   pr.round++;
   // paraliż sejmu uderza w cały serwer
   alive().forEach(k=>{const q=G.p[k];q.act=cl(q.act-1.2);q.uni=cl(q.uni-.8);M(q,-1)});
@@ -3480,7 +3484,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.12';
+let WERSJA='1.1.13';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3491,6 +3495,13 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.13':{data:'4 sierpnia 2026', zmiany:[
+   'Obecność w kanałach da się wreszcie zbudować. Zanikała szybciej, niż można ją było odnawiać, więc siedziała na sztywnym suficie i nie dawało się z niej zrobić wyniku.',
+   'Kapitał nie schodzi już poniżej zera przy paraliżu partii, a dopłaty koalicyjne płacisz tylko wtedy, gdy naprawdę cię na nie stać.',
+   'Minister, który odszedł z partii albo dał się podkupić, nie siedzi już w radzie jako duch — resort wraca do obsadzenia.',
+   'Sejm, w którym nikt nie ma mandatu, nie wywraca już wyboru premiera. Król rozwiązuje izbę i idziemy do przedterminowych wyborów.',
+   'Sprzątanie po kodzie: martwy ekran przewodnictwa i nieużywane resztki poszły w kosz.',
+ ]},
  '1.1.12':{data:'4 sierpnia 2026', zmiany:[
    'Kadencja ma dokładnie dwanaście tygodni. Koniec z „13 z 12” — po ostatnim tygodniu idziesz prosto do urn.',
    'Wejście w Układ sterów i wycofanie się nie zabiera już limitu na kadencję ani akcji. Limit zużywa się dopiero, gdy coś zatwierdzisz.',
@@ -5044,88 +5055,9 @@ function steryOk(){
   XP(12);render();
 }
 
-function openLead(){
-  const p=me(),cur=lead(G.me);
-  /* Wszystkie ślepe zaułki oddają akcję: skoro nic się nie wydarzyło,
-     gracz nie ma za co płacić ani tracić limitu na kadencję. */
-  if(G.me==='PPP'&&sitActive('kraniecPPP'))return modal('Przewodnictwo','Jeszcze nie teraz',
-    `<p>Lager wciąż formalnie prowadzi partię i nikt nie odważy się tego ruszyć, dopóki sytuacja
-     <b>Kraniec PPP</b> się nie rozstrzygnie. Wtedy sam zdecydujesz, co dalej.</p>`,[{l:'Rozumiem',f:actBack}],actBack);
-  if(G.useTerm.lider)return modal('Przewodnictwo','Już raz w tej kadencji',
-    `<p>Partia zmieniła przewodniczącego w tej kadencji. Kolejna roszada możliwa dopiero po wyborach ,
-     ludzie nie zniosą drugiej zmiany w ciągu kilku tygodni.</p>`,[{l:'Rozumiem',f:actBack}],actBack);
-  const cands=roster(p).filter(x=>!isLead(p,x));
-  if(!cands.length&&!p.lead2)return modal('Przewodnictwo','Nie ma kim zastąpić',
-    `<p>W ${p.n} nie ma nikogo, kto mógłby przejąć stery. ${p.lead} rządzi, dopóki nie odejdzie sam.</p>`,
-    [{l:'Rozumiem',f:actBack}],actBack);
-  const st=x=>`charyzma ${x.char} · kompetencja ${x.komp} · wytrzymałość ${x.wytrz} · autorytet ${x.autor}`;
-  const traitsTxt=innAll(G.me).map(t=>`★ ${t.n}`).join(' · ');
-  const opts=cands.map(c=>{const x=L(c),better=x.avg>cur.avg;
-      const acc=cl(.42+(better?.34:-.12)+p.fame/320+p.uni/400,.12,.95);
-      const ic=INNATE[c];
-      return {l:`${c} przejmuje samodzielnie ${better?'<span class="ok">(lepszy)</span>':'<span class="bad">(słabszy)</span>'}${ic?` <span style="color:var(--acc)">★ ${ic.n}</span>`:''}`,
-        s:`${st(x)} · szansa zgody ${Math.round(acc*100)}%${ic?`, ${ic.d}`:''}`,
-        f:()=>{
-          if(!ch(acc)){p.uni=cl(p.uni-6);
-            say(`<b>${c} odmówił</b> objęcia przewodnictwa w ${p.ab}.`,'bad');
-            close();
-            modal('Przewodnictwo','Odmowa',
-              `<p><b style="color:var(--tx)">${c}</b> nie przyjął propozycji. Szansa wynosiła ${Math.round(acc*100)}%,
-               a nieudana próba kosztowała partię 6 punktów jedności, ludzie widzieli, że szukasz następcy.</p>
-               <p>Akcja i kapitał przepadły. Spróbuj z kimś innym albo popraw najpierw sławę i jedność.</p>`,
-              [{l:'Rozumiem',s:'',f:()=>{close();render()}}]);
-            return}
-          const old=p.lead,old2=p.lead2;
-          p.lead=c; p.lead2=null; p.bench=p.bench.filter(y=>y!==c);
-          if(!p.main.includes(old)&&!p.bench.includes(old))p.bench.push(old);
-          if(old2&&!p.main.includes(old2)&&!p.bench.includes(old2))p.bench.push(old2);
-          G.useTerm.lider=1;p.uni=cl(p.uni+(better?9:-6));p.fame=cl(p.fame-3);G.en=cl(G.en+34);
-          if(G.gov&&G.pmOk&&G.gov.pm===G.me&&G.gov.pmLead===old)
-            say(`<b>${c} obejmuje przewodnictwo</b> w ${p.ab}, ale premierem pozostaje <b>${old}</b>, fotel należy do osoby, nie do funkcji partyjnej.`,'good');
-          else say(`<b>${c} obejmuje przewodnictwo</b> w ${p.ab}. ${old}${old2?' i '+old2:''} schodzi do zaplecza.`,'good');
-          close();render()}}});
-  if(p.lead2){
-    opts.push({l:`Kończę współprzewodnictwo z ${p.lead2}`,s:`${p.lead2} wraca do zaplecza, ${p.lead} rządzi sam`,
-      f:()=>{const old2=p.lead2;p.lead2=null;
-        if(!p.main.includes(old2)&&!p.bench.includes(old2))p.bench.push(old2);
-        G.useTerm.lider=1;p.uni=cl(p.uni-5);
-        say(`<b>${old2} schodzi ze steru.</b> ${p.ab} znów ma jednego przewodniczącego: ${p.lead}.`,'bad');
-        close();render()}});
-  } else if(cands.length){
-    opts.push({l:'Ustanawiam współprzewodnictwo',s:`Wybierz, kto dołączy do sterów obok ${p.lead}`,
-      f:()=>{close();openCoLead()}});
-  }
-  // rezygnacja musi iść przez actBack, inaczej gracz płaci akcją i traci limit kadencji za samo zajrzenie
-  opts.push({l:'Zostawiam jak jest',s:'Nie tracisz akcji ani kapitału',f:actBack});
-  modal('Przewodnictwo',`Kto poprowadzi ${p.ab}?`,
-    `<p>Obecnie: <b style="color:var(--tx)">${p.lead}${p.lead2?' / '+p.lead2:''}</b>, ${st(cur)}.${traitsTxt?` <span style="color:var(--acc)">${traitsTxt}</span>`:''}</p>
-     <p>Zmiana wchodzi w życie natychmiast i wpływa na wszystko: regenerację energii, ryzyko gafy w wywiadzie,
-     wynik debat, tempo rekrutacji i jedność partii.</p>`,
-    opts,actBack)}
-function openCoLead(){
-  const p=me();
-  const cands=roster(p).filter(x=>x!==p.lead);
-  if(!cands.length)return;
-  const cur=lead(G.me);
-  modal('Przewodnictwo','Kto dołączy do steru?',
-    `<p>Współprzewodnictwo dzieli statystyki po połowie: ${p.lead} i nowa osoba będą liczeni jako średnia obu.
-     Cechy wrodzone obu zaczną działać naraz, na dobre i na złe.</p>`,
-    cands.map(c=>{const x=L(c),avgN=Math.round((cur.avg+x.avg)/2);
-      const acc=cl(.5+p.fame/340+p.uni/420-(x.avg>cur.avg?0:.08),.15,.95);
-      const ic=INNATE[c];
-      return {l:`${c}${ic?` <span style="color:var(--acc)">★ ${ic.n}</span>`:''}`,
-        s:`${st2(x)} · po uśrednieniu ~${avgN} · szansa zgody ${Math.round(acc*100)}%${ic?`, ${ic.d}`:''}`,
-        f:()=>{
-          if(!ch(acc)){p.uni=cl(p.uni-4);
-            say(`<b>${c} odmówił</b> współprzewodnictwa w ${p.ab}. Woli zostać na zapleczu.`,'bad');
-            close();render();return}
-          p.lead2=c;p.bench=p.bench.filter(y=>y!==c);
-          if(!p.main.includes(c))p.main.push(c);
-          G.useTerm.lider=1;p.uni=cl(p.uni-4);G.en=cl(G.en+16);
-          say(`<b>${c} dołącza do ${p.lead}</b> jako współprzewodniczący ${p.ab}. Statystyki i cechy wrodzone łączą się.`,'good');
-          close();render()}};
-    }),close)}
-function st2(x){return `charyzma ${x.char} · kompetencja ${x.komp} · wytrzymałość ${x.wytrz} · autorytet ${x.autor}`}
+/* Był tu osobny ekran zmiany przewodniczącego (openLead/openCoLead). Nic go nie
+   otwierało — gracz dochodzi do sterów wyłącznie przez decyzję „Układ sterów”,
+   która robi to samo i pozwala ustawić od jednego do trzech przewodniczących. */
 
 /* ---- koalicja / ministerstwa / głosowania ---- */
 function werbChance(n,from){
@@ -5278,6 +5210,21 @@ function ministerStaz(id){
   return (G.term-od.t)*12+(G.week-od.w);
 }
 const ministerBlokada=id=>Math.max(0,KARENCJA-ministerStaz(id));
+/* Minister musi być żywą osobą z istniejącej partii. Ludzie odchodzą z zaplecza
+   do bezpartyjnych i dają się podkupić konkurencji — a ich resort zostawał
+   podpisany nazwiskiem, którego nie ma już w żadnym składzie. */
+function sprzatnijRade(){
+  radaInit();
+  RESORTY.forEach(r=>{
+    const n=G.rada[r.id];
+    if(!n)return;
+    if(!partiaOsoby(n)){
+      delete G.rada[r.id];delete G.radaOd[r.id];
+      if(G.gov&&G.gov.pm===G.me)
+        say(`<b>${n}</b> znika ze sceny — resort ${r.n} zostaje bez ministra.`,'bad');
+    }
+  });
+}
 /* w której partii siedzi dana osoba */
 function partiaOsoby(nick){
   return alive().find(k=>roster(G.p[k]).includes(nick))||null;
@@ -7439,7 +7386,12 @@ function tryGov(){
   if(sum<MAJ)return modal('Błąd','Za mało mandatów',`<p>Masz ${sum}, potrzeba ${MAJ}.</p>`,[{l:'Rozumiem',f:close}]);
   if(!govSel.every(k=>accepts(k,govPay*2)))
     return modal('Błąd','Ktoś odmawia',`<p>Nie wszyscy chcą z tobą rządzić. Podnieś dopłatę albo zmień skład.</p>`,[{l:'Rozumiem',f:close}]);
-  G.kp-=govPay*7;
+  // dopłaty koalicyjne płaci się z kasy, a nie z kredytu
+  const koszt=govPay*7;
+  if(G.kp<koszt)return modal('Błąd','Nie stać cię na taką dopłatę',
+    `<p>Umowa kosztowałaby <b>${koszt}</b> kapitału, a masz <b>${Math.round(G.kp)}</b>.
+     Zejdź z dopłatą albo zbierz więcej.</p>`,[{l:'Rozumiem',f:close}]);
+  G.kp-=koszt;
   const team=[G.me,...govSel];
   const pm=team.filter(k=>!pmBlocked(k)).sort((a,b)=>kingScore(b)-kingScore(a))[0]
     ||team.slice().sort((a,b)=>kingScore(b)-kingScore(a))[0];
@@ -8235,7 +8187,7 @@ function dead(){
 
 /* ---- eksport uchwytów ---- */
 Object.assign(window,{start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
-  openLead,openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
+  openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,
   openResort,startLaw,signLaw,premierTab,prezydentTab,
@@ -8251,17 +8203,14 @@ window.__game={openDym,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministe
   naborOcena,panelGlosowania,KLOCKI,openKanaly,
   newGame,endWeek,runElection,tally,allocate,aiGov,startTerm,startPM,doPMVote,pmFailForward,
   localScore,openRecruit,openTrain,collapseGov,makeBlocs,prezPool,drawFrom,giveBack,purge,eliteRisk,ratio,syncCoal,prezDone,makeNoise,XP,
-  giveBackCap,prezRound1,prezRound2,runRunoff,memberFlow,prezWait,prezPush,openPush,crownPrez,hemi,pmBlocked,rotateBench,AVA,TEM,INNATE,conflictOf,buyTrait,buyStat,traitsOf,xpOs,xpPula,leadWybrany,COMBO,ostatniWynik,hasCen,hasHeg,LOGOS,applyGoals,checkDeath,isPMperson,isPrezPerson,income,EV,wotumChance,
-  prezRound1,prezGo,A,fire,me,topSeg,sejmVote,setGov,PID,REG,SEG,SID,BASE,COAL,LP,LEAD,THR,
+  giveBackCap,prezRound1,prezRound2,runRunoff,memberFlow,prezWait,prezPush,openPush,crownPrez,hemi,pmBlocked,rotateBench,AVA,TEM,INNATE,conflictOf,buyTrait,buyStat,traitsOf,xpOs,xpPula,COMBO,ostatniWynik,hasCen,hasHeg,LOGOS,applyGoals,checkDeath,isPMperson,isPrezPerson,income,EV,wotumChance,prezGo,A,fire,me,topSeg,sejmVote,setGov,PID,REG,SEG,SID,BASE,COAL,LP,LEAD,THR,
   TOPUP,DIST_SEATS,TOTAL_SEATS,MAJ,accepts,thrFor,
-  radar,feed,runDateAnim,gameDate,dateStr,mapTab,actTab,pollTab,partieTab,sejmTab,leadTab,kingTab,sidebar,setup,pmScreen,prezScreen,marScreen,startMar,marContinue,marDeclare,isMar,isWice,isMarPerson,ownPool,bestRep,runRace,raceScore,results,TRAITS,sizeF,shown,enGain,pickMain,kingScore,kingFactors,kingFav,saveCode,loadCode,allBlocs,addRegion,delRegion,rebalanceSeats,
-  roster,leads,isLead,lead,L,innAll,GOALS,openStery,sterySet,steryTog,steryOk,creditsBox,AUTORZY,WERSJA,
+  radar,feed,runDateAnim,gameDate,dateStr,mapTab,actTab,pollTab,partieTab,sejmTab,leadTab,kingTab,sidebar,setup,pmScreen,prezScreen,marScreen,startMar,marContinue,marDeclare,isMar,isWice,isMarPerson,ownPool,bestRep,runRace,raceScore,results,TRAITS,sizeF,shown,enGain,pickMain,kingScore,kingFactors,kingFav,allBlocs,addRegion,delRegion,rebalanceSeats,isLead,lead,L,innAll,GOALS,openStery,sterySet,steryTog,steryOk,creditsBox,AUTORZY,WERSJA,
   LAWS,lawVote,proposeLaw,signLaw,applyLaw,lawDone,lawIntake,lawsPending,lawsToSign,startLaw,
   LAWPAR,lawEdytowalna,lawParams,radykalnosc,aiProposeLaw,openEdycja,rozstrzygnijUstawe,
   nastrojSejmu,bylWBloku,doLobby,rysujOkno,
-  CHAR,charOf,aiWagi,aiLos,aiOkreg,aiCel,ai,POSTERS,aiCoal,aiGoals,aiAgents,campInit,aiPrzemiana,
-  RESORTY,obsadz,openResort,radaKto,partiaOsoby,premierTab,prezydentTab,TOTAL_SEATS_LIVE,
-  openCamp,campBar,campInit,campRank,runFinalCamp,closeFinalCamp,
+  CHAR,charOf,aiWagi,aiLos,aiOkreg,aiCel,ai,POSTERS,aiCoal,aiGoals,aiAgents,campInit,aiPrzemiana,obsadz,openResort,partiaOsoby,premierTab,prezydentTab,TOTAL_SEATS_LIVE,
+  openCamp,campBar,campRank,runFinalCamp,closeFinalCamp,
   get G(){return G}, setRender(f){render=f}, setModal(f){modal=f}};
 render();
 })();
