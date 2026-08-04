@@ -3204,13 +3204,39 @@ const KRE_OGOLNE=[
   ['tygodni','Tygodni w kadencji',4,24,12],
   ['krolPrzychylnosc','Przychylność Króla',-40,40,0],
 ];
+/* Co da się ustawić pojedynczej partii. Reszta sceny zostaje bez zmian, więc
+   scenariusz może zaczynać się od jednego konkretnego układu sił, a nie tylko
+   od przesunięcia wszystkim po równo. */
+const KRE_PARTIA=[
+  ['mandaty','Mandaty',-20,20,0],
+  ['fame','Sława',-60,60,0],
+  ['cred','Wiarygodność',-60,60,0],
+  ['uni','Jedność',-60,60,0],
+  ['ctr','Kontrowersja',-60,60,0],
+  ['pot','Sufit rozwoju',-40,60,0],
+];
 function openKreator(){
-  KRE={nazwa:'',opis:'',trudnosc:'Mod',autor:'',ef:{}};
+  KRE={nazwa:'',opis:'',trudnosc:'Mod',autor:'',ef:{},partie:{},wybrana:null,kadencja:1};
   KRE_POLA.concat(KRE_OGOLNE).forEach(([k,,,,dom])=>KRE.ef[k]=dom);
   kreatorRys();
 }
 function kreSet(k,v){if(KRE)KRE[k]=v}
 function kreEf(k,v){if(KRE)KRE.ef[k]=Math.round(+v||0);kreatorRys()}
+/* Wybór partii do osobnego ustawienia. Drugie kliknięcie w tę samą zwija panel. */
+function krePartia(k){
+  if(!KRE)return;
+  KRE.wybrana=KRE.wybrana===k?null:k;
+  if(KRE.wybrana&&!KRE.partie[k])KRE.partie[k]={};
+  kreatorRys();
+}
+function krePole(k,pole,v){
+  if(!KRE||!KRE.partie[k])return;
+  const n=Math.round(+v||0);
+  if(n===0)delete KRE.partie[k][pole]; else KRE.partie[k][pole]=n;
+  kreatorRys();
+}
+function kreWyczysc(k){if(KRE){delete KRE.partie[k];if(KRE.wybrana===k)KRE.wybrana=null;kreatorRys()}}
+const kreIleZmian=k=>Object.keys((KRE&&KRE.partie[k])||{}).length;
 function kreatorRys(){
   const suwak=([k,opis,min,max])=>`
     <div class="krow"><span>${opis}</span>
@@ -3232,6 +3258,28 @@ function kreatorRys(){
       ${KRE_POLA.map(suwak).join('')}
       <div class="sterlab" style="margin-top:14px">Zasady rozgrywki</div>
       ${KRE_OGOLNE.map(suwak).join('')}
+
+      <div class="sterlab" style="margin-top:16px">Pojedyncze partie</div>
+      <div class="note" style="margin:0 0 10px">Kliknij partię, żeby ustawić ją osobno.
+      Te zmiany dochodzą do tego, co wyżej — możesz komuś dołożyć mandatów, kogoś pogrążyć,
+      a reszcie sceny nie ruszać.</div>
+      <div class="krepartie">
+        ${alive().map(k=>{const ile=kreIleZmian(k);
+          return `<button class="krep ${KRE.wybrana===k?'on':''} ${ile?'ma':''}"
+            onclick="krePartia('${k}')" title="${esc(G.p[k].n)}">
+            ${crest(k,'s')}<span>${G.p[k].ab}</span>${ile?`<i>${ile}</i>`:''}</button>`}).join('')}
+      </div>
+      ${KRE.wybrana?`
+        <div class="krebox">
+          <div class="krehd"><b>${esc(G.p[KRE.wybrana].n)}</b>
+            <button class="btn g sm" onclick="kreWyczysc('${KRE.wybrana}')">Wyczyść</button></div>
+          ${KRE_PARTIA.map(([pole,opis,mini,maks])=>{
+            const w=(KRE.partie[KRE.wybrana]||{})[pole]||0;
+            return `<div class="krow"><span>${opis}</span>
+              <input type="range" min="${mini}" max="${maks}" value="${w}"
+                oninput="krePole('${KRE.wybrana}','${pole}',this.value)">
+              <b class="m">${w>0?'+':''}${w}</b></div>`}).join('')}
+        </div>`:''}
     </div>
     <div class="op">
       <button class="opt" id="kzap"><b>Zapisuję scenariusz</b><span>Trafi na listę przy następnym uruchomieniu</span></button>
@@ -3263,6 +3311,14 @@ async function kreatorZapisz(){
     efekty:{wszystkie:{},partie:{}}};
   KRE_POLA.forEach(([k,,,,dom])=>{if(KRE.ef[k]!==dom)mod.efekty.wszystkie[k]=KRE.ef[k]});
   KRE_OGOLNE.forEach(([k,,,,dom])=>{if(KRE.ef[k]!==dom)mod.efekty[k]=KRE.ef[k]});
+  // ustawienia pojedynczych partii — tylko te, w których gracz naprawdę coś ruszył
+  Object.keys(KRE.partie||{}).forEach(k=>{
+    const z=KRE.partie[k];
+    if(z&&Object.keys(z).length){
+      mod.efekty.partie[k]=z;
+      zmiany.push(`${G.p[k]?G.p[k].ab:k}: `+Object.keys(z).map(p=>`${p} ${z[p]>0?'+':''}${z[p]}`).join(', '));
+    }
+  });
   const a=(window.pywebview&&window.pywebview.api)||null;
   if(!a||!a.mod_zapisz)return modal('Kreator','Nie mam gdzie tego zapisać',
     `<p>Zapis modów działa w wersji na komputer. W przeglądarce nie ma dostępu do plików.</p>`,
@@ -3719,7 +3775,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.20';
+let WERSJA='1.1.21';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -8702,7 +8758,7 @@ Object.assign(window,{start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,m
   closeFinalCamp,runFinalCamp,openEdycja,edytSet,edytOk,
   setTab:k=>{G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
   signAgent,agentCost,agentFree,AGENTS,render,
-  setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
+  setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.__game={openDym,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
   zawiedzeniKoalicjanci,demografiaSerwera,SERVER,SERVER_MAX,AGENTS,mogeZglosic,rozwiazChance,radaKto,RESORTY,pmOsoba,pmOsoby,leads,roster,
   aiTransfery,aiOpozycja,aiObsadzRade,aiRekonstrukcja,znuzenie,hegemon,resortyPartii,leadWybrany,aiPlan,ustawPlany,
