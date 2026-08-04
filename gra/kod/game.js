@@ -3031,6 +3031,78 @@ function histChartIn(){
 }
 /* ---- scenariusze ---- */
 let SCENSEL=null;
+/* ══════════ MODY ══════════
+   Mod to jeden plik JSON w katalogu gracza. Celowo nie ma w nim kodu — opisuje
+   wyłącznie, co zmienić na starcie, a gra sama to stosuje. Dzięki temu mod od
+   kogoś obcego nie może zrobić w grze niczego, czego nie przewidzieliśmy tutaj. */
+let MODY=[];
+function modEfekty(ef){
+  if(!ef||typeof ef!=='object')return;
+  const licz=(v,teraz)=>typeof v==='number'?v:teraz;
+
+  // zmiany dotyczące wszystkich partii naraz
+  const w=ef.wszystkie||{};
+  alive().forEach(k=>{
+    const p=G.p[k];
+    ['fame','cred','uni','act','ctr','pret'].forEach(s=>{
+      if(typeof w[s]==='number')p[s]=cl(p[s]+w[s]);
+    });
+    if(typeof w.skladProc==='number'){
+      ['eli','int','ser'].forEach(s2=>{
+        const ub=Math.round(p.comp[s2]*(-w.skladProc/100));
+        const realne=Math.max(-p.comp[s2],ub);
+        p.comp[s2]+=realne;
+        if(realne<0)G.free[s2]=(G.free[s2]||0)-realne;
+      });
+      p.mem=p.comp.eli+p.comp.int+p.comp.ser;
+    }
+    if(typeof w.obecnosc==='number')REG.forEach(r=>p.pres[r.id]=cl(p.pres[r.id]+w.obecnosc));
+  });
+
+  // zmiany dla konkretnych partii
+  const per=ef.partie||{};
+  Object.keys(per).forEach(k=>{
+    if(!G.p[k]||G.p[k].dead)return;
+    const p=G.p[k], z=per[k]||{};
+    ['fame','cred','uni','act','ctr','pret','pot'].forEach(s=>{
+      if(typeof z[s]==='number')p[s]=cl(p[s]+z[s],0,s==='pot'?200:100);
+    });
+    if(typeof z.mandaty==='number')p.seats=Math.max(0,p.seats+z.mandaty);
+    if(z.rozwiazana===true){p.dead=1;p.seats=0}
+  });
+
+  if(typeof ef.kapital==='number')G.kp=Math.max(0,G.kp+ef.kapital);
+  if(typeof ef.akcje==='number')G.apMax=Math.max(1,G.apMax+ef.akcje),G.ap=G.apMax;
+  if(typeof ef.frekwencja==='number')G.turnout=cl(ef.frekwencja,.4,1);
+  if(typeof ef.tygodni==='number')G.weeks=Math.max(4,Math.min(24,Math.round(ef.tygodni)));
+  if(typeof ef.krolPrzychylnosc==='number')G.king.rel=cl(G.king.rel+ef.krolPrzychylnosc);
+}
+/* Scenariusze z modów dokładają się do wbudowanych. Jeśli mod ma zły format,
+   pomijamy go bez słowa — jedna literówka w cudzym pliku nie może zablokować gry. */
+function modyDoScen(){
+  MODY.forEach(m=>{
+    if(!m||!m.nazwa)return;
+    const id='mod-'+(m.id||m.nazwa).toString().slice(0,40);
+    SCEN[id]={
+      n:String(m.nazwa).slice(0,60),
+      t:String(m.trudnosc||'Mod').slice(0,20),
+      d:String(m.opis||'Scenariusz z moda.').slice(0,400),
+      mod:String(m.zmiany||'Zmiany opisane przez autora moda.').slice(0,400),
+      zModa:true, autor:String(m.autor||'').slice(0,40),
+      apply(){try{modEfekty(m.efekty)}catch(e){}}
+    };
+  });
+}
+async function wczytajMody(){
+  try{
+    const a=(window.pywebview&&window.pywebview.api)||null;
+    if(!a||!a.mody)return;
+    const lista=await a.mody();
+    MODY=Array.isArray(lista)?lista:[];
+    modyDoScen();
+  }catch(e){MODY=[]}
+}
+
 const SCEN={
  klasyk:{n:'Sejm zastany',t:'Standard',logo:'',
   d:'Serwer taki, jaki jest naprawdę: rząd kisielka48, monarchiści w opozycji, wszystko na swoim miejscu.',
@@ -3098,17 +3170,143 @@ function scenScreen(){
   <div class="scengrid">
     ${Object.keys(SCEN).map(id=>{const x=SCEN[id];
       return `<button class="scencard ${SCENSEL===id?'on':''}" onclick="pickScen('${id}')">
-        <div class="stag">${x.t}</div>
+        <div class="stag">${x.t}${x.zModa?' · mod':''}</div>
         <h3>${x.n}</h3>
         <p>${x.d}</p>
         <div class="smod">${x.mod}</div>
+        ${x.zModa?`<div class="smod" style="color:var(--acc)">${x.autor?'autor: '+esc(x.autor):'twój scenariusz'}</div>`:''}
       </button>`}).join('')}
   </div>
-  <div style="display:flex;gap:10px;margin-top:20px">
+  <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
     <button class="btn g sm" onclick="backToMode()">← Tryby gry</button>
+    <button class="btn sm" onclick="openKreator()">Kreator scenariuszy</button>
+    ${MODY.length?`<button class="btn g sm" onclick="openMody()">Twoje mody (${MODY.length})</button>`:''}
   </div>`;
 }
 function pickScen(id){SCENSEL=id;MODE='free';SFX.click();render()}
+
+/* ---- kreator scenariuszy ----
+   Formularz, z którego wychodzi zwykły plik moda. Wszystko, co da się tu ustawić,
+   gra potem stosuje sama — nie ma tu miejsca na kod, więc nie ma też miejsca
+   na to, żeby czyjś scenariusz zrobił coś nieprzewidzianego. */
+let KRE=null;
+const KRE_POLA=[
+  ['ctr','Kontrowersja wszystkich partii',-40,40,0],
+  ['uni','Jedność wszystkich partii',-40,40,0],
+  ['fame','Sława wszystkich partii',-40,40,0],
+  ['act','Aktywność wszystkich partii',-40,40,0],
+  ['skladProc','Zmiana składu partii (%)',-60,60,0],
+  ['obecnosc','Obecność w kanałach',-40,40,0],
+];
+const KRE_OGOLNE=[
+  ['kapital','Twój kapitał na start',-40,400,0],
+  ['akcje','Akcje na tydzień',-1,3,0],
+  ['tygodni','Tygodni w kadencji',4,24,12],
+  ['krolPrzychylnosc','Przychylność Króla',-40,40,0],
+];
+function openKreator(){
+  KRE={nazwa:'',opis:'',trudnosc:'Mod',autor:'',ef:{}};
+  KRE_POLA.concat(KRE_OGOLNE).forEach(([k,,,,dom])=>KRE.ef[k]=dom);
+  kreatorRys();
+}
+function kreSet(k,v){if(KRE)KRE[k]=v}
+function kreEf(k,v){if(KRE)KRE.ef[k]=Math.round(+v||0);kreatorRys()}
+function kreatorRys(){
+  const suwak=([k,opis,min,max])=>`
+    <div class="krow"><span>${opis}</span>
+      <input type="range" min="${min}" max="${max}" value="${KRE.ef[k]}"
+        oninput="kreEf('${k}',this.value)">
+      <b class="m">${KRE.ef[k]>0&&k!=='tygodni'?'+':''}${KRE.ef[k]}</b></div>`;
+  const v=rysujOkno('kreator',`
+    <button class="mdlx" type="button" aria-label="Zamknij">×</button>
+    <div class="kick">Kreator</div>
+    <h2>Własny scenariusz</h2>
+    <div class="bd">
+      <div class="note" style="margin:0 0 12px">Ustaw, jak ma wyglądać serwer w chwili startu.
+      Scenariusz zapisze się jako plik moda i pojawi się na liście obok wbudowanych.</div>
+      <div class="krow"><span>Nazwa</span><input id="kn" type="text" maxlength="60" value="${esc(KRE.nazwa)}" placeholder="np. Wojna wszystkich ze wszystkimi"></div>
+      <div class="krow"><span>Trudność</span><input id="kt" type="text" maxlength="20" value="${esc(KRE.trudnosc)}"></div>
+      <div class="krow"><span>Autor</span><input id="ka" type="text" maxlength="40" value="${esc(KRE.autor)}" placeholder="twój nick"></div>
+      <div class="krow"><span>Opis</span><input id="ko" type="text" maxlength="200" value="${esc(KRE.opis)}" placeholder="co się dzieje na serwerze"></div>
+      <div class="sterlab" style="margin-top:16px">Wszystkie partie na starcie</div>
+      ${KRE_POLA.map(suwak).join('')}
+      <div class="sterlab" style="margin-top:14px">Zasady rozgrywki</div>
+      ${KRE_OGOLNE.map(suwak).join('')}
+    </div>
+    <div class="op">
+      <button class="opt" id="kzap"><b>Zapisuję scenariusz</b><span>Trafi na listę przy następnym uruchomieniu</span></button>
+      <button class="opt" id="kno"><b>Jednak nie</b><span>Nic nie zapisuję</span></button>
+    </div>`);
+  const czytaj=()=>{
+    KRE.nazwa=(v.querySelector('#kn')||{}).value||'';
+    KRE.trudnosc=(v.querySelector('#kt')||{}).value||'Mod';
+    KRE.autor=(v.querySelector('#ka')||{}).value||'';
+    KRE.opis=(v.querySelector('#ko')||{}).value||'';
+  };
+  ['#kn','#kt','#ka','#ko'].forEach(s=>{const e=v.querySelector(s);if(e)e.oninput=czytaj});
+  v.querySelector('#kno').onclick=()=>{KRE=null;close();render()};
+  v.querySelector('.mdlx').onclick=()=>{KRE=null;close();render()};
+  v.querySelector('#kzap').onclick=()=>{czytaj();kreatorZapisz()};
+}
+async function kreatorZapisz(){
+  if(!KRE)return;
+  if(!KRE.nazwa.trim())return modal('Kreator','Bez nazwy ani rusz',
+    `<p>Scenariusz musi mieć nazwę — po niej znajdziesz go na liście.</p>`,
+    [{l:'Wracam',f:()=>{close();kreatorRys()}}]);
+  const zmiany=[];
+  KRE_POLA.concat(KRE_OGOLNE).forEach(([k,opis,,,dom])=>{
+    if(KRE.ef[k]!==dom)zmiany.push(`${opis}: ${KRE.ef[k]>0?'+':''}${KRE.ef[k]}`);
+  });
+  const mod={nazwa:KRE.nazwa.trim(),opis:KRE.opis.trim()||'Scenariusz z kreatora.',
+    trudnosc:KRE.trudnosc.trim()||'Mod',autor:KRE.autor.trim(),
+    zmiany:zmiany.join(' · ')||'Bez zmian względem zwykłej gry.',
+    efekty:{wszystkie:{},partie:{}}};
+  KRE_POLA.forEach(([k,,,,dom])=>{if(KRE.ef[k]!==dom)mod.efekty.wszystkie[k]=KRE.ef[k]});
+  KRE_OGOLNE.forEach(([k,,,,dom])=>{if(KRE.ef[k]!==dom)mod.efekty[k]=KRE.ef[k]});
+  const a=(window.pywebview&&window.pywebview.api)||null;
+  if(!a||!a.mod_zapisz)return modal('Kreator','Nie mam gdzie tego zapisać',
+    `<p>Zapis modów działa w wersji na komputer. W przeglądarce nie ma dostępu do plików.</p>`,
+    [{l:'Rozumiem',f:()=>{close();render()}}]);
+  let wynik=null;
+  try{wynik=await a.mod_zapisz(mod)}catch(e){wynik={ok:false,blad:e.message}}
+  KRE=null;close();
+  if(wynik&&wynik.ok){
+    await wczytajMody();
+    render();
+    modal('Kreator','Scenariusz zapisany',
+      `<p><b>${esc(mod.nazwa)}</b> jest już na liście scenariuszy.</p>
+       <p style="margin-top:10px">Plik leży w katalogu modów — możesz go wysłać komuś,
+       a on wrzuci go u siebie i zagra w to samo.</p>`,
+      [{l:'Dobrze',f:()=>{close();render()}}]);
+  }else{
+    modal('Kreator','Nie udało się zapisać',
+      `<p>${esc((wynik&&wynik.blad)||'Nieznany błąd.')}</p>`,
+      [{l:'Trudno',f:()=>{close();render()}}]);
+  }
+}
+async function openMody(){
+  const a=(window.pywebview&&window.pywebview.api)||null;
+  let folder='';
+  try{folder=a&&a.mody_folder?await a.mody_folder():''}catch(e){}
+  modal('Mody',`Wgrane mody: ${MODY.length}`,
+    `<p>Mody to pojedyncze pliki. Żeby dodać cudzy scenariusz, wrzuć jego plik do katalogu
+     modów i uruchom grę ponownie.</p>
+     ${folder?`<div class="note" style="margin:12px 0"><b>Katalog modów</b><br>
+       <span style="font-family:var(--m);font-size:11.5px;word-break:break-all">${esc(folder)}</span></div>`:''}
+     ${MODY.length?`<div class="lawheld">${MODY.map(m=>
+       `<div class="lh"><span>${esc(m.nazwa)}${m.autor?' — '+esc(m.autor):''}</span>
+         <button class="btn g sm" onclick="modUsun('${esc(m.plik||'')}')">Usuń</button></div>`).join('')}</div>`
+      :'<p class="dim">Nie masz jeszcze żadnych modów. Zrób własny w kreatorze.</p>'}`,
+    [{l:'Zamykam',f:()=>{close();render()}}]);
+}
+async function modUsun(plik){
+  const a=(window.pywebview&&window.pywebview.api)||null;
+  if(!a||!a.mod_usun||!plik)return;
+  try{await a.mod_usun(plik)}catch(e){}
+  await wczytajMody();
+  close();render();
+  openMody();
+}
 
 /* ══════════ 1.6 TEST · FALA 2 ══════════ */
 /* ---- noc wyborcza ---- */
@@ -3521,7 +3719,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.17';
+let WERSJA='1.1.18';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3532,6 +3730,12 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.18':{data:'4 sierpnia 2026', zmiany:[
+   'Mody i własne scenariusze. W kreatorze ustawiasz, jak ma wyglądać serwer na starcie, i zapisujesz to jako plik — swój scenariusz pojawia się na liście obok wbudowanych.',
+   'Plik moda możesz wysłać komuś innemu. Wrzuca go u siebie do katalogu modów i gra w dokładnie to samo.',
+   'Mody nie zawierają kodu, tylko opis zmian — cudzy scenariusz nie może zrobić w grze niczego poza tym, co przewidziano.',
+   'Launcher wygląda inaczej: godło, wyraźny stan gotowości i jeden duży przycisk, gdy nie ma czego pobierać.',
+ ]},
  '1.1.16':{data:'4 sierpnia 2026', zmiany:[
    'Aktualizacja nie otwiera już dwóch okien gry naraz. Launcher odblokowywał przycisk pół sekundy przed startem gry i dało się kliknąć drugi raz.',
  ]},
@@ -8489,7 +8693,7 @@ Object.assign(window,{start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,m
   closeFinalCamp,runFinalCamp,openEdycja,edytSet,edytOk,
   setTab:k=>{G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
   signAgent,agentCost,agentFree,AGENTS,render,
-  setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
+  setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.__game={openDym,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
   zawiedzeniKoalicjanci,demografiaSerwera,SERVER,SERVER_MAX,AGENTS,mogeZglosic,rozwiazChance,radaKto,RESORTY,pmOsoba,pmOsoby,leads,roster,
   aiTransfery,aiOpozycja,aiObsadzRade,aiRekonstrukcja,znuzenie,hegemon,resortyPartii,leadWybrany,aiPlan,ustawPlany,
@@ -8508,6 +8712,17 @@ window.__game={openDym,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministe
   nastrojSejmu,bylWBloku,doLobby,rysujOkno,
   CHAR,charOf,aiWagi,aiLos,aiOkreg,aiCel,ai,POSTERS,aiCoal,aiGoals,aiAgents,campInit,aiPrzemiana,obsadz,openResort,partiaOsoby,premierTab,prezydentTab,TOTAL_SEATS_LIVE,
   openCamp,campBar,campRank,runFinalCamp,closeFinalCamp,
-  get G(){return G}, setRender(f){render=f}, setModal(f){modal=f}};
+  get G(){return G}, setRender(f){render=f}, setModal(f){modal=f},
+  MODY:()=>MODY, wczytajMody, modEfekty, modyDoScen};
 render();
+/* Mody dociągamy po pierwszym rysowaniu: most do Pythona wstaje chwilę po stronie,
+   a ekran wyboru scenariusza i tak przerysuje się, gdy lista dojdzie. */
+if(typeof window!=='undefined'){
+  const sprobujMody=(ile)=>{
+    const a=window.pywebview&&window.pywebview.api;
+    if(a&&a.mody)wczytajMody().then(()=>{if(MODY.length)render()});
+    else if(ile>0)setTimeout(()=>sprobujMody(ile-1),400);
+  };
+  setTimeout(()=>sprobujMody(12),300);
+}
 })();

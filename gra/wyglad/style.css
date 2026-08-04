@@ -1,4 +1,4 @@
-:root{
+﻿:root{
   --bg:#0a100b; --p1:#111912; --p2:#162117; --p3:#1d2b1e;
   --line:#27392a; --line2:#3e5a42;
   --tx:#eef2e7; --dim:#a3b49e; --dim2:#73846f;
@@ -1179,3 +1179,11 @@ table.t tr.me td:first-child{box-shadow:inset 3px 0 0 var(--acc)}
   .card>.b{overflow-x:auto;-webkit-overflow-scrolling:touch}
   table.t{width:max-content;min-width:100%}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---- kreator scenariuszy: wiersz etykieta + kontrolka + wartosc ---- */
+.krow{display:grid;grid-template-columns:minmax(120px,1fr) minmax(0,1.4fr) auto;gap:12px;align-items:center;margin-bottom:9px;font-size:13px}
+.krow input[type=text]{background:var(--p1);border:1px solid var(--line);border-radius:var(--r2);color:var(--tx);padding:7px 10px;font:inherit;min-width:0}
+.krow input[type=text]:focus{outline:none;border-color:var(--acc)}
+.krow input[type=range]{width:100%;accent-color:var(--acc)}
+.krow b{min-width:42px;text-align:right;color:var(--acc)}
+@media(max-width:640px){.krow{grid-template-columns:1fr auto}.krow input[type=range]{grid-column:1/-1}}
