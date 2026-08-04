@@ -3484,7 +3484,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.13';
+let WERSJA='1.1.14';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3495,6 +3495,10 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.14':{data:'4 sierpnia 2026', zmiany:[
+   'Zapisy ze starszych wersji wczytują się normalnie. Wcześniej rozgrywka sprzed aktualizacji potrafiła wywalić grę przy pierwszym kliknięciu.',
+   'Zapis z „trzynastego tygodnia” sam się prostuje przy wczytaniu.',
+ ]},
  '1.1.13':{data:'4 sierpnia 2026', zmiany:[
    'Obecność w kanałach da się wreszcie zbudować. Zanikała szybciej, niż można ją było odnawiać, więc siedziała na sztywnym suficie i nie dawało się z niej zrobić wyniku.',
    'Kapitał nie schodzi już poniżej zera przy paraliżu partii, a dopłaty koalicyjne płacisz tylko wtedy, gdy naprawdę cię na nie stać.',
@@ -8114,6 +8118,19 @@ function loadCode(code){
   }});
   PID.forEach(a=>{G.rel[a]=G.rel[a]||{};PID.forEach(b2=>{if(a!==b2&&G.rel[a][b2]===undefined)G.rel[a][b2]=RI(-8,26)})});
   G.goals=G.goals||{};G.agents=G.agents||{};G.tutSeen=G.tutSeen||{};G.sits=G.sits||[];G.polls=G.polls||[];
+  /* Zapis ze starszego wydania nie zna pól, które doszły później. Bez tego gra
+     wywracała się przy pierwszym kliknięciu na „G.useTerm.stery” — a to znaczy,
+     że gracz tracił rozgrywkę tylko dlatego, że wyszła nowa wersja. */
+  G.useTerm=G.useTerm||{};G.catUsed=G.catUsed||{};G.once=G.once||{};G.used=G.used||{};
+  G.lup=G.lup||{};G.xpOs=G.xpOs||{};G.znuz=G.znuz||{};G.znuzKad=G.znuzKad||{};
+  G.rada=G.rada||{};G.radaOd=G.radaOd||{};G.lawTerm=G.lawTerm||{};G.law=G.law||{};
+  G.coal=G.coal||{};G.free=G.free||{eli:0,int:0,ser:0};G.king=G.king||{rel:52,paid:0};
+  if(typeof G.bezRzadu!=='number')G.bezRzadu=0;
+  if(typeof G.xp!=='number')G.xp=0;
+  if(typeof G.prest!=='number')G.prest=0;
+  if(typeof G.weeks!=='number'||G.weeks<1)G.weeks=12;
+  if(typeof G.week!=='number'||G.week<1)G.week=1;
+  if(G.week>G.weeks)G.week=G.weeks;      // stare zapisy potrafią mieć trzynasty tydzień
   if(!G.ptraits){G.ptraits={};if(G.traits&&G.traits.length)G.ptraits[G.p[G.me].lead]=G.traits.slice()}
   G.sejmPrez=null;G.mar=null;
   if(G.phase==='marszalek')G.phase='camp';
