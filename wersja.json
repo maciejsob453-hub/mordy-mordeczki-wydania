@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.24",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/13117369f77e530cdea5eb972b775f43a9c8be7c",
+ "wersja": "1.1.25",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,8 +14,8 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "d4187299353f8b2278f6ad21651ee0146da3a2ec688ae9757d0db7596684fd16",
-   "bajtow": 568762
+   "sha": "30de049224c08ec58b1e46b8f16f6c129ab4c435862d312829cf453a9588ee87",
+   "bajtow": 569353
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -368,6 +368,11 @@
    "bajtow": 37688
   },
   {
+   "sciezka": "gra/obrazki/ava-kaziu-prime.webp",
+   "sha": "d9636f7e8a4a6d1e06ab2e666cf8e744f7bcb3c8e394675d2d7dcb565ae13cd0",
+   "bajtow": 17332
+  },
+  {
    "sciezka": "gra/obrazki/ava-ke-trab.png",
    "sha": "cbc239f43318b907036cabcddca08249eedb7c56652d6fbc36ea39e54d1866fe",
    "bajtow": 26829
@@ -570,6 +575,5 @@
   "sha": "771e518561de93bb1338155c6782f37b93b7739913a429f3e0b4f3e1aa7ddc05",
   "bajtow": 12146589,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.21/Mordy.Mordeczki.Launcher.exe"
- },
- "commit": "13117369f77e530cdea5eb972b775f43a9c8be7c"
+ }
 }

@@ -6,7 +6,7 @@
    ═══════════════════════════════════════════════════════════ */
 (function(){
 "use strict";
-const LOGOS = {"PKR": "obrazki/2d4de0deb7c1.webp", "WP": "obrazki/10efbd4fb21b.webp", "LSD": "obrazki/62ff16ae5515.webp", "KAN": "obrazki/28efd8279222.svg", "HAND": "obrazki/f3c9da594c00.svg", "POST": "obrazki/adb43c8743c7.webp", "LIB": "obrazki/5609cc4b3929.webp", "ALT": "obrazki/1fb954d6dd7c.webp", "ADS": "obrazki/a5665e494ecf.webp", "HMO": "obrazki/3da3c7510fc8.webp", "SS": "obrazki/5ed581dc6fb1.webp", "REP": "obrazki/a56a5574593a.webp", "PD": "obrazki/505b87671205.webp", "PPP": "obrazki/9a313b752b8b.webp", "ZHM": "obrazki/07520c9d52a7.webp", "NP": "obrazki/686628e32c75.webp", "ROM": "obrazki/f72e203052b7.webp", "NBR": "obrazki/20c8f32ecec2.webp", "FD": "obrazki/1f63df863e7f.webp", "KK": "obrazki/40064ea5d3ff.webp", "PKD": "obrazki/174141e9bca2.webp", "PLR": "obrazki/2f9ecd9fa8cf.webp", "ChPC": "obrazki/4c15d82ceb7d.webp", "DPD": "obrazki/04774de77d36.webp", "POJ": "obrazki/31bfab4a1110.webp", "PP": "obrazki/720fb5e0b9e2.webp", "P1612": "obrazki/logo-p1612.png", "CEN": "obrazki/logo-centrum.webp", "HEG": "obrazki/logo-hegemon.webp", "SWIA": "obrazki/logo-swiadek.svg"};
+const LOGOS = {"PKR": "obrazki/2d4de0deb7c1.webp", "WP": "obrazki/10efbd4fb21b.webp", "LSD": "obrazki/62ff16ae5515.webp", "KAN": "obrazki/28efd8279222.svg", "HAND": "obrazki/f3c9da594c00.svg", "POST": "obrazki/adb43c8743c7.webp", "LIB": "obrazki/5609cc4b3929.webp", "ALT": "obrazki/1fb954d6dd7c.webp", "ADS": "obrazki/a5665e494ecf.webp", "HMO": "obrazki/3da3c7510fc8.webp", "SS": "obrazki/5ed581dc6fb1.webp", "REP": "obrazki/a56a5574593a.webp", "PD": "obrazki/505b87671205.webp", "PPP": "obrazki/9a313b752b8b.webp", "ZHM": "obrazki/07520c9d52a7.webp", "NP": "obrazki/686628e32c75.webp", "ROM": "obrazki/f72e203052b7.webp", "NBR": "obrazki/20c8f32ecec2.webp", "FD": "obrazki/1f63df863e7f.webp", "KK": "obrazki/40064ea5d3ff.webp", "PKD": "obrazki/174141e9bca2.webp", "PLR": "obrazki/2f9ecd9fa8cf.webp", "ChPC": "obrazki/4c15d82ceb7d.webp", "DPD": "obrazki/04774de77d36.webp", "POJ": "obrazki/31bfab4a1110.webp", "PP": "obrazki/720fb5e0b9e2.webp", "P1612": "obrazki/logo-p1612.png", "CEN": "obrazki/logo-centrum.webp", "HEG": "obrazki/logo-hegemon.webp", "SWIA": "obrazki/logo-swiadek.svg", "KAZIK": "obrazki/ava-kaziu-prime.webp"};
 
 /* ══════════ POKRĘTŁA TRUDNOŚCI ══════════
    Wszystko, czym realnie stroi się grę, siedzi tutaj. Wcześniej te liczby były
@@ -2525,7 +2525,12 @@ const app=document.getElementById('app');
 const crest=(k,s='m')=>{const src=(G&&G.p&&G.p[k]&&G.p[k].logo&&LOGOS[G.p[k].logo])||LOGOS[k]||'';
   return `<img class="crest ${s}" src="${src}" alt="${(G?G.p[k]:BASE[k]).ab}">`};
 const stars=d=>'★'.repeat(d)+'☆'.repeat(5-d);
-const ava=(name,col,sz)=>{const im=AVA[name];const s=sz||38;
+/* Po ukończeniu Kazikmistrza Kaziu wraca do swojego najbardziej rozpoznawalnego
+   awatara — tego z czasów, o których wszyscy mówią „stare dobre lata”. */
+const ava=(name,col,sz)=>{
+  const im=(name==='Kaziu'&&typeof goalDone==='function'&&goalDone('kazik'))
+    ? 'obrazki/ava-kaziu-prime.webp' : AVA[name];
+  const s=sz||38;
   return im?`<img class="avaimg" src="${im}" alt="${name}" style="width:${s}px;height:${s}px;border-color:${col}">`
    :`<span class="ava" style="background:${col};width:${s}px;height:${s}px;font-size:${s*.38}px">${initials(name)}</span>`};
 const leadName=k=>leads(G.p[k]).join(' / ');
@@ -3807,7 +3812,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.24';
+let WERSJA='1.1.25';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3818,6 +3823,10 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.25':{data:'5 sierpnia 2026', zmiany:[
+   'Cel Kazikmistrz ma własne logo, a po jego ukończeniu Kaziu wraca do swojego starego awatara — tego, po którym wszyscy go pamiętają.',
+ ]},
+
  '1.1.24':{data:'5 sierpnia 2026', zmiany:[
    'Naprawiony błąd: ustawa z poprzedniej kadencji zostawała na biurku prezydenta i naliczała karę za zwłokę w sprawie, której nigdy nie widziałeś. Teraz projekt przepada wraz z końcem kadencji.',
    'Zmęczenie władzą psuje też relacje — im dłużej rządzisz, tym gorzej reszta sceny na ciebie patrzy.',
@@ -6875,7 +6884,7 @@ const GOALS={
   run(){const p=me();
    p.swiaMode=1;p.cred=cl(p.cred+6);
    say('<b>Świadek Koronny.</b> Cztery kadencje w opozycji, czyste konto i mandaty, których nikt ci nie dał w prezencie. Serwer to odnotował.','roy')}},
- kazik:{n:'Kazikmistrz',for:['DPD'],logo:null,bots:0,
+ kazik:{n:'Kazikmistrz',for:['DPD'],logo:'KAZIK',bots:0,
   what:'Kaziu bierze partię, wygrywa wybory i nagle okazuje się, że przez te wszystkie lata wszyscy się mylili. Nie zmienia się szyld ani herb — zmienia się on.',
   req:[
    {t:'Kaziu przewodzi partii',v:()=>isLead(me(),'Kaziu')?'przewodzi':me().lead,ok:()=>isLead(me(),'Kaziu')},
@@ -6885,6 +6894,7 @@ const GOALS={
    {t:'Co najmniej 250 kapitału w kasie',v:()=>Math.round(G.kp)+' / 250',ok:()=>G.kp>=250},
   ],
   cons:['Kaziu traci cechę „Ktoś to musiał wziąć” i dostaje „Stare dobre lata”.',
+   'Wraca jego stary awatar — ten, po którym wszyscy go pamiętają.',
    'Zamiast tracić, partia zyskuje: wiarygodność +1,6 i jedność +1,4 tygodniowo.',
    'Koalicjanci schodzą z wymaganiami o 14 zamiast żądać o 16 więcej — różnica trzydziestu punktów w każdej rozmowie.',
    'Nazwa, herb i barwy partii zostają bez zmian. To nie przemiana partii, tylko jednego człowieka.'],
