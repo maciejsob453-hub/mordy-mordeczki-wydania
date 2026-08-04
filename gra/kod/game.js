@@ -3812,7 +3812,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.25';
+let WERSJA='1.1.26';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3823,6 +3823,16 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.26':{data:'5 sierpnia 2026', zmiany:[
+   'Weto nie marnuje juz calej kadencji. Podejscie do ustawy zuzywa sie dopiero po rozstrzygnieciu sprawy, a nie w chwili zlozenia projektu.',
+   'Sejm moze odrzucic weto prezydenta wiekszoscia trzech piatych. Palac przestal byc instancja, od ktorej nie ma odwolania.',
+   'Kazde weto kosztuje prezydenta: kontrowersja w gore, wiarygodnosc w dol i relacje z premierem na minus. Przegrane weto zabiera mu takze slawe.',
+   'Prezydent komputerowy czyta ustawy: patrzy na radykalnosc, na to czy projekt jest jego, i czy sam siedzi w rzadzie.',
+   'Przed zlozeniem projektu widzisz ostrzezenie, ze jako nie-rzadowiec pracujesz na konto premiera. Przy glosowaniu widac autora od razu.',
+   'Partia bez mandatow nie ma juz prawa inicjatywy ustawodawczej.',
+   'Ustawa przepchnieta przez opozycje obniza sprawczosc rzadu - to dowod, ze gabinet stracil kontrole nad izba.',
+ ]},
+
  '1.1.25':{data:'5 sierpnia 2026', zmiany:[
    'Cel Kazikmistrz ma własne logo, a po jego ukończeniu Kaziu wraca do swojego starego awatara — tego, po którym wszyscy go pamiętają.',
  ]},
@@ -4769,6 +4779,8 @@ function mojeResorty(){
 }
 function mogeZglosic(id){
   const l=lawById(id);if(!l)return false;
+  // kto nie ma ani jednego mandatu, ten nie ma prawa inicjatywy — nie miałby nawet jak zagłosować
+  if(!me().seats)return false;
   if(isPM())return true;
   return !!(l.resort&&mojeResorty().includes(l.resort));
 }
@@ -4791,7 +4803,11 @@ function startLaw(id){
     `<p>${l.d}</p><p><b>Skutek:</b> ${l.skutek}</p>
      <p style="margin-top:10px">Do przejścia trzeba ${l.prog>.6?'<b>dwóch trzecich</b>':'<b>zwykłej większości</b>'} głosów.
      Licząc obecne nastroje sejmu, wygląda to na <b>${w.ok?'przechodzące':'przegrane'}</b>, ale głosowanie i tak rozstrzygnie się przy urnie.</p>`,
-    [{l:'Kieruję pod głosowanie',s:'Sejm głosuje od razu',f:()=>proposeLaw(id)},
+    [{l:'Kieruję pod głosowanie',
+      s:(G.gov&&G.pmOk&&!G.gov.parties.includes(G.me))
+        ? `Uwaga: nie jesteś w rządzie — zasługę zapisze premier ${G.p[G.gov.pm].ab}`
+        : 'Sejm głosuje od razu',
+      f:()=>proposeLaw(id)},
      {l:'Jeszcze nie teraz',s:'Wrócisz do tego później',f:close}],close);
 }
 /* Jedno okno do wszystkich ustaw z pokrętłami — i przy zgłaszaniu, i przy poprawianiu. */
@@ -6243,7 +6259,13 @@ function sprawczosc(przeszla,kto){
   if(!g||!G.pmOk)return;
   if(typeof g.spraw!=='number')g.spraw=50;
   const rzadowa=g.parties.includes(kto);
-  if(!rzadowa)return;                       // ustawy opozycji nie obciążają gabinetu
+  if(!rzadowa){
+    // opozycja przepchnęła swoje: rząd stracił kontrolę nad izbą i to widać
+    if(przeszla){g.spraw=cl((g.spraw||50)-11);APPR(-3);
+      const pm=G.p[g.pm];if(pm){pm.cred=cl(pm.cred-2);M(pm,-4)}
+      if(g.pm===G.me)say('<b>Opozycja przepchnęła ustawę pod twoim nosem.</b> Sejm przestaje słuchać rządu.','bad')}
+    return;
+  }
   if(przeszla){
     g.spraw=cl(g.spraw+9);g.wygrane=(g.wygrane||0)+1;
     APPR(+2);
@@ -6266,12 +6288,15 @@ function proposeLaw(id,opcje){
   if(!law||!mogeZglosic(id)||G.lawPend||G.lawTerm[id])return;
   if(lawDone(id)&&!lawEdytowalna(id))return;        // bez pokręteł nie ma czego poprawiać
   if(ustawaWTymTygodniu())return;                   // jeden projekt na tydzień
-  G.lawTerm[id]=1;                                  // jedno podejście na kadencję
+  /* Podejście zużywa się dopiero wtedy, gdy sprawa naprawdę się kończy — przy
+     przegranym głosowaniu albo po podpisie. Weto prezydenta nie może spalać
+     projektu, który sejm przegłosował: premier wygrał izbę i ma prawo wrócić. */
   G.lawWeek=G.term+'-'+G.week;                      // laska marszałkowska zajęta do końca tygodnia
   const w=lawVote(id,opcje);
   close();
   if(!w.ok){
     me().ctr=cl(me().ctr+3);
+    G.lawTerm[id]=1;      // przegrane głosowanie to zużyte podejście
     sprawczosc(false,G.me);
     if(G.przekupiony&&G.przekupiony.doTerm===G.term)G.przekupiony=null;   // kupiony głos działa raz
     say(`<b>${law.n} przepada.</b> Za ${w.za}, przeciw ${w.przeciw} przy progu ${w.potrzeba}.`,'bad');
@@ -6393,7 +6418,10 @@ function openGlosowanie(law,opcje,pm){
   const nast=opcje?Object.keys(opcje).map(k=>`${LAWPAR[law.id].opis[k]}: <b>${opcje[k]}${k==='prog'?'%':''}</b>`).join(' · '):'';
   const rad=radykalnosc(law.id,opcje);
   modal('Sejm głosuje',law.n,
-    `<p><b>${G.p[pm].ab}</b> kieruje pod głosowanie ustawę, którą firmuje premier ${G.p[pm].lead}.</p>
+    `<p><b>${G.p[pm].ab}</b> kieruje pod głosowanie ustawę, którą firmuje ${G.p[pm].lead}.
+     ${G.gov&&G.pmOk&&G.gov.pm!==pm?`Projekt idzie spoza gabinetu — jeśli przejdzie,
+       najwięcej zapisze sobie premier <b>${G.p[G.gov.pm].ab}</b>.`
+      :'To projekt rządowy.'}</p>
      <p>${law.d}</p>
      <p><b>Skutek:</b> ${law.skutek}</p>
      ${nast?`<div class="note" style="margin:12px 0">${nast}</div>`:''}
@@ -6413,6 +6441,7 @@ function rozstrzygnijUstawe(id,opcje,pm,mojGlos,relZmiana){
     G.rel[pm][G.me]=cl(G.rel[pm][G.me]+relZmiana,-100,100);
   }
   if(!w.ok){
+    G.lawTerm[id]=1;
     sprawczosc(false,pm);
     if(G.przekupiony&&G.przekupiony.doTerm===G.term)G.przekupiony=null;
     say(`<b>${law.n}</b> od ${G.p[pm].ab} przepada w sejmie: za ${w.za}, przeciw ${w.przeciw}.`,'bad');
@@ -6460,7 +6489,15 @@ function aiSignLaw(){
     return;
   }
   const rel=G.rel[prezK]&&G.gov&&G.gov.pm?G.rel[prezK][G.gov.pm]:0;
-  const przyjmie=ch(cl(.55+rel/140,.15,.95));
+  /* Pałac czyta, co podpisuje. Ustawa radykalna budzi opór, ustawa korzystna
+     dla partii prezydenta przechodzi łatwiej, a projekt firmowany przez własny
+     obóz nie zostaje zawetowany z powodu jednej kłótni z premierem. */
+  const rad=radykalnosc(G.lawPend.id,G.lawPend.opcje||null);
+  const swoja=G.lawPend.przez===prezK;
+  const wRzadzie=!!(G.gov&&G.gov.parties.includes(prezK));
+  const szansa=cl(.5+rel/190-rad*.42+(swoja?.45:0)+(wRzadzie?.18:0)
+    +(law.kat==='rozrywka'?.1:0)-(law.prog>.6?.12:0),.08,.97);
+  const przyjmie=ch(szansa);
   signLaw(przyjmie,true);
   // Decyzja Pałacu ginęła w kronice — przy własnej ustawie mówimy o niej wprost.
   if(moja){
@@ -6522,11 +6559,71 @@ function zwlokaPrezydenta(){
      kontrowersja <b>+8</b>.</p>`,
     [{l:'Rozumiem',f:()=>{close();render()}}]);
 }
+/* Weto nie jest już ostatecznym słowem. Sejm może je odrzucić większością
+   trzech piątych — tak jak w każdej normalnej procedurze. Prezydent przestaje
+   być instancją, od której nie ma odwołania. */
+const PROG_WETO=.6;
+/* Sejm głosuje nad odrzuceniem weta. Poprzeć musi trzy piąte izby, więc udaje się
+   to tylko rządom z realnym zapleczem — ale przestaje być tak, że pałac zamyka
+   temat jednym podpisem. Prezydent płaci za każde weto, niezależnie od wyniku. */
+function odrzucenieWeta(id,opcje,pmK,glosy){
+  const law=lawById(id);
+  const prezK=G.prez?G.prez.party:null;
+  // weto zawsze coś kosztuje pałac: to konflikt z izbą, a nie darmowy przycisk
+  if(prezK&&G.p[prezK]){
+    const q=G.p[prezK];
+    q.ctr=cl(q.ctr+7);q.cred=cl(q.cred-3);
+    if(G.gov&&G.gov.pm&&G.rel[prezK][G.gov.pm]!==undefined){
+      G.rel[prezK][G.gov.pm]=cl(G.rel[prezK][G.gov.pm]-12,-100,100);
+      G.rel[G.gov.pm][prezK]=cl(G.rel[G.gov.pm][prezK]-12,-100,100);
+    }
+  }
+  // izba głosuje tak, jak głosowała nad ustawą, ale próg jest teraz wyższy
+  let za=0,przeciw=0,wstrzym=0;const by={};
+  alive().forEach(k=>{
+    const s=G.p[k].seats;if(!s)return;
+    const poprzednio=(glosy&&glosy.by)?glosy.by[k]:null;
+    // kto był za ustawą, ten broni jej dalej; reszta rzadko zmienia zdanie
+    const chce=poprzednio==='za'?.92:poprzednio==='wstrzymał się'?.35:.12;
+    if(ch(chce)){za+=s;by[k]='za'}
+    else if(ch(.2)){wstrzym+=s;by[k]='wstrzymał się'}
+    else{przeciw+=s;by[k]='przeciw'}
+  });
+  const potrzeba=Math.ceil(TOTAL_SEATS*PROG_WETO);
+  const udalo=za>=potrzeba;
+  const w={za,przeciw,wstrzym,by,potrzeba,rad:0,ok:udalo};
+  if(udalo){
+    G.lawTerm[id]=1;
+    applyLaw(id,opcje);
+    if(!G.lawBy)G.lawBy={};
+    if(pmK)G.lawBy[id]=pmK;
+    if(G.gov)G.gov.spraw=cl((G.gov.spraw||50)+7);
+    if(prezK&&G.p[prezK]){G.p[prezK].fame=cl(G.p[prezK].fame-6);M(G.p[prezK],-12)}
+    say(`<b>Sejm odrzucił weto</b> ${za}:${przeciw}. ${law.n} wchodzi w życie mimo prezydenta.`,'good');
+  }else{
+    G.lawTerm[id]=1;
+    if(G.gov)G.gov.spraw=cl((G.gov.spraw||50)-8);
+    say(`<b>Weto utrzymane</b> ${za}:${przeciw} przy progu ${potrzeba}. ${law.n} nie wchodzi w życie.`,'bad');
+  }
+  if(me().seats>0||pmK===G.me)
+    modal('Sejm',udalo?'Weto odrzucone':'Weto utrzymane',
+      `<p>Prezydent zawetował <b>${law.n}</b>, więc sejm głosował nad odrzuceniem weta.
+       Potrzeba było <b>${potrzeba}</b> z ${TOTAL_SEATS} głosów, czyli trzech piątych izby.</p>
+       <p style="margin-top:8px">Za <b>${za}</b>, przeciw <b>${przeciw}</b>, wstrzymało się <b>${wstrzym}</b>.</p>
+       ${panelGlosowania(w)}
+       <p style="margin-top:12px">${udalo
+         ? 'Ustawa wchodzi w życie ponad głową pałacu. Prezydent traci na tym twarz.'
+         : 'Weto zostaje w mocy. Ustawa przepada na tę kadencję.'}</p>`,
+      [{l:'Rozumiem',f:()=>{close();render()}}]);
+  render();
+}
 function signLaw(ok,cicho){
   if(!G.lawPend)return;
   const {id,opcje}=G.lawPend, law=lawById(id);
   const pmK=G.lawPend.przez||(G.gov?G.gov.pm:null);
+  const glosyPrzed=G.lawPend;
   G.lawPend=null;
+  if(!ok){odrzucenieWeta(id,opcje,pmK,glosyPrzed);return}
   if(ok){
     applyLaw(id,opcje);
     if(pmK===G.me)G.bezUstaw=0;      // licznik bezczynności zerujemy przy każdej swojej ustawie
@@ -8929,7 +9026,7 @@ window.__game={openDym,pusteResorty,openZmiana,openPrzekup,cenaDzialacza,ministe
   giveBackCap,prezRound1,prezRound2,runRunoff,memberFlow,prezWait,prezPush,openPush,crownPrez,hemi,pmBlocked,rotateBench,AVA,TEM,INNATE,conflictOf,buyTrait,buyStat,inflacja,inflacjaProc,INFLACJA_PROG,traitsOf,xpOs,xpPula,COMBO,ostatniWynik,hasCen,hasHeg,LOGOS,applyGoals,checkDeath,isPMperson,isPrezPerson,income,EV,wotumChance,prezGo,A,fire,me,topSeg,sejmVote,setGov,PID,REG,SEG,SID,BASE,COAL,LP,LEAD,THR,
   TOPUP,DIST_SEATS,TOTAL_SEATS,MAJ,accepts,thrFor,
   radar,feed,runDateAnim,gameDate,dateStr,mapTab,actTab,pollTab,partieTab,sejmTab,leadTab,kingTab,sidebar,setup,pmScreen,prezScreen,marScreen,startMar,marContinue,marDeclare,isMar,isWice,isMarPerson,ownPool,bestRep,runRace,raceScore,results,TRAITS,sizeF,shown,enGain,pickMain,kingScore,kingFactors,kingFav,allBlocs,addRegion,delRegion,rebalanceSeats,isLead,lead,L,innAll,GOALS,openStery,sterySet,steryTog,steryOk,creditsBox,AUTORZY,WERSJA,
-  LAWS,lawVote,proposeLaw,signLaw,applyLaw,lawDone,lawIntake,lawsPending,lawsToSign,startLaw,
+  LAWS,lawVote,proposeLaw,signLaw,odrzucenieWeta,PROG_WETO,applyLaw,lawDone,lawIntake,lawsPending,lawsToSign,startLaw,
   LAWPAR,lawEdytowalna,lawParams,radykalnosc,aiProposeLaw,openEdycja,rozstrzygnijUstawe,
   nastrojSejmu,bylWBloku,doLobby,rysujOkno,
   CHAR,charOf,aiWagi,aiLos,aiOkreg,aiCel,ai,POSTERS,aiCoal,aiGoals,aiAgents,campInit,aiPrzemiana,obsadz,openResort,partiaOsoby,premierTab,prezydentTab,TOTAL_SEATS_LIVE,
