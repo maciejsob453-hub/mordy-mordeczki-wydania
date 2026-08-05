@@ -3833,7 +3833,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.32';
+let WERSJA='1.1.33';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3844,6 +3844,12 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.33':{data:'5 sierpnia 2026', zmiany:[
+   'STOL TYGODNIA. Nad decyzjami stoi teraz stol z miejscami na twoje ruchy. Puste zapraszaja, zajete zostaja jako zapis tego, co zagrales, razem z liczbami, ktore ta decyzja naprawde dala. Wczesniej po zagraniu nie bylo po niej sladu poza wpisem w kronice.',
+   'Decyzja za dwa albo trzy ruchy zajmuje na stole tyle miejsc, ile kosztuje, wiec od razu widac, ile tygodnia zjada.',
+   'LUK KADENCJI. Nad zakladkami biegnie os dwunastu tygodni: przebyte wygaszone, biezacy duzy i zloty, na koncu odliczanie do wyborow, ktore czerwienieje na dwa tygodnie przed urna. Dwunasty tydzien przestal wygladac dokladnie jak drugi.',
+ ]},
+
  '1.1.32':{data:'5 sierpnia 2026', zmiany:[
    'PRZEBUDOWA UKLADU. Nawigacja zeszla z gory na lewa szyne i zostaje na miejscu przy przewijaniu, tak jak w klientach gier. Gra przestala czytac sie jak strona internetowa z paskiem i menu.',
    'Tresc dostala cala wysokosc okna i sporo szerokosci: decyzje mieszcza sie teraz w trzech kolumnach zamiast dwoch, a wybrany dzial widac non stop zamiast szukac go w rzedzie kilkunastu zakladek.',
@@ -4328,6 +4334,7 @@ function game(){
         ? `<button class="btn sm" style="margin-left:auto" onclick="openPush()">Dorzuć do kampanii${G.prez2.spent?` (wydano ${G.prez2.spent})`:''}</button>`
         : '<span class="dim" style="margin-left:auto;font-size:12.5px">Nie ma cię w dogrywce.</span>'}
     </div></div>`:''}
+  ${lukKadencji()}
   <div class="nav">
     ${(()=>{const nv=[['mapa','Mapa okręgów'],['akcje','Decyzje'+(G.ap?`<span class="badge">${G.ap}</span>`:'')],
        ['lider','Lider'+(leads(G.p[G.me]).some(n=>xpOs(n)>=35)?'<span class="badge">!</span>':'')],['krol','Król'+(kingFav(G.me)<0?'<span class="badge">!</span>':'')],['partie','Partie'],['sondaz','Sondaż']];
@@ -4636,17 +4643,17 @@ function mapTab(q,AL){
           const glosy=ld[x.id];
           return `<g class="hex" onclick="setSel('${x.id}')">
             <polygon class="hglow" points="${hexPts(x.x,x.y,R0)}" fill="${c}" filter="url(#soft)"/>
-            <polygon class="hf" points="${hexPts(x.x,x.y,R0)}" fill="${c}" fill-opacity="${(.10+dp/240).toFixed(3)}"
-              stroke="${on?'var(--acc)':c}" stroke-width="${on?3.2:1.5}" stroke-opacity="${on?1:.6}"/>
+            <polygon class="hf" points="${hexPts(x.x,x.y,R0)}" fill="${c}" fill-opacity="${(.17+dp/155).toFixed(3)}"
+              stroke="${on?'var(--acc)':c}" stroke-width="${on?3.6:1.6}" stroke-opacity="${on?1:.72}"/>
             <path d="${darc}" fill="none" stroke="${G.p[dom].c}" stroke-width="${(3+dp/22).toFixed(1)}" stroke-linecap="round" stroke-opacity=".85"/>
             ${dom===G.me?'':`<path d="${arc}" fill="none" stroke="${p.c}" stroke-width="3" stroke-linecap="round" stroke-opacity="${(.35+pr/190).toFixed(2)}"/>`}
             <rect x="${x.x-19}" y="${x.y-72}" width="38" height="38" rx="7" fill="#f4f1ea" fill-opacity=".93"/>
             <image class="hcrest" href="${crestSrc}" x="${x.x-17}" y="${x.y-70}" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>
             <text x="${x.x}" y="${x.y-12}" text-anchor="middle" fill="var(--tx)" font-size="17.5" font-weight="660">${x.n}</text>
             <text x="${x.x}" y="${x.y+9}" text-anchor="middle" fill="${c}" font-size="13" font-weight="650" letter-spacing=".04em">${G.p[Lk].ab} dominuje</text>
-            ${Array.from({length:x.seats}).map((_,i)=>`<rect x="${x.x-(x.seats*11-3)/2+i*11}" y="${x.y+20}" width="8" height="8" rx="2"
-              fill="var(--acc)" fill-opacity=".85"/>`).join('')}
-            <text x="${x.x}" y="${x.y+50}" text-anchor="middle" fill="var(--dim2)" font-size="11.5" font-family="ui-monospace,monospace">w głosach ${G.p[glosy].ab} · twoja obecność ${Math.round(pr)}</text>
+            ${Array.from({length:x.seats}).map((_,i)=>`<rect x="${x.x-(x.seats*11-3)/2+i*11}" y="${x.y+20}" width="8" height="8" rx="4"
+              fill="var(--acc)" fill-opacity=".95" stroke="rgba(0,0,0,.5)" stroke-width=".6"/>`).join('')}
+            <text x="${x.x}" y="${x.y+50}" text-anchor="middle" fill="var(--dim)" font-size="12" font-family="ui-monospace,monospace">${G.p[glosy].ab} bierze głosy · ty ${Math.round(pr)}/100</text>
           </g>`}).join('')}
       </svg></div>
       <div class="legend">${alive().sort((a,b)=>q.res[b].tot-q.res[a].tot).slice(0,7)
@@ -4701,6 +4708,58 @@ const AFXN={fame:['Sława','#d9ab45'],ctr:['Kontrowersja','#d5544a'],cred:['Wiar
  rel:['Relacje','#e2a05f'],kp:['Kapitał','#c9a227'],risk:['Ryzyko','#c04a3e'],pret:['Pretensjonalność','#c78ad2'],
  prog:['Program','#9b7fd4'],lider:['Lider','#5f9bd0'],energia:['Energia','#7fbe69']};
 function actFx(id){return AFX[id]||[]}
+/* ═══ STÓŁ TYGODNIA ═══
+   Trzy miejsca na ruchy, które masz w tygodniu. Puste zapraszają, zajęte zostają
+   jako zapis tego, co zrobiłeś, razem z liczbami. Wcześniej po zagraniu decyzji
+   nie było po niej śladu poza wpisem w kronice — kafel po prostu szarzał. */
+const STOL_NAZWY={fame:'sława',cred:'wiarygodność',uni:'jedność',act:'aktywność',mem:'ludzie'};
+function stolTygodnia(){
+  const klucz=G.term+'-'+G.week;
+  const zagrane=(G.stolTyg===klucz&&G.stol)?G.stol:[];
+  const wolne=Math.max(0,G.apMax-zagrane.reduce((a,x)=>a+x.ap,0));
+  const miejsca=[];
+  zagrane.forEach(x=>{for(let i=0;i<x.ap;i++)miejsca.push(i===0?x:{ciag:x})});
+  for(let i=0;i<wolne;i++)miejsca.push(null);
+  return `<div class="stol">
+    <div class="stolh">
+      <h3>Twój tydzień</h3>
+      <span class="stoln">${wolne?wolne+' '+pl(wolne,'wolny ruch','wolne ruchy','wolnych ruchów'):'tydzień rozegrany'}</span>
+    </div>
+    <div class="stolm" style="grid-template-columns:repeat(${Math.max(1,miejsca.length)},1fr)">
+      ${miejsca.map(m=>{
+        if(!m)return `<div class="mj"><div class="pust">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+            stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          <b>wolny ruch</b></div></div>`;
+        if(m.ciag)return `<div class="mj pelne ciag" style="--ac:${CATCOL[m.ciag.kat]||'var(--line2)'}"></div>`;
+        const zm=Object.keys(m.zm).map(k=>
+          `<span class="${m.zm[k]>0?'p':'m'}">${STOL_NAZWY[k]} ${m.zm[k]>0?'+':''}${m.zm[k]}</span>`).join('');
+        return `<div class="mj pelne" style="--ac:${CATCOL[m.kat]||'var(--line2)'}">
+          <div class="ptak"><svg viewBox="0 0 24 24" width="10" height="10" fill="none"
+            stroke="#08170a" stroke-width="3" stroke-linecap="round"><path d="M4 13l5 5L20 7"/></svg></div>
+          <h4>${m.n}</h4>
+          <div class="skut">${zm||'<span class="n">bez zmian w cechach</span>'}</div>
+        </div>`}).join('')}
+    </div>
+  </div>`;
+}
+
+/* ═══ ŁUK KADENCJI ═══
+   Dwunasty tydzień wyglądał dokładnie jak drugi. Teraz widać, gdzie jesteś
+   w cyklu i ile zostało do urny. */
+function lukKadencji(){
+  const zost=Math.max(0,G.weeks-G.week);
+  return `<div class="luk">
+    <span class="luke">Kadencja ${G.term}</span>
+    <div class="luktor">
+      ${Array.from({length:G.weeks}).map((_,i)=>{
+        const n=i+1, kl=n<G.week?'byl':n===G.week?'jest':'';
+        return `<div class="lukt ${kl}">${n===G.week?`<em>TYDZIEŃ ${n}</em>`:''}<i></i></div>`}).join('')}
+    </div>
+    <span class="lukurna ${zost<=2?'blisko':''}">${zost===0?'Wybory w tym tygodniu'
+      :'Wybory za '+zost+' '+pl(zost,'tydzień','tygodnie','tygodni')}</span>
+  </div>`;
+}
 const CATCOL={kam:'#d9ab45',org:'#5f9bd0',dyp:'#7fbe69',bru:'#c04a3e',pro:'#b08fd6',
   wla:'#c8952b',prem:'#e0b23c',prz:'#b08fd6',opo:'#b0674a',spe:'#75695b',prm:'#8e1e5e'};
 /* Kafle decyzji. Osobno, bo te same karty pokazują się i w Decyzjach,
@@ -4980,7 +5039,8 @@ function actTab(){
   const dost=new Set();A.forEach(a=>{if(cats.some(c=>c[0]===a.cat))actFx(a.id).forEach(f=>dost.add(f))});
   // ile kategorii stoi jeszcze otworem — inaczej gracz widzi tylko wyszarzone kafle
   const wolnych=cats.filter(([c])=>c==='spe'||!(G.catUsed[c]||0)).length;
-  return `<div class="card"><div class="h"><h3>Decyzje tygodnia</h3>
+  return `${stolTygodnia()}
+  <div class="card"><div class="h"><h3>Decyzje tygodnia</h3>
     <span class="n">${ikona('akcje','sm')}${G.ap}/${G.apMax} akcji · ${ikona('kapital','sm')}${Math.round(G.kp)} kapitału · ${ikona('energia','sm')}${Math.round(G.en)} energii
     · ${wolnych} ${pl(wolnych,'kategoria otwarta','kategorie otwarte','kategorii otwartych')}</span></div>
     <div class="b">
@@ -5063,6 +5123,7 @@ function step(){
 }
 function fire(a,t,r,s,tm){
   const p0=me(),f0=p0.fame,m0=p0.mem,c0=p0.ctr,pr0=p0.pret,rel0=t?G.rel[G.me][t]:null;
+  const stolPrzed=snap();   // stan sprzed decyzji, żeby stół pokazał jej własny skutek
   const prs0=Object.fromEntries(REG.map(x=>[x.id,p0.pres[x.id]]));
   const cb=G.lastAct?COMBO.find(c=>c.a===G.lastAct&&c.b===a.id):null;
   const sf=sizeF(p0), tr=hasT;
@@ -5130,6 +5191,15 @@ function fire(a,t,r,s,tm){
     if(a.ap)fxPush('−'+a.ap+' '+pl(a.ap,'akcja','akcje','akcji'),'');
   }
   G.actedWeek=G.term+'-'+G.week;
+  /* Stół tygodnia. Zapisujemy nie sam identyfikator, tylko różnicę, jaką ta
+     decyzja zrobiła — dzięki temu kafel na stole mówi, co naprawdę wyszło,
+     a nie powtarza ogólny opis z listy. */
+  const stolKlucz=G.term+'-'+G.week;
+  if(!G.stol||G.stolTyg!==stolKlucz){G.stol=[];G.stolTyg=stolKlucz}
+  const stolPo=snap(), stolZm={};
+  ['fame','cred','uni','act','mem'].forEach(k=>{
+    const d=Math.round(stolPo[k]-stolPrzed[k]); if(d)stolZm[k]=d});
+  G.stol.push({id:a.id,n:a.n,kat:a.cat,ap:a.ap,zm:stolZm});
   checkDeath();
   // uwaga: decyzje z własnym oknem (nabór, rekonstrukcja, ustawa, rebranding) otwierają je w a.f,
   // więc fire nie może tu zamykać niczego, bo skasowałby okno w tej samej klatce
