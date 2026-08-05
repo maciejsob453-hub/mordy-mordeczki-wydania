@@ -200,14 +200,22 @@ const AGENTS=[
  {n:'Tako',             seg:'int',kp:56,d:'Wygląda jak coś, co wyszło z sennego koszmaru, a pisze jak profesor. Bezpartyjny z wyboru i bez zamiaru, żeby to zmienić — chyba że ktoś zaproponuje coś naprawdę środkowego.'},
 ];
 const agentFree=n=>!(G&&G.agents&&G.agents[n]);
+/* Przy jednym transferze na tydzień wolna pula znikała w pierwszej kadencji.
+   Dwa na kadencję sprawiają, że bezpartyjni są na wagę złota przez całą grę
+   i żaden gracz nie wykupi wszystkich. */
+const AGENCI_NA_KADENCJE=2;
+const agenciWziete=()=>(G&&G.agentTerm&&G.agentTerm.t===G.term)?G.agentTerm.n:0;
+const agenciZostalo=()=>Math.max(0,AGENCI_NA_KADENCJE-agenciWziete());
 function agentCost(n,k){const a=AGENTS.find(x=>x.n===n);if(!a)return 0;
   return Math.round(a.kp*(k?1:sizeF(me()).kp))}
 function signAgent(n){
   const a=AGENTS.find(x=>x.n===n);if(!a||!agentFree(n))return;
   if(G.agentWeek===G.term+'-'+G.week)return;
+  if(!agenciZostalo())return;
   const c=agentCost(n);if(G.kp<c)return;
   const p=me();
   G.kp-=c;G.agents[n]=G.me;G.agentWeek=G.term+'-'+G.week;SFX.coin();
+  G.agentTerm=(G.agentTerm&&G.agentTerm.t===G.term)?{t:G.term,n:G.agentTerm.n+1}:{t:G.term,n:1};
   p.comp[a.seg]++;p.mem++;
   if(!p.bench.includes(n))p.bench.push(n);
   p.uni=cl(p.uni+(a.seg==='eli'?3:1));
@@ -330,7 +338,7 @@ const BASE={
  PPP :{n:'Partia Polskich Patriotów',ab:'PPP',c:'#237a3a',founded:'25.04.2025',pull:15.115,
    fame:78,cred:50,uni:40,act:35,ctr:35,pret:30,mem:41,pot:74,diff:1,
    aff:{eli:5,int:4,ser:7}, comp0:[1,7,33],
-   blurb:'Największa partia serwera. 41 osób, siedem mandatów i lider, który nie odpisuje na DM.',
+   blurb:'Największa partia serwera. 41 osób, sześć mandatów i lider, który nie odpisuje na DM.',
    flaw:'Lager ma wytrzymałość 30 i kompetencję 36, energia ledwo się odnawia, wiarygodność wycieka. Na ławce czekają kenzo i bluetes33.'},
  KK  :{n:'Kongres Koronny',ab:'KK',c:'#a01c2c',founded:'16.02.2024',pull:12.592,
    fame:72,cred:64,uni:35,act:30,ctr:20,pret:38,mem:34,pot:62,diff:2,
@@ -580,7 +588,10 @@ function newGame(id){
   say('<b>Rząd zastany:</b> kisielek48 premierem, dziewięć partii, '+st+' z '+TOTAL_SEATS+' mandatów. Monarchiści po raz pierwszy poza gabinetem.','roy');
 }
 // mandat po rozwiązanej ChPC przeszedł razem z jej posłem do Nowej Perspektywy
-const START_SEATS={PPP:7,KK:4,ROM:1,FD:7,NP:8,PLR:3,PKD:1,PP:1,POJ:1,NBR:1,ZHM:1,DPD:4,SS:1};
+/* Z PPP i z Kongresu Koronnego ludzie odeszli. Mandaty nie wyparowały: zabrał je
+   sąsiad z tego samego obozu — republikański PKD i monarchistyczny ROM. Oba stoją
+   poza gabinetem, więc rząd kisielka48 dalej ma równo 26 z 40. */
+const START_SEATS={PPP:6,KK:3,ROM:2,FD:7,NP:8,PLR:3,PKD:2,PP:1,POJ:1,NBR:1,ZHM:1,DPD:4,SS:1};
 function seedSeats(){
   // sejm zastany: rząd kisielka48 ma 26 z 40, monarchiści idą w opozycję
   const s=Object.assign({},START_SEATS);
@@ -822,6 +833,13 @@ function stance(k,kind,tgt,pro){
 }
 function sejmVote(kind,tgt,pro,myVote){
   const by={};let yes=0,no=0,abst=0;const bribed=[];
+  /* Dyscyplina koalicyjna przy wyborze premiera. Koalicja zawiązuje się wokół
+     konkretnego obozu, więc jej członkowie popierają kandydata z własnych szeregów,
+     a przeciw komuś spoza niego głosują. Bez tej reguły dało się zebrać koalicję,
+     patrzeć, jak Król desygnuje kogoś zupełnie obcego, i widzieć własnych
+     koalicjantów głosujących za nim jak gdyby nigdy nic. */
+  const wKoalicji=k=>!!(G.gov&&G.gov.parties&&G.gov.parties.includes(k));
+  const dyscyplina=k=>(kind!=='pm'||!wKoalicji(k))?0:(wKoalicji(tgt)?70:-70);
   // opozycja wykłada kapitał, żeby oderwać koalicjanta od głosowania
   const opoPow=(kind==='pm')&&G.gov&&G.term>1
     ? alive().filter(x=>!G.gov.parties.includes(x)&&G.p[x].seats>0)
@@ -830,7 +848,7 @@ function sejmVote(kind,tgt,pro,myVote){
     const s=G.p[k].seats; if(!s)return;
     let v;
     if(k===G.me&&myVote!==undefined)v=myVote;
-    else if(opoPow>0&&G.gov&&G.gov.parties.includes(k)&&k!==tgt&&k!==G.me){
+    else if(opoPow>0&&G.gov&&G.gov.parties.includes(k)&&G.gov.parties.includes(tgt)&&k!==tgt&&k!==G.me){
       const key=k+'|'+tgt;
       if(!G.bribeCache)G.bribeCache={};
       if(G.bribeCache[key]===undefined){
@@ -838,11 +856,11 @@ function sejmVote(kind,tgt,pro,myVote){
         G.bribeCache[key]=ch(cl(opoPow*.55-loj*.42,0,.20));
       }
       if(G.bribeCache[key]){v=-1;bribed.push(k)}
-      else{const x=stance(k,kind,tgt,pro)+R(-14,14);v=x>4?1:x<-16?-1:0}
+      else{const x=stance(k,kind,tgt,pro)+R(-14,14)+dyscyplina(k);v=x>4?1:x<-16?-1:0}
     }
     else{
       const press=(kind==='pm'&&G.pmProc)?(G.pmProc.round-1)*9:0;
-      let x=stance(k,kind,tgt,pro)+R(-14,14)+press;
+      let x=stance(k,kind,tgt,pro)+R(-14,14)+press+dyscyplina(k);
       // opozycja głosuje twardo przeciw wszystkiemu, co idzie od rządu
       if(G.gov&&!G.gov.parties.includes(k)&&(G.gov.parties.includes(tgt)||tgt===pro&&G.gov.parties.includes(pro)))x-=40;
       const hi=kind==='pm'?4:14, lo=kind==='pm'?-16:-8;
@@ -1509,9 +1527,12 @@ function endWeek(){
   const total=PID.reduce((a,k)=>a+G.p[k].mem,0)+freeTot();
   if(total<SERVER_MAX&&ch(.45)){G.free.ser+=RI(0,1);if(ch(.16))G.free.int+=1}
   G.prev=snap();
-  if(G.ap>=G.apMax){   // tydzień bez jednej decyzji to tydzień stracony
+  /* Kara szła z tego, że zostały niewydane akcje — a część decyzji akcję zwraca,
+     więc odpalała się też komuś, kto zagrał i odzyskał punkt. Liczy się fakt
+     zagrania czegokolwiek w tym tygodniu, i tylko to. */
+  if(G.actedWeek!==G.term+'-'+tydzienPrzed){
     p.fame=cl(p.fame-1.8);p.act=cl(p.act-2.5);M(p,-4);p.uni=cl(p.uni-1);
-    say('<b>Tydzień bez ruchu.</b> Kanały partii milczały, sondaż to odnotuje.','bad');
+    say('<b>Tydzień bez ruchu.</b> Nie zagrałeś ani jednej decyzji, więc kanały partii milczały: sława −1,8, aktywność −2,5, jedność −1.','bad');
   }
   if(G.actedWeek===G.term+'-'+tydzienPrzed)G.streak=(G.streak||0)+1;
   else G.streak=0;
@@ -3812,7 +3833,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.30';
+let WERSJA='1.1.31';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3823,6 +3844,14 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.31':{data:'5 sierpnia 2026', zmiany:[
+   'Sejm zastany poprawiony: PPP ma szesc mandatow zamiast siedmiu, Kongres Koronny trzy zamiast czterech. Ludzie odeszli, a mandaty przejeli sasiedzi z tego samego obozu, wiec izba dalej ma rowno 40, a rzad kisielka48 26.',
+   'Koalicjanci maja wreszcie dyscypline. Gdy Krol desygnuje premiera spoza twojej koalicji, twoi partnerzy glosuja przeciw; gdy kandydat jest z koalicji, popieraja go i dopiero wtedy da sie ich przekupic. Wczesniej glosowali za kazdym.',
+   'Republike moga odbudowac tylko partie republikanskie: PPP, PLR, PKD, NBR i DPD. Warunek dostepu odsiewal wczesniej wylacznie DPD, wiec cel otwieral sie kazdemu, lacznie z monarchistami.',
+   'Tydzien bez ruchu nie odpala sie juz po zagraniu decyzji, ktora zwraca akcje. Liczy sie fakt zagrania czegokolwiek, a nie stan licznika akcji. Komunikat mowi teraz, ile dokladnie kosztuje bezczynnosc.',
+   'Transfery bezpartyjnych: dwa na kadencje zamiast jednego na tydzien. Wolna pula znikala do konca pierwszej kadencji, teraz starcza na cala gre i nikt nie wykupi wszystkich.',
+ ]},
+
  '1.1.30':{data:'5 sierpnia 2026', zmiany:[
    'Ekran startowy: zza tytulu bije cieple swiatlo, liczby serwera sa duze i zlote, a karty trybow wyraznie leza nad tlem i mocniej reaguja na kursor.',
    'Cechy przewodniczacego: poprawione obciecie podpisu AUTORYTET.',
@@ -4971,11 +5000,16 @@ function actTab(){
 }
 function agentBox(){
   const wolni=AGENTS.filter(a=>agentFree(a.n)), moi=AGENTS.filter(a=>G.agents[a.n]===G.me);
-  const blok=G.agentWeek===G.term+'-'+G.week;
+  const zostalo=agenciZostalo();
+  const blok=G.agentWeek===G.term+'-'+G.week||!zostalo;
   return `<div class="card" style="margin-top:14px"><div class="h"><h3>Transfery bezpartyjnych</h3>
-    <span class="n">${wolni.length} ${pl(wolni.length,'wolny','wolnych','wolnych')} · ${moi.length} u ciebie</span></div><div class="b">
+    <span class="n">${wolni.length} ${pl(wolni.length,'wolny','wolnych','wolnych')} · ${moi.length} u ciebie ·
+      <b style="color:${zostalo?'var(--acc)':'var(--neg)'}">${zostalo}/${AGENCI_NA_KADENCJE}</b> w kadencji</span></div><div class="b">
     <div class="note" style="margin:0 0 13px">Poza partiami chodzi po serwerze kilka osób, które da się ściągnąć czystym kapitałem, bez akcji i bez zgody kogokolwiek.
-    ${blok?'<b>W tym tygodniu podpisałeś już transfer.</b>':'<b>Jeden transfer na tydzień.</b>'} Inne partie robią to samo, kto pierwszy ten lepszy.</div>
+    <b>Dwa transfery na kadencję</b>, najwyżej jeden na tydzień.
+    ${!zostalo?'<b style="color:var(--neg)">Limit tej kadencji wyczerpany</b> — kolejni bezpartyjni dopiero po wyborach.'
+      :G.agentWeek===G.term+'-'+G.week?'<b>W tym tygodniu podpisałeś już transfer.</b>':''}
+    Inne partie robią to samo, kto pierwszy ten lepszy.</div>
     <div class="agrid">${wolni.map(a=>{
       const c=agentCost(a.n), st=LEAD[a.n]||[50,50,50,50];
       const sc=SEG.find(x=>x.id===a.seg).c;
@@ -4990,7 +5024,7 @@ function agentBox(){
         </div>
         <div class="adesc">${a.d}</div>
         <div class="astat">${['charyzma','kompet.','wytrz.','autorytet'].map((x,i)=>`<span>${x} <b>${st[i]}</b></span>`).join('')}</div>
-        <button class="btn sm" ${ok?'':'disabled'} onclick="signAgent('${esc(a.n)}')">${G.kp<c?'Za mało kapitału':blok?'Transfer w tym tygodniu zużyty':'Podpisuję transfer'}</button>
+        <button class="btn sm" ${ok?'':'disabled'} onclick="signAgent('${esc(a.n)}')">${!zostalo?'Limit kadencji wyczerpany':G.agentWeek===G.term+'-'+G.week?'Transfer w tym tygodniu zużyty':G.kp<c?'Za mało kapitału':'Podpisuję transfer'}</button>
       </div>`}).join('')||'<span class="dim">Nikt wolny nie chodzi teraz po serwerze. Wróć za tydzień.</span>'}</div>
   </div></div>`;
 }
@@ -6807,8 +6841,11 @@ const GOALS={
  /* DPD nie skacze prosto do Republikańskiej — najpierw musi przejść przez Centrum.
     Dwie drogi z jednej partii (Kazikmistrz i Centrum) mają być wyborem, a nie
     skrótem do najsilniejszego celu w grze. */
- republika:{n:'Pod błyskiem niebieskiej chwały',for:['PPP','PLR','PKD','DPD'],logo:'REP',bots:0,
-  avail:()=>G.me!=='DPD'||hasCen(G.me),
+ republika:{n:'Pod błyskiem niebieskiej chwały',for:['PPP','PLR','PKD','NBR','DPD'],logo:'REP',bots:0,
+  /* Ten warunek odsiewał wyłącznie DPD, więc cel otwierał się każdemu — łącznie
+     z monarchistami i socjaldemokratami, którzy nie mają z republiką nic wspólnego.
+     Liczy się przynależność do obozu republikańskiego i nic poza nią. */
+  avail:()=>GOALS.republika.for.includes(G.me),
   what:'Odtwarzasz Partię Republikańską. Stare barwy, stare gwiazdy, twój szyld, a pozostałe partie z tym samym celem wchłaniasz razem z ludźmi i mandatami.',
   req:[
    {t:'Przychylność Króla co najmniej 50',v:()=>Math.round(kingFav(G.me))+' / 50',ok:()=>kingFav(G.me)>=50},
@@ -7192,7 +7229,9 @@ function switchIdentity(mode){
 function myGoals(){if(!G)return [];
   return Object.keys(GOALS).filter(id=>{const g=GOALS[id];
     if(g.avail)return !!g.avail();                       // własny warunek dostępu jest rozstrzygający
-    if(!g.for.includes(G.me))return id==='republika'&&(hasLib(G.me)||hasLib2(G.me));
+    /* Republikę odbudowują wyłącznie partie republikańskie. Wcześniej wystarczyło
+       mieć liberalny profil i cel otwierał się dosłownie każdemu, łącznie z FD. */
+    if(!g.for.includes(G.me))return false;
     return true;
   })}
 const reqOf=id=>(GOALS[id]?GOALS[id].req:[]).filter(r=>!(r.gone&&r.gone()));
@@ -9046,7 +9085,8 @@ Object.assign(window,{start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,m
   setTab:k=>{if(G.tab!==k)G._we=1;G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
   signAgent,agentCost,agentFree,AGENTS,render,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
-window.__game={openDym,pusteResorty,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
+window.__game={myGoals,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,
+  openDym,pusteResorty,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
   zawiedzeniKoalicjanci,demografiaSerwera,SERVER,SERVER_MAX,AGENTS,mogeZglosic,rozwiazChance,radaKto,RESORTY,pmOsoba,pmOsoby,leads,roster,
   aiTransfery,aiOpozycja,aiObsadzRade,aiRekonstrukcja,znuzenie,hegemon,resortyPartii,leadWybrany,aiPlan,ustawPlany,
   rozliczenieKadencji,sprawdzZapis,doganianie,repChetni,BAL,saveCode,loadCode,
