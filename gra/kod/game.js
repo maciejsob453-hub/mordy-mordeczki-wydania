@@ -3833,7 +3833,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.31';
+let WERSJA='1.1.32';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3844,6 +3844,13 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.32':{data:'5 sierpnia 2026', zmiany:[
+   'PRZEBUDOWA UKLADU. Nawigacja zeszla z gory na lewa szyne i zostaje na miejscu przy przewijaniu, tak jak w klientach gier. Gra przestala czytac sie jak strona internetowa z paskiem i menu.',
+   'Tresc dostala cala wysokosc okna i sporo szerokosci: decyzje mieszcza sie teraz w trzech kolumnach zamiast dwoch, a wybrany dzial widac non stop zamiast szukac go w rzedzie kilkunastu zakladek.',
+   'Pasek zasobow jest osobnym panelem z zaokraglona rama, a nie kanapka miedzy tytulem a menu.',
+   'Na waskim oknie szyna sama wraca na gore, wiec nic sie nie zwezi do niczytelnosci.',
+ ]},
+
  '1.1.31':{data:'5 sierpnia 2026', zmiany:[
    'Sejm zastany poprawiony: PPP ma szesc mandatow zamiast siedmiu, Kongres Koronny trzy zamiast czterech. Ludzie odeszli, a mandaty przejeli sasiedzi z tego samego obozu, wiec izba dalej ma rowno 40, a rzad kisielka48 26.',
    'Koalicjanci maja wreszcie dyscypline. Gdy Krol desygnuje premiera spoza twojej koalicji, twoi partnerzy glosuja przeciw; gdy kandydat jest z koalicji, popieraja go i dopiero wtedy da sie ich przekupic. Wczesniej glosowali za kazdym.',
