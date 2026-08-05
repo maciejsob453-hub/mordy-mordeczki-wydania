@@ -62,17 +62,15 @@ h4{font-size:var(--t-baza);letter-spacing:-.004em}
 .btn:active{transform:translateY(1px)}
 .btn.sm{padding:6px 12px;font-size:var(--t-male)}
 
-/* ---- decyzje: kafle mają wyglądać jak karty do zagrania ---- */
-.act{
-  border-radius:var(--r3);
-  padding:var(--o3) var(--o4) var(--o3);
-  transition:border-color .14s, background .14s, transform .1s;
-}
-.act:not([disabled]):hover{transform:translateY(-1px)}
-.act h4{font-size:var(--t-baza);margin-bottom:2px}
-.act .dd{font-size:var(--t-drobne);line-height:1.5;color:var(--dim)}
-.act .c{gap:5px;margin-top:var(--o3)}
-.cst{font-size:var(--t-mini);padding:3px 7px;border-radius:var(--r1)}
+/* ---- decyzje ----
+   Kafel ma własną architekturę w style.css: pasek kategorii na lewej krawędzi
+   (::before), poświata pod kursorem (::after) i stopka z kosztami. Nie wolno
+   jej nadpisywać — padding siedzi w dzieciach, więc kafel zostaje na zerze. */
+.act{border-radius:var(--r3)}
+/* zaległość po starszej wersji układu: nagłówek miał własny padding, przez co
+   tytuł stał o 15 px dalej niż opis i kropka kategorii pod nim */
+.act h4{padding:0;font-size:var(--t-baza)}
+.act .dd{font-size:var(--t-drobne);line-height:1.5}
 
 /* ---- paski statystyk: cieńsze, spokojniejsze ---- */
 .trk{height:5px;border-radius:3px;background:#0a0f0a}
@@ -147,19 +145,16 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .fx{padding:4px 10px;border-radius:999px;border:1px solid var(--line);
   font-size:var(--t-mini);font-weight:600;transition:.14s}
 
-/* siatka kafli: równe wysokości, wyraźny lewy akcent kategorii */
+/* siatka kafli */
 .actgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:var(--o3)}
-.act{border-left:3px solid var(--ac,var(--line2));display:flex;flex-direction:column}
-.act .dd{flex:1}
-.act[disabled]{opacity:.46}
-.act .ahd{display:flex;align-items:flex-start;gap:var(--o2);margin-bottom:var(--o1)}
-.act .apx{display:flex;gap:3px;margin-left:auto;flex:none}
-.act .apx b{width:7px;height:7px;border-radius:50%;background:var(--line2);display:block}
-.act .apx b.on{background:var(--acc)}
-.afx{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
-.afx span{font-size:9.5px;letter-spacing:.03em;display:inline-flex;align-items:center;gap:3px}
-.blk{margin-top:var(--o2);padding-top:var(--o2);border-top:1px solid var(--line);
-  font-size:var(--t-mini);color:var(--neg);letter-spacing:.01em}
+/* pasek kategorii przy krawędzi dostaje poświatę, żeby kolor był barwą, a nie kreską */
+.act::before{width:3px;box-shadow:0 0 14px -2px var(--ac)}
+.act:disabled::before{box-shadow:none}
+/* stopka z kosztami: czytelna cena, podpis schodzi na drugi plan */
+.act .c{background:linear-gradient(180deg,rgba(0,0,0,.3),rgba(0,0,0,.16))}
+.act .cst{padding:7px 12px;font-size:12.5px}
+.act .cst em{font-size:8px;letter-spacing:.14em}
+.blk{padding:7px 14px 7px 16px;font-size:10.5px}
 .spentbar{border-radius:var(--r2);padding:var(--o3) var(--o4);font-size:var(--t-drobne);
   line-height:1.5;margin-bottom:var(--o4)}
 
@@ -171,6 +166,242 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .okr.on{border-color:var(--acc);background:linear-gradient(180deg,rgba(216,168,62,.1),var(--p1) 60%)}
 .okr h4{font-size:var(--t-drobne);margin-bottom:2px}
 .okr .dim{font-size:var(--t-mini)}
+
+/* ═══════════════════════════════════════════════════════════
+   ETAP 3 — REDESIGN WŁAŚCIWY
+   Etapy 1 i 2 porządkowały odstępy. Tutaj zmienia się to, jak gra wygląda:
+   atmosfera sali, pasek władzy, ruch. Nadal wyłącznie warstwa wizualna —
+   ani jedna reguła nie dotyka logiki.
+   ═══════════════════════════════════════════════════════════ */
+
+:root{
+  --krzywa:cubic-bezier(.2,.7,.3,1);
+  --sprezyna:cubic-bezier(.34,1.36,.5,1);
+  --zloto-blask:0 0 22px -6px rgba(217,171,69,.55);
+
+  /* PALETA — najważniejsza zmiana całego redesignu.
+     Wcześniej tło strony (#0a100b) i tło karty (#111912) dzieliło tak mało,
+     że wszystko zlewało się w jedną płaską plamę i żaden panel nie wyglądał
+     na panel. Teraz tło schodzi głębiej, a warstwy nad nim idą wyraźnie w górę
+     — dopiero z takim rozstawem widać, co na czym leży. */
+  --bg:#060a07;
+  --p1:#121a14; --p2:#1a2620; --p3:#24332a;
+  --line:#2c4132; --line2:#4a6a52;
+  --dim:#adbda8; --dim2:#7d8f79;
+}
+
+/* ─────────── ATMOSFERA ───────────
+   Wcześniej tło było płaskim ciemnym prostokątem. Teraz gra ma się dziać
+   w konkretnym miejscu: przyciemnione brzegi, ciepła poświata znad mównicy,
+   ziarno jak na starej taśmie z transmisji obrad. */
+
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    /* światło znad sali */
+    radial-gradient(1400px 620px at 50% -260px, rgba(217,171,69,.13), transparent 68%),
+    /* zieleń sukna po bokach */
+    radial-gradient(760px 900px at -10% 45%, rgba(84,150,96,.075), transparent 65%),
+    radial-gradient(760px 900px at 110% 55%, rgba(84,150,96,.06), transparent 65%),
+    /* winieta: wzrok sam idzie do środka */
+    radial-gradient(130% 100% at 50% 42%, transparent 52%, rgba(0,0,0,.5) 100%);
+}
+/* ziarno — jeden plik SVG w treści arkusza, nic się nie dociąga z sieci */
+body::after{
+  content:'';position:fixed;inset:-60px;z-index:0;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:ziarno 7s steps(6) infinite;
+}
+@keyframes ziarno{
+  0%{transform:translate(0,0)} 16%{transform:translate(-14px,9px)}
+  33%{transform:translate(11px,-13px)} 50%{transform:translate(-9px,-7px)}
+  66%{transform:translate(13px,11px)} 83%{transform:translate(-12px,4px)}
+  100%{transform:translate(0,0)}
+}
+.wrap,.hud,.mdl,.mdlbg{position:relative;z-index:1}
+
+/* ─────────── HUD: pasek władzy ───────────
+   To jedyny element widoczny non stop, więc ma wyglądać jak pulpit, a nie jak
+   rząd luźnych liczb. Kolor partii wchodzi w krawędź, odczyty dostają moduły. */
+
+.hud{
+  padding:var(--o3) var(--o5);
+  background:linear-gradient(180deg, rgba(22,33,23,.93), rgba(10,16,11,.88));
+  backdrop-filter:blur(18px) saturate(1.25);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 18px 40px -30px #000, 0 1px 0 rgba(255,255,255,.045) inset;
+}
+/* barwa partii biegnie przez cały dół paska — od razu wiadomo, kim się gra */
+.hud::after{
+  height:2px;opacity:1;
+  background:linear-gradient(90deg,
+    transparent, var(--partia) 12%, var(--acc) 50%, var(--partia) 88%, transparent);
+  box-shadow:0 0 16px -3px var(--partia);
+}
+.hud .id{gap:var(--o3)}
+.hud .id h2{font-family:var(--fd);font-size:var(--t-duze);letter-spacing:.01em}
+.hud .id .crest{width:44px;height:44px;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--partia) 70%,transparent),
+             0 0 20px -6px var(--partia), 0 2px 6px rgba(0,0,0,.5)}
+
+/* odczyty jako moduły pulpitu, oddzielone pionową kreską */
+.rgroup{display:flex;align-items:center;gap:0}
+.rgroup .rs{padding:var(--o1) var(--o4);position:relative}
+.rgroup .rs+.rs::before{
+  content:'';position:absolute;left:0;top:14%;bottom:14%;width:1px;
+  background:linear-gradient(180deg,transparent,var(--line2),transparent)}
+.rs .rv b{font-size:19px;letter-spacing:-.02em;
+  background:linear-gradient(180deg,#fbf3dd,#d9ab45 130%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.rs .rv span{font-size:9.5px;letter-spacing:.15em}
+.rs svg,.rs img{filter:drop-shadow(0 0 8px rgba(217,171,69,.3))}
+/* moduł pod kursorem podnosi się i rozjaśnia — widać, że da się w niego wejść */
+.rs.tip::after{content:'';position:absolute;inset:2px;border-radius:var(--r2);
+  background:rgba(217,171,69,.07);opacity:0;transition:opacity .16s;pointer-events:none}
+.rs.tip:hover::after{opacity:1}
+.hud .tura{position:relative}
+.tipbox{border-radius:var(--r3);box-shadow:var(--sh3);border-color:var(--line2)}
+
+/* ─────────── NAWIGACJA ───────────
+   Zakładki wyglądały jak tekst na kresce. Teraz aktywna naprawdę się wybija. */
+.nav{gap:var(--o1);padding-top:var(--o2);
+  background:linear-gradient(180deg,rgba(0,0,0,.24),transparent)}
+.nav button{position:relative;padding:11px 16px;border-radius:var(--r2) var(--r2) 0 0;
+  border-bottom:2px solid transparent;transition:color .15s,background .15s}
+.nav button::after{content:'';position:absolute;left:50%;right:50%;bottom:-2px;height:2px;
+  background:var(--acc);border-radius:2px;transition:left .22s var(--krzywa),right .22s var(--krzywa)}
+.nav button:hover::after{left:22%;right:22%;background:var(--line2)}
+.nav button.on{background:linear-gradient(180deg,rgba(216,168,62,.13),transparent)}
+.nav button.on::after{left:0;right:0;background:var(--acc);box-shadow:var(--zloto-blask)}
+.nav .badge{box-shadow:0 0 12px -3px var(--neg);animation:tetno 2.4s var(--krzywa) infinite}
+@keyframes tetno{0%,72%,100%{transform:scale(1)}80%{transform:scale(1.16)}}
+
+/* ─────────── KARTY: światło na krawędzi ─────────── */
+.card{transition:border-color .18s,box-shadow .22s,transform .16s}
+/* cienka smuga światła po górnej krawędzi, w kolorze kategorii karty */
+.card>.h::after{height:1px;opacity:.85;
+  background:linear-gradient(90deg,transparent,var(--kolor,var(--acc)),transparent)}
+.card:hover{border-color:var(--line2);
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset, var(--sh2), 0 0 34px -22px var(--kolor,var(--acc))}
+.card.win{animation:zwyciestwo 2.8s var(--krzywa) infinite}
+@keyframes zwyciestwo{
+  0%,100%{box-shadow:0 0 0 1px var(--acc), 0 0 26px -6px var(--acc)}
+  50%{box-shadow:0 0 0 1px var(--acc), 0 0 40px -4px var(--acc)}
+}
+
+/* ─────────── WEJŚCIE WIDOKU ───────────
+   Odpala się wyłącznie przy zmianie zakładki (flaga _we w game.js), więc
+   klikanie decyzji niczym nie miga. */
+.widok.wejscie>*{animation:wjazd .34s var(--krzywa) both}
+.widok.wejscie>*:nth-child(1){animation-delay:0s}
+.widok.wejscie>*:nth-child(2){animation-delay:.05s}
+.widok.wejscie>*:nth-child(3){animation-delay:.1s}
+.widok.wejscie>*:nth-child(4){animation-delay:.14s}
+.widok.wejscie>*:nth-child(n+5){animation-delay:.18s}
+@keyframes wjazd{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+/* ─────────── DECYZJE ───────────
+   Poświata pod kursorem już istnieje (::after w style.css) — tu zostaje tylko
+   mocniej wyciągnięta, żeby kafel naprawdę się zapalał. */
+.act:hover:not([disabled]){box-shadow:var(--sh2), 0 0 34px -16px var(--ac)}
+.act:hover:not([disabled])::after{opacity:.2}
+.act:active:not([disabled]){transform:translateY(-1px)}
+.cats button.on{box-shadow:0 0 18px -8px var(--acc)}
+
+/* ─────────── PASKI STATYSTYK ───────────
+   Wypełnienie dostaje własną poświatę, więc wysoka wartość naprawdę wygląda
+   na wysoką, zamiast być kreską w innym odcieniu. */
+.trk{box-shadow:inset 0 1px 3px rgba(0,0,0,.6);overflow:hidden}
+.trk i{position:relative;box-shadow:0 0 10px -3px currentColor}
+.trk i::after{content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(180deg,rgba(255,255,255,.24),transparent 60%)}
+
+/* ─────────── SALA SEJMOWA ───────────
+   Ławy mają wyglądać jak ława, a nie jak kwadrat. Własne mandaty świecą. */
+.seat{width:19px;height:19px;
+  box-shadow:0 1px 2px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.22);
+  transition:transform .14s var(--sprezyna), box-shadow .14s}
+.seat:hover{transform:translateY(-2px) scale(1.14);z-index:2;position:relative}
+.seat.mine{box-shadow:0 0 0 2px var(--acc), 0 0 12px -2px var(--acc),
+  inset 0 1px 0 rgba(255,255,255,.3)}
+.seats{gap:5px;max-width:560px;padding:var(--o3) 0}
+.seatchart{padding-top:var(--o5)}
+.sejmleg{gap:var(--o2);padding-bottom:var(--o4)}
+.sl{padding:5px 12px 5px 6px}
+.sl.ja{box-shadow:0 0 0 1px var(--acc), 0 0 18px -7px var(--acc)}
+
+/* ─────────── GŁOSOWANIE ───────────
+   Moment rozstrzygnięcia jest najważniejszy w całej rozgrywce, a wyglądał
+   jak zwykły pasek postępu. */
+.votebar{height:34px;border-radius:var(--r2);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.65), 0 0 0 1px var(--line);
+  margin:var(--o4) 0 var(--o2)}
+.votebar i{font-size:var(--t-drobne);font-weight:700;letter-spacing:.02em;
+  text-shadow:0 1px 3px rgba(0,0,0,.6);
+  transition:flex-basis .6s var(--krzywa), width .6s var(--krzywa);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+.vrow{padding:var(--o2) var(--o1);border-radius:var(--r1);transition:background .14s}
+.vrow:hover{background:rgba(255,255,255,.022)}
+.vrow .vv{font-size:var(--t-male)}
+
+/* ─────────── HERBY ─────────── */
+.crest{transition:box-shadow .16s,transform .16s}
+.crest.l,.crest.m{box-shadow:0 1px 0 rgba(255,255,255,.5) inset, 0 3px 10px rgba(0,0,0,.5)}
+
+/* ─────────── PIGUŁKI, NOTKI, TABELE ─────────── */
+.pill{box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.note{border-left:3px solid var(--acc2);
+  background:linear-gradient(90deg,rgba(217,171,69,.07),transparent 60%)}
+
+/* ─────────── OKNA ───────────
+   Tło za oknem rozmywa grę zamiast ją tylko przyciemniać — okno wychodzi
+   na wierzch, a nie leży na płaskiej czerni. */
+.veil{backdrop-filter:blur(7px) saturate(.8);background:rgba(4,7,4,.74)}
+.mdl{animation:oknoWjazd .26s var(--sprezyna) both;
+  border:1px solid var(--line2);
+  background:linear-gradient(180deg,var(--p2),var(--p1) 46%)}
+@keyframes oknoWjazd{from{opacity:0;transform:translateY(14px) scale(.975)}to{opacity:1;transform:none}}
+.opt:hover{border-color:var(--acc);background:rgba(217,171,69,.07);transform:translateX(2px)}
+
+/* ─────────── PRZYCISKI ───────────
+   Złoty przycisk jest w grze zawsze tym najważniejszym, więc niech świeci.
+   Szary (.g) i czerwony (.r) zostają spokojne — inaczej wszystko krzyczy naraz. */
+.btn{box-shadow:0 1px 0 rgba(255,255,255,.3) inset, 0 0 20px -10px var(--acc), var(--sh1)}
+.btn:not(:disabled):hover{box-shadow:0 1px 0 rgba(255,255,255,.35) inset,
+  0 0 28px -9px var(--acc), var(--sh2)}
+.btn.g,.btn.r{box-shadow:var(--sh1)}
+.btn.g:hover{box-shadow:var(--sh1), 0 0 18px -12px var(--acc)}
+
+/* ─────────── CECHY PRZEWODNICZĄCEGO ───────────
+   Cztery liczby, na które gracz patrzy najczęściej po sondażu. Były czterema
+   szarymi kwadratami; teraz to odczyty, a nie tło. */
+.lstat{gap:var(--o2);margin-top:var(--o3)}
+/* bez overflow:hidden — najdłuższy podpis („AUTORYTET") jest szerszy niż kratka
+   i musi mieć prawo wyjść poza nią, zamiast tracić ostatnią literę */
+.lstat div{position:relative;padding:var(--o2) 1px 7px;
+  background:linear-gradient(180deg,var(--p3),var(--p1));border:1px solid var(--line);
+  transition:border-color .16s,transform .14s}
+.lstat div::before{content:'';position:absolute;left:1px;right:1px;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--acc2),transparent);opacity:.7}
+.lstat div:hover{border-color:var(--line2);transform:translateY(-1px)}
+.lstat b{font-size:17px;
+  background:linear-gradient(180deg,#fbf3dd,#d9ab45 135%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lstat span{font-size:8px;letter-spacing:.04em;white-space:nowrap}
+
+/* ─────────── GŁĘBIA WARSTW ───────────
+   Po pogłębieniu tła karty mogą wreszcie rzucać cień, który coś znaczy. */
+.card{box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 14px 34px -26px #000, 0 3px 10px -6px rgba(0,0,0,.7)}
+.card>.b{background:linear-gradient(180deg,rgba(255,255,255,.012),transparent 90px)}
+.klocek,.okr,.bperson,.agent{background:linear-gradient(180deg,var(--p2),var(--p1))}
+
+/* ─────────── DOSTĘPNOŚĆ ───────────
+   Kto ma w systemie wyłączone animacje, ten dostaje grę bez ruchu.
+   Wygląd zostaje ten sam, znika wyłącznie ruch. */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important}
+}
 
 /* ---- ogólne wygładzenie przejść ---- */
 button,.act,.opt,.card,.pill{transition-timing-function:cubic-bezier(.2,.7,.3,1)}

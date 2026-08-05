@@ -3812,7 +3812,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.28';
+let WERSJA='1.1.29';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3823,6 +3823,17 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.29':{data:'5 sierpnia 2026', zmiany:[
+   'Nowa paleta calej gry. Tlo zeszlo glebiej, a panele poszly w gore, wiec karty wreszcie wygladaja jak karty lezace na czyms, a nie jak plamy w tym samym kolorze co tlo.',
+   'Sala obrad dostala atmosfere: cieple swiatlo znad mownicy, przyciemnione brzegi i delikatne ziarno jak na transmisji z obrad.',
+   'Pasek u gory to teraz pulpit: odczyty rozdzielone kreskami, zlote liczby, barwa twojej partii biegnie przez cala dolna krawedz.',
+   'Zakladki maja plynny wskaznik, a przy zmianie widoku karty wjezdzaja po kolei. Animacja odpala sie tylko przy zmianie zakladki, wiec klikanie decyzji niczym nie miga.',
+   'Lawy w Sejmie sa wypukle i reaguja na kursor, wlasne mandaty swieca zlotem. Pasek glosowania jest wyzszy i wypelnia sie plynnie.',
+   'Cechy przewodniczacego czyta sie jak odczyty przyrzadu, a nie jak cztery szare kwadraty.',
+   'Naprawione: tytul decyzji stal o 15 pikseli dalej niz jej opis, bo zostal mu padding po starszej wersji ukladu.',
+   'Kto ma w systemie wylaczone animacje, dostaje gre bez ruchu.',
+ ]},
+
  '1.1.28':{data:'5 sierpnia 2026', zmiany:[
    'Drugi etap nowego wygladu: ekran Decyzji. Kategorie wygladaja teraz jak nawigacja, filtry skutkow zeszly na drugi plan, a kafle maja rowne wysokosci i kolorowy akcent kategorii przy lewej krawedzi.',
    'Wyszarzone decyzje wyrazniej odrozniaja sie od dostepnych, a powod blokady stoi w osobnej linii pod kaflem.',
@@ -4289,10 +4300,11 @@ function game(){
   </div>
   <div class="layout">
     <div style="display:flex;flex-direction:column;gap:14px">${sidebar(p,q)}</div>
-    <div>${G.tab==='mapa'?kurier()+mapTab(q,AL):G.tab==='akcje'?actTab():G.tab==='partie'?partieTab():G.tab==='sondaz'?pollTab(q,AL)
+    <div class="widok${G._we?' wejscie':''}" data-tab="${G.tab}">${G.tab==='mapa'?kurier()+mapTab(q,AL):G.tab==='akcje'?actTab():G.tab==='partie'?partieTab():G.tab==='sondaz'?pollTab(q,AL)
       :G.tab==='cele'?goalTab():G.tab==='lider'?leadTab():G.tab==='krol'?kingTab()
       :G.tab==='premier'?premierTab():G.tab==='prezydent'?prezydentTab():sejmTab()}</div>
   </div>`;
+  G._we=0;
 }
 function radar(p){
   const AX=[['Sława',p.fame,'var(--acc)'],['Wiarygodność',p.cred,'var(--info)'],['Jedność',p.uni,'var(--pos)'],
@@ -9023,7 +9035,10 @@ Object.assign(window,{start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,m
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,
   openResort,startLaw,signLaw,premierTab,prezydentTab,
   closeFinalCamp,runFinalCamp,openEdycja,edytSet,edytOk,
-  setTab:k=>{G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
+  /* _we to jednorazowa flaga animacji wejścia. Ekran przerysowuje się po każdej
+     decyzji, więc gdyby karty wjeżdżały za każdym razem, gra migałaby przy każdym
+     kliknięciu. Animacja ma się odpalić tylko przy realnej zmianie widoku. */
+  setTab:k=>{if(G.tab!==k)G._we=1;G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
   signAgent,agentCost,agentFree,AGENTS,render,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.__game={openDym,pusteResorty,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
