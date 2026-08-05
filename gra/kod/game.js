@@ -3812,7 +3812,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.27';
+let WERSJA='1.1.28';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3823,6 +3823,12 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.28':{data:'5 sierpnia 2026', zmiany:[
+   'Drugi etap nowego wygladu: ekran Decyzji. Kategorie wygladaja teraz jak nawigacja, filtry skutkow zeszly na drugi plan, a kafle maja rowne wysokosci i kolorowy akcent kategorii przy lewej krawedzi.',
+   'Wyszarzone decyzje wyrazniej odrozniaja sie od dostepnych, a powod blokady stoi w osobnej linii pod kaflem.',
+   'Mapa okregow: kafle reaguja na kursor i wyraznie pokazuja, ktory okreg jest wybrany.',
+ ]},
+
  '1.1.27':{data:'5 sierpnia 2026', zmiany:[
    'Pierwszy etap nowego wygladu: jedna skala wielkosci pisma i jeden rytm odstepow zamiast wartosci dobieranych na oko w kilkunastu miejscach.',
    'Karty maja spokojniejsza rame i wyrazniejszy naglowek, kafle decyzji czytaja sie jak karty do zagrania.',

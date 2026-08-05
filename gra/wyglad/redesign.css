@@ -123,5 +123,54 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .rs .rv b{font-size:var(--t-duze)}
 .rs .rv span{font-size:var(--t-mini);letter-spacing:.06em;text-transform:uppercase;color:var(--dim2)}
 
+/* ═══════════ ETAP 2: DECYZJE ═══════════
+   Ekran, na którym gracz siedzi najdłużej. Wcześniej kategorie, filtry i kafle
+   miały podobną wagę wizualną i wszystko zlewało się w jedną szarą płachtę. */
+
+/* pasek kategorii: to jest nawigacja, więc ma wyglądać jak nawigacja */
+.cats{display:flex;flex-wrap:wrap;gap:var(--o2);margin-bottom:var(--o4);
+  padding-bottom:var(--o3);border-bottom:1px solid var(--line)}
+.cats button{
+  padding:7px 14px;border-radius:999px;font-size:var(--t-male);font-weight:600;
+  background:var(--p1);border:1px solid var(--line);color:var(--dim);
+  transition:border-color .14s,color .14s,background .14s}
+.cats button:hover{color:var(--tx);border-color:var(--line2)}
+.cats button.on{background:rgba(216,168,62,.14);border-color:var(--acc);color:var(--acc)}
+.cats button.spent{opacity:.42}
+.cats button.roy{border-color:rgba(176,143,214,.4)}
+
+/* filtry skutków: drugorzędne wobec kategorii, więc mniejsze i cichsze */
+.fxbar{display:flex;flex-wrap:wrap;align-items:center;gap:var(--o1);
+  margin-bottom:var(--o4);font-size:var(--t-mini)}
+.fxlab{color:var(--dim2);letter-spacing:.1em;text-transform:uppercase;
+  font-family:var(--m);margin-right:var(--o2)}
+.fx{padding:4px 10px;border-radius:999px;border:1px solid var(--line);
+  font-size:var(--t-mini);font-weight:600;transition:.14s}
+
+/* siatka kafli: równe wysokości, wyraźny lewy akcent kategorii */
+.actgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:var(--o3)}
+.act{border-left:3px solid var(--ac,var(--line2));display:flex;flex-direction:column}
+.act .dd{flex:1}
+.act[disabled]{opacity:.46}
+.act .ahd{display:flex;align-items:flex-start;gap:var(--o2);margin-bottom:var(--o1)}
+.act .apx{display:flex;gap:3px;margin-left:auto;flex:none}
+.act .apx b{width:7px;height:7px;border-radius:50%;background:var(--line2);display:block}
+.act .apx b.on{background:var(--acc)}
+.afx{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.afx span{font-size:9.5px;letter-spacing:.03em;display:inline-flex;align-items:center;gap:3px}
+.blk{margin-top:var(--o2);padding-top:var(--o2);border-top:1px solid var(--line);
+  font-size:var(--t-mini);color:var(--neg);letter-spacing:.01em}
+.spentbar{border-radius:var(--r2);padding:var(--o3) var(--o4);font-size:var(--t-drobne);
+  line-height:1.5;margin-bottom:var(--o4)}
+
+/* ═══════════ ETAP 2: MAPA OKRĘGÓW ═══════════ */
+.mapwrap{gap:var(--o4)}
+.okr{border-radius:var(--r3);padding:var(--o3) var(--o4);border:1px solid var(--line);
+  background:linear-gradient(180deg,var(--p2),var(--p1) 60%);transition:border-color .14s,transform .1s}
+.okr:hover{border-color:var(--line2);transform:translateY(-1px)}
+.okr.on{border-color:var(--acc);background:linear-gradient(180deg,rgba(216,168,62,.1),var(--p1) 60%)}
+.okr h4{font-size:var(--t-drobne);margin-bottom:2px}
+.okr .dim{font-size:var(--t-mini)}
+
 /* ---- ogólne wygładzenie przejść ---- */
 button,.act,.opt,.card,.pill{transition-timing-function:cubic-bezier(.2,.7,.3,1)}
