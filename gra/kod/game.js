@@ -3991,65 +3991,95 @@ function sitModal(kick,tyt,body,opts){
 let MODE=null;
 function pickMode(m){MODE=m;SFX.click();if(m==='tut'){SCENSEL=null;return startTutorial()}if(m==='free')SCENSEL=null;render()}
 function backToMode(){MODE=null;render()}
+/* Ikony trybów. Jedna definicja, żeby karty miały wspólny język i grubość kreski. */
+const IKO={
+ tut:'<path d="M12 18h22a6 6 0 0 1 6 6v26a6 6 0 0 0-6-6H12z"/><path d="M52 18H40a6 6 0 0 0-6 6v26a6 6 0 0 1 6-6h12z" opacity=".55"/><path d="M18 28h10M18 36h8"/>',
+ free:'<path d="M32 7l6.6 13.7L53 23l-10.6 10.2L45 48l-13-6.8L19 48l2.6-14.8L11 23l14.4-2.3z"/><path d="M32 48v9" opacity=".5"/><path d="M24 57h16" opacity=".5"/>',
+ upad:'<path d="M14 52h36"/><path d="M20 52V28l12-12 12 12v24"/><path d="M27 52V38h10v14" opacity=".55"/><path d="M46 14l6 6M52 14l-6 6" opacity=".8"/>',
+ los :'<path d="M32 8l20 11v22L32 52 12 41V19z"/><path d="M32 30v22" opacity=".5"/><path d="M12 19l20 11 20-11" opacity=".5"/><circle cx="32" cy="22" r="2.6" fill="currentColor" stroke="none"/><circle cx="23" cy="38" r="2.2" fill="currentColor" stroke="none" opacity=".7"/><circle cx="41" cy="38" r="2.2" fill="currentColor" stroke="none" opacity=".7"/>',
+ kre :'<path d="M12 50h40"/><path d="M18 50V32M30 50V20M42 50V38"/><path d="M44 14l7 7-19 19-9 2 2-9z"/>',
+ plik:'<path d="M14 14h20l6 7h10v33H14z"/><path d="M32 30v16" opacity=".8"/><path d="M25 39l7 7 7-7" opacity=".8"/>',
+};
+const iko=k=>`<svg class="mico" viewBox="0 0 64 64"><g fill="none" stroke="currentColor"
+  stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${IKO[k]}</g></svg>`;
+
+/* ── Ślepy los ──
+   Karta bez podpowiedzi: gra sama dobiera scenariusz i partię, a gracz dowiaduje
+   się, czym gra, dopiero po starcie. Nie ma tu żadnej nowej mechaniki — to zwykły
+   start, tylko wybrany za ciebie. */
+function slepyLos(){
+  const scenariusze=Object.keys(SCEN);
+  const partie=PID.filter(k=>BASE[k]);
+  const s=scenariusze[RI(0,scenariusze.length-1)];
+  const p=partie[RI(0,partie.length-1)];
+  SCENSEL=s; MODE='free'; SFX.click();
+  modal('Ślepy los','Los wybrał za ciebie',
+    `<p>Scenariusz: <b>${esc(SCEN[s].n)}</b><br>Partia: <b>${esc(BASE[p].n)}</b></p>
+     <p class="dim" style="font-size:13px">${esc(BASE[p].blurb)}</p>`,
+    [{l:'Biorę, co dali',s:'Zaczynam tą partią',f:()=>{close();start(p)}},
+     {l:'Losuj jeszcze raz',s:'Inny scenariusz i inna partia',f:()=>{close();slepyLos()}},
+     {l:'Wybiorę sam',s:'Przechodzę do listy partii',f:()=>{close();render()}}]);
+}
+
 function modeScreen(){
+  const karta=(o)=>`
+    <button class="modecard ${o.kl||''}" ${o.wyl?'disabled aria-disabled="true"':`onclick="${o.akcja}"`}>
+      <div class="mramka"></div>
+      <div class="mikob">${iko(o.i)}</div>
+      ${o.data?`<div class="mdata">${o.data}</div>`:''}
+      <div class="mtag">${o.tag}</div>
+      <h2>${o.n}</h2>
+      <p>${o.d}</p>
+      <div class="mfoot"><span>${o.stopka}</span><b>${o.akcjaN}</b></div>
+    </button>`;
+
   app.innerHTML=`
   <div class="startekran">
-  <div class="intro">
-    <div class="kick">Mordy Mordeczki · roleplay polityczny</div>
-    <h1>Sejm<svg class="seal" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <div class="sztandar">
+    <div class="sztlewa">
+      <div class="kick">Mordy Mordeczki · roleplay polityczny</div>
+      <h1>Sejm</h1>
+      <p>Prowadzisz partię na serwerze liczącym 670 osób. Dwanaście tygodni kampanii,
+         wybory, rząd albo opozycja, i tak w kółko. Wybierz, od kiedy zaczynasz.</p>
+    </div>
+    <svg class="seal" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
       <g fill="none" stroke="var(--acc2)" stroke-width="1.1">
         <circle cx="50" cy="50" r="43"/><circle cx="50" cy="50" r="36"/>
         <path d="M50 14 L54 24 L50 22 L46 24 Z" fill="var(--acc2)" stroke="none"/>
         <g opacity=".85"><path d="M28 62 Q50 78 72 62"/><path d="M30 58 Q50 72 70 58"/></g>
-      </g></svg></h1>
-    <p>Prowadzisz partię na serwerze liczącym 670 osób. Dwanaście tygodni kampanii, wybory,
-       rząd albo opozycja, i tak w kółko. Wybierz, od kiedy zaczynasz.</p>
-    <div class="mstats">
-      <div><b>670</b><span>osób na serwerze</span></div>
-      <div><b>40</b><span>mandatów</span></div>
-      <div><b>14</b><span>partii</span></div>
-      <div><b>12</b><span>tygodni kadencji</span></div>
-      <div><b>∞</b><span>kadencji</span></div>
-    </div>
+      </g></svg>
   </div>
-  <div class="modes trzy">
-    <button class="modecard" onclick="pickMode('tut')">
-      <svg class="mico" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
-        <path d="M12 18h22a6 6 0 0 1 6 6v26a6 6 0 0 0-6-6H12z"/>
-        <path d="M52 18H40a6 6 0 0 0-6 6v26a6 6 0 0 1 6-6h12z" opacity=".55"/>
-        <path d="M18 28h10M18 36h8"/></g>
-        <circle cx="47" cy="13" r="6" fill="currentColor" opacity=".25"/></svg>
-      <div class="mtag">dla nowych</div>
-      <h2>Samouczek</h2>
-      <p>Prowadzę cię krok po kroku przez pierwszą kadencję Stronnictwem Reisei: obecność w kanałach,
-         kolejność decyzji, transfery, cele partyjne i wybory. Możesz przerwać w każdej chwili
-         i grać dalej normalnie.</p>
-      <div class="mfoot"><span>ok. 10 minut</span><b>Zaczynam →</b></div>
-    </button>
-    <button class="modecard" onclick="pickMode('free')">
-      <svg class="mico" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
-        <path d="M32 7l6.6 13.7L53 23l-10.6 10.2L45 48l-13-6.8L19 48l2.6-14.8L11 23l14.4-2.3z"/>
-        <path d="M32 48v9" opacity=".5"/><path d="M24 57h16" opacity=".5"/></g></svg>
-      <div class="mdata">1 sierpnia 2026</div>
-      <div class="mtag">pełna gra</div>
-      <h2>Dzień dzisiejszy</h2>
-      <p>Serwer taki, jaki jest teraz: czternaście partii od największej po jednoosobową,
-         rząd na swoim miejscu i wszystko do wzięcia. Albo własna partia zbudowana od zera w kreatorze.</p>
-      <div class="mfoot"><span>wszystkie partie i kreator</span><b>Wybieram partię →</b></div>
-    </button>
-    <button class="modecard wkrotce" disabled aria-disabled="true">
-      <svg class="mico" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
-        <path d="M14 52h36"/><path d="M20 52V28l12-12 12 12v24"/>
-        <path d="M27 52V38h10v14" opacity=".55"/>
-        <path d="M46 14l6 6M52 14l-6 6" opacity=".8"/></g></svg>
-      <div class="mdata">25 kwietnia 2025</div>
-      <div class="mtag">scenariusz</div>
-      <h2>Upadek Republikanów</h2>
-      <p>Zaczynasz szesnaście miesięcy wcześniej, w tygodniu, w którym niebieski sztandar poszedł w dół,
-         a jego ludzie rozeszli się po całym serwerze. Wszystko, co znasz, dopiero się z tego ułoży.</p>
-      <div class="mfoot"><span>w przygotowaniu</span><b>Wkrótce</b></div>
-    </button>
+
+  <div class="tabliczki">
+    <div><b>670</b><span>osób na serwerze</span></div>
+    <div><b>40</b><span>mandatów</span></div>
+    <div><b>14</b><span>partii</span></div>
+    <div><b>12</b><span>tygodni kadencji</span></div>
+    <div><b>∞</b><span>kadencji</span></div>
   </div>
+
+  <div class="dzialnag"><span>Od czego zaczynasz</span></div>
+  <div class="modes">
+    ${karta({i:'tut',akcja:"pickMode('tut')",tag:'dla nowych',n:'Samouczek',
+      d:'Prowadzę cię krok po kroku przez pierwszą kadencję Stronnictwem Reisei: obecność w kanałach, kolejność decyzji, transfery, cele partyjne i wybory.',
+      stopka:'ok. 10 minut',akcjaN:'Zaczynam →'})}
+    ${karta({i:'free',akcja:"pickMode('free')",tag:'pełna gra',data:'1 sierpnia 2026',kl:'glowna',n:'Dzień dzisiejszy',
+      d:'Serwer taki, jaki jest teraz: czternaście partii od największej po jednoosobową, rząd na swoim miejscu i wszystko do wzięcia.',
+      stopka:'wszystkie partie i kreator',akcjaN:'Wybieram partię →'})}
+    ${karta({i:'los',akcja:'slepyLos()',tag:'???',kl:'tajemna',n:'Ślepy los',
+      d:'Nie wybierasz nic. Ani sceny, ani partii. Dowiadujesz się, kim grasz, dopiero kiedy siadasz do stołu.',
+      stopka:'losowa scena i partia',akcjaN:'Rzucam →'})}
+    ${karta({i:'kre',akcja:'openKreator()',tag:'twoje',n:'Kreator scenariuszy',
+      d:'Ustawiasz, jak wygląda serwer w chwili startu: kto ile ma mandatów, jak duże są partie, ile trwa kadencja. Gotowy scenariusz zapiszesz jako plik.',
+      stopka:'pełny edytor',akcjaN:'Buduję →'})}
+    ${karta({i:'plik',akcja:'wczytajScenPlik()',tag:'twoje',n:'Wczytaj scenariusz',
+      d:'Ktoś przysłał ci plik <b>.mmscen</b>? Wczytaj go tutaj, a stanie na liście obok wbudowanych i zagrasz nim od razu.',
+      stopka:'plik .mmscen',akcjaN:'Wczytuję →'})}
+    ${karta({i:'upad',wyl:1,kl:'wkrotce',tag:'scenariusz',data:'25 kwietnia 2025',n:'Upadek Republikanów',
+      d:'Zaczynasz szesnaście miesięcy wcześniej, w tygodniu, w którym niebieski sztandar poszedł w dół, a jego ludzie rozeszli się po całym serwerze.',
+      stopka:'w przygotowaniu',akcjaN:'Wkrótce'})}
+  </div>
+
   <div class="loadbar">
     <input class="ta2" id="loadCodeInp" placeholder="Masz kod zapisu? Wklej go tutaj (MM...) i wczytaj rozgrywkę">
     <button class="btn g sm" onclick="tryLoadFromSetup()">Wczytaj zapis</button>
@@ -4065,7 +4095,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.36';
+let WERSJA='1.1.37';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4076,6 +4106,12 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.37':{data:'5 sierpnia 2026', zmiany:[
+   'EKRAN TRYBOW OD NOWA. Byly trzy plaskie prostokaty na czarnym tle. Teraz ekran jest zbudowany z plyt jak w grach Paradoxu: sztandar z mosiezna listwa, liczby w osadzonych tabliczkach, karty z okuciami w rogach i ikonami w plakietkach.',
+   'TRZY NOWE KARTY. Kreator scenariuszy i Wczytaj scenariusz weszly prosto na ekran startowy, wiec nie trzeba ich juz szukac. Doszedl tez Slepy los: gra sama dobiera scenariusz i partie, a dowiadujesz sie, kim grasz, dopiero po starcie.',
+   'Launcher przestal zajmowac sie scenariuszami — robi tylko to, do czego jest: odpala gre i ja aktualizuje.',
+ ]},
+
  '1.1.36':{data:'5 sierpnia 2026', zmiany:[
    'NOWY KREATOR SCENARIUSZY. Byl ciasnym oknem z kilkunastoma suwakami, po ktorym nie dalo sie poznac, co wlasciwie powstaje. Teraz to pelny ekran: ustawienia w sekcjach po lewej, a po prawej stale widoczny opis tego, co scenariusz naprawde zrobi na starcie.',
    'SCENARIUSZ JAKO PLIK. Zapisujesz go jako plik .mmscen i wysylasz komu chcesz. Na liscie scenariuszy jest przycisk Wczytaj z pliku, ktory stawia cudzy scenariusz obok wbudowanych.',
@@ -9498,7 +9534,7 @@ function dead(){
     <div style="margin-top:24px"><button class="btn" onclick="newRun()">Od nowa</button></div></div>`}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,

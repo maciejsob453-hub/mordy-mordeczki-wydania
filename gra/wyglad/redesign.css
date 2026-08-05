@@ -495,6 +495,114 @@ body::after{
 .card>.b{background:linear-gradient(180deg,rgba(255,255,255,.012),transparent 90px)}
 .klocek,.okr,.bperson,.agent{background:linear-gradient(180deg,var(--p2),var(--p1))}
 
+/* ═══════════════════════════════════════════════════════════
+   EKRAN TRYBÓW — język paradoxowy
+   Wcześniej były to trzy płaskie prostokąty na czarnym tle. Gry Paradoxu
+   budują ekran z płyt: każdy element wygląda na osadzony w ramie, ma własną
+   krawędź światła u góry, cień pod spodem i mosiężne okucia w rogach.
+   Stąd bierze się wrażenie, że to przyrząd, a nie strona.
+   ═══════════════════════════════════════════════════════════ */
+.sztandar{display:flex;align-items:flex-start;gap:var(--o6);
+  padding:var(--o5) var(--o5) var(--o5);border-radius:var(--r4);
+  border:1px solid var(--line2);position:relative;overflow:hidden;
+  background:
+    radial-gradient(720px 260px at 22% -60px,rgba(217,171,69,.16),transparent 68%),
+    linear-gradient(180deg,var(--p2),rgba(0,0,0,.42));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 26px 56px -40px #000}
+/* mosiężna listwa u dołu sztandaru */
+.sztandar::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--acc) 18%,var(--zloto2,#f7e3aa) 50%,var(--acc) 82%,transparent);
+  opacity:.75}
+.sztlewa{flex:1;min-width:0}
+.sztandar h1{font-size:clamp(46px,6vw,86px);line-height:.95;margin:var(--o3) 0 var(--o3)}
+.sztandar p{color:var(--dim);max-width:60ch;font-size:clamp(14px,1.05vw,16.5px);margin:0}
+.sztandar .seal{position:static;flex:none;width:clamp(96px,9vw,150px);height:auto;
+  opacity:.5;align-self:center}
+
+/* tabliczki z liczbami — osadzone, nie dopisane */
+.tabliczki{display:flex;flex-wrap:wrap;gap:1px;margin:var(--o4) 0 var(--o5);
+  border:1px solid var(--line);border-radius:var(--r3);overflow:hidden;
+  background:var(--line)}
+.tabliczki>div{flex:1 1 150px;padding:var(--o3) var(--o4);
+  background:linear-gradient(180deg,var(--p2),var(--p1));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.tabliczki b{display:block;font-family:var(--m);font-size:26px;font-weight:700;line-height:1.05;
+  background:linear-gradient(180deg,#fbf3dd,#d9ab45 130%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.tabliczki span{display:block;font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--dim2);font-weight:700;margin-top:5px}
+
+/* nagłówek działu z linią biegnącą przez całą szerokość */
+.dzialnag{display:flex;align-items:center;gap:var(--o4);margin-bottom:var(--o4)}
+.dzialnag span{font-family:var(--m);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--acc);font-weight:700;flex:none}
+.dzialnag::after{content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,var(--acc2),var(--line) 40%,transparent)}
+
+/* ── karty trybów ── */
+.startekran .modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:var(--o4);max-width:none;margin:0 0 var(--o5)}
+.startekran .modecard{
+  position:relative;overflow:hidden;padding:var(--o5) var(--o5) var(--o4);
+  border-radius:var(--r3);border:1px solid var(--line2);
+  background:linear-gradient(168deg,var(--p2),rgba(0,0,0,.5));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 20px 44px -34px #000;
+  transition:transform .18s var(--krzywa),border-color .18s,box-shadow .24s}
+/* okucia w rogach: rysowane ramką, nie obrazkiem */
+.mramka{position:absolute;inset:7px;pointer-events:none;opacity:.5;transition:opacity .2s}
+.mramka::before,.mramka::after{content:'';position:absolute;width:16px;height:16px}
+.mramka::before{top:0;left:0;border-top:1px solid var(--acc);border-left:1px solid var(--acc)}
+.mramka::after{bottom:0;right:0;border-bottom:1px solid var(--acc);border-right:1px solid var(--acc)}
+.startekran .modecard:hover{transform:translateY(-4px);border-color:var(--acc);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 30px 60px -34px #000,0 0 48px -22px var(--acc)}
+.startekran .modecard:hover .mramka{opacity:1}
+
+/* ikona siedzi w plakietce, nie wisi w rogu */
+.mikob{position:absolute;right:var(--o4);top:var(--o4);width:56px;height:56px;
+  border-radius:var(--r3);display:grid;place-items:center;
+  border:1px solid var(--line);background:linear-gradient(180deg,var(--p3),rgba(0,0,0,.4));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);transition:.22s}
+.mikob .mico{position:static;width:34px;height:34px;color:var(--line2);transition:.22s}
+.startekran .modecard:hover .mikob{border-color:var(--acc2);transform:none}
+.startekran .modecard:hover .mikob .mico{color:var(--acc);transform:none}
+.startekran .modecard h2{font-size:clamp(21px,1.6vw,27px);margin:var(--o3) 0 var(--o2);
+  padding-right:66px}
+.startekran .modecard p{font-size:13.5px;line-height:1.55;color:var(--dim);margin:0}
+.startekran .modecard .mfoot{margin-top:var(--o4);padding-top:var(--o3);
+  border-top:1px solid var(--line);font-size:12px}
+.startekran .modecard .mfoot b{color:var(--acc)}
+.startekran .mdata{margin-bottom:var(--o2)}
+
+/* karta główna: ta, którą wybiera większość */
+.modecard.glowna{border-color:var(--acc2);
+  background:
+    radial-gradient(420px 190px at 78% -40px,rgba(217,171,69,.14),transparent 70%),
+    linear-gradient(168deg,var(--p2),rgba(0,0,0,.5))}
+.modecard.glowna .mikob .mico{color:var(--acc2)}
+
+/* karta tajemna: nic nie zdradza, więc i wygląda inaczej niż reszta */
+.modecard.tajemna{border-color:#3b3550;
+  background:
+    radial-gradient(460px 200px at 70% -50px,rgba(176,143,214,.16),transparent 70%),
+    linear-gradient(168deg,#161327,rgba(0,0,0,.55))}
+.modecard.tajemna .mtag{color:var(--roy);border-color:rgba(176,143,214,.5);
+  background:rgba(176,143,214,.1);letter-spacing:.3em}
+.modecard.tajemna .mikob{border-color:rgba(176,143,214,.35)}
+.modecard.tajemna .mikob .mico{color:rgba(176,143,214,.55)}
+.modecard.tajemna:hover{border-color:var(--roy);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 30px 60px -34px #000,0 0 52px -20px var(--roy)}
+.modecard.tajemna:hover .mikob .mico{color:var(--roy)}
+.modecard.tajemna .mramka::before,.modecard.tajemna .mramka::after{border-color:var(--roy)}
+.modecard.tajemna .mfoot b{color:var(--roy)}
+
+.modecard.wkrotce{opacity:.42;border-style:dashed}
+.modecard.wkrotce .mramka{opacity:.2}
+
+@media (max-width:760px){
+  .sztandar{flex-direction:column;gap:var(--o4)}
+  .sztandar .seal{align-self:flex-start;width:88px}
+}
+
 /* ─────────── EKRAN STARTOWY ───────────
    Pierwsze, co gracz widzi, a wyglądało jak tekst na czarnym tle. Tytuł ma
    świecić, liczby mają ważyć, karty trybów mają zapraszać do kliknięcia. */

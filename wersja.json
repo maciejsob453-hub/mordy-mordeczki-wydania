@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.36",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/0b8cdcd44ea4130d21b6898fbb394f894af7379a",
+ "wersja": "1.1.37",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,8 +14,8 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "f7e91d5814e65ac739f9a9554396a6fd58d2a2b2b8aa8a92d761fb20512019b5",
-   "bajtow": 604294
+   "sha": "d42d15c2bcf701269c297d7b837d80fc1c823db39af774c8935b4d7205d407e4",
+   "bajtow": 607073
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -554,8 +554,8 @@
   },
   {
    "sciezka": "gra/wyglad/redesign.css",
-   "sha": "3595d957069bc92b87721f4ccbe6e956903e1030f6cf3f9563f48f637ff297f7",
-   "bajtow": 36955
+   "sha": "d23cfc39f5625c7d988c62dd904034e7b8d3281f2cb16f0449a853652b99bad1",
+   "bajtow": 43441
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -570,16 +570,15 @@
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.36/Mordy.Mordeczki.exe"
  },
  "runtime": {
-  "sha": "9dcf03d8e3c4185a75b117af406577d64efd9559c8310be50fed14af66be9872",
-  "bajtow": 13704327,
-  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.36/biblioteki-1.1.36.zip",
-  "znacznik": "2eb28efdbe5659b1f83c47d54c4f8fa5a02b26f47c26c5901791237f4186e0d4"
+  "sha": "50968e92e84f0439c4b8a1a1262bea434ca2a1fbb81f746dc7250f02f305c80e",
+  "bajtow": 13704469,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.37/biblioteki-1.1.37.zip",
+  "znacznik": "b58326ed177ba1157b6d794b891c92db7af0223b9229426d120209129e836f76"
  },
  "launcher": {
   "nazwa": "Mordy Mordeczki Launcher.exe",
   "sha": "e0f582f398e571c686dc8a20c8d660400ce0e437636f84ad738bd86af0a91212",
   "bajtow": 12136320,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.36/Mordy.Mordeczki.Launcher.exe"
- },
- "commit": "0b8cdcd44ea4130d21b6898fbb394f894af7379a"
+ }
 }
