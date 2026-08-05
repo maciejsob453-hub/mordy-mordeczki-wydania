@@ -1186,6 +1186,32 @@ body::after{
    mechaniki jeszcze nie ma.
    ═══════════════════════════════════════════════════════════ */
 .ekoblok{display:flex;flex-direction:column;gap:var(--o4)}
+/* wzór, z którego wychodzi PKB — ma być widać, że to nie liczba z powietrza */
+.pkbwzor{font-family:var(--m);font-size:11.5px;color:var(--dim);margin-top:9px}
+
+/* składniki mnożnika */
+.ekoczyn{display:flex;flex-direction:column;gap:5px}
+.ekocz{display:flex;align-items:center;gap:var(--o3);padding:8px var(--o3);
+  border-radius:var(--r2);border:1px solid var(--line);position:relative;
+  background:linear-gradient(178deg,var(--p2),rgba(0,0,0,.28))}
+.ekocz::before{content:'';position:absolute;left:0;top:9px;bottom:9px;width:3px;
+  border-radius:0 3px 3px 0}
+.ekocz.plus::before{background:var(--pos)} .ekocz.minus::before{background:var(--neg)}
+.ekoczl{flex:1;min-width:0}
+.ekoczl b{display:block;font-size:13px}
+.ekoczl span{font-size:11px;color:var(--dim2)}
+.ekoczv{font-family:var(--m);font-size:15px;font-weight:700;flex:none}
+.ekocz.plus .ekoczv{color:var(--pos)} .ekocz.minus .ekoczv{color:var(--neg)}
+
+/* lista kieszeni: ile kto ma i ile z tego wyjdzie kapitału */
+.ekos.szef{border-color:var(--acc2);background:
+  radial-gradient(300px 90px at 0% 50%,rgba(217,171,69,.12),transparent 70%),
+  linear-gradient(178deg,var(--p2),rgba(0,0,0,.28))}
+.ekotag{font-style:normal;font-family:var(--m);font-size:8.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--acc);margin-left:6px}
+.ekodaje{font-family:var(--m);font-size:11px;color:var(--dim2);width:74px;
+  text-align:right;flex:none}
+
 /* tempo wzrostu pod wielką liczbą */
 .pkbtempo{font-family:var(--m);font-size:12.5px;font-weight:700;margin-top:8px;
   color:var(--dim2)}

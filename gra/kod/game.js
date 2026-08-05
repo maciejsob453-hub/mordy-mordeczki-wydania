@@ -574,7 +574,7 @@ function newGame(id){
   G.free={eli:13,int:Math.round(fr*.24),ser:0};       // elita jest rzadkim towarem
   G.free.ser=fr-G.free.eli-G.free.int;
   G.mood={eli:1,int:1,ser:1};
-  G.pkb=PKB_START; G.kapPryw={};
+  G.kapPryw={}; G.pkb=0; G.skarb=0;
   makeNoise();
   G.prev=snap();
   say(`Kadencja 1. Do wyborów ${G.weeks} tygodni. Prezydentem jest <b>${G.prez.lead}</b> (${G.p[G.prez.party].ab}).`,'roy');
@@ -993,6 +993,9 @@ const A=[
   const g=Math.round(R(14,24)*(0.75+lead(G.me).komp/200)*(hasT('negocjator')?1.5:1)*dm);
   G.rel[G.me][t]=cl(G.rel[G.me][t]+g,-100,100);G.rel[t][G.me]=cl(G.rel[t][G.me]+g,-100,100);
   return `Relacje z <b>${G.p[t].ab}</b> +${g} (teraz ${Math.round(G.rel[G.me][t])}).`}},
+{id:'zrzutka',cat:'org',n:'Zrzutka z prywatnych kieszeni',ap:1,kp:0,en:10,
+ d:'Prosisz kogoś ze swojego zaplecza, żeby wyłożył własne pieniądze na partię. Milion prywatnego majątku to jeden punkt kapitału. Nikt nie robi tego z radości: jedność leci w dół, a ten, kogo wydoisz, odchodzi z partii z pretensjami. Im więcej bierzesz, tym gorzej to wygląda.',
+ f:()=>{openZrzutka();return null}},
 {id:'werb',cat:'dyp',n:'Werbunek działacza',ap:2,kp:22,en:14,
  d:'Dzwonisz do konkretnej osoby z cudzej partii i próbujesz ją przeciągnąć. Ludzie rzadko zmieniają barwy, więc szanse są niskie: liczy się relacja z jej partią, twoja wielkość, twoja kontrowersja i pretensjonalność. Przewodniczącego ściągniesz tylko w wyjątkowych okolicznościach.',
  f:()=>{openWerb();return null}},
@@ -1519,15 +1522,11 @@ function endWeek(){
       p.act=cl(p.act-Math.min(3,nad/150));
       say(`<b>Kapitał leży bezczynnie.</b> Limit to ${Math.round(lim)}, a ty trzymasz ${Math.round(G.kp+kara)}: przepada ${kara}, kontrowersja rośnie. Serwer nie lubi partii, które tylko zbierają.`,'bad');
     }
-    // Danina od niewykorzystanego majątku, jeśli sejm ją uchwalił ustawą o podatkach.
-    const pod=G.law&&typeof G.law.podatki==='object'?G.law.podatki:null;
-    if(pod&&pod.majatek>0&&G.kp>40){
-      const danina=Math.round((G.kp-40)*pod.majatek/100);
-      if(danina>0){
-        G.kp-=danina;
-        if(G.week%4===0)say(`<b>Danina od leżącego kapitału.</b> Skarb sejmu zabiera ${danina} (${pod.majatek}% nadwyżki ponad 40).`,'bad');
-      }
-    }
+    /* Danina od leżącego kapitału partii poszła precz. Ustawa o podatkach robiła
+       dwie zupełnie różne rzeczy pod jedną nazwą: skubała kapitał partii i osobno
+       majątki prywatne, a do tego przestawiała progresję składek. Nie dało się
+       z tego wyczytać, co właściwie robi jeden suwak. Zostaje jedno znaczenie:
+       podatek od majątku dotyczy prywatnych kont i przez nie rusza PKB. */
   }
   // gospodarka rusza się raz na tydzień, po rozliczeniu daniny
   pkbTydzien();
@@ -1741,6 +1740,7 @@ function aiCel(k,prog){
 function ai(){
   alive().forEach(k=>{
     if(k===G.me)return;const p=G.p[k],ld=lead(k);
+    aiZrzutka(k);          // po prywatne pieniądze sięga tylko partia pod kreską
     const n=Math.max(1, 1+Math.round(p.act/34)+Math.round((p.uni-46)/26));   // rozsypana partia działa wolniej
     const wagi=aiWagi(k,p);
     for(let i=0;i<n;i++){
@@ -2672,6 +2672,16 @@ const leadAva=(k,sz)=>{const p=G.p[k],s=sz||38,ls=leads(p);
 
 function render(){if(PROBA)return;
   applyTheme();initTips();initKeys();
+  /* Decyzja z własnym oknem jest opłacona z góry, a zapis o opłacie służy do
+     jej cofnięcia. Zamknięcie okna w dowolny inny sposób niż przyciskiem
+     „wstecz" zostawiało ten zapis wiszący: decyzja liczyła się jako zużyta
+     mimo że nic z niej nie wyszło, a pierwsze „wstecz" w kolejnym oknie
+     oddawało pieniądze za tamtą i zdejmowało jej limit. Stąd wywiady w kółko
+     za darmo z jednej strony, a z drugiej przepadające decyzje, z których
+     gracz się wycofał. Skoro okna nie ma, a opłata wciąż wisi, znaczy to,
+     że decyzja nie doszła do skutku — oddajemy ją w całości. */
+  if(G&&G.lastCharge&&typeof document!=='undefined'&&!document.getElementById('veil'))
+    oddajOplate();
   if(CRE)return creator();
   if(KRE)return kreatorEkran();
   if(!G)return MODE==='free'?setup():MODE==='scen'?scenScreen():modeScreen();
@@ -4182,7 +4192,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.46';
+let WERSJA='1.1.47';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4193,6 +4203,18 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.47':{data:'5 sierpnia 2026', zmiany:[
+   'WYWIADY ZA DARMO W KOLKO — KONIEC. Decyzja z wlasnym oknem jest oplacona z gory, a zapis o tej oplacie sluzy do jej cofniecia. Wywiad, nabor i uklad sterow nie kasowaly go po zakonczeniu, wiec zapis przechodzil na nastepne decyzje: pierwsze „wstecz" w dowolnym kolejnym oknie oddawalo pieniadze za tamta i zdejmowalo jej limit.',
+   'PORZUCONA DECYZJA NIE LICZY SIE JUZ JAKO ZUZYTA. Zamkniecie okna w inny sposob niz przyciskiem „wstecz" zostawialo decyzje policzona, choc nic z niej nie wyszlo. Teraz gra sama to rozpoznaje: nie ma okna, a oplata wisi — znaczy, ze decyzja nie doszla do skutku, wiec wraca w calosci razem z akcja i limitem.',
+   'PKB LICZY SIE Z MAJATKU: suma prywatnych kont razy mnoznik obrotu. Dlatego konta stoja w milionach, a PKB w miliardach, i wszystko, co rusza majatkiem, widac od razu.',
+   'Mnoznik obrotu nie jest staly. Skladaja sie na niego kompetencja ministra finansow, kompetencja premiera, stabilnosc, inwestycje i zaufanie przedsiebiorcow — wszystkie pieć widac wypisane w dziale Ekonomia razem z tym, ile kazdy dodaje.',
+   'KAPITAL PRYWATNY ZYJE. Rosnie sam z siebie, a podatek ten wzrost zjada i przy wysokiej stawce wychodzi juz pod kreska. Podatek daje pieniadze teraz, ale zabiera i majatek, i zaufanie, wiec PKB zwalnia z dwoch stron naraz — nie ma jednej najlepszej stawki.',
+   'MAJATKI ROZDANE PO NAZWISKACH, a nie z automatu. Bartek, Tortex i loof maja po 150–230 mln i sami robia ponad polowe majatku serwera. kenzo, Supernes, Mnem i Aryati maja wiecej niz niejeden lider. Kromka, Kaziu, Sulejman czy impir siedza na kilku milionach mimo przewodnictwa. Bezpartyjni maja tysiace, wiec po zwerbowaniu od razu widac, ze nic nie wnosza.',
+   'NOWA DECYZJA: ZRZUTKA Z PRYWATNYCH KIESZENI (Organizacja). Milion prywatnego majatku to jeden punkt kapitalu partii. Kto wylozy, ten odchodzi z partii, a jednosc siada tym mocniej, im grubszy portfel wydoisz. Przewodniczacego nie ruszysz. AI siega po to samo, ale tylko gdy ma kase pod kreska.',
+   'USTAWA O PODATKACH ROBI JUZ TYLKO JEDNA RZECZ. Wczesniej pod jedna nazwa skubala kapital partii, osobno majatki prywatne i jeszcze przestawiala progresje skladek — nie dalo sie wyczytac, co robi jeden suwak. Zostal podatek od prywatnych majatkow, ktory napelnia skarb i przez majatki rusza PKB.',
+   'Panel ekonomii nie ma juz zadnych przyciskow podatkowych — podatki ustawia sie wylacznie ustawa.',
+ ]},
+
  '1.1.46':{data:'5 sierpnia 2026', zmiany:[
    'DECYZJE PRZESTALY ODPALAC SIE SAME. Podglad skutkow gral prawdziwa decyzje dziewiec razy na kopii stanu, zeby pokazac widelki. Decyzje takie jak nabor, wywiad czy uklad sterow nie licza niczego same — otwieraja wlasne okno. Podglad naprawde je otwieral, a ze jego pamiec kasuje sie co tydzien, na starcie kazdego tygodnia sypalo oknami. Teraz podglad nie otwiera niczego, nie gra dzwiekami i nie sypie konfetti.',
    'Przy decyzjach, ktorych skutek rozstrzyga sie dopiero w oknie, podglad mowi to wprost zamiast milczec jak przy decyzji bez skutkow.',
@@ -4889,7 +4911,21 @@ const kasaSkrot=v=>{v=Math.abs(v||0);
    milionami, ktoś z dalekiego zaplecza tysiącami, a bezpartyjny grosikami.
    Do tego dochodzi autorytet i kompetencja, które podbijają wynik stromo, więc
    najbardziej znani wychodzą daleko przed resztę własnej półki. */
-const KAP_POLKA={lider:12e6, glowny:820e3, zaplecze:24e3, wolny:2200};
+/* Majątek nie wynika ze statystyk, tylko z tego, kim ktoś jest na serwerze.
+   Statystyki dawały płaską drabinkę, na której każdy lider był bogaty i każdy
+   z zaplecza biedny — a tak to nie wygląda. Dlatego półki są wpisane wprost:
+   trzy wielkie fortuny, kilka średnich, reszta liderów skromnie, zaplecze
+   w tysiącach, bezpartyjni na dnie. */
+const KAP_OSOBY={
+  // trzy fortuny, które same robią ponad połowę majątku serwera
+  'Bartek':230e6, 'Tortex':185e6, 'loof':150e6,
+  // zaplecze, które ma więcej niż niejeden lider
+  'kenzo':96e6, 'Supernes':54e6, 'Mnem':38e6, 'Aryati':44e6,
+  // liderzy bez fortuny — kilkanaście milionów i tyle
+  'Kromka':7.4e6, 'Vengeance':11e6, 'Maciek':9.2e6, 'impir':6.8e6, 'inwid':6.1e6,
+  'Fazmiś':13e6, 'Kaziu':4.9e6, 'Sulejman':3.6e6, 'Peterdeus':12e6, 'Lager':10.5e6,
+};
+const KAP_POLKA={lider:14e6, glowny:2.2e6, zaplecze:52e3, wolny:2600};
 function rolaOsoby(n){
   if(!G||!G.p)return 'wolny';
   for(const k of alive()){
@@ -4904,68 +4940,102 @@ function kapPryw(n){
   if(!G||!n)return 0;
   if(!G.kapPryw)G.kapPryw={};
   if(G.kapPryw[n]===undefined){
-    const x=L(n);
-    let ziarno=0; for(let i=0;i<n.length;i++)ziarno=(ziarno*31+n.charCodeAt(i))%100000;
-    const rozrzut=.5+(ziarno%1000)/1000*1.5;                    // stały dla danej osoby
-    const renoma=Math.pow(1+(x.autor*.6+x.komp*.4)/100,2.7);    // znani wychodzą przed szereg
-    G.kapPryw[n]=Math.round(KAP_POLKA[rolaOsoby(n)]*renoma*rozrzut);
+    if(KAP_OSOBY[n]!==undefined){
+      // nazwiskom z listy dokładamy tylko drobny rozrzut, żeby nie były co do złotówki równe
+      let z=0; for(let i=0;i<n.length;i++)z=(z*31+n.charCodeAt(i))%1000;
+      G.kapPryw[n]=Math.round(KAP_OSOBY[n]*(.92+z/1000*.16));
+    }else{
+      const x=L(n);
+      let z=0; for(let i=0;i<n.length;i++)z=(z*31+n.charCodeAt(i))%100000;
+      const rozrzut=.45+(z%1000)/1000*1.3;
+      const renoma=Math.pow(1+(x.autor*.55+x.komp*.45)/100,1.9);
+      G.kapPryw[n]=Math.round(KAP_POLKA[rolaOsoby(n)]*renoma*rozrzut);
+    }
   }
   return G.kapPryw[n];
 }
 
 /* ── PKB ──
-   PKB nie jest sumą kieszeni, tylko rocznym obrotem całego serwera: 670 osób
-   robi ze swoich pieniędzy dużo więcej ruchu, niż wynosi sam ich majątek.
-   Dlatego stoi w miliardach, podczas gdy pojedyncze konta idą w miliony.
+   PKB nie jest osobną liczbą żyjącą własnym życiem, tylko wyliczeniem z majątku:
 
-   Rusza się co tydzień i zależy od trzech rzeczy:
-     • aktywność partii — serwer, na którym coś się dzieje, produkuje więcej,
-     • kontrowersja — awantury odstraszają i hamują obrót,
-     • stawka podatku od majątku — im wyżej, tym mocniej dławi wzrost,
-       za to napełnia skarb i realnie strzyże prywatne konta.
-   Stąd cała stawka ustawy podatkowej: podatek daje pieniądze teraz i kosztuje
-   wzrost później. */
-const PKB_MIN=1e9;
-function pkbTempo(){
-  const ps=alive().map(k=>G.p[k]); if(!ps.length)return 0;
-  const akt=ps.reduce((a,p)=>a+p.act,0)/ps.length;
-  const ktr=ps.reduce((a,p)=>a+p.ctr,0)/ps.length;
-  const st=stawkaMajatkowa();
-  const t=.0016+(akt-45)/100*.0062-(ktr-40)/100*.0041-st*.0013;
-  return Math.max(-.021,Math.min(.026,t));
-}
+       PKB = suma kapitału prywatnego × mnożnik obrotu
+
+   Dzięki temu pojedyncze konta mogą stać w milionach, a PKB i tak wychodzi
+   w miliardach — i wszystko, co rusza majątkiem, od razu widać na PKB.
+
+   Mnożnik nie jest stały. Mówi, ile razy w roku te same pieniądze zmienią
+   właściciela, a to zależy od tego, jak rządzona jest gospodarka:
+     • kompetencja ministra finansów — kto liczy, ten nie gubi,
+     • kompetencja premiera — rząd bez głowy dławi obrót,
+     • stabilność — awantury i brak rządu zatrzymują pieniądze w kieszeni,
+     • zaufanie przedsiębiorców — rośnie przy niskich podatkach, siada przy wysokich,
+     • inwestycje — aktywne partie ciągną serwer do przodu.
+
+   Sam majątek też się rusza: bez podatku rośnie żwawo, przy wysokim maleje.
+   Stąd dylemat, o który chodzi — podatek daje pieniądze teraz, ale zjada
+   i majątek, i mnożnik, więc PKB leci w dół z dwóch stron naraz. */
+const PKB_MNOZNIK_BAZA=80;
 const stawkaMajatkowa=()=>{const pod=G&&G.law&&typeof G.law.podatki==='object'?G.law.podatki:null;
   return pod&&pod.majatek>0?pod.majatek:0};
 const progresjaWlaczona=()=>{const pod=G&&G.law&&typeof G.law.podatki==='object'?G.law.podatki:null;
   return !!(pod&&pod.progresja>0)};
 
-/* Tygodniowy ruch gospodarki: najpierw fiskus strzyże konta, potem PKB
-   przesuwa się o swoje tempo. Wołane raz na tydzień z endWeek. */
+/* Kto pilnuje kasy państwa. Bez obsadzonego resortu liczy się sam premier. */
+function ministerFinansow(){
+  if(!G||!G.rada)return null;
+  const r=RESORTY.find(x=>/finans|gospod|skarb/i.test(x.n||x.id));
+  return r?(G.rada[r.id]||null):null;
+}
+function pkbCzynniki(){
+  const ps=alive().map(k=>G.p[k]);
+  const akt=ps.length?ps.reduce((a,p)=>a+p.act,0)/ps.length:45;
+  const ktr=ps.length?ps.reduce((a,p)=>a+p.ctr,0)/ps.length:40;
+  const mf=ministerFinansow(), pm=G.gov&&G.gov.pm?(G.gov.pmLead||G.p[G.gov.pm].lead):null;
+  const kompMF=mf?L(mf).komp:45;
+  const kompPM=pm?L(pm).komp:40;
+  const st=stawkaMajatkowa();
+  return [
+   {n:'Minister finansów', v:(kompMF-50)*.18, o:mf?`${mf}, kompetencja ${kompMF}`:'wakat na resorcie'},
+   {n:'Premier',           v:(kompPM-50)*.12, o:pm?`${pm}, kompetencja ${kompPM}`:'brak rządu'},
+   {n:'Stabilność',        v:(45-ktr)*.14+(G.gov&&G.pmOk?3:-6),
+    o:`średnia kontrowersja ${Math.round(ktr)}${G.gov&&G.pmOk?', rząd stoi':', rządu nie ma'}`},
+   {n:'Inwestycje',        v:(akt-45)*.16, o:`średnia aktywność ${Math.round(akt)}`},
+   {n:'Zaufanie przedsiębiorców', v:12-st*1.9, o:st?`podatek ${st}%`:'podatku od majątku nie ma'},
+  ];
+}
+const pkbMnoznik=()=>{
+  const suma=pkbCzynniki().reduce((a,x)=>a+x.v,0);
+  return Math.max(28,Math.min(140,PKB_MNOZNIK_BAZA+suma));
+};
+const pkbLicz=()=>Math.round(kapPrywRazem()*pkbMnoznik());
+
+/* Tygodniowy ruch gospodarki: fiskus strzyże konta, majątek sam z siebie
+   rośnie albo maleje, a PKB przelicza się z tego, co zostało. */
 function pkbTydzien(){
   if(!G)return;
-  if(!G.pkb)G.pkb=PKB_START;
-  const st=stawkaMajatkowa();
-  if(st>0){
-    /* Kogo naprawdę boli, decyduje progresja. Włączona — płacą przede wszystkim
-       bogaci, czyli ci sami, którzy siedzą w sejmie i mają to przegłosować.
-       Wyłączona — stawka jest równa dla wszystkich, więc najciężej wychodzi
-       tym, których jest najwięcej i którzy mają najmniej. */
-    const d=podzialMajatku(), prog=progresjaWlaczona();
-    let wplyw=0;
-    d.lu.forEach(({n,v})=>{
-      const bogaty=v>=d.sr;
-      const mnoz=prog?(bogaty?1.7:.3):1;
-      const pobrane=Math.round(v*(st/100)*mnoz/12);      // stawka jest roczna
-      if(pobrane<=0)return;
-      G.kapPryw[n]=Math.max(0,v-pobrane); wplyw+=pobrane;
-    });
-    G.skarb=(G.skarb||0)+wplyw;
-    G.podatekOstatnio=wplyw;
-  } else G.podatekOstatnio=0;
-  const t=pkbTempo();
-  G.pkbPop=G.pkb;
-  G.pkb=Math.max(PKB_MIN,Math.round(G.pkb*(1+t)));
-  G.pkbTempo=t;
+  if(!G.kapPryw)G.kapPryw={};
+  const st=stawkaMajatkowa(), prog=progresjaWlaczona();
+  const d=podzialMajatku();
+  let wplyw=0;
+  /* Majątek rośnie sam, bo ludzie coś na tym serwerze robią. Podatek zjada
+     ten wzrost, a przy wysokiej stawce wychodzi już pod kreską. */
+  const wzrost=.006-st*.0011;
+  d.lu.forEach(({n,v})=>{
+    let nowe=v*(1+wzrost);
+    if(st>0){
+      // progresja decyduje, kogo to naprawdę boli
+      const mnoz=prog?(v>=d.sr?1.7:.3):1;
+      const pobrane=Math.round(v*(st/100)*mnoz/12);       // stawka jest roczna
+      nowe-=pobrane; wplyw+=pobrane;
+    }
+    G.kapPryw[n]=Math.max(1000,Math.round(nowe));
+  });
+  if(wplyw>0)G.skarb=(G.skarb||0)+wplyw;
+  G.podatekOstatnio=wplyw;
+  G.kapPop=d.suma;
+  G.pkbPop=G.pkb||pkbLicz();
+  G.pkb=pkbLicz();
+  G.pkbTempo=G.pkbPop?(G.pkb-G.pkbPop)/G.pkbPop:0;
 }
 /* Bezpartyjni też mają kieszenie — i to najpłytsze ze wszystkich. Bez nich
    zestawienie majątków pokazywałoby wyłącznie tych, którzy już się gdzieś
@@ -4982,53 +5052,141 @@ function podzialMajatku(){
   return {lu,suma,sr,bogaci,biedni};
 }
 
+/* ── zamiana kapitału prywatnego na partyjny ──
+   Milion prywatnego majątku to jeden punkt kapitału partii. Wygląda na darmowe
+   pieniądze, więc musi mieć cenę, której nie da się obejść: kto wyłożył swoje,
+   ten wychodzi z partii, a reszta składu to widzi i jedność siada. Im grubszy
+   portfel wydoisz, tym większa dziura po nim zostaje. */
+const KAP_ZA_MLN=1;
+const zrzutkaDaje=n=>Math.floor(kapPryw(n)/1e6*KAP_ZA_MLN);
+function zrzutkaKoszt(n){
+  const kp=zrzutkaDaje(n);
+  return {kp, uni:Math.round(cl(4+kp*.22,4,34)), ctr:Math.round(cl(2+kp*.10,2,16))};
+}
+function openZrzutka(){
+  if(PROBA)return;
+  close();
+  const p=me();
+  // przewodniczący nie wychodzi z własnej partii, więc jego kieszeń jest poza zasięgiem
+  const lista=roster(p).filter(n=>!isLead(p,n)).sort((a,b)=>kapPryw(b)-kapPryw(a));
+  if(!lista.length)return modal('Zrzutka','Nie masz kogo prosić',
+    `<p>W partii nie ma nikogo poza przewodnictwem, a przewodniczący nie wypisze się sam z siebie.</p>`,
+    [{l:'Trudno',f:actBack}],actBack);
+  const razem=lista.reduce((a,n)=>a+kapPryw(n),0);
+  modal('Zrzutka','Kto wyłoży własne pieniądze',
+    `<p>Zaplecze ${p.ab} trzyma razem <b>${kasa(razem)}</b> prywatnego majątku.
+     Każdy <b>milion</b> zamienia się na <b>${KAP_ZA_MLN}</b> kapitału partii.</p>
+     <p class="dim" style="font-size:13px">Kto wyłoży, ten odchodzi — nikt nie oddaje
+     dorobku życia i zostaje jakby nigdy nic. Jedność spada tym mocniej, im większa suma.</p>`,
+    lista.slice(0,7).map(n=>{const k=zrzutkaKoszt(n);
+      return {l:`${n} — ${kasaSkrot(kapPryw(n))}`,
+        s:k.kp?`daje ${k.kp} kapitału · jedność −${k.uni} · kontrowersja +${k.ctr} · odchodzi z partii`
+              :'ma za mało, żeby cokolwiek z tego wyszło',
+        dis:!k.kp, f:()=>zrzutkaWez(n)}})
+      .concat([{l:'Nikogo nie proszę',s:'Nie tracisz akcji ani energii',f:actBack}]),
+    actBack);
+}
+function zrzutkaWez(n){
+  const p=me(), k=zrzutkaKoszt(n);
+  if(!k.kp)return;
+  G.kp+=k.kp; p.uni=cl(p.uni-k.uni); p.ctr=cl(p.ctr+k.ctr);
+  G.kapPryw[n]=Math.max(1000,Math.round(kapPryw(n)*.06));   // zostaje mu ledwie co
+  p.bench=p.bench.filter(x=>x!==n); p.main=p.main.filter(x=>x!==n);
+  M(p,-3);
+  G.lastCharge=null;                                        // zrzutka doszła do skutku
+  say(`<b>${n} wyłożył własne pieniądze.</b> Partia dostaje ${k.kp} kapitału, `
+     +`ale ${n} odchodzi, a jedność leci o ${k.uni} w dół.`,'bad');
+  close();
+  modal('Zrzutka','Pieniądze są, człowieka nie ma',
+    `<p><b>${n}</b> przelał, co miał: <b>+${k.kp}</b> kapitału.</p>
+     <p style="margin-top:10px">Jedność <b>−${k.uni}</b>, kontrowersja <b>+${k.ctr}</b>,
+     a ${n} wypisał się z ${p.ab} tego samego dnia.</p>`,
+    [{l:'Rozumiem',f:()=>{close();render()}}]);
+}
+/* AI robi to samo, ale wyłącznie z rozpaczy — kiedy kasa jest pod kreską. */
+function aiZrzutka(k){
+  const p=G.p[k];
+  if(!p||p.dead||(p.bank||0)>-6||!ch(.12))return;
+  const kand=roster(p).filter(n=>!isLead(p,n)).sort((a,b)=>kapPryw(b)-kapPryw(a))[0];
+  if(!kand)return;
+  const kp=zrzutkaDaje(kand); if(kp<4)return;
+  p.bank=(p.bank||0)+kp; p.uni=cl(p.uni-Math.round(cl(4+kp*.22,4,34)));
+  G.kapPryw[kand]=Math.max(1000,Math.round(kapPryw(kand)*.06));
+  p.bench=p.bench.filter(x=>x!==kand); p.main=p.main.filter(x=>x!==kand);
+  say(`<b>${p.ab} sięgnął po prywatne pieniądze.</b> ${kand} wyłożył swoje i odszedł z partii.`,'bad');
+}
+
+function kapitalTab(){
+  const p=me(), lista=roster(p).sort((a,b)=>kapPryw(b)-kapPryw(a));
+  const razem=lista.reduce((a,n)=>a+kapPryw(n),0);
+  const doWziecia=lista.filter(n=>!isLead(p,n)).reduce((a,n)=>a+zrzutkaDaje(n),0);
+  return `<div class="card"><div class="h"><h3>Kapitał prywatny zaplecza</h3>
+    <span class="n">${kasaSkrot(razem)} w ${lista.length} ${pl(lista.length,'kieszeni','kieszeniach','kieszeniach')}</span></div>
+    <div class="b">
+    <div class="tabliczki" style="margin:0 0 14px">
+      <div><b>${kasaSkrot(razem)}</b><span>majątek zaplecza</span></div>
+      <div><b>${doWziecia}</b><span>kapitału do wzięcia</span></div>
+      <div><b>${KAP_ZA_MLN}</b><span>kapitał za milion</span></div>
+    </div>
+    <div class="ekolista">${lista.map((n,i)=>{const k=zrzutkaKoszt(n), szef=isLead(p,n);
+      return `<div class="ekos ${szef?'szef':''}">
+        <span class="ekopoz">${i+1}</span>${ava(n,p.c,26)}
+        <span class="ekon">${n}${szef?' <em class="ekotag">przewodnictwo</em>':''}</span>
+        <b class="ekow">${mordedolar(12)} ${kasaSkrot(kapPryw(n))}</b>
+        <span class="ekodaje">${szef?'—':k.kp?`+${k.kp} kap.`:'za mało'}</span>
+      </div>`}).join('')}</div>
+    <div class="note" style="margin-top:12px">Zamiana idzie przez decyzję
+      <b>Zrzutka z prywatnych kieszeni</b> w Organizacji. Milion majątku to
+      ${KAP_ZA_MLN} kapitału, ale kto wyłoży, ten odchodzi z partii, a jedność siada
+      tym mocniej, im grubszy portfel wydoisz. Przewodniczącego nie ruszysz.</div>
+    </div></div>`;
+}
+
 function ekonomiaTab(){
-  if(!G.pkb)G.pkb=PKB_START;        // zapisy sprzed tej wersji nie mają jeszcze PKB
+  if(!G.pkb)G.pkb=pkbLicz();        // zapisy sprzed tej wersji nie mają jeszcze PKB
   const d=podzialMajatku();
   const udzial=G.pkb?d.suma/G.pkb*100:0;
   const wiersz=(x,i)=>`<div class="ekos">
     <span class="ekopoz">${i+1}</span>${ava(x.n,'#6f7a6b',26)}
     <span class="ekon">${x.n}</span>
     <b class="ekow">${mordedolar(12)} ${kasaSkrot(x.v)}</b></div>`;
-  const t=G.pkbTempo!==undefined?G.pkbTempo:pkbTempo();
-  const st=stawkaMajatkowa(), prog=progresjaWlaczona();
-  const kier=t>0?'up':t<0?'dn':'';
+  const t=G.pkbTempo||0, kier=t>0?'up':t<0?'dn':'';
+  const mn=pkbMnoznik(), czyn=pkbCzynniki();
+  const dK=G.kapPop?d.suma-G.kapPop:0;
   return `
   <div class="ekoblok">
     <div class="card"><div class="h"><h3>Produkt krajowy brutto</h3>
-      <span class="n">stan na kadencję ${G.term}, tydzień ${G.week}</span></div><div class="b">
+      <span class="n">kadencja ${G.term}, tydzień ${G.week}</span></div><div class="b">
       <div class="pkbplyta">
         <div class="pkbduza">${mordedolar(30)} ${kasa(G.pkb)}</div>
-        <div class="pkbpod">obrót całego serwera · ${
-          G.pkbPop?`w zeszłym tygodniu ${kasa(G.pkbPop)}`:'pierwszy tydzień pomiaru'}</div>
-        <div class="pkbtempo ${kier}">${t>0?'+':''}${(t*100).toFixed(2)}% tygodniowo</div>
+        <div class="pkbwzor">${kasaSkrot(d.suma)} kapitału prywatnego × ${mn.toFixed(1)} obrotu</div>
+        <div class="pkbtempo ${kier}">${t>0?'+':''}${(t*100).toFixed(2)}% tygodniowo${
+          G.pkbPop?` · tydzień temu ${kasaSkrot(G.pkbPop)}`:''}</div>
       </div>
       <div class="tabliczki" style="margin:14px 0 0">
         <div><b>${kasaSkrot(d.suma)}</b><span>kapitał prywatny razem</span></div>
-        <div><b>${st?st+'%':'brak'}</b><span>podatek od majątku</span></div>
+        <div><b>${dK>0?'+':''}${kasaSkrot(dK)}</b><span>zmiana w tygodniu</span></div>
+        <div><b>${mn.toFixed(1)}×</b><span>mnożnik obrotu</span></div>
         <div><b>${kasaSkrot(G.skarb||0)}</b><span>zebrane do skarbu</span></div>
-        <div><b>${d.bogaci.length}/${d.biedni.length}</b><span>bogatych / biednych</span></div>
       </div>
-      <div class="note" style="margin-top:14px"><b>Skąd bierze się ten ruch.</b>
-        Aktywne partie napędzają obrót, awantury go duszą, a podatek od majątku
-        hamuje wzrost, za to napełnia skarb i realnie strzyże prywatne konta.
-        Podatek ustawia się <b>ustawą o podatkach</b> w dziale Premier, nie tutaj.</div>
+      <div class="note" style="margin-top:14px"><b>PKB liczy się z majątku.</b>
+        Bierzemy sumę wszystkich prywatnych kont i mnożymy przez obrót — ile razy
+        w roku te same pieniądze zmienią właściciela. Dlatego konta stoją
+        w milionach, a PKB w miliardach, i wszystko, co rusza majątkiem,
+        widać tu od razu.</div>
     </div></div>
 
-    <div class="card"><div class="h"><h3>Kto zapłaci</h3>
-      <span class="n">${st?(prog?'progresja włączona':'stawka równa dla wszystkich'):'nikt, podatku nie ma'}</span></div><div class="b">
-      <p style="font-size:13.5px;margin-top:0">Bogatych jest <b>${d.bogaci.length}</b>
-      i mają razem <b>${kasaSkrot(d.bogaci.reduce((a,x)=>a+x.v,0))}</b> — tylko że to oni
-      siedzą w sejmie i sami sobie tego nie uchwalą. Biednych jest <b>${d.biedni.length}</b>,
-      mają razem <b>${kasaSkrot(d.biedni.reduce((a,x)=>a+x.v,0))}</b>, łatwiej ich przegłosować,
-      ale jest ich więcej przy urnach.</p>
-      ${st?`<div class="note" style="margin:0">Przy obecnej ustawie
-        ${prog?'bogaci płacą <b>1,7×</b> stawki, a biedni <b>0,3×</b>'
-              :'każdy płaci <b>tyle samo</b>, więc procentowo najciężej wychodzą najubożsi'}.
-        W zeszłym tygodniu skarb zabrał <b>${kasaSkrot(G.podatekOstatnio||0)}</b>.</div>`
-       :`<div class="dim" style="font-size:12.5px">Dopóki sejm nie uchwali daniny od majątku,
-         prywatne konta nikną tylko z własnej głupoty właścicieli.</div>`}
+    <div class="card"><div class="h"><h3>Z czego składa się mnożnik</h3>
+      <span class="n">baza ${PKB_MNOZNIK_BAZA} · teraz ${mn.toFixed(1)}</span></div><div class="b">
+      <div class="ekoczyn">${czyn.map(x=>`<div class="ekocz ${x.v>=0?'plus':'minus'}">
+        <div class="ekoczl"><b>${x.n}</b><span>${x.o}</span></div>
+        <div class="ekoczv">${x.v>0?'+':''}${x.v.toFixed(1)}</div></div>`).join('')}</div>
+      <div class="dim" style="font-size:12px;margin-top:11px">Podatek od majątku ustawia sejm
+      <b>ustawą o podatkach</b>. Im wyższy, tym mocniej zjada i majątek, i zaufanie —
+      więc PKB leci w dół z dwóch stron naraz.</div>
     </div></div>
+
+    ${kapitalTab()}
 
     <div class="card"><div class="h"><h3>Najbogatsi na serwerze</h3>
       <span class="n">${d.lu.length} ${pl(d.lu.length,'osoba','osoby','osób')} w zapleczach</span></div><div class="b">
@@ -5954,18 +6112,23 @@ function fire(a,t,r,s,tm){
   // więc fire nie może tu zamykać niczego, bo skasowałby okno w tej samej klatce
   pend=null;render();
 }
+/* Oddanie opłaty za decyzję, która nie doszła do skutku. Wydzielone z actBack,
+   bo to samo musi się dziać, gdy okno zniknie bez kliknięcia „wstecz”. */
+function oddajOplate(){
+  const c=G&&G.lastCharge; if(!c)return;
+  G.ap+=c.ap;G.kp+=c.kp;G.en=cl(G.en+c.en);
+  if(G.used[c.id])G.used[c.id]--;
+  if(G.catUsed[c.cat])G.catUsed[c.cat]--;
+  /* Limit „raz na kadencję” zużywa się dopiero wtedy, gdy gracz naprawdę coś
+     zatwierdzi. Wcześniej wystarczyło zajrzeć w zmianę przewodniczącego
+     i wycofać się, żeby stracić ją na całą kadencję. */
+  if(c.term1)delete G.useTerm[c.id];
+  if(c.once)delete G.once[c.id];
+  if(G.lastAct===c.id)G.lastAct=null;
+  G.lastCharge=null;
+}
 function actBack(){   // rezygnacja w oknie decyzji oddaje to, co pobrała sama decyzja
-  const c=G.lastCharge;
-  if(c){G.ap+=c.ap;G.kp+=c.kp;G.en=cl(G.en+c.en);
-    if(G.used[c.id])G.used[c.id]--;
-    if(G.catUsed[c.cat])G.catUsed[c.cat]--;
-    /* Limit „raz na kadencję” zużywa się dopiero wtedy, gdy gracz naprawdę coś
-       zatwierdzi. Wcześniej wystarczyło zajrzeć w zmianę przewodniczącego
-       i wycofać się, żeby stracić ją na całą kadencję. */
-    if(c.term1)delete G.useTerm[c.id];
-    if(c.once)delete G.once[c.id];
-    if(G.lastAct===c.id)G.lastAct=null;
-    G.lastCharge=null}
+  oddajOplate();
   pend=null;close();render();
 }
 function chooseReg(){const p=me();
@@ -6290,6 +6453,7 @@ function wywiadKoniec(){
     :kreg===2?'Zmieniałeś ton raz — dało się to obronić.'
     :'Skakałeś między trzema rejestrami i widać to na nagraniu.';
   WYW=null;
+  G.lastCharge=null;      // wywiad się odbył, nie ma czego zwracać
   close();
   const podsum=`<div class="wypodsum">
       <div><b>${traf}/${ile}</b><span>trafione rejestry</span></div>
@@ -6432,7 +6596,7 @@ function naborPublikuj(){
       <p style="margin-top:14px;font-size:16px;color:${g?'var(--pos)':'var(--neg)'}">
         <b>${g?`Dołącza ${opis}.`:'Pula serwerowiczów jest pusta.'}</b><br><span style="font-size:13.5px;color:var(--dim)">Partia liczy teraz <b style="color:var(--tx)">${p.mem}</b> ${pl(p.mem,'osobę','osoby','osób')}, skład: ${p.comp.eli} elity, ${p.comp.int} intelektualistów, ${p.comp.ser} serwerowiczów.</span></p>`;
     v.querySelector('.op').innerHTML=`<button class="opt" id="rok"><b>Zamykam</b><span></span></button>`;
-    v.querySelector('#rok').onclick=()=>{NABOR=null;pend=null;close();render()};
+    v.querySelector('#rok').onclick=()=>{NABOR=null;pend=null;G.lastCharge=null;close();render()};
 }
 function danina(v){
   if(!G||G.kp<v)return;
@@ -6465,7 +6629,8 @@ function openTrainFor(kto){
       return {l:`${n[0].toUpperCase()+n.slice(1)} ${cur} → ~${Math.min(99,cur+gain)}`,s:d,
         f:()=>{if(!G.lup[kto])G.lup[kto]=[0,0,0,0];
           G.lup[kto][i]+=gain;
-          say(`<b>${kto}</b> podciąga ${n} do ${L(kto)[id]}.`);close();render()}}})
+          say(`<b>${kto}</b> podciąga ${n} do ${L(kto)[id]}.`);
+          G.lastCharge=null;close();render()}}})   // szkolenie się odbyło
       .concat([{l:'Rezygnuję',s:'Nie tracisz akcji ani kapitału',f:actBack}]),actBack)
 }
 
@@ -6548,7 +6713,7 @@ function steryOk(){
   // kto wypadł ze sterów, wraca na ławkę zamiast zniknąć ze składu
   stare.forEach(n=>{if(!nowe.includes(n)&&!p.main.includes(n)&&!p.bench.includes(n))p.bench.push(n)});
   p.uni=cl(p.uni+k.uni);p.ctr=cl(p.ctr+k.ctr);
-  STER=null;pend=null;close();
+  STER=null;pend=null;G.lastCharge=null;close();   // stery przestawione, nie ma czego zwracać
   say(`<b>Nowy układ sterów.</b> ${p.ab} prowadzi ${nowe.length===1?'samodzielnie':'wspólnie'}: ${nowe.join(', ')}.`,'roy');
   XP(12);render();
 }
@@ -6770,6 +6935,7 @@ function obsadz(id,nick,zPartii){
   radaInit();
   const res=RESORTY.find(r=>r.id===id);
   if(!res)return;                       // resort mógł zniknąć razem z zapisem ze starszej wersji
+  if(G)G.lastCharge=null;               // resort obsadzony — decyzja doszła do skutku
   const stary=G.rada[id];
   if(stary&&stary!==nick){
     /* Każda roszada w radzie ma swoją cenę: partia odwołanego zapamiętuje,
@@ -6955,7 +7121,7 @@ function openDym(){
     cand.map(k=>{const rs=ministrowieZ(k).map(r=>r.n).join(', ');
       return {l:`Odwołuję ${G.p[k].lead} (${G.p[k].ab})`,
       s:`${rs} · relacje ${Math.round(G.rel[G.me][k])} → −55 · koalicja traci ${G.p[k].seats} ${pl(G.p[k].seats,'mandat','mandaty','mandatów')}`,
-      f:()=>{close();
+      f:()=>{close();G.lastCharge=null;   // minister odwołany, decyzja doszła do skutku
         RESORTY.forEach(r=>{const n=radaKto(r.id);
           if(n&&partiaOsoby(n)===k){delete G.rada[r.id];delete G.radaOd[r.id]}});
         G.rel[G.me][k]=-55;G.rel[k][G.me]=-55;
@@ -7092,7 +7258,7 @@ const LAWS=[
   skutek:'Wpływy ze składek rosną o jedną piątą. Dotyczy wszystkich partii, więc bogaci zyskują najwięcej.'},
  {id:'podatki',n:'Ustawa o podatkach',kat:'gospodarka',prog:.5,resort:'fin',wybor:true,
   d:'Ustalasz, kto ile oddaje: daninę od kapitału leżącego bezczynnie i to, czy wszyscy płacą po równo, czy bogatsi więcej.',
-  skutek:'Nastawiasz daninę od niewykorzystanego majątku i wybierasz między podatkiem proporcjonalnym a progresywnym.'},
+  skutek:'Nastawiasz podatek od prywatnych majątków na serwerze i wybierasz, czy stawka jest równa dla wszystkich, czy bogaci płacą więcej. Podatek napełnia skarb, ale zjada majątki i zaufanie przedsiębiorców, więc PKB zwalnia z dwóch stron naraz.'},
  {id:'zagadki',n:'Ustawa o zagadkach tematycznych',kat:'rozrywka',prog:.5,resort:'kultura',
   d:'Cotygodniowe zagadki na kanałach, z nagrodami z budżetu sejmu.',
   skutek:'Co kadencję dochodzą serwerowicze, najwięcej partii, która to przepchnęła. Serwer ożywa, więc rośnie też aktywność.'},
@@ -7145,7 +7311,7 @@ const LAWPAR={
   baza:{majatek:0,progresja:0},
   zakres:{majatek:[0,12],progresja:[0,1]},
   krok:{majatek:1,progresja:1},
-  opis:{majatek:'Danina od leżącego kapitału (%)',progresja:'Progresja (0 równo, 1 progresywnie)'},
+  opis:{majatek:'Podatek od prywatnego majątku (%)',progresja:'Progresja (0 równo, 1 progresywnie)'},
   jedn:''},
 };
 const lawEdytowalna=id=>!!LAWPAR[id];
@@ -10103,8 +10269,9 @@ Object.assign(window,{slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,
      kliknięciu. Animacja ma się odpalić tylko przy realnej zmianie widoku. */
   setTab:k=>{if(G.tab!==k)G._we=1;G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
   signAgent,agentCost,agentFree,AGENTS,render,
-  ekonomiaTab,kapPryw,kapPrywRazem,podzialMajatku,PKB_START,kasa,kasaSkrot,
-  rolaOsoby,pkbTempo,pkbTydzien,stawkaMajatkowa,wszyscyZaplecze,alive,
+  ekonomiaTab,kapitalTab,kapPryw,kapPrywRazem,podzialMajatku,kasa,kasaSkrot,
+  rolaOsoby,pkbTydzien,pkbLicz,pkbMnoznik,pkbCzynniki,stawkaMajatkowa,
+  wszyscyZaplecze,alive,openZrzutka,zrzutkaWez,zrzutkaDaje,aiZrzutka,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
   get KRE(){return KRE}, SCEN, kreatorDane,
