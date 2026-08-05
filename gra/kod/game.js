@@ -1529,6 +1529,8 @@ function endWeek(){
       }
     }
   }
+  // gospodarka rusza się raz na tydzień, po rozliczeniu daniny
+  pkbTydzien();
   G.en=cl(G.en+enGain());
   Object.keys(G.used).forEach(k=>{if(ch(.42))G.used[k]=Math.max(0,G.used[k]-1)});
   // Tygodniowy ruch jest drobny i tylko uzupełnia to, co naprawdę liczy się przy
@@ -3068,6 +3070,7 @@ const sndOn=()=>!(G&&G.mute);
 function ac(){try{if(!AC&&typeof window!=='undefined'&&(window.AudioContext||window.webkitAudioContext))
   AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}return AC}
 function beep(f,d,type,vol,slide){
+  if(PROBA)return;                    // podgląd liczy po cichu, nie gra dziewięć razy
   if(!sndOn())return;const c=ac();if(!c)return;
   try{
     if(c.state==='suspended')c.resume();
@@ -3124,6 +3127,7 @@ function graj(id){
 function toggleMute(){G.mute=!G.mute;if(G.mute)stopMuzyka();else SFX.ok();render()}
 /* ---- cząstki ---- */
 function burst(kolor,ile,mocno){
+  if(PROBA)return;                    // konfetti też nie należy do podglądu
   if(typeof document==='undefined'||!document.body)return;
   let cv=document.getElementById('cfx');
   if(!cv){cv=document.createElement('canvas');cv.id='cfx';cv.className='cfx';document.body.appendChild(cv)}
@@ -3152,6 +3156,7 @@ function burst(kolor,ile,mocno){
   requestAnimationFrame(rys);
 }
 function shake(){
+  if(PROBA)return;                    // ekran nie ma się trząść od samego liczenia
   if(typeof document==='undefined'||!document.body||!document.body.classList)return;
   document.body.classList.add('shk');setTimeout(()=>document.body.classList.remove('shk'),480);
 }
@@ -4177,7 +4182,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.45';
+let WERSJA='1.1.46';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4188,6 +4193,16 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.46':{data:'5 sierpnia 2026', zmiany:[
+   'DECYZJE PRZESTALY ODPALAC SIE SAME. Podglad skutkow gral prawdziwa decyzje dziewiec razy na kopii stanu, zeby pokazac widelki. Decyzje takie jak nabor, wywiad czy uklad sterow nie licza niczego same — otwieraja wlasne okno. Podglad naprawde je otwieral, a ze jego pamiec kasuje sie co tydzien, na starcie kazdego tygodnia sypalo oknami. Teraz podglad nie otwiera niczego, nie gra dzwiekami i nie sypie konfetti.',
+   'Przy decyzjach, ktorych skutek rozstrzyga sie dopiero w oknie, podglad mowi to wprost zamiast milczec jak przy decyzji bez skutkow.',
+   'PKB DZIALA. To roczny obrot calego serwera, wiec stoi w miliardach, i rusza sie co tydzien: aktywne partie napedzaja wzrost, awantury go dusza, a podatek od majatku hamuje go i jednoczesnie napelnia skarb.',
+   'PODATKI SIEDZA W USTAWIE, NIE W ZAKLADCE. Ustawa o podatkach realnie strzyze prywatne konta i przesuwa PKB. Przy progresji place glownie bogaci — czyli ci sami, ktorzy siedza w sejmie i maja to przeglosowac. Bez progresji stawka jest rowna, wiec procentowo najciezej wychodzi najubozszym, ktorych jest najwiecej przy urnach.',
+   'Kapital prywatny rozjechal sie tak, jak powinien: przewodniczacy obracaja milionami, dalekie zaplecze tysiacami, a bezpartyjni grosikami. Rozpietosc siega trzech tysiecy razy.',
+   'WYWIAD OD NOWA. Zamiast trzech pytan z jednym wlasciwym tonem masz cztery losowane z puli, kazde z wlasnym naciskiem. Pod pytaniem z nozem przechwalki nie przejda nikomu, przy lekkim odbiciu pokora brzmi jak brak pomyslu. Licza sie dwie rzeczy naraz, dziennikarz i widownia, i chca czego innego. Do tego kregoslup: kto trzyma jedna linie, dostaje premie, kto skacze miedzy rejestrami, traci wiarygodnosc.',
+   'Wywiad wyglada teraz jak studio: portret pod swiatlem, dwa wskazniki, ktore ruszaja sie po kazdej odpowiedzi, pytanie postawione jak cytat i reakcja dziennikarza od razu po odpowiedzi.',
+ ]},
+
  '1.1.45':{data:'5 sierpnia 2026', zmiany:[
    'NOWY DZIAL: EKONOMIA — i od razu mowi o sobie, ze jest NIEDOKONCZONY. Widac PKB serwera i kapital prywatny kazdej osoby z zaplecz, ale nic z tego jeszcze nie dziala: PKB stoi w miejscu, nikt nie zarabia, nikt nie traci, a przyciski ustawy podatkowej sa wylaczone. Dzial jest po to, zeby zobaczyc liczby i dopiero na nich zdecydowac, jak ma dzialac.',
    'KAPITAL PRYWATNY POD PORTRETAMI. Kazdy z zaplecza ma wlasny majatek, osobny od kapitalu partii, widoczny pod avatarem w zakladce Partie i we wlasnym zapleczu. Rozrzut jest ostry celowo: garstka bogatych i duzo biednych, bo na tym ma stac spor, kogo opodatkowac.',
@@ -4761,7 +4776,7 @@ function game(){
       if(isPM())nv.push(['premier','Premier'+(lawsPending()?'<span class="badge">!</span>':'')]);
       if(hasPrez())nv.push(['prezydent','Prezydent'+(lawsToSign().length?`<span class="badge">${lawsToSign().length}</span>`:'')]);
       nv.push(['sejm','Sejm i władza']);
-      nv.push(['ekonomia','Ekonomia<span class="badge wip">wip</span>']);
+      nv.push(['ekonomia','Ekonomia']);
       return nv.map(([k,n])=>`<button class="${G.tab===k?'on':''}" onclick="setTab('${k}')">${n}</button>`).join('')})()}
   </div>
   <div class="layout">
@@ -4832,14 +4847,33 @@ function partieTab(){
    skąd PKB ma brać wzrost i co dokładnie ma z nim robić ustawa podatkowa.  */
 const PKB_START=51894432103;
 
-/* Mordedolar. Znak waluty jest na razie zastępczy — rysowany kółkiem z „M",
-   bo prawdziwej emotki jeszcze nie mam w plikach gry. Kiedy trafi do
-   gra/obrazki, wystarczy podmienić ciało tej jednej funkcji. */
+/* Mordedolar — znak przy każdej kwocie w grze.
+   Bierzemy obrazek z gra/obrazki/mordedolar.png. Dopóki pliku tam nie ma,
+   przeglądarka odpala onerror i w to miejsce wchodzi rysowana sakiewka:
+   wygląda podobnie, więc ekran nie czeka na plik, a po wrzuceniu grafiki
+   nie trzeba zmieniać ani jednej linijki kodu. */
+const MDOL_ZAPAS=`<svg viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M5.4 9.2c-1 1.5-1.6 3.2-1.6 5 0 4 3.6 7 8.2 7s8.2-3 8.2-7c0-1.8-.6-3.5-1.6-5z"
+    fill="currentColor" opacity=".55"/>
+  <path d="M8.4 9.2c-.5-1.1-.4-2.2.4-2.9.9-.8 2.3-.7 3.2.2.9-.9 2.3-1 3.2-.2.8.7.9 1.8.4 2.9"
+    fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  <ellipse cx="9.3" cy="17.4" rx="3.1" ry="1.15" fill="currentColor"/>
+  <ellipse cx="9.3" cy="15.4" rx="3.1" ry="1.15" fill="currentColor"/>
+  <ellipse cx="14.7" cy="16.6" rx="2.7" ry="1.05" fill="currentColor"/>
+</svg>`;
+/* O plik pytamy raz, przy starcie, i to poza drzewem strony — dzięki temu
+   w samej grze nigdy nie ląduje obrazek, który się nie wczytał. Kiedy plik
+   się pojawi, po pierwszym uruchomieniu gra przerysuje się już z nim. */
+let MDOL_PLIK=false;
+if(typeof Image!=='undefined'){
+  const pr=new Image();
+  pr.onload=()=>{MDOL_PLIK=true;try{render()}catch(e){}};
+  pr.src='obrazki/mordedolar.png';
+}
 const mordedolar=(px)=>{const s=px||13;
-  return `<svg class="mdol" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true"
-    style="vertical-align:-2px"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor"
-    stroke-width="1.6"/><path d="M7.5 16.5V8l4.5 5 4.5-5v8.5" fill="none" stroke="currentColor"
-    stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`};
+  return `<span class="mdol" style="width:${s}px;height:${s}px" aria-hidden="true">${
+    MDOL_PLIK?`<img src="obrazki/mordedolar.png" alt="" width="${s}" height="${s}">`
+             :MDOL_ZAPAS}</span>`};
 
 /* Duże liczby czyta się tylko z odstępami co trzy cyfry. */
 const kasa=v=>Math.round(v||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');
@@ -4848,23 +4882,96 @@ const kasaSkrot=v=>{v=Math.abs(v||0);
          v>=1e3?(v/1e3).toFixed(1)+' tys.':Math.round(v)+''};
 
 /* Kapitał prywatny liczymy raz na osobę i zapamiętujemy w stanie gry, żeby
-   nie skakał przy każdym rysowaniu. Wysokość bierze się z tego, kim ta osoba
-   jest: autorytet i kompetencja robią z niej kogoś zamożnego. Rozrzut jest
-   celowo ostry — na tym ma stać spór, czy opodatkować niewielu bogatych,
-   czy wielu biednych. */
+   nie skakał przy każdym rysowaniu.
+
+   Rozrzut ma być brutalny, bo na nim stoi cały spór podatkowy. Decyduje przede
+   wszystkim to, kim ktoś jest na serwerze: przewodniczący partii obraca
+   milionami, ktoś z dalekiego zaplecza tysiącami, a bezpartyjny grosikami.
+   Do tego dochodzi autorytet i kompetencja, które podbijają wynik stromo, więc
+   najbardziej znani wychodzą daleko przed resztę własnej półki. */
+const KAP_POLKA={lider:12e6, glowny:820e3, zaplecze:24e3, wolny:2200};
+function rolaOsoby(n){
+  if(!G||!G.p)return 'wolny';
+  for(const k of alive()){
+    const p=G.p[k];
+    if(isLead(p,n))return 'lider';
+    if((p.main||[]).includes(n))return 'glowny';
+    if((p.bench||[]).includes(n))return 'zaplecze';
+  }
+  return 'wolny';
+}
 function kapPryw(n){
   if(!G||!n)return 0;
   if(!G.kapPryw)G.kapPryw={};
   if(G.kapPryw[n]===undefined){
     const x=L(n);
     let ziarno=0; for(let i=0;i<n.length;i++)ziarno=(ziarno*31+n.charCodeAt(i))%100000;
-    const baza=1.4e6+(ziarno%900)*1e4;                     // stała dla danej osoby
-    const mnoznik=Math.pow(1+(x.autor+x.komp)/100,3.1);    // zamożność rośnie stromo
-    G.kapPryw[n]=Math.round(baza*mnoznik);
+    const rozrzut=.5+(ziarno%1000)/1000*1.5;                    // stały dla danej osoby
+    const renoma=Math.pow(1+(x.autor*.6+x.komp*.4)/100,2.7);    // znani wychodzą przed szereg
+    G.kapPryw[n]=Math.round(KAP_POLKA[rolaOsoby(n)]*renoma*rozrzut);
   }
   return G.kapPryw[n];
 }
-const wszyscyZaplecze=()=>[...new Set(alive().flatMap(k=>roster(G.p[k])))];
+
+/* ── PKB ──
+   PKB nie jest sumą kieszeni, tylko rocznym obrotem całego serwera: 670 osób
+   robi ze swoich pieniędzy dużo więcej ruchu, niż wynosi sam ich majątek.
+   Dlatego stoi w miliardach, podczas gdy pojedyncze konta idą w miliony.
+
+   Rusza się co tydzień i zależy od trzech rzeczy:
+     • aktywność partii — serwer, na którym coś się dzieje, produkuje więcej,
+     • kontrowersja — awantury odstraszają i hamują obrót,
+     • stawka podatku od majątku — im wyżej, tym mocniej dławi wzrost,
+       za to napełnia skarb i realnie strzyże prywatne konta.
+   Stąd cała stawka ustawy podatkowej: podatek daje pieniądze teraz i kosztuje
+   wzrost później. */
+const PKB_MIN=1e9;
+function pkbTempo(){
+  const ps=alive().map(k=>G.p[k]); if(!ps.length)return 0;
+  const akt=ps.reduce((a,p)=>a+p.act,0)/ps.length;
+  const ktr=ps.reduce((a,p)=>a+p.ctr,0)/ps.length;
+  const st=stawkaMajatkowa();
+  const t=.0016+(akt-45)/100*.0062-(ktr-40)/100*.0041-st*.0013;
+  return Math.max(-.021,Math.min(.026,t));
+}
+const stawkaMajatkowa=()=>{const pod=G&&G.law&&typeof G.law.podatki==='object'?G.law.podatki:null;
+  return pod&&pod.majatek>0?pod.majatek:0};
+const progresjaWlaczona=()=>{const pod=G&&G.law&&typeof G.law.podatki==='object'?G.law.podatki:null;
+  return !!(pod&&pod.progresja>0)};
+
+/* Tygodniowy ruch gospodarki: najpierw fiskus strzyże konta, potem PKB
+   przesuwa się o swoje tempo. Wołane raz na tydzień z endWeek. */
+function pkbTydzien(){
+  if(!G)return;
+  if(!G.pkb)G.pkb=PKB_START;
+  const st=stawkaMajatkowa();
+  if(st>0){
+    /* Kogo naprawdę boli, decyduje progresja. Włączona — płacą przede wszystkim
+       bogaci, czyli ci sami, którzy siedzą w sejmie i mają to przegłosować.
+       Wyłączona — stawka jest równa dla wszystkich, więc najciężej wychodzi
+       tym, których jest najwięcej i którzy mają najmniej. */
+    const d=podzialMajatku(), prog=progresjaWlaczona();
+    let wplyw=0;
+    d.lu.forEach(({n,v})=>{
+      const bogaty=v>=d.sr;
+      const mnoz=prog?(bogaty?1.7:.3):1;
+      const pobrane=Math.round(v*(st/100)*mnoz/12);      // stawka jest roczna
+      if(pobrane<=0)return;
+      G.kapPryw[n]=Math.max(0,v-pobrane); wplyw+=pobrane;
+    });
+    G.skarb=(G.skarb||0)+wplyw;
+    G.podatekOstatnio=wplyw;
+  } else G.podatekOstatnio=0;
+  const t=pkbTempo();
+  G.pkbPop=G.pkb;
+  G.pkb=Math.max(PKB_MIN,Math.round(G.pkb*(1+t)));
+  G.pkbTempo=t;
+}
+/* Bezpartyjni też mają kieszenie — i to najpłytsze ze wszystkich. Bez nich
+   zestawienie majątków pokazywałoby wyłącznie tych, którzy już się gdzieś
+   ustawili, a cały dół drabiny by z niego wypadł. */
+const wszyscyZaplecze=()=>[...new Set(
+  alive().flatMap(k=>roster(G.p[k])).concat(AGENTS.map(a=>a.n)))].filter(Boolean);
 const kapPrywRazem=()=>wszyscyZaplecze().reduce((a,n)=>a+kapPryw(n),0);
 /* Próg „bogatego" stawiamy na średniej — powyżej niej jest garstka, poniżej reszta.
    Dokładnie ten podział ma być stawką ustawy podatkowej. */
@@ -4883,43 +4990,44 @@ function ekonomiaTab(){
     <span class="ekopoz">${i+1}</span>${ava(x.n,'#6f7a6b',26)}
     <span class="ekon">${x.n}</span>
     <b class="ekow">${mordedolar(12)} ${kasaSkrot(x.v)}</b></div>`;
+  const t=G.pkbTempo!==undefined?G.pkbTempo:pkbTempo();
+  const st=stawkaMajatkowa(), prog=progresjaWlaczona();
+  const kier=t>0?'up':t<0?'dn':'';
   return `
   <div class="ekoblok">
-    <div class="ekotasma">NIEDOKOŃCZONE! Dział jest wyłączony — liczby są, mechaniki jeszcze nie ma.</div>
-
     <div class="card"><div class="h"><h3>Produkt krajowy brutto</h3>
       <span class="n">stan na kadencję ${G.term}, tydzień ${G.week}</span></div><div class="b">
       <div class="pkbplyta">
         <div class="pkbduza">${mordedolar(30)} ${kasa(G.pkb)}</div>
-        <div class="pkbpod">mld · wartość nie zmienia się jeszcze z niczego</div>
+        <div class="pkbpod">obrót całego serwera · ${
+          G.pkbPop?`w zeszłym tygodniu ${kasa(G.pkbPop)}`:'pierwszy tydzień pomiaru'}</div>
+        <div class="pkbtempo ${kier}">${t>0?'+':''}${(t*100).toFixed(2)}% tygodniowo</div>
       </div>
       <div class="tabliczki" style="margin:14px 0 0">
         <div><b>${kasaSkrot(d.suma)}</b><span>kapitał prywatny razem</span></div>
-        <div><b>${udzial.toFixed(2)}%</b><span>tyle to z PKB</span></div>
-        <div><b>${d.bogaci.length}</b><span>powyżej średniej</span></div>
-        <div><b>${d.biedni.length}</b><span>poniżej średniej</span></div>
+        <div><b>${st?st+'%':'brak'}</b><span>podatek od majątku</span></div>
+        <div><b>${kasaSkrot(G.skarb||0)}</b><span>zebrane do skarbu</span></div>
+        <div><b>${d.bogaci.length}/${d.biedni.length}</b><span>bogatych / biednych</span></div>
       </div>
-      <div class="note" style="margin-top:14px"><b>Czego tu jeszcze nie ma.</b>
-        PKB stoi w miejscu — nic go nie podnosi ani nie obniża. Nie wiadomo jeszcze,
-        skąd ma brać wzrost ani co dokładnie robi z nim ustawa podatkowa. Kapitał
-        prywatny jest policzony i widoczny, ale nikt go nie zarabia i nikt go nie traci.</div>
+      <div class="note" style="margin-top:14px"><b>Skąd bierze się ten ruch.</b>
+        Aktywne partie napędzają obrót, awantury go duszą, a podatek od majątku
+        hamuje wzrost, za to napełnia skarb i realnie strzyże prywatne konta.
+        Podatek ustawia się <b>ustawą o podatkach</b> w dziale Premier, nie tutaj.</div>
     </div></div>
 
-    <div class="card"><div class="h"><h3>Ustawa podatkowa</h3>
-      <span class="n">zablokowane</span></div><div class="b">
-      <p class="dim" style="font-size:13.5px;margin-top:0">Pomysł jest taki: sejm głosuje,
-      kogo opodatkować. Bogatych jest <b>${d.bogaci.length}</b> i mają razem
-      <b>${kasaSkrot(d.bogaci.reduce((a,x)=>a+x.v,0))}</b>, ale to oni siedzą w sejmie i sami sobie
-      tego nie uchwalą. Biednych jest <b>${d.biedni.length}</b>, mają razem
-      <b>${kasaSkrot(d.biedni.reduce((a,x)=>a+x.v,0))}</b> i są łatwiejsi do przegłosowania,
-      tylko że jest ich więcej przy urnach.</p>
-      <div class="ekowyl">
-        <button class="btn" disabled>Podatek od bogatych</button>
-        <button class="btn" disabled>Podatek od biednych</button>
-        <button class="btn g" disabled>Podatek liniowy</button>
-      </div>
-      <div class="dim" style="font-size:12px;margin-top:10px">Przyciski są martwe do czasu,
-      aż zapadnie decyzja, jak liczyć PKB.</div>
+    <div class="card"><div class="h"><h3>Kto zapłaci</h3>
+      <span class="n">${st?(prog?'progresja włączona':'stawka równa dla wszystkich'):'nikt, podatku nie ma'}</span></div><div class="b">
+      <p style="font-size:13.5px;margin-top:0">Bogatych jest <b>${d.bogaci.length}</b>
+      i mają razem <b>${kasaSkrot(d.bogaci.reduce((a,x)=>a+x.v,0))}</b> — tylko że to oni
+      siedzą w sejmie i sami sobie tego nie uchwalą. Biednych jest <b>${d.biedni.length}</b>,
+      mają razem <b>${kasaSkrot(d.biedni.reduce((a,x)=>a+x.v,0))}</b>, łatwiej ich przegłosować,
+      ale jest ich więcej przy urnach.</p>
+      ${st?`<div class="note" style="margin:0">Przy obecnej ustawie
+        ${prog?'bogaci płacą <b>1,7×</b> stawki, a biedni <b>0,3×</b>'
+              :'każdy płaci <b>tyle samo</b>, więc procentowo najciężej wychodzą najubożsi'}.
+        W zeszłym tygodniu skarb zabrał <b>${kasaSkrot(G.podatekOstatnio||0)}</b>.</div>`
+       :`<div class="dim" style="font-size:12.5px">Dopóki sejm nie uchwali daniny od majątku,
+         prywatne konta nikną tylko z własnej głupoty właścicieli.</div>`}
     </div></div>
 
     <div class="card"><div class="h"><h3>Najbogatsi na serwerze</h3>
@@ -5013,6 +5121,7 @@ function sidebar(p,q){
     ${p.ctr>=90?`<div class="ctrwarn bad"><b>Paraliż</b> Sondaż liczony na pół, kapitał wycieka, co tydzień ktoś odchodzi. Schładzaj: przeprosiny, wyciszenie sporu, otwarte konsultacje.</div>`
       :p.ctr>=70?`<div class="ctrwarn"><b>Uwaga na kontrowersję</b> Przy 90 partia wpada w paraliż. Zostało ci ${Math.round(90-p.ctr)} punktów luzu.</div>`:''}
     ${b('Pretensjonalność',p.pret,'#d98b4a','pret')}
+    <div id="podgNota" class="podgnota"></div>
     </div>
     ${(()=>{const z=znuzenie(G.me);if(!z)return '';
       const strata=Math.round(z/1.65);
@@ -5633,9 +5742,23 @@ function przewidz(id){
 
 /* Duch na paskach w bocznej kolumnie: pokazuje, dokąd pojedzie każda cecha,
    zanim klikniesz. Rusza samym DOM-em, bez przerysowywania ekranu. */
+/* Decyzje, których skutek rozstrzyga się dopiero w oknie — podgląd nie ma tu
+   czego pokazać i musi to powiedzieć wprost, zamiast milczeć jak przy decyzji
+   bez skutków. */
+const BEZ_PODGLADU={rekr:'Nabór liczy się z ogłoszenia, które ułożysz w oknie.',
+  wywiad:'Wynik zależy od odpowiedzi, których udzielisz na żywo.',
+  stery:'Skutek zależy od tego, kogo posadzisz u steru.',
+  szkolenie:'Wybierasz w oknie, którą cechę podnosisz.',
+  dymisja:'Zależy od tego, kogo wyrzucisz z rządu.',
+  zmianaMin:'Zależy od tego, kogo posadzisz na resorcie.'};
 function podglad(id){
   const box=document.getElementById('paskiCech'); if(!box)return;
   const w=id?przewidz(id):null;
+  const nota=document.getElementById('podgNota');
+  if(nota){
+    const t=id&&BEZ_PODGLADU[id]&&(!w||!Object.keys(w).length)?BEZ_PODGLADU[id]:'';
+    nota.textContent=t; nota.classList.toggle('wid',!!t);
+  }
   PODG_CECHY.forEach(([k])=>{
     const pas=box.querySelector('.trk[data-c="'+k+'"]'); if(!pas)return;
     const duch=pas.querySelector('.duch'), et=box.querySelector('.wart[data-c="'+k+'"]');
@@ -5998,94 +6121,209 @@ function naborTog(id){
    koncie; atak przebija się, gdy nikt o tobie nie słyszał, i pogrąża, gdy właśnie
    coś przeskrobałeś. Dlatego wywiadu nie da się wykuć — trzeba czytać własną
    sytuację. Kompetencja przewodniczącego daje margines błędu, nie zwalnia z myślenia. */
+/* Pula pytań. Z każdego wywiadu losujemy cztery, po jednym z każdego etapu,
+   żeby dwa wywiady pod rząd nie wyglądały identycznie. Nacisk pytania decyduje,
+   ile ono waży i jakiego rejestru oczekuje studio. */
 const WYWIAD_PYT=[
- {q:'Zacznijmy od tego, co wszyscy widzieli. Ostatnie tygodnie to u was seria wpadek. Co pan na to?',
+ // ── otwarcie ──
+ {et:0,nacisk:'zwykly',q:'Zacznijmy od tego, co wszyscy widzieli. Ostatnie tygodnie to u was seria wpadek. Co pan na to?',
   o:[{l:'Przyznaję, zawaliliśmy i wyciągamy wnioski',ton:'pokora'},
      {l:'To wyrwane z kontekstu, media szukają sensacji',ton:'obrona'},
      {l:'A pytał pan o wpadki innych partii?',ton:'atak'}]},
- {q:'Czym wasza partia różni się od reszty sejmu? Bo z zewnątrz wyglądacie podobnie.',
+ {et:0,nacisk:'lekki',q:'Na dzień dobry coś prostego: czym się pan dzisiaj pochwali?',
+  o:[{l:'Tym, że jeszcze nas nie rozwiązali. Na razie',ton:'pokora'},
+     {l:'Konkretami. Mam je wypisane, mogę czytać',ton:'obrona'},
+     {l:'Tym, że reszta sejmu nie ma się czym pochwalić',ton:'atak'}]},
+ // ── środek: pytanie o tożsamość ──
+ {et:1,nacisk:'zwykly',q:'Czym wasza partia różni się od reszty sejmu? Bo z zewnątrz wyglądacie podobnie.',
   o:[{l:'Mamy konkretny program i da się go sprawdzić',ton:'obrona'},
      {l:'Różnimy się tym, że nie obiecujemy cudów',ton:'pokora'},
      {l:'Reszta sejmu to jedna wielka zmowa, my nie',ton:'atak'}]},
- {q:'Ostatnie pytanie: gdzie będziecie za dwie kadencje?',
+ {et:1,nacisk:'zwykly',q:'Ludzie mówią, że jesteście partią jednego człowieka. Jest w tym coś?',
+  o:[{l:'Jest. Pracujemy nad tym i nie ukrywam tego',ton:'pokora'},
+     {l:'Mamy zaplecze, tylko ono nie krzyczy na kanałach',ton:'obrona'},
+     {l:'Lepiej jeden konkretny niż dziesięciu takich jak u konkurencji',ton:'atak'}]},
+ // ── środek: pytanie z nożem ──
+ {et:2,nacisk:'ostry',q:'Mam tu wasze obietnice sprzed kadencji. Ani jednej nie dowieźliście. Kłamaliście?',
+  o:[{l:'Nie dowieźliśmy i nie będę tego owijał',ton:'pokora'},
+     {l:'Dowieźliśmy trzy z nich, mogę wymienić po kolei',ton:'obrona'},
+     {l:'A kto je zablokował? Niech pan zapyta koalicji',ton:'atak'}]},
+ {et:2,nacisk:'ostry',q:'Pański człowiek napisał na kanale rzeczy, których nie powtórzę na antenie. Zostaje w partii?',
+  o:[{l:'Nie zostaje. Dziś rano było po sprawie',ton:'pokora'},
+     {l:'Zostaje, bo przeprosił i naprawił to publicznie',ton:'obrona'},
+     {l:'Zostaje. Nie będę zwalniał ludzi na pański gwizdek',ton:'atak'}]},
+ // ── zamknięcie ──
+ {et:3,nacisk:'zwykly',q:'Ostatnie pytanie: gdzie będziecie za dwie kadencje?',
   o:[{l:'W rządzie, i to my będziemy rozdawać karty',ton:'atak'},
      {l:'Tam, gdzie postawi nas serwer. Bez wielkich słów',ton:'pokora'},
      {l:'Silniejsi niż dziś, bo robimy swoje krok po kroku',ton:'obrona'}]},
+ {et:3,nacisk:'lekki',q:'Na koniec: co powie pan komuś, kto dziś zakłada własną partię?',
+  o:[{l:'Żeby dwa razy pomyślał. Ja bym nie zakładał',ton:'pokora'},
+     {l:'Żeby zaczął od ludzi, nie od nazwy i logo',ton:'obrona'},
+     {l:'Żeby się pospieszył, bo miejsca już prawie nie ma',ton:'atak'}]},
 ];
+/* Reakcje dziennikarza — krótkie, bo ma to być wtrącenie, nie akapit. */
+const WYW_REAKCJE={
+  traf:['Dziennikarz kiwa głową i notuje.','Dziennikarz na chwilę odpuszcza.',
+        'To go zatrzymało. Zagląda w kartki.'],
+  pudlo:['Dziennikarz unosi brew.','„To ciekawe" — a po głosie słychać, że nie.',
+         'Dziennikarz zapisuje coś i podkreśla dwa razy.']};
 let WYW=null;
-/* Który rejestr jest teraz właściwy — wynika wyłącznie ze stanu partii. */
+/* Rejestr, który pasuje do samej partii — punkt wyjścia, nie wyrok. */
 function wywiadOczekiwany(p){
   if(p.ctr>=55)return 'pokora';                 // po aferze nikt nie chce słuchać przechwałek
   if(p.fame<=32)return 'atak';                  // nieznani muszą zrobić hałas
   if(p.cred>=58)return 'obrona';                // wiarygodnym opłaca się mówić konkretami
   return p.pret>=55?'pokora':'obrona';
 }
+/* ── wywiad: co się zmieniło ──
+   Wcześniej cały wywiad miał jeden właściwy ton i wystarczyło go odgadnąć raz.
+   Teraz każde pytanie ma własny nacisk i to on przesuwa oczekiwanie: pod ostrym
+   pytaniem przechwałki nie przejdą nawet znanej partii, a przy lekkim odbiciu
+   pokora brzmi jak brak pomysłu. Do tego liczą się dwie rzeczy naraz —
+   dziennikarz i widownia — i one chcą czego innego, więc nie da się zadowolić
+   obu w każdym pytaniu. Na koniec dochodzi kręgosłup: kto trzyma jedną linię,
+   dostaje premię, kto skacze między tonami, traci wiarygodność. */
+const TONY={pokora:{n:'Pokora',k:'#7cb463'},obrona:{n:'Konkret',k:'#5a9be8'},atak:{n:'Atak',k:'#d1554a'}};
+function oczekiwanyDlaPytania(p,pyt){
+  const baza=wywiadOczekiwany(p);
+  if(pyt.nacisk==='ostry')  return p.ctr>=40?'pokora':'obrona';   // pod ścianą nie ma miejsca na hałas
+  if(pyt.nacisk==='lekki')  return p.fame<=48?'atak':baza;        // lekkie pytanie to okazja na hałas
+  return baza;
+}
+/* Dziennikarz punktuje za trafiony rejestr, widownia ma własny gust: lubi
+   atak, gdy partia jest nieznana, i pokorę, gdy właśnie narozrabiała. */
+function wywiadPunkty(p,pyt,ton){
+  const ok=ton===oczekiwanyDlaPytania(p,pyt);
+  const waga=pyt.nacisk==='ostry'?1.35:pyt.nacisk==='lekki'?.75:1;
+  const dzien=Math.round((ok?11:-9)*waga);
+  let widz=ok?5:-4;
+  if(ton==='atak')   widz+=p.fame<=45?6:-3;
+  if(ton==='pokora') widz+=p.ctr>=50?6:-2;
+  if(ton==='obrona') widz+=p.cred>=55?4:0;
+  return {ok,dzien,widz:Math.round(widz*waga)};
+}
 function openWywiad(){
+  if(PROBA)return;
   close();
   const p=me();
-  WYW={i:0,traf:0,oczek:wywiadOczekiwany(p),wybory:[]};
+  // po jednym pytaniu z każdego etapu — wywiad ma łuk, a nie losową sieczkę
+  const zestaw=[0,1,2,3].map(et=>{const g=WYWIAD_PYT.filter(x=>x.et===et);
+    return g[RI(0,g.length-1)]}).filter(Boolean);
+  WYW={i:0,traf:0,pyt:zestaw,wybory:[],
+       dzien:52,                                  // nastawienie dziennikarza
+       widz:Math.round(cl(30+p.fame*.45)),        // widownia zaczyna od tego, czy cię zna
+       reakcja:null};
   wywiadRys();
 }
 function wywiadOdp(nr){
   if(!WYW)return;
-  const pyt=WYWIAD_PYT[WYW.i], wyb=pyt.o[nr];
+  const pyt=WYW.pyt[WYW.i], wyb=pyt&&pyt.o[nr];
   if(!wyb)return;
+  const p=me();
+  const w=wywiadPunkty(p,pyt,wyb.ton);
   WYW.wybory.push(wyb.ton);
-  if(wyb.ton===WYW.oczek)WYW.traf++;
+  if(w.ok)WYW.traf++;
+  WYW.dzien=cl(WYW.dzien+w.dzien);
+  WYW.widz=cl(WYW.widz+w.widz);
+  const pula=w.ok?WYW_REAKCJE.traf:WYW_REAKCJE.pudlo;
+  WYW.reakcja={t:pula[RI(0,pula.length-1)],ok:w.ok,dzien:w.dzien,widz:w.widz};
   WYW.i++;
-  if(WYW.i<WYWIAD_PYT.length)wywiadRys();
+  if(WYW.i<WYW.pyt.length)wywiadRys();
   else wywiadKoniec();
 }
+/* Kręgosłup: ile różnych rejestrów poszło w eter. Jeden albo dwa to linia,
+   trzy to skakanie i widać to na wiarygodności. */
+const wywiadKregoslup=()=>new Set(WYW.wybory).size;
 function wywiadRys(){
-  const p=me(), pyt=WYWIAD_PYT[WYW.i];
-  const ld=lead(G.me);
+  const p=me(), pyt=WYW.pyt[WYW.i], ld=lead(G.me);
+  const NAC={ostry:['pytanie z nożem','ostre'],zwykly:['pytanie zasadnicze','zwykle'],
+             lekki:['pytanie na odbicie','lekkie']};
+  const nac=NAC[pyt.nacisk]||NAC.zwykly;
+  const miara=(n,v,kl)=>`<div class="wymiara ${kl}">
+    <div class="wyml"><span>${n}</span><b>${Math.round(v)}</b></div>
+    <div class="trk"><i style="width:${cl(v)}%"></i></div></div>`;
+  const r=WYW.reakcja;
   const v=rysujOkno('wywiad',`
     <button class="mdlx" type="button" aria-label="Zamknij">×</button>
-    <div class="kick">Wywiad na żywo · pytanie ${WYW.i+1} z ${WYWIAD_PYT.length}</div>
-    <h2>${esc(ld.n)} przed mikrofonem</h2>
+    <div class="wystudio">
+      <div class="wyglowa">
+        ${ava(ld.n,p.c,54)}
+        <div style="min-width:0">
+          <div class="kick">Wywiad na żywo · ${nac[0]}</div>
+          <h2>${esc(ld.n)} przed mikrofonem</h2>
+        </div>
+        <div class="wypips">${WYW.pyt.map((_,i)=>
+          `<i class="${i<WYW.i?'byl':i===WYW.i?'jest':''}"></i>`).join('')}</div>
+      </div>
+      <div class="wymiary">
+        ${miara('Dziennikarz',WYW.dzien,'dz')}
+        ${miara('Widownia',WYW.widz,'wd')}
+      </div>
+    </div>
     <div class="bd">
-      <div class="note" style="margin:0 0 12px">Twoja partia: sława <b>${Math.round(p.fame)}</b>,
-        wiarygodność <b>${Math.round(p.cred)}</b>, kontrowersja <b>${Math.round(p.ctr)}</b>,
-        pretensjonalność <b>${Math.round(p.pret)}</b>. Od tego zależy, co dziś zabrzmi wiarygodnie.</div>
-      <p style="font-size:15px;line-height:1.55"><b>Dziennikarz:</b> ${pyt.q}</p>
-      <div class="naborkrok"><span>Trafione odpowiedzi</span>
-        <b class="${WYW.traf>=2?'gotowe':''}">${WYW.traf} z ${WYWIAD_PYT.length}</b></div>
+      ${r?`<div class="wyreak ${r.ok?'ok':'zle'}">${r.t}
+        <span>${r.dzien>0?'+':''}${r.dzien} dziennikarz · ${r.widz>0?'+':''}${r.widz} widownia</span></div>`:''}
+      <div class="wypyt ${pyt.nacisk}">${pyt.q}</div>
+      <div class="wypodp">Pytanie ${WYW.i+1} z ${WYW.pyt.length} · nacisk ${nac[1]}
+        ${WYW.wybory.length?`· dotąd ${[...new Set(WYW.wybory)].map(t=>TONY[t].n).join(', ')}`:''}</div>
     </div>
     <div class="op">${pyt.o.map((o,i)=>
-      `<button class="opt" data-w="${i}"><b>${o.l}</b></button>`).join('')}</div>`);
+      `<button class="opt wyopt" data-w="${i}" style="--ton:${TONY[o.ton].k}">
+        <b>${o.l}</b><span>${TONY[o.ton].n}</span></button>`).join('')}</div>`);
+  if(!v)return;                       // podgląd skutków nie rysuje okna
   v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>wywiadOdp(+b.dataset.w));
   v.querySelector('.mdlx').onclick=actBack;
 }
 function wywiadKoniec(){
   const p=me(), ld=lead(G.me);
-  // kompetencja daje margines błędu: mądry lider wybroni się jednym trafieniem mniej
-  const prog=ld.komp>=78?1:2;
-  const udany=WYW.traf>=prog;
-  const traf=WYW.traf;
+  const traf=WYW.traf, ile=WYW.pyt.length;
+  const kreg=wywiadKregoslup();
+  /* Kręgosłup dokłada się do oceny: jedna linia przez cały wywiad robi lepsze
+     wrażenie niż cztery trafione odpowiedzi wygłoszone czterema różnymi głosami. */
+  const bonus=kreg===1?9:kreg===2?3:-7;
+  const komp=ld.komp>=78?6:ld.komp>=60?3:0;      // wygadany lider ratuje słabszy dzień
+  const ocena=Math.round((WYW.dzien+WYW.widz)/2+bonus+komp);
+  const udany=ocena>=52;
+  const dzien=Math.round(WYW.dzien), widz=Math.round(WYW.widz);
+  const opisKreg=kreg===1?'Trzymałeś jedną linię przez cały wywiad.'
+    :kreg===2?'Zmieniałeś ton raz — dało się to obronić.'
+    :'Skakałeś między trzema rejestrami i widać to na nagraniu.';
   WYW=null;
   close();
+  const podsum=`<div class="wypodsum">
+      <div><b>${traf}/${ile}</b><span>trafione rejestry</span></div>
+      <div><b>${dzien}</b><span>dziennikarz</span></div>
+      <div><b>${widz}</b><span>widownia</span></div>
+      <div><b>${ocena}</b><span>ocena łączna</span></div>
+    </div>`;
   if(udany){
-    const g=R(6,10);
-    p.fame=cl(p.fame+g);p.cred=cl(p.cred+R(5,8));
+    /* Nagroda idzie tam, skąd przyszła: dziennikarz robi wiarygodność,
+       widownia robi sławę. Dzięki temu dwa dobre wywiady potrafią wyjść
+       zupełnie inaczej. */
+    const gf=Math.round(2+widz/14), gc=Math.round(2+dzien/16);
+    p.fame=cl(p.fame+gf);p.cred=cl(p.cred+gc);
+    if(ocena>=72)p.ctr=cl(p.ctr-3);
     if(p.marg&&ch(.5))p.marg=0;
-    say(`<b>Dobry wywiad.</b> ${ld.n} trafił w ton, sława i wiarygodność w górę.`,'good');
-    modal('Wywiad','Wyszedłeś z tego obronną ręką',
-      `<p>Trafione odpowiedzi: <b>${traf}</b> z ${WYWIAD_PYT.length}. Serwer uznał, że
-       ${ld.n} mówił jak człowiek, a nie jak komunikat prasowy.</p>
-       <p style="margin-top:10px">Sława <b>+${Math.round(g)}</b>, wiarygodność w górę,
-       kontrowersja bez zmian.</p>`,
+    say(`<b>Dobry wywiad.</b> ${ld.n} trafił w ton: sława +${gf}, wiarygodność +${gc}.`,'good');
+    modal('Wywiad',ocena>=72?'Wyszło znakomicie':'Wyszedłeś z tego obronną ręką',
+      `${podsum}<p>${opisKreg} Serwer uznał, że ${ld.n} mówił jak człowiek,
+       a nie jak komunikat prasowy.</p>
+       <p style="margin-top:10px">Sława <b>+${gf}</b> od widowni, wiarygodność <b>+${gc}</b>
+       od dziennikarza${ocena>=72?', a kontrowersja nawet trochę siadła':''}.</p>`,
       [{l:'Dobrze',f:()=>{close();render()}}]);
   }else{
-    p.ctr=cl(p.ctr+R(14,20));p.cred=cl(p.cred-R(4,7));p.fame=cl(p.fame+2);
-    M(p,-8);
-    say(`<b>Wywiad wymknął się spod kontroli.</b> ${ld.n} mówił nie to, co trzeba. Kontrowersja w górę.`,'bad');
-    modal('Wywiad','Poszło źle',
-      `<p>Trafione odpowiedzi: <b>${traf}</b> z ${WYWIAD_PYT.length}, a potrzeba było <b>${prog}</b>.</p>
-       <p style="margin-top:10px">Fragmenty krążą po kanałach wyrwane z kontekstu.
-       <b>Kontrowersja mocno w górę</b>, wiarygodność w dół.</p>
-       <p class="dim" style="margin-top:10px">Ton dobiera się do sytuacji partii: przy wysokiej
-       kontrowersji ludzie chcą pokory, przy niskiej sławie — odważnego uderzenia,
-       a przy dobrej wiarygodności — konkretów.</p>`,
+    const kara=Math.round(8+(52-ocena)*.55);
+    p.ctr=cl(p.ctr+kara);p.cred=cl(p.cred-Math.round(3+(52-ocena)/9));p.fame=cl(p.fame+2);
+    M(p,-6);
+    say(`<b>Wywiad wymknął się spod kontroli.</b> ${ld.n} mówił nie to, co trzeba. Kontrowersja +${kara}.`,'bad');
+    modal('Wywiad',ocena<32?'Katastrofa na antenie':'Poszło źle',
+      `${podsum}<p>${opisKreg} Fragmenty krążą po kanałach wyrwane z kontekstu.
+       <b>Kontrowersja +${kara}</b>, wiarygodność w dół.</p>
+       <p class="dim" style="margin-top:10px">Rejestr dobiera się nie tylko do partii, ale i do
+       pytania: pod pytaniem z nożem przechwałki nie przejdą nikomu, a przy lekkim odbiciu
+       pokora brzmi jak brak pomysłu. Widownia i dziennikarz chcą czego innego, więc nie da się
+       zadowolić obu naraz — trzeba wybrać, na kim ci bardziej zależy.</p>`,
       [{l:'Trudno',f:()=>{close();render()}}]);
   }
   render();
@@ -6145,6 +6383,7 @@ function naborRys(){
   if(pelne)op.querySelector('#rgo').onclick=naborPublikuj;
 }
 function openRecruit(reg){
+  if(PROBA)return;                    // to samo, co w modal(): podgląd niczego nie otwiera
   close();
   NABOR={reg,wyb:[]};
   const v=document.createElement('div');v.className='veil';v.id='veil';
@@ -6295,6 +6534,7 @@ function steryRys(){
       <button class="opt" id="sok" ${gotowe?'':'disabled'}><b>Zatwierdzam ${steryOpis(STER.ile)}</b>
         <span>${gotowe?STER.wyb.join(' · '):`brakuje ${STER.ile-STER.wyb.length}`}</span></button>
       <button class="opt" id="sno"><b>Jednak nie</b><span>Nic nie tracisz</span></button></div>`);
+  if(!v)return;                       // podgląd skutków nie rysuje okna
   v.querySelector('#sno').onclick=actBack;
   v.querySelector('.mdlx').onclick=actBack;
   if(gotowe)v.querySelector('#sok').onclick=steryOk;
@@ -8392,6 +8632,7 @@ function kingTab(){
    Gdy to wciąż to samo okno, podmieniamy tylko środek — inaczej całość znika
    i wjeżdża od nowa, co przy klikaniu +/− wygląda jak miganie. */
 function rysujOkno(nazwa,srodek){
+  if(PROBA)return null;               // to samo, co w modal(): podgląd niczego nie otwiera
   const stary=document.getElementById('veil');
   if(stary&&stary.dataset.okno===nazwa){
     const mdl=stary.querySelector('.mdl');
@@ -8405,6 +8646,12 @@ function rysujOkno(nazwa,srodek){
   return v;
 }
 function modal(k,t,b,o,onX){
+  /* Podgląd skutków odpala prawdziwą decyzję dziewięć razy na kopii stanu.
+     Decyzje takie jak nabór, wywiad czy szkolenie nie liczą niczego same —
+     otwierają własne okno. Bez tej blokady podgląd naprawdę je otwierał,
+     więc okna wyskakiwały same z siebie, a że pamięć podglądu kasuje się co
+     tydzień, sypało nimi na starcie każdego tygodnia. */
+  if(PROBA)return;
   close();
   const v=document.createElement('div');v.className='veil';v.id='veil';
   v.innerHTML=`<div class="mdl" role="dialog" aria-modal="true">
@@ -9857,6 +10104,7 @@ Object.assign(window,{slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,
   setTab:k=>{if(G.tab!==k)G._we=1;G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
   signAgent,agentCost,agentFree,AGENTS,render,
   ekonomiaTab,kapPryw,kapPrywRazem,podzialMajatku,PKB_START,kasa,kasaSkrot,
+  rolaOsoby,pkbTempo,pkbTydzien,stawkaMajatkowa,wszyscyZaplecze,alive,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
   get KRE(){return KRE}, SCEN, kreatorDane,

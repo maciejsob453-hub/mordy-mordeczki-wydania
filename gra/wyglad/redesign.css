@@ -1186,14 +1186,87 @@ body::after{
    mechaniki jeszcze nie ma.
    ═══════════════════════════════════════════════════════════ */
 .ekoblok{display:flex;flex-direction:column;gap:var(--o4)}
-/* taśma jak na budowie — jedyne miejsce w grze, gdzie coś krzyczy */
-.ekotasma{padding:11px var(--o4);border-radius:var(--r3);font-family:var(--m);
-  font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
-  color:#241c05;text-align:center;
-  border:1px solid rgba(217,171,69,.5);
-  background:repeating-linear-gradient(135deg,
-    #d9ab45 0 16px, #1a1305 16px 32px);
-  text-shadow:0 1px 0 rgba(255,255,255,.25)}
+/* tempo wzrostu pod wielką liczbą */
+.pkbtempo{font-family:var(--m);font-size:12.5px;font-weight:700;margin-top:8px;
+  color:var(--dim2)}
+.pkbtempo.up{color:var(--pos)} .pkbtempo.dn{color:var(--neg)}
+
+/* znak waluty: obrazek, a pod nim rysowany zapas na wypadek braku pliku */
+.mdol{display:inline-block;vertical-align:-2px;flex:none;line-height:0}
+.mdol img{display:block;object-fit:contain;width:100%;height:100%}
+.mdol svg{width:100%;height:100%;color:var(--acc)}
+
+/* ═══════════════════════════════════════════════════════════
+   WYWIAD
+   Był listą trzech pytań na płaskim tle. Teraz to studio: portret pod światłem,
+   dwa wskaźniki, które chcą czego innego, i pytanie postawione jak cytat.
+   ═══════════════════════════════════════════════════════════ */
+.wystudio{position:relative;overflow:hidden;padding:var(--o4) var(--o5) var(--o3);
+  border-bottom:1px solid var(--line);
+  background:
+    radial-gradient(520px 190px at 22% -60px,rgba(217,171,69,.15),transparent 70%),
+    linear-gradient(180deg,var(--p2),rgba(0,0,0,.36))}
+.wyglowa{display:flex;align-items:center;gap:var(--o4)}
+.wyglowa h2{font-family:var(--fd);font-size:22px;font-weight:600;margin:2px 0 0}
+.wyglowa .ava,.wyglowa .avaimg{box-shadow:0 0 0 1px rgba(255,255,255,.15),
+  0 0 26px -8px var(--acc),0 4px 12px rgba(0,0,0,.55)}
+/* pastylki postępu — ile pytań za tobą */
+.wypips{margin-left:auto;display:flex;gap:5px;flex:none}
+.wypips i{width:8px;height:8px;border-radius:50%;background:var(--p3);
+  border:1px solid var(--line2);transition:.25s var(--sprezyna)}
+.wypips i.byl{background:var(--line2)}
+.wypips i.jest{width:14px;border-radius:999px;background:var(--acc);border-color:#f7e3aa;
+  box-shadow:0 0 12px -2px var(--acc)}
+
+.wymiary{display:flex;gap:var(--o4);margin-top:var(--o3)}
+.wymiara{flex:1;min-width:0}
+.wyml{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.wyml span{font-family:var(--m);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--dim2);font-weight:700}
+.wyml b{font-family:var(--m);font-size:14px}
+.wymiara .trk{height:6px}
+.wymiara.dz .trk i{background:var(--info)}
+.wymiara.wd .trk i{background:var(--acc)}
+
+/* reakcja dziennikarza po odpowiedzi */
+.wyreak{display:flex;align-items:baseline;gap:var(--o3);flex-wrap:wrap;
+  padding:9px var(--o3);border-radius:var(--r2);margin-bottom:var(--o3);
+  font-size:13px;border-left:3px solid var(--line2);background:rgba(255,255,255,.025);
+  animation:wjazd .3s var(--krzywa) both}
+.wyreak.ok{border-left-color:var(--pos)}
+.wyreak.zle{border-left-color:var(--neg)}
+.wyreak span{margin-left:auto;font-family:var(--m);font-size:10.5px;color:var(--dim2);
+  white-space:nowrap}
+
+/* samo pytanie: cytat, nie akapit */
+.wypyt{font-family:var(--fd);font-size:17px;line-height:1.5;padding:var(--o3) 0 var(--o3) var(--o4);
+  border-left:3px solid var(--acc2);position:relative}
+.wypyt.ostry{border-left-color:var(--neg)}
+.wypyt.lekki{border-left-color:var(--line2)}
+.wypodp{font-family:var(--m);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dim2);margin-top:9px;font-weight:700}
+
+/* odpowiedź niesie swój rejestr na krawędzi */
+.wyopt{position:relative}
+.wyopt::before{content:'';position:absolute;left:0;top:9px;bottom:9px;width:3px;
+  border-radius:0 3px 3px 0;background:var(--ton);opacity:.85}
+.wyopt span{color:var(--ton);font-family:var(--m);font-size:9.5px;letter-spacing:.14em;
+  text-transform:uppercase;font-weight:700}
+
+.wypodsum{display:flex;flex-wrap:wrap;gap:1px;margin:0 0 var(--o4);
+  border:1px solid var(--line);border-radius:var(--r3);overflow:hidden;background:var(--line)}
+.wypodsum>div{flex:1 1 90px;padding:var(--o3);text-align:center;
+  background:linear-gradient(180deg,var(--p2),var(--p1))}
+.wypodsum b{display:block;font-family:var(--m);font-size:21px;font-weight:700;
+  background:linear-gradient(180deg,#fbf3dd,#d9ab45 130%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.wypodsum span{display:block;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dim2);font-weight:700;margin-top:5px}
+
+/* nota podglądu: czemu przy tej decyzji paski nic nie pokazują */
+.podgnota{display:none;font-size:11.5px;line-height:1.4;color:var(--dim2);
+  margin-top:9px;padding-left:9px;border-left:2px solid var(--acc2)}
+.podgnota.wid{display:block}
 
 .pkbplyta{position:relative;overflow:hidden;border-radius:var(--r3);
   padding:var(--o5) var(--o4);text-align:center;border:1px solid var(--line2);
