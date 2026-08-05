@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.35",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/00945f000dc07964279e5e27b9168ed114b67e46",
+ "wersja": "1.1.36",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,8 +14,8 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "7c8d09ed410d7bd2dad6e82b883d302371c6ebcdb6adc2293ea0a5c47ea8ab29",
-   "bajtow": 596203
+   "sha": "f7e91d5814e65ac739f9a9554396a6fd58d2a2b2b8aa8a92d761fb20512019b5",
+   "bajtow": 604294
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -554,8 +554,8 @@
   },
   {
    "sciezka": "gra/wyglad/redesign.css",
-   "sha": "f70af4fa786b78dd6d3e0ff14293cd606c3df4152eb83ab3449d832eb7d72686",
-   "bajtow": 34456
+   "sha": "3595d957069bc92b87721f4ccbe6e956903e1030f6cf3f9563f48f637ff297f7",
+   "bajtow": 36955
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -565,21 +565,20 @@
  ],
  "exe": {
   "nazwa": "Mordy Mordeczki.exe",
-  "sha": "b95fd625ba72060f50cbe83f4def1ccc70a266b621c5b7a60dd7be9d759aec5e",
-  "bajtow": 6079654,
-  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.18/Mordy.Mordeczki.exe"
+  "sha": "00299251cda910117f8639a13311b7a399139a5a8e21b062570ffdd36eefe4c3",
+  "bajtow": 6080543,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.36/Mordy.Mordeczki.exe"
  },
  "runtime": {
-  "sha": "4b1977ee928cab3d5895cc8165acecf70b55fc8999577e55d4c64208736944da",
-  "bajtow": 13703617,
-  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.23/biblioteki-1.1.23.zip",
-  "znacznik": "03e7724d6517cb08aeff7f738476d09f79e0b5ce7b3c38f9375436a92f888b24"
+  "sha": "9dcf03d8e3c4185a75b117af406577d64efd9559c8310be50fed14af66be9872",
+  "bajtow": 13704327,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.36/biblioteki-1.1.36.zip",
+  "znacznik": "2eb28efdbe5659b1f83c47d54c4f8fa5a02b26f47c26c5901791237f4186e0d4"
  },
  "launcher": {
   "nazwa": "Mordy Mordeczki Launcher.exe",
   "sha": "771e518561de93bb1338155c6782f37b93b7739913a429f3e0b4f3e1aa7ddc05",
   "bajtow": 12146589,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.21/Mordy.Mordeczki.Launcher.exe"
- },
- "commit": "00945f000dc07964279e5e27b9168ed114b67e46"
+ }
 }

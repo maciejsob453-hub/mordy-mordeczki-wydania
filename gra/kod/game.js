@@ -2665,6 +2665,7 @@ const leadAva=(k,sz)=>{const p=G.p[k],s=sz||38,ls=leads(p);
 function render(){if(PROBA)return;
   applyTheme();initTips();initKeys();
   if(CRE)return creator();
+  if(KRE)return kreatorEkran();
   if(!G)return MODE==='free'?setup():MODE==='scen'?scenScreen():modeScreen();
   if(G.phase==='dead')return dead();
   if(G.phase==='result'&&G.night&&!G.night.done)return nightScreen();
@@ -3206,11 +3207,15 @@ function modEfekty(ef){
       if(typeof w[s]==='number')p[s]=cl(p[s]+w[s]);
     });
     if(typeof w.skladProc==='number'){
+      /* Ujemna wartość ma partie zmniejszyć, dodatnia powiększyć. Stał tu minus,
+         który odwracał znak, więc scenariusz „partie o 30% mniejsze" robił je
+         o 30% większe. Przy powiększaniu ludzie muszą skądś przyjść, więc biorą
+         się z puli bezpartyjnych i tylko tylu, ilu tam naprawdę jest. */
       ['eli','int','ser'].forEach(s2=>{
-        const ub=Math.round(p.comp[s2]*(-w.skladProc/100));
-        const realne=Math.max(-p.comp[s2],ub);
+        const chce=Math.round(p.comp[s2]*(w.skladProc/100));
+        const realne=chce<0?Math.max(-p.comp[s2],chce):Math.min(chce,G.free[s2]||0);
         p.comp[s2]+=realne;
-        if(realne<0)G.free[s2]=(G.free[s2]||0)-realne;
+        G.free[s2]=(G.free[s2]||0)-realne;
       });
       p.mem=p.comp.eli+p.comp.int+p.comp.ser;
     }
@@ -3335,13 +3340,53 @@ function scenScreen(){
         ${x.zModa?`<div class="smod" style="color:var(--acc)">${x.autor?'autor: '+esc(x.autor):'twój scenariusz'}</div>`:''}
       </button>`}).join('')}
   </div>
-  <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
+  <div class="scennarz">
     <button class="btn g sm" onclick="backToMode()">← Tryby gry</button>
     <button class="btn sm" onclick="openKreator()">Kreator scenariuszy</button>
-    ${MODY.length?`<button class="btn g sm" onclick="openMody()">Twoje mody (${MODY.length})</button>`:''}
+    <button class="btn g sm" onclick="wczytajScenPlik()">Wczytaj z pliku…</button>
+    ${MODY.length?`<span class="dim" style="font-size:12px;margin-left:auto">
+      ${MODY.length} ${pl(MODY.length,'własny scenariusz','własne scenariusze','własnych scenariuszy')}
+      · <button class="conowego" onclick="openMody()">zarządzaj</button></span>`:''}
   </div>`;
 }
 function pickScen(id){SCENSEL=id;MODE='free';SFX.click();render()}
+
+/* ── scenariusz jako plik ──
+   Scenariusz ma być czymś, co się wysyła koledze i wczytuje jednym kliknięciem.
+   Z pliku bierzemy wyłącznie dane; efekty i tak przechodzą przez modEfekty,
+   które rozumie skończoną listę pól, więc cudzy plik nie wykona nic własnego. */
+async function wczytajScenPlik(){
+  const a=(window.pywebview&&window.pywebview.api)||null;
+  if(!a||!a.scen_wczytaj)return modal('Niedostępne','Wczytywanie z pliku',
+    '<p>Ta wersja gry działa w przeglądarce i nie ma dostępu do plików. Użyj aplikacji.</p>',
+    [{l:'Rozumiem',f:close}]);
+  let dane=null;
+  try{ dane=await a.scen_wczytaj(); }catch(e){ dane=null }
+  if(!dane)return;
+  if(!dane.nazwa)return modal('Nie ten plik','Wczytywanie scenariusza',
+    '<p>W tym pliku nie ma scenariusza. Plik scenariusza ma rozszerzenie <b>.mmscen</b> '+
+    'i powstaje z <b>Kreatora scenariuszy</b>.</p>',[{l:'Rozumiem',f:close}]);
+  try{
+    const zapis=await a.mod_zapisz(dane);
+    if(zapis&&zapis.ok===false)throw new Error('zapis');
+  }catch(e){ /* nie udało się zachować na stałe — scenariusz i tak zadziała w tej sesji */ }
+  MODY=MODY.filter(m=>m.nazwa!==dane.nazwa).concat([dane]);
+  modyDoScen();
+  SCENSEL='mod-'+(dane.id||dane.nazwa).toString().slice(0,40);
+  SFX.click();
+  modal('Wczytany','Scenariusz gotowy',
+    `<p><b>${esc(String(dane.nazwa).slice(0,60))}</b> jest już na liście i został wybrany.
+     ${dane.autor?'Autor: <b>'+esc(String(dane.autor).slice(0,40))+'</b>.':''}</p>`,
+    [{l:'Wybieram partię',f:()=>{close();MODE='free';render()}},
+     {l:'Zostaję na liście',f:()=>{close();render()}}]);
+}
+
+async function zapiszScenPlik(dane){
+  const a=(window.pywebview&&window.pywebview.api)||null;
+  if(!a||!a.scen_zapisz)return null;
+  try{ return await a.scen_zapisz(dane,String(dane.nazwa||'scenariusz')); }
+  catch(e){ return null }
+}
 
 /* ---- kreator scenariuszy ----
    Formularz, z którego wychodzi zwykły plik moda. Wszystko, co da się tu ustawić,
@@ -3395,77 +3440,155 @@ function krePole(k,pole,v){
 }
 function kreWyczysc(k){if(KRE){delete KRE.partie[k];if(KRE.wybrana===k)KRE.wybrana=null;kreatorRys()}}
 const kreIleZmian=k=>Object.keys((KRE&&KRE.partie[k])||{}).length;
-function kreatorRys(){
-  const suwak=([k,opis,min,max])=>`
-    <div class="krow"><span>${opis}</span>
-      <input type="range" min="${min}" max="${max}" value="${KRE.ef[k]}"
-        oninput="kreEf('${k}',this.value)">
-      <b class="m">${KRE.ef[k]>0&&k!=='tygodni'?'+':''}${KRE.ef[k]}</b></div>`;
-  const v=rysujOkno('kreator',`
-    <button class="mdlx" type="button" aria-label="Zamknij">×</button>
-    <div class="kick">Kreator</div>
-    <h2>Własny scenariusz</h2>
-    <div class="bd">
-      <div class="note" style="margin:0 0 12px">Ustaw, jak ma wyglądać serwer w chwili startu.
-      Scenariusz zapisze się jako plik moda i pojawi się na liście obok wbudowanych.</div>
-      <div class="krow"><span>Nazwa</span><input id="kn" type="text" maxlength="60" value="${esc(KRE.nazwa)}" placeholder="np. Wojna wszystkich ze wszystkimi"></div>
-      <div class="krow"><span>Trudność</span><input id="kt" type="text" maxlength="20" value="${esc(KRE.trudnosc)}"></div>
-      <div class="krow"><span>Autor</span><input id="ka" type="text" maxlength="40" value="${esc(KRE.autor)}" placeholder="twój nick"></div>
-      <div class="krow"><span>Opis</span><input id="ko" type="text" maxlength="200" value="${esc(KRE.opis)}" placeholder="co się dzieje na serwerze"></div>
-      <div class="sterlab" style="margin-top:16px">Wszystkie partie na starcie</div>
-      ${KRE_POLA.map(suwak).join('')}
-      <div class="sterlab" style="margin-top:14px">Zasady rozgrywki</div>
-      ${KRE_OGOLNE.map(suwak).join('')}
-
-      <div class="sterlab" style="margin-top:16px">Pojedyncze partie</div>
-      <div class="note" style="margin:0 0 10px">Kliknij partię, żeby ustawić ją osobno.
-      Te zmiany dochodzą do tego, co wyżej — możesz komuś dołożyć mandatów, kogoś pogrążyć,
-      a reszcie sceny nie ruszać.</div>
-      <div class="krepartie">
-        ${alive().map(k=>{const ile=kreIleZmian(k);
-          return `<button class="krep ${KRE.wybrana===k?'on':''} ${ile?'ma':''}"
-            onclick="krePartia('${k}')" title="${esc(G.p[k].n)}">
-            ${crest(k,'s')}<span>${G.p[k].ab}</span>${ile?`<i>${ile}</i>`:''}</button>`}).join('')}
-      </div>
-      ${KRE.wybrana?`
-        <div class="krebox">
-          <div class="krehd"><b>${esc(G.p[KRE.wybrana].n)}</b>
-            <button class="btn g sm" onclick="kreWyczysc('${KRE.wybrana}')">Wyczyść</button></div>
-          ${KRE_PARTIA.map(([pole,opis,mini,maks])=>{
-            const w=(KRE.partie[KRE.wybrana]||{})[pole]||0;
-            return `<div class="krow"><span>${opis}</span>
-              <input type="range" min="${mini}" max="${maks}" value="${w}"
-                oninput="krePole('${KRE.wybrana}','${pole}',this.value)">
-              <b class="m">${w>0?'+':''}${w}</b></div>`}).join('')}
-        </div>`:''}
-    </div>
-    <div class="op">
-      <button class="opt" id="kzap"><b>Zapisuję scenariusz</b><span>Trafi na listę przy następnym uruchomieniu</span></button>
-      <button class="opt" id="kno"><b>Jednak nie</b><span>Nic nie zapisuję</span></button>
-    </div>`);
-  const czytaj=()=>{
-    KRE.nazwa=(v.querySelector('#kn')||{}).value||'';
-    KRE.trudnosc=(v.querySelector('#kt')||{}).value||'Mod';
-    KRE.autor=(v.querySelector('#ka')||{}).value||'';
-    KRE.opis=(v.querySelector('#ko')||{}).value||'';
-  };
-  ['#kn','#kt','#ka','#ko'].forEach(s=>{const e=v.querySelector(s);if(e)e.oninput=czytaj});
-  v.querySelector('#kno').onclick=()=>{KRE=null;close();render()};
-  v.querySelector('.mdlx').onclick=()=>{KRE=null;close();render()};
-  v.querySelector('#kzap').onclick=()=>{czytaj();kreatorZapisz()};
+/* ── kreator scenariuszy ──
+   Był ciasnym oknem z listą kilkunastu suwaków, po której nie dało się poznać,
+   co właściwie powstaje. Teraz to pełny ekran: po lewej ustawienia w sekcjach,
+   po prawej żywy opis tego, co scenariusz naprawdę zrobi na starcie. */
+function kreOpisZmian(){
+  const e=KRE.ef, w=[], z=[];
+  if(e.skladProc)w.push(`partie ${e.skladProc>0?'większe':'mniejsze'} o <b>${Math.abs(e.skladProc)}%</b>`);
+  [['fame','sława'],['uni','jedność'],['act','aktywność'],['ctr','kontrowersja']].forEach(([k,n])=>{
+    if(e[k])w.push(`${n} u wszystkich <b>${e[k]>0?'+':''}${e[k]}</b>`)});
+  if(e.obecnosc)w.push(`obecność w kanałach <b>${e.obecnosc>0?'+':''}${e.obecnosc}</b>`);
+  if(e.kapital)z.push(`twój kapitał na start <b>${e.kapital>0?'+':''}${e.kapital}</b>`);
+  if(e.akcje)z.push(`akcje na tydzień <b>${e.akcje>0?'+':''}${e.akcje}</b>`);
+  if(e.tygodni!==12)z.push(`kadencja trwa <b>${e.tygodni}</b> ${pl(e.tygodni,'tydzień','tygodnie','tygodni')}`);
+  if(e.krolPrzychylnosc)z.push(`Król nastawiony <b>${e.krolPrzychylnosc>0?'+':''}${e.krolPrzychylnosc}</b>`);
+  return {sceny:w, zasady:z, osobne:Object.keys(KRE.partie).filter(k=>kreIleZmian(k))};
 }
-async function kreatorZapisz(){
+function kreatorEkran(){
+  const suwak=([k,opis,min,max,dom])=>{
+    const v=KRE.ef[k];
+    return `<div class="krow ${v!==dom?'ruszony':''}"><span>${opis}</span>
+      <input type="range" min="${min}" max="${max}" value="${v}"
+        oninput="kreEf('${k}',this.value)">
+      <b class="m">${v>0&&k!=='tygodni'?'+':''}${v}</b></div>`};
+  const op=kreOpisZmian();
+  const pusty=!op.sceny.length&&!op.zasady.length&&!op.osobne.length;
+  app.innerHTML=`
+  <div class="kreekran">
+    <div class="krehead">
+      <div>
+        <div class="kick">Kreator scenariuszy</div>
+        <h1>Zbuduj własny start serwera</h1>
+        <p class="dim">Ustawiasz, jak wygląda scena w chwili, gdy siadasz do gry.
+        Gotowy scenariusz zapiszesz jako plik i wyślesz komu chcesz.</p>
+      </div>
+      <button class="btn g sm" onclick="kreWyjdz()">← Wracam do listy</button>
+    </div>
+
+    <div class="krebody">
+      <div class="krelewa">
+        <div class="card"><div class="h"><h3>Podstawy</h3></div><div class="b">
+          <div class="krow"><span>Nazwa</span><input id="kn" type="text" maxlength="60"
+            value="${esc(KRE.nazwa)}" placeholder="np. Wojna wszystkich ze wszystkimi"></div>
+          <div class="krow"><span>Trudność</span><input id="kt" type="text" maxlength="20"
+            value="${esc(KRE.trudnosc)}" placeholder="np. Trudny"></div>
+          <div class="krow"><span>Autor</span><input id="ka" type="text" maxlength="40"
+            value="${esc(KRE.autor)}" placeholder="twój nick"></div>
+          <div class="krow"><span>Opis</span><input id="ko" type="text" maxlength="200"
+            value="${esc(KRE.opis)}" placeholder="co się stało na serwerze"></div>
+        </div></div>
+
+        <div class="card"><div class="h"><h3>Wszystkie partie na starcie</h3>
+          <span class="n">dotyczy każdego, łącznie z tobą</span></div><div class="b">
+          ${KRE_POLA.map(suwak).join('')}
+        </div></div>
+
+        <div class="card"><div class="h"><h3>Zasady rozgrywki</h3></div><div class="b">
+          ${KRE_OGOLNE.map(suwak).join('')}
+        </div></div>
+
+        <div class="card"><div class="h"><h3>Pojedyncze partie</h3>
+          <span class="n">${op.osobne.length?op.osobne.length+' ustawionych':'nic osobno'}</span></div><div class="b">
+          <div class="note" style="margin:0 0 11px">Te zmiany dochodzą do tego, co wyżej.
+          Możesz komuś dołożyć mandatów, kogoś pogrążyć, a reszty sceny nie ruszać.</div>
+          <div class="krepartie">
+            ${alive().map(k=>{const ile=kreIleZmian(k);
+              return `<button class="krep ${KRE.wybrana===k?'on':''} ${ile?'ma':''}"
+                onclick="krePartia('${k}')" title="${esc(G.p[k].n)}">
+                ${crest(k,'s')}<span>${G.p[k].ab}</span>${ile?`<i>${ile}</i>`:''}</button>`}).join('')}
+          </div>
+          ${KRE.wybrana?`<div class="krebox">
+            <div class="krehd"><b>${esc(G.p[KRE.wybrana].n)}</b>
+              <button class="btn g sm" onclick="kreWyczysc('${KRE.wybrana}')">Wyczyść</button></div>
+            ${KRE_PARTIA.map(([pole,opis,mini,maks])=>{
+              const w=(KRE.partie[KRE.wybrana]||{})[pole]||0;
+              return `<div class="krow ${w?'ruszony':''}"><span>${opis}</span>
+                <input type="range" min="${mini}" max="${maks}" value="${w}"
+                  oninput="krePole('${KRE.wybrana}','${pole}',this.value)">
+                <b class="m">${w>0?'+':''}${w}</b></div>`}).join('')}
+          </div>`:'<div class="dim" style="font-size:12.5px">Kliknij herb, żeby ustawić partię osobno.</div>'}
+        </div></div>
+      </div>
+
+      <div class="kreprawa">
+        <div class="card win"><div class="h"><h3>Tak to wyjdzie</h3></div><div class="b">
+          <div class="krepodg">
+            <b>${esc(KRE.nazwa)||'<span class="dim">Scenariusz bez nazwy</span>'}</b>
+            <span class="krett">${esc(KRE.trudnosc)||'Mod'}</span>
+          </div>
+          <p class="dim" style="font-size:13px;margin:0 0 12px">${esc(KRE.opis)||'Brak opisu.'}</p>
+          ${pusty?`<div class="note">Na razie nic nie zmieniasz — to będzie zwykły
+            <b>Sejm zastany</b>. Poruszaj suwakami po lewej, a tutaj zobaczysz, co z tego wychodzi.</div>`:`
+            ${op.sceny.length?`<div class="sterlab">Scena na starcie</div>
+              <ul class="krelista">${op.sceny.map(x=>'<li>'+x+'</li>').join('')}</ul>`:''}
+            ${op.zasady.length?`<div class="sterlab" style="margin-top:12px">Zasady</div>
+              <ul class="krelista">${op.zasady.map(x=>'<li>'+x+'</li>').join('')}</ul>`:''}
+            ${op.osobne.length?`<div class="sterlab" style="margin-top:12px">Osobno ustawione</div>
+              <ul class="krelista">${op.osobne.map(k=>`<li><b>${G.p[k].ab}</b> — ${kreIleZmian(k)}
+                ${pl(kreIleZmian(k),'zmiana','zmiany','zmian')}</li>`).join('')}</ul>`:''}`}
+        </div></div>
+
+        <div class="kreakcje">
+          <button class="btn" onclick="kreatorZapisz()">Zapisz na listę</button>
+          <button class="btn g" onclick="kreatorDoPliku()">Zapisz do pliku…</button>
+          <button class="btn g" onclick="kreWyjdz()">Odrzuć</button>
+        </div>
+        <div class="dim" style="font-size:11.5px;margin-top:9px">
+          Plik <b>.mmscen</b> wyślesz komukolwiek — wczyta go przyciskiem
+          <b>Wczytaj z pliku</b> na liście scenariuszy.</div>
+      </div>
+    </div>
+  </div>`;
+  ['#kn','#kt','#ka','#ko'].forEach(s=>{const e=document.querySelector(s);
+    if(e)e.oninput=()=>{kreCzytaj();kreOdswiezPodglad()}});
+}
+/* Tekst czytamy bez przerysowania ekranu — inaczej pisanie w polu przerywałoby
+   się po każdej literze. */
+function kreCzytaj(){
   if(!KRE)return;
+  const w=s=>(document.querySelector(s)||{}).value||'';
+  KRE.nazwa=w('#kn'); KRE.trudnosc=w('#kt')||'Mod'; KRE.autor=w('#ka'); KRE.opis=w('#ko');
+}
+function kreOdswiezPodglad(){
+  const b=document.querySelector('.krepodg b'), tt=document.querySelector('.krepodg .krett'),
+        o=document.querySelector('.kreprawa .b>p');
+  if(b)b.innerHTML=esc(KRE.nazwa)||'<span class="dim">Scenariusz bez nazwy</span>';
+  if(tt)tt.textContent=KRE.trudnosc||'Mod';
+  if(o)o.textContent=KRE.opis||'Brak opisu.';
+}
+function kreWyjdz(){KRE=null;render()}
+async function kreatorDoPliku(){
+  kreCzytaj();
   if(!KRE.nazwa.trim())return modal('Kreator','Bez nazwy ani rusz',
-    `<p>Scenariusz musi mieć nazwę — po niej znajdziesz go na liście.</p>`,
-    [{l:'Wracam',f:()=>{close();kreatorRys()}}]);
+    '<p>Scenariusz musi mieć nazwę — po niej znajdziesz go na liście.</p>',[{l:'Wracam',f:close}]);
+  const plik=await zapiszScenPlik(kreatorDane());
+  if(plik)modal('Zapisany','Scenariusz w pliku',
+    `<p>Zapisałem <b>${esc(plik)}</b>. Możesz go teraz wysłać komu chcesz —
+     wczyta go przyciskiem <b>Wczytaj z pliku</b> na liście scenariuszy.</p>`,
+    [{l:'Dobra',f:close}]);
+}
+function kreatorRys(){kreatorEkran()}
+/* Jedno miejsce, w którym powstaje scenariusz. Zapis na listę i zapis do pliku
+   biorą stąd to samo, więc plik wysłany koledze zadziała identycznie. */
+function kreatorDane(){
   const zmiany=[];
   KRE_POLA.concat(KRE_OGOLNE).forEach(([k,opis,,,dom])=>{
     if(KRE.ef[k]!==dom)zmiany.push(`${opis}: ${KRE.ef[k]>0?'+':''}${KRE.ef[k]}`);
   });
   const mod={nazwa:KRE.nazwa.trim(),opis:KRE.opis.trim()||'Scenariusz z kreatora.',
     trudnosc:KRE.trudnosc.trim()||'Mod',autor:KRE.autor.trim(),
-    zmiany:zmiany.join(' · ')||'Bez zmian względem zwykłej gry.',
     efekty:{wszystkie:{},partie:{}}};
   KRE_POLA.forEach(([k,,,,dom])=>{if(KRE.ef[k]!==dom)mod.efekty.wszystkie[k]=KRE.ef[k]});
   KRE_OGOLNE.forEach(([k,,,,dom])=>{if(KRE.ef[k]!==dom)mod.efekty[k]=KRE.ef[k]});
@@ -3477,6 +3600,15 @@ async function kreatorZapisz(){
       zmiany.push(`${G.p[k]?G.p[k].ab:k}: `+Object.keys(z).map(p=>`${p} ${z[p]>0?'+':''}${z[p]}`).join(', '));
     }
   });
+  mod.zmiany=zmiany.join(' · ')||'Bez zmian względem zwykłej gry.';
+  return mod;
+}
+async function kreatorZapisz(){
+  if(!KRE)return;
+  if(!KRE.nazwa.trim())return modal('Kreator','Bez nazwy ani rusz',
+    `<p>Scenariusz musi mieć nazwę — po niej znajdziesz go na liście.</p>`,
+    [{l:'Wracam',f:()=>{close();kreatorRys()}}]);
+  const mod=kreatorDane();
   const a=(window.pywebview&&window.pywebview.api)||null;
   if(!a||!a.mod_zapisz)return modal('Kreator','Nie mam gdzie tego zapisać',
     `<p>Zapis modów działa w wersji na komputer. W przeglądarce nie ma dostępu do plików.</p>`,
@@ -3933,7 +4065,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.35';
+let WERSJA='1.1.36';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3944,6 +4076,13 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.36':{data:'5 sierpnia 2026', zmiany:[
+   'NOWY KREATOR SCENARIUSZY. Byl ciasnym oknem z kilkunastoma suwakami, po ktorym nie dalo sie poznac, co wlasciwie powstaje. Teraz to pelny ekran: ustawienia w sekcjach po lewej, a po prawej stale widoczny opis tego, co scenariusz naprawde zrobi na starcie.',
+   'SCENARIUSZ JAKO PLIK. Zapisujesz go jako plik .mmscen i wysylasz komu chcesz. Na liscie scenariuszy jest przycisk Wczytaj z pliku, ktory stawia cudzy scenariusz obok wbudowanych.',
+   'Naprawione: zmiana skladu partii dzialala odwrotnie. Scenariusz ustawiony na partie mniejsze o 30% robil je o 30% wiekszymi. Przy powiekszaniu ludzie biora sie teraz z puli bezpartyjnych, a nie znikad.',
+   'Suwak, ktory ruszyles, jest podswietlony, wiec widac, co zmieniles wzgledem zwyklej gry.',
+ ]},
+
  '1.1.35':{data:'5 sierpnia 2026', zmiany:[
    'KONIEC PRZEBUDOWYWANIA EKRANU. Gra po kazdej decyzji niszczyla caly ekran i tworzyla go od nowa. Teraz ekran jest zszywany: porownanie wezel po wezle zostawia nietkniete wszystko, co sie nie zmienilo.',
    'Dzieki temu paski cech dojezdzaja plynnie zamiast przeskakiwac, przewijanie zostaje tam, gdzie bylo, herby i awatary nie mrugaja przy kazdym kliknieciu, a odczyt, ktory sie wlasnie zmienil, mruga zlotem.',
@@ -9359,7 +9498,7 @@ function dead(){
     <div style="margin-top:24px"><button class="btn" onclick="newRun()">Od nowa</button></div></div>`}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,
@@ -9371,7 +9510,9 @@ Object.assign(window,{podglad,przewidz,start,pickParty,danina,openSave,doLobby,t
   setTab:k=>{if(G.tab!==k)G._we=1;G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
   signAgent,agentCost,agentFree,AGENTS,render,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
-window.__game={przewidz,podglad,get PROBA(){return PROBA},myGoals,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,
+window.__game={przewidz,podglad,get PROBA(){return PROBA},
+  get KRE(){return KRE}, SCEN, kreatorDane,
+  myGoals,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,
   openDym,pusteResorty,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
   zawiedzeniKoalicjanci,demografiaSerwera,SERVER,SERVER_MAX,AGENTS,mogeZglosic,rozwiazChance,radaKto,RESORTY,pmOsoba,pmOsoby,leads,roster,
   aiTransfery,aiOpozycja,aiObsadzRade,aiRekonstrukcja,znuzenie,hegemon,resortyPartii,leadWybrany,aiPlan,ustawPlany,
@@ -9391,7 +9532,7 @@ window.__game={przewidz,podglad,get PROBA(){return PROBA},myGoals,goalDone,goalO
   CHAR,charOf,aiWagi,aiLos,aiOkreg,aiCel,ai,POSTERS,aiCoal,aiGoals,aiAgents,campInit,aiPrzemiana,obsadz,openResort,partiaOsoby,premierTab,prezydentTab,TOTAL_SEATS_LIVE,
   openCamp,campBar,campRank,runFinalCamp,closeFinalCamp,
   get G(){return G}, setRender(f){render=f}, setModal(f){modal=f},
-  MODY:()=>MODY, wczytajMody, modEfekty, modyDoScen};
+  MODY:()=>MODY, ustawMody:v=>{MODY=Array.isArray(v)?v:[]}, wczytajMody, modEfekty, modyDoScen};
 render();
 /* Mody dociągamy po pierwszym rysowaniu: most do Pythona wstaje chwilę po stronie,
    a ekran wyboru scenariusza i tak przerysuje się, gdy lista dojdzie. */

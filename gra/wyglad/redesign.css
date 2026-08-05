@@ -599,6 +599,47 @@ body::after{
   color:var(--dim);background:rgba(0,0,0,.3);border:1px solid var(--line)}
 .lukurna.blisko{color:#f4a89f;background:rgba(213,84,74,.12);border-color:rgba(213,84,74,.4)}
 
+/* ═══════════════════════════════════════════════════════════
+   KREATOR SCENARIUSZY
+   Był oknem z kilkunastoma suwakami, po którym nie dało się poznać, co
+   właściwie powstaje. Teraz to pełny ekran: ustawienia po lewej, a po prawej
+   stale widoczny opis tego, co scenariusz zrobi na starcie.
+   ═══════════════════════════════════════════════════════════ */
+.kreekran{max-width:1500px;margin:0 auto;padding:var(--o5) 0 var(--o6)}
+.krehead{display:flex;align-items:flex-start;gap:var(--o5);margin-bottom:var(--o5);
+  padding-bottom:var(--o4);border-bottom:1px solid var(--line)}
+.krehead h1{font-size:34px;margin:var(--o2) 0 var(--o2)}
+.krehead p{max-width:62ch;font-size:14px;margin:0}
+.krehead>button{margin-left:auto;flex:none}
+.krebody{display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:var(--o5);align-items:start}
+.krelewa{display:flex;flex-direction:column;gap:var(--o4);min-width:0}
+.kreprawa{position:sticky;top:var(--o4)}
+
+/* suwak, który gracz ruszył, ma to po sobie pokazać */
+.krow.ruszony>span{color:var(--tx)}
+.krow.ruszony>b{color:var(--acc)}
+.krow.ruszony{background:rgba(217,171,69,.05);border-radius:var(--r2)}
+
+.krepodg{display:flex;align-items:center;gap:var(--o3);margin-bottom:var(--o2)}
+.krepodg b{font-family:var(--fd);font-size:19px;font-weight:600;min-width:0}
+.krett{margin-left:auto;flex:none;font-family:var(--m);font-size:9.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--acc);border:1px solid var(--acc2);
+  border-radius:999px;padding:3px 10px;font-weight:700}
+.krelista{list-style:none;margin:var(--o2) 0 0;padding:0;display:flex;flex-direction:column;gap:5px}
+.krelista li{position:relative;padding-left:15px;font-size:12.5px;line-height:1.45;color:var(--dim)}
+.krelista li::before{content:'';position:absolute;left:2px;top:8px;width:5px;height:5px;
+  border-radius:50%;background:var(--acc);opacity:.75}
+.krelista li b{color:var(--tx)}
+.kreakcje{display:flex;flex-direction:column;gap:var(--o2);margin-top:var(--o4)}
+.kreakcje .btn{width:100%;justify-content:center;text-align:center}
+
+.scennarz{display:flex;gap:var(--o3);margin-top:var(--o5);flex-wrap:wrap;align-items:center}
+
+@media (max-width:1080px){
+  .krebody{grid-template-columns:minmax(0,1fr)}
+  .kreprawa{position:static}
+}
+
 /* ─────────── DOSTĘPNOŚĆ ───────────
    Kto ma w systemie wyłączone animacje, ten dostaje grę bez ruchu.
    Wygląd zostaje ten sam, znika wyłącznie ruch. */
