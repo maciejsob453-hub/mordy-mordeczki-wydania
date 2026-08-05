@@ -2551,6 +2551,98 @@ function applyTheme(){
 
 /* ══════════ RENDER ══════════ */
 const app=document.getElementById('app');
+
+/* ═══════════════════════════════════════════════════════════
+   ZSZYWANIE EKRANU
+   Gra buduje cały ekran jako jeden napis i wpisywała go w app.innerHTML po
+   każdej decyzji. Wszystko było wtedy niszczone i tworzone od nowa: liczby
+   skakały zamiast dojeżdżać, przewijanie wracało na górę, obrazki mrugały,
+   a najechanie kursorem gubiło się w trakcie.
+
+   Zamiast przepisywać dwadzieścia trzy miejsca, w których gra rysuje ekran,
+   przechwytujemy samo przypisanie. Nowy napis trafia do oderwanego pudełka,
+   a potem idzie porównanie węzeł po węźle: co się nie zmieniło, zostaje
+   nietknięte. Dzięki temu przejścia CSS mają na czym działać, bo element
+   naprawdę trwa między jednym rysowaniem a drugim.
+   ═══════════════════════════════════════════════════════════ */
+const OPIS_INNER=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');
+
+const tenSamWezel=(a,b)=>a.nodeType===b.nodeType&&
+  (a.nodeType!==1||(a.tagName===b.tagName&&(a.id||'')===(b.id||'')));
+
+function zszyjAtrybuty(stary,nowy){
+  const na=nowy.attributes;
+  for(let i=na.length-1;i>=0;i--){
+    const at=na[i];
+    if(stary.getAttribute(at.name)!==at.value)stary.setAttribute(at.name,at.value);
+  }
+  const sa=stary.attributes;
+  for(let i=sa.length-1;i>=0;i--){
+    const at=sa[i];
+    if(!nowy.hasAttribute(at.name))stary.removeAttribute(at.name);
+  }
+  /* Pola formularza trzymają to, co wpisał gracz, we właściwości, a nie
+     w atrybucie. Bez tego kod zapisu kasowałby się w trakcie pisania. */
+  const tg=stary.tagName;
+  if(tg==='INPUT'||tg==='TEXTAREA'){
+    if(stary!==document.activeElement&&stary.value!==nowy.value)stary.value=nowy.value;
+    if(stary.checked!==nowy.checked)stary.checked=nowy.checked;
+  } else if(tg==='SELECT'&&stary!==document.activeElement){
+    if(stary.value!==nowy.value)stary.value=nowy.value;
+  }
+}
+
+function zszyjWezel(stary,nowy){
+  if(stary.nodeType===3||stary.nodeType===8){
+    if(stary.nodeValue!==nowy.nodeValue)stary.nodeValue=nowy.nodeValue;
+    return;
+  }
+  if(stary.nodeType!==1)return;
+  zszyjAtrybuty(stary,nowy);
+  zszyjDzieci(stary,nowy);
+}
+
+function zszyjDzieci(stary,nowy){
+  const nd=nowy.childNodes;
+  for(let i=0;i<nd.length;i++){
+    const n=nd[i], s=stary.childNodes[i];
+    if(!s){stary.appendChild(document.importNode(n,true));continue}
+    if(tenSamWezel(s,n))zszyjWezel(s,n);
+    else stary.replaceChild(document.importNode(n,true),s);
+  }
+  while(stary.childNodes.length>nd.length)stary.removeChild(stary.lastChild);
+}
+
+function zszyj(cel,html){
+  const pudlo=document.createElement('div');
+  OPIS_INNER.set.call(pudlo,html);
+  zszyjDzieci(cel,pudlo);
+}
+
+Object.defineProperty(app,'innerHTML',{
+  configurable:true,
+  get(){return OPIS_INNER.get.call(app)},
+  set(html){
+    const przewijanie=window.scrollY;
+    /* Skoro odczyty przeżywają rysowanie, da się wreszcie zobaczyć, że się
+       zmieniły. Zapamiętujemy je przed zszyciem i mrugamy tymi, które poszły
+       w górę albo w dół — wcześniej liczba po prostu była inna. */
+    const odczyty=[...app.querySelectorAll('.rs .rv b')];
+    const przed=odczyty.map(x=>x.textContent);
+    zszyj(app,html);
+    app.querySelectorAll('.rs .rv b').forEach((x,i)=>{
+      if(przed[i]===undefined||przed[i]===x.textContent)return;
+      const rs=x.closest('.rs'); if(!rs)return;
+      rs.classList.remove('mrug'); void rs.offsetWidth; rs.classList.add('mrug');
+      setTimeout(()=>rs.classList.remove('mrug'),520);
+    });
+    /* Animacja wejścia zakładki nie odpali się sama, kiedy element przetrwał
+       zszywanie — trzeba ją przerwać i puścić od nowa. */
+    const w=app.querySelector('.widok.wejscie');
+    if(w){w.classList.remove('wejscie');void w.offsetWidth;w.classList.add('wejscie')}
+    if(window.scrollY!==przewijanie)window.scrollTo(0,przewijanie);
+  }
+});
 const crest=(k,s='m')=>{const src=(G&&G.p&&G.p[k]&&G.p[k].logo&&LOGOS[G.p[k].logo])||LOGOS[k]||'';
   return `<img class="crest ${s}" src="${src}" alt="${(G?G.p[k]:BASE[k]).ab}">`};
 const stars=d=>'★'.repeat(d)+'☆'.repeat(5-d);
@@ -3841,7 +3933,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.34';
+let WERSJA='1.1.35';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3852,6 +3944,13 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.35':{data:'5 sierpnia 2026', zmiany:[
+   'KONIEC PRZEBUDOWYWANIA EKRANU. Gra po kazdej decyzji niszczyla caly ekran i tworzyla go od nowa. Teraz ekran jest zszywany: porownanie wezel po wezle zostawia nietkniete wszystko, co sie nie zmienilo.',
+   'Dzieki temu paski cech dojezdzaja plynnie zamiast przeskakiwac, przewijanie zostaje tam, gdzie bylo, herby i awatary nie mrugaja przy kazdym kliknieciu, a odczyt, ktory sie wlasnie zmienil, mruga zlotem.',
+   'Pole tekstowe, w ktorym wlasnie piszesz, nie kasuje sie w trakcie rysowania.',
+   'Zszywanie objelo wszystkie dwadziescia trzy miejsca, w ktorych gra rysuje ekran, bez zmiany ani jednego z nich: przechwycone jest samo przypisanie tresci.',
+ ]},
+
  '1.1.34':{data:'5 sierpnia 2026', zmiany:[
    'PODGLAD SKUTKOW. Najedz kursorem na decyzje, a paski cech w bocznej kolumnie pokaza ducha: zakreskowany odcinek mowi, dokad pojedzie kazda cecha, a przy liczbie staja widelki w rodzaju 62 +5...+8. Przestales klikac w ciemno.',
    'Widelki, a nie jedna liczba, bo skutki sa losowe z zalozenia. Gra odpala prawdziwa decyzje dziewiec razy na kopii stanu i pokazuje rozrzut, jaki z tego wyszedl. Zaden wynik nie jest zmyslony ani wpisany recznie, wiec podglad nie rozjedzie sie z gra.',

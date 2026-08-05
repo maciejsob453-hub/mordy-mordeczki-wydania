@@ -288,6 +288,14 @@ body::after{
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .rs .rv span{font-size:9.5px;letter-spacing:.15em}
 .rs svg,.rs img{filter:drop-shadow(0 0 8px rgba(217,171,69,.3))}
+/* odczyt, który się właśnie zmienił, mruga — dopiero po zszywaniu ekranu
+   element trwa na tyle długo, żeby dało się to w ogóle pokazać */
+.rs .rv b{transition:filter .18s}
+.rs.mrug .rv b{animation:mrugniecie .5s var(--krzywa)}
+@keyframes mrugniecie{
+  0%{filter:brightness(1)}
+  22%{filter:brightness(1.75) drop-shadow(0 0 14px rgba(217,171,69,.85))}
+  100%{filter:brightness(1)}}
 /* moduł pod kursorem podnosi się i rozjaśnia — widać, że da się w niego wejść */
 .rs.tip::after{content:'';position:absolute;inset:2px;border-radius:var(--r2);
   background:rgba(217,171,69,.07);opacity:0;transition:opacity .16s;pointer-events:none}
