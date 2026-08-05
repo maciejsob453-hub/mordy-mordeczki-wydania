@@ -3812,7 +3812,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.29';
+let WERSJA='1.1.30';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3823,6 +3823,11 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.30':{data:'5 sierpnia 2026', zmiany:[
+   'Ekran startowy: zza tytulu bije cieple swiatlo, liczby serwera sa duze i zlote, a karty trybow wyraznie leza nad tlem i mocniej reaguja na kursor.',
+   'Cechy przewodniczacego: poprawione obciecie podpisu AUTORYTET.',
+ ]},
+
  '1.1.29':{data:'5 sierpnia 2026', zmiany:[
    'Nowa paleta calej gry. Tlo zeszlo glebiej, a panele poszly w gore, wiec karty wreszcie wygladaja jak karty lezace na czyms, a nie jak plamy w tym samym kolorze co tlo.',
    'Sala obrad dostala atmosfere: cieple swiatlo znad mownicy, przyciemnione brzegi i delikatne ziarno jak na transmisji z obrad.',
