@@ -457,6 +457,26 @@ body::after{
    Tło za oknem rozmywa grę zamiast ją tylko przyciemniać — okno wychodzi
    na wierzch, a nie leży na płaskiej czerni. */
 .veil{backdrop-filter:blur(7px) saturate(.8);background:rgba(4,7,4,.74)}
+/* Okno decyzji to ten sam klocek co karta i karta trybu: mosiężna listwa
+   u góry, okucie w rogu, wybory jako osadzone płytki. */
+.mdl{position:relative;overflow:hidden}
+.mdl::before{content:'';position:absolute;left:0;right:0;top:0;height:2px;z-index:2;
+  background:linear-gradient(90deg,transparent,var(--acc) 20%,#f7e3aa 50%,var(--acc) 80%,transparent);
+  opacity:.75}
+.mdl::after{content:'';position:absolute;right:10px;bottom:10px;width:15px;height:15px;
+  border-bottom:1px solid var(--acc);border-right:1px solid var(--acc);opacity:.35;pointer-events:none}
+.mdl .h .k{letter-spacing:.2em;font-size:10px}
+.mdl .h h2{font-family:var(--fd);font-weight:600}
+/* opcja do wyboru wygląda na płytkę, którą się naciska, a nie na wiersz listy */
+.opt{background:linear-gradient(180deg,var(--p2),rgba(0,0,0,.3));
+  border:1px solid var(--line);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+  transition:border-color .16s,background .16s,transform .14s var(--krzywa)}
+.opt:hover{border-color:var(--acc);transform:translateX(3px);
+  background:linear-gradient(180deg,rgba(217,171,69,.1),rgba(0,0,0,.28));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 0 26px -16px var(--acc)}
+.mdlx{transition:border-color .15s,background .15s,transform .15s var(--sprezyna)}
+.mdlx:hover{transform:rotate(90deg)}
 .mdl{animation:oknoWjazd .26s var(--sprezyna) both;
   border:1px solid var(--line2);
   background:linear-gradient(180deg,var(--p2),var(--p1) 46%)}

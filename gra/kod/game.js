@@ -4095,7 +4095,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.40';
+let WERSJA='1.1.41';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4106,6 +4106,11 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.41':{data:'5 sierpnia 2026', zmiany:[
+   'OKNA I MODALE w tym samym jezyku: mosiezna listwa u gory, okucie w rogu, naglowek szeryfowy. Opcje do wyboru wygladaja teraz na plytki, ktore sie naciska, a nie na wiersze listy — pod kursorem odjezdzaja w bok i swieca zlotem.',
+   'Krzyzyk zamykajacy obraca sie pod kursorem.',
+ ]},
+
  '1.1.40':{data:'5 sierpnia 2026', zmiany:[
    'KARTY W CALEJ GRZE jako plyty, tym samym jezykiem co ekrany startowe: krawedz swiatla u gory, listwa w barwie dzialu pod naglowkiem i okucie w rogu, ktore zapala sie pod kursorem. Jedna zmiana przeszla naraz na Sejm, Sondaz, Partie, Lidera i Cele.',
  ]},
