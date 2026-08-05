@@ -2567,6 +2567,10 @@ const app=document.getElementById('app');
    ═══════════════════════════════════════════════════════════ */
 const OPIS_INNER=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');
 
+/* Liczby, które mrugają, kiedy zmienią wartość, i pudełka, które przy tym świecą */
+const MRUG_LICZBY='.rs .rv b,.nocsz .tabliczki b';
+const MRUG_PUDLO='.rs,.tabliczki>div';
+
 const tenSamWezel=(a,b)=>a.nodeType===b.nodeType&&
   (a.nodeType!==1||(a.tagName===b.tagName&&(a.id||'')===(b.id||'')));
 
@@ -2626,13 +2630,14 @@ Object.defineProperty(app,'innerHTML',{
     const przewijanie=window.scrollY;
     /* Skoro odczyty przeżywają rysowanie, da się wreszcie zobaczyć, że się
        zmieniły. Zapamiętujemy je przed zszyciem i mrugamy tymi, które poszły
-       w górę albo w dół — wcześniej liczba po prostu była inna. */
-    const odczyty=[...app.querySelectorAll('.rs .rv b')];
+       w górę albo w dół — wcześniej liczba po prostu była inna.
+       To samo dotyczy tabliczek nocy wyborczej: rosną w trakcie liczenia. */
+    const odczyty=[...app.querySelectorAll(MRUG_LICZBY)];
     const przed=odczyty.map(x=>x.textContent);
     zszyj(app,html);
-    app.querySelectorAll('.rs .rv b').forEach((x,i)=>{
+    app.querySelectorAll(MRUG_LICZBY).forEach((x,i)=>{
       if(przed[i]===undefined||przed[i]===x.textContent)return;
-      const rs=x.closest('.rs'); if(!rs)return;
+      const rs=x.closest(MRUG_PUDLO); if(!rs)return;
       rs.classList.remove('mrug'); void rs.offsetWidth; rs.classList.add('mrug');
       setTimeout(()=>rs.classList.remove('mrug'),520);
     });
@@ -3666,42 +3671,90 @@ function startNight(){
   const rows=Object.keys(grp).map(c=>{const g=grp[c],lista=!!CO()[c];
     return {ab:lista?c:G.p[c].ab, n:lista?CO()[c].n:G.p[c].n, m:g.m, st:g.st,
       pct:g.v/total*100, col:lista?(CO()[c].c||G.p[g.m[0]].c):G.p[c].c, mine:g.m.includes(G.me),
+      /* próg tej listy: im więcej partii pod jednym szyldem, tym wyżej.
+         Bez tego noc nie mówi najważniejszej rzeczy — kto siada tuż pod kreską. */
+      thr:thrFor(g.m.length), we:g.st>0, gl:g.v,
       d:prevH?g.st-g.m.reduce((a,k)=>a+(prevH[k]||0),0):null}})
     .sort((a,b)=>b.pct-a.pct);
   G.night={i:0,done:false,rows,total};
 }
 function nightScreen(){
-  const N=G.night, poz=N.rows.length, odkryte=N.rows.slice(poz-N.i), settled=N.i>=poz, remain=poz-N.i;
+  const N=G.night, poz=N.rows.length, settled=N.i>=poz, remain=poz-N.i;
+  /* Zszywanie ekranu porównuje dzieci po numerze, więc lista musi rosnąć NA KOŃCU.
+     Wcześniej nowy wynik dochodził na początek: każdy wiersz podmieniał treść
+     w cudzym węźle, przez co nowa lista wjeżdżała bez ruchu, a przerysowywany
+     był wiersz na samym dole — ten pokazany dawno temu. Dlatego w treści idą
+     od najsłabszej, a .nightbox odwraca je z powrotem, żeby zwycięzca był u góry.
+
+     Z tego samego powodu pusty cokół i cokół z nazwiskiem mają różne id:
+     zszywanie porównuje węzły po id, więc dopiero to robi z tego wymianę węzła,
+     a nie podmianę treści w starym — i animacja wjazdu ma się na czym odpalić. */
+  const podane=N.rows.slice(poz-N.i), ujawnione=podane.slice().reverse();
   const max=Math.max(...N.rows.map(r=>r.pct),1);
   const zwyc=settled?N.rows[0]:null;
+  // starsze zapisy nie mają w wierszu ani progu, ani liczby głosów — stąd zapasy
+  const glosy=r=>r.gl!==undefined?r.gl:Math.round(r.pct/100*N.total);
+  const wszedl=r=>r.we!==undefined?r.we:r.st>0;
+  const policzone=podane.reduce((a,r)=>a+glosy(r),0);
+  const kolejnosc=N.rows.slice().reverse();     // komisje podają od najsłabszej
   app.innerHTML=`
-  <div class="intro" style="padding:38px 0 8px">
-    <div class="kick">Noc wyborcza · kadencja ${G.term} · ${N.total} głosów</div>
-    <h1>${remain===1?'Ostatnia lista, ta najważniejsza…':'Liczymy głosy'}</h1>
-    <p>Wyniki spływają od najsłabszych. ${!settled?`Zostało ${remain} ${pl(remain,'lista','listy','list')}.`:'Wszystko policzone.'}</p>
-  </div>
-  ${zwyc?`<div class="card win" style="margin-bottom:14px;text-align:center;padding:16px">
-    <div class="dim" style="font-size:11.5px;letter-spacing:.14em;text-transform:uppercase">Zwycięzca nocy</div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:6px">
-      ${zwyc.m.slice(0,4).map(k=>crest(k,'s')).join('')}
-      <b style="font-size:19px;color:${zwyc.mine?'var(--acc)':'var(--tx)'}">${zwyc.n}</b>
-      <span class="m dim">${fmt(zwyc.pct)}% · ${zwyc.st} ${pl(zwyc.st,'mandat','mandaty','mandatów')}</span>
-    </div></div>`:''}
-  <div class="card"><div class="b nightbox">
-    ${odkryte.map((r,idx)=>{const miejsce=poz-N.i+idx+1;
-      return `<div class="nrow ${r.mine?'me':''} ${idx===0&&!settled?'fresh':''}">
-        <div class="npos">${miejsce}</div>
-        <div class="ncrest">${r.m.slice(0,4).map(k=>crest(k,'s')).join('')}</div>
-        <div class="nname"><b>${r.n}</b><span>${r.m.map(k=>G.p[k].ab).join(' · ')}</span></div>
-        <div class="ntrk"><i style="width:${(r.pct/max*100).toFixed(1)}%;background:${r.col}"></i></div>
-        <div class="npct">${fmt(r.pct)}%</div>
-        <div class="nseat">${r.st}<em>${pl(r.st,'mandat','mandaty','mandatów')}</em>
-          ${r.d!==null&&r.d!==0?`<u class="${r.d>0?'up':'dn'}">${r.d>0?'+':''}${r.d}</u>`:''}</div>
-      </div>`}).join('')||'<div class="dim" style="padding:24px;text-align:center">Komisje zaraz podadzą pierwsze wyniki…</div>'}
-  </div></div>
-  <div style="display:flex;gap:10px;justify-content:center;margin-top:18px">
-    ${!settled?`<button class="btn g" onclick="nightSkip()">Pokaż wszystko od razu</button>`
-      :`<button class="btn" onclick="nightEnd()">Przechodzę do wyników →</button>`}
+  <div class="nocekran">
+    <div class="nocsz">
+      <div class="kick">Noc wyborcza · kadencja ${G.term}</div>
+      <h1>${settled?'Wszystko policzone':remain===1?'Ostatnia lista, ta najważniejsza…':'Liczymy głosy'}</h1>
+      <p>${settled?'Komisje zamknęły protokoły. Tak wygląda nowy sejm.'
+        :'Komisje podają wyniki od najsłabszej listy.'}</p>
+      <div class="tabliczki">
+        <div><b>${policzone}</b><span>policzone głosy</span></div>
+        <div><b>${N.i}/${poz}</b><span>podane listy</span></div>
+        <div><b>${Math.round(N.total/SERVER*100)}%</b><span>frekwencja</span></div>
+        <div><b>${TOTAL_SEATS}</b><span>mandatów w grze</span></div>
+      </div>
+      <div class="nockom">
+        <span class="luke">komisje</span>
+        <div class="nockomt">${kolejnosc.map((r,j)=>
+          `<i class="${j<N.i?'on':''}" style="--pc:${r.col}"></i>`).join('')}</div>
+        <span class="luke">${settled?'wszystkie podały':`zostało ${remain}`}</span>
+      </div>
+    </div>
+
+    <div class="noccokol ${zwyc?'jest':''}">
+      <div class="mramka"></div>
+      <div class="luke">Zwycięzca nocy</div>
+      ${zwyc?`<div class="nocczolo" id="cokol-jest">
+          <div class="ncrest">${zwyc.m.slice(0,4).map(k=>crest(k,'m')).join('')}</div>
+          <div class="noccn"><b>${zwyc.n}</b><span>${zwyc.m.map(k=>G.p[k].ab).join(' · ')}</span></div>
+          <div class="noccl"><b>${zwyc.st}</b><em>${pl(zwyc.st,'mandat','mandaty','mandatów')}</em></div>
+          <div class="noccp"><b>${fmt(zwyc.pct)}%</b><em>poparcia</em></div>
+        </div>`
+       :`<div class="noccpusto" id="cokol-pusty">Cokół czeka. Komisje jeszcze liczą.</div>`}
+    </div>
+
+    <div class="nocplyta">
+      <div class="nightbox">
+        ${ujawnione.map((r,j)=>{
+          const miejsce=poz-j, thr=r.thr||0;
+          const thrL=thr?cl(thr/max*100,0,100):0;
+          return `<div class="nrow ${r.mine?'me':''} ${wszedl(r)?'':'out'}" style="--pc:${r.col}">
+            <div class="npos">${miejsce}</div>
+            <div class="ncrest">${r.m.slice(0,4).map(k=>crest(k,'s')).join('')}</div>
+            <div class="nname"><b>${r.n}</b><span>${r.m.map(k=>G.p[k].ab).join(' · ')}</span></div>
+            <div class="ntrk"><i style="width:${(r.pct/max*100).toFixed(1)}%;background:${r.col};color:${r.col}"></i>
+              ${thr?`<u style="left:${thrL.toFixed(1)}%" title="próg tej listy: ${thr}%"></u>`:''}</div>
+            <div class="npct">${fmt(r.pct)}%</div>
+            <div class="nseat"><b>${r.st}</b><em>${pl(r.st,'mandat','mandaty','mandatów')}</em></div>
+            <div class="ndelta ${r.d===null||r.d===0?'pusto':r.d>0?'up':'dn'}">${
+              r.d!==null&&r.d!==0?(r.d>0?'+':'')+r.d:''}</div>
+          </div>`}).join('')}
+      </div>
+      ${N.i?'':'<div class="nocczek">Komisje zaraz podadzą pierwsze wyniki…</div>'}
+    </div>
+
+    <div class="ekstopka">
+      <span class="ekleg">kreska w pasku to próg tej listy</span>
+      <button class="btn ${settled?'':'g'}" onclick="${settled?'nightEnd()':'nightSkip()'}">${
+        settled?'Przechodzę do wyników →':'Pokaż wszystko od razu'}</button>
+    </div>
   </div>`;
   if(!settled)setTimeout(nightStep,remain<=1?1300:remain===2?820:(N.i<2?520:Math.max(260,560-N.i*45)));
 }
@@ -4095,7 +4148,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.41';
+let WERSJA='1.1.42';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4106,6 +4159,14 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.42':{data:'5 sierpnia 2026', zmiany:[
+   'NOC WYBORCZA OD NOWA. Byla tabelka na karcie. Teraz to studio: sztandar z tabliczkami, ktore rosna w trakcie liczenia, rzad komisji zapalajacych sie barwa swojej listy i cokol zwyciezcy, ktory stoi pusty od pierwszej sekundy i czeka, az ktos go zajmie. Kazda lista to osadzona plytka ze swiecaca listwa w swoim kolorze, a mandaty stoja w zlotej tabliczce.',
+   'Na pasku poparcia widac wreszcie prog tej listy. Od razu wiadomo, kto siadl tuz pod kreska, a kto ja przeskoczyl — listy, ktore nie weszly, sa wygaszone.',
+   'Nowy wynik naprawde wjezdza na ekran. Wczesniej animacja szla na zly wiersz: nowa lista podmieniala sie po cichu, a od nowa rozjezdzal sie pasek tej najslabszej, pokazanej dawno temu.',
+   'EKRAN WYNIKOW tym samym jezykiem, wiec czyta sie dalej jak ciag tej samej nocy: ta sama plyta z mosiezna listwa, ten sam rzad tabliczek. Slupki sa teraz osadzone w plycie i swieca, twoja kolumna dostala zlota plinte, a rozliczenie kadencji te same plytki co wiersze nocy.',
+   'Przycisk zamykajacy oba ekrany przykleja sie do dolu okna, wiec nie trzeba do niego przewijac.',
+ ]},
+
  '1.1.41':{data:'5 sierpnia 2026', zmiany:[
    'OKNA I MODALE w tym samym jezyku: mosiezna listwa u gory, okucie w rogu, naglowek szeryfowy. Opcje do wyboru wygladaja teraz na plytki, ktore sie naciska, a nie na wiersze listy — pod kursorem odjezdzaja w bok i swieca zlotem.',
    'Krzyzyk zamykajacy obraca sie pod kursorem.',
@@ -8619,22 +8680,27 @@ function results(){
   let maxList=maxPct;
   app.innerHTML=`
   <div class="wynik">
-    <div class="kick">Wyniki wyborów · kadencja ${G.term} · ${total} oddanych głosów · frekwencja ${Math.round(total/SERVER*100)}%</div>
-    <div style="display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;position:relative">
+    <div class="kick">Wyniki wyborów · kadencja ${G.term}</div>
+    <div class="wynczolo">
       ${crest(G.me,'l')}
-      <div style="min-width:0">
+      <div class="wynlicz">
         <div class="big">${ms}</div>
-        <div style="font-family:var(--m);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim2);margin-top:2px">
-          <span style="white-space:nowrap">${pl(ms,'mandat','mandaty','mandatów')} dla ${p.ab}</span>${dSeat(G.me)!==null&&dSeat(G.me)!==0?`<span class="delta2 ${dSeat(G.me)>0?'up':'dn'}">${dSeat(G.me)>0?'+':''}${dSeat(G.me)}</span>`:''}</div>
+        <div class="wynpod"><span>${pl(ms,'mandat','mandaty','mandatów')} dla ${p.ab}</span>${
+          dSeat(G.me)!==null&&dSeat(G.me)!==0?`<span class="delta2 ${dSeat(G.me)>0?'up':'dn'}">${dSeat(G.me)>0?'+':''}${dSeat(G.me)}</span>`:''}</div>
       </div>
-      <div style="margin-left:auto;text-align:right">
-        <div style="font-family:var(--m);font-size:30px;font-weight:600">${fmt(votes[G.me]/total*100)}%</div>
-        <div style="font-size:12px;color:var(--dim2)">${votes[G.me]} głosów</div></div>
     </div>
     <p class="sub">${ms>=MAJ?'<b class="ok">Samodzielna większość.</b> Nie potrzebujesz nikogo.':
       top1?'Jesteś <b style="color:var(--acc)">największą partią sejmu</b>, desygnacja premiera należy do ciebie.':
       ms?'Bez koalicji nie ma rządu. Sprawdź, kto w ogóle chce z tobą rozmawiać.':
       '<b class="bad">Poza sejmem.</b> Zabrakło do progu, 12 tygodnii w cieniu.'}</p>
+    <!-- ten sam rząd tabliczek co na nocy wyborczej: oba ekrany mają się czytać
+         jako jeden ciąg, a nie jak dwie różne gry -->
+    <div class="tabliczki">
+      <div><b>${fmt(votes[G.me]/total*100)}%</b><span>twoje poparcie</span></div>
+      <div><b>${votes[G.me]}</b><span>głosów na ciebie</span></div>
+      <div><b>${rank.indexOf(G.me)>=0?(rank.indexOf(G.me)+1)+'.':'—'}</b><span>miejsce w sejmie</span></div>
+      <div><b>${Math.round(total/SERVER*100)}%</b><span>frekwencja</span></div>
+    </div>
   </div>
   ${rozliczenieKadencji()}
   <div style="max-width:440px;margin:0 auto 6px">${hemi(arr,440)}</div>
@@ -8677,10 +8743,11 @@ function results(){
         :'<p class="dim">Bez mandatów nie negocjujesz.</p>'}
     </div></div>
   </div>
-  <div style="text-align:center;margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-    ${ms?`<button class="btn" onclick="tryGov()">Zgłoś koalicję →</button>`:''}
-    <button class="btn g" onclick="goOpo()">${ms?'Nie tworzę rządu':'Dalej'}</button>
+  <div class="ekstopka">
+    <span class="ekleg">${ms?`do większości trzeba ${MAJ} mandatów`:'bez mandatów zostaje ci opozycja'}</span>
     <button class="btn g" onclick="summary()">Podsumowanie</button>
+    <button class="btn g" onclick="goOpo()">${ms?'Nie tworzę rządu':'Dalej'}</button>
+    ${ms?`<button class="btn" onclick="tryGov()">Zgłoś koalicję →</button>`:''}
   </div>`;
   drawGov();
 }

@@ -848,6 +848,266 @@ body::after{
   .kreprawa{position:static}
 }
 
+/* ═══════════════════════════════════════════════════════════
+   NOC WYBORCZA
+   Najważniejsze pięć minut w całej kadencji, a wyglądało jak arkusz
+   kalkulacyjny: numerek, kreska, procent. Teraz to studio: sztandar
+   z tabliczkami u góry, rząd komisji, które po kolei podają wynik,
+   cokół czekający na zwycięzcę i listy jako osadzone płytki.
+
+   Kolejność w treści jest odwrócona (najsłabsza pierwsza), bo zszywanie
+   porównuje dzieci po numerze i lista musi rosnąć na końcu — inaczej
+   nowy wynik podmienia treść w cudzym węźle i nic się nie rusza.
+   Tu odwracamy ją z powrotem, żeby zwycięzca siedział na górze.
+   ═══════════════════════════════════════════════════════════ */
+.nocekran{max-width:1180px;margin:0 auto;padding:var(--o5) 0 var(--o6)}
+
+/* ── sztandar nocy ── */
+.nocsz{position:relative;overflow:hidden;border-radius:var(--r4);
+  border:1px solid var(--line2);padding:var(--o4) var(--o5);
+  margin-bottom:var(--o3);
+  background:
+    radial-gradient(760px 280px at 30% -70px,rgba(217,171,69,.17),transparent 68%),
+    linear-gradient(180deg,var(--p2),rgba(0,0,0,.44));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 26px 56px -40px #000}
+/* mosiężna listwa u dołu — ten sam znak firmowy co sztandar ekranu trybów */
+.nocsz::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--acc) 18%,#f7e3aa 50%,var(--acc) 82%,transparent);
+  opacity:.78}
+.nocsz h1{font-family:var(--fd);font-size:clamp(30px,3.3vw,44px);line-height:1.02;
+  margin:var(--o2) 0 6px;filter:drop-shadow(0 6px 30px rgba(217,171,69,.26))}
+.nocsz>p{margin:0;color:var(--dim);font-size:14px;max-width:64ch}
+.nocsz .tabliczki{margin:var(--o3) 0}
+.nocsz .tabliczki>div{padding:var(--o2) var(--o4)}
+.nocsz .tabliczki b{font-size:22px}
+/* tabliczka, której liczba właśnie urosła, mruga tak jak odczyt w pasku władzy */
+.tabliczki>div{transition:background .2s}
+.tabliczki>div.mrug b{animation:mrugniecie .5s var(--krzywa)}
+
+/* ── rząd komisji ── */
+.nockom{display:flex;align-items:center;gap:var(--o3);
+  padding:9px var(--o4);border-radius:var(--r3);border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(0,0,0,.36),rgba(0,0,0,.12))}
+.nockom .luke{flex:none}
+.nockom .luke:last-child{margin-left:auto;color:var(--acc);opacity:.85}
+.nockomt{display:flex;align-items:center;gap:6px;flex:1;min-width:0;flex-wrap:wrap}
+.nockomt i{width:9px;height:9px;border-radius:50%;flex:none;
+  background:var(--p3);border:1px solid var(--line2);
+  transition:background .3s var(--krzywa),box-shadow .3s var(--krzywa),transform .3s var(--sprezyna)}
+/* komisja, która podała wynik, zapala się barwą swojej listy */
+.nockomt i.on{background:var(--pc,var(--acc));border-color:rgba(255,255,255,.35);
+  box-shadow:0 0 12px -2px var(--pc,var(--acc));transform:scale(1.25)}
+
+/* ── cokół zwycięzcy ──
+   Stoi od pierwszej sekundy, pusty i wygaszony. Dzięki temu ekran nie
+   przeskakuje w najważniejszym momencie, a puste miejsce samo w sobie
+   robi napięcie: ktoś je zaraz zajmie. */
+.noccokol{position:relative;overflow:hidden;border-radius:var(--r4);
+  border:1px solid var(--line);padding:var(--o4) var(--o5) var(--o4);
+  margin-bottom:var(--o4);min-height:104px;
+  display:flex;flex-direction:column;justify-content:center;gap:var(--o2);
+  background:linear-gradient(168deg,rgba(26,38,32,.6),rgba(0,0,0,.4));
+  transition:border-color .4s var(--krzywa),box-shadow .5s var(--krzywa),background .5s}
+.noccokol>.luke{position:relative;z-index:1}
+.noccokol .mramka{opacity:.16}
+.noccokol.jest{border-color:var(--acc);
+  background:
+    radial-gradient(560px 220px at 50% -60px,rgba(217,171,69,.2),transparent 70%),
+    linear-gradient(168deg,var(--p2),rgba(0,0,0,.44));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 46px -18px var(--acc);
+  animation:zwyciestwo 2.8s var(--krzywa) infinite}
+.noccokol.jest .mramka{opacity:.85}
+.noccpusto{color:var(--dim2);font-size:13.5px;font-style:italic}
+.nocczolo{display:flex;align-items:center;gap:var(--o4);flex-wrap:wrap;
+  position:relative;z-index:1;animation:cokol .5s var(--sprezyna) both}
+@keyframes cokol{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.nocczolo .ncrest{display:flex;gap:4px;flex:none}
+.noccn{min-width:0;flex:1}
+.noccn b{display:block;font-family:var(--fd);font-size:clamp(19px,2vw,27px);
+  font-weight:600;line-height:1.15}
+.noccn span{font-family:var(--m);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--dim2)}
+/* mandaty i procent w tabliczkach, nie luzem obok nazwy */
+.noccl,.noccp{flex:none;text-align:right;padding-left:var(--o4);position:relative}
+.noccl::before,.noccp::before{content:'';position:absolute;left:0;top:12%;bottom:12%;width:1px;
+  background:linear-gradient(180deg,transparent,var(--line2),transparent)}
+.noccl b,.noccp b{display:block;font-family:var(--m);font-weight:700;line-height:1;
+  background:linear-gradient(180deg,#fbf3dd,#d9ab45 130%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.noccl b{font-size:38px}
+.noccp b{font-size:26px}
+.noccl em,.noccp em{display:block;font-style:normal;font-family:var(--m);font-size:8.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dim2);font-weight:700;margin-top:5px}
+
+/* ── płyta z listami ── */
+.nocplyta{border-radius:var(--r4);border:1px solid var(--line);
+  padding:var(--o4);position:relative;
+  background:
+    radial-gradient(620px 220px at 50% -40px,rgba(217,171,69,.07),transparent 72%),
+    linear-gradient(180deg,var(--p2),rgba(0,0,0,.34));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 22px 48px -38px #000}
+.nocczek{text-align:center;color:var(--dim2);font-size:13.5px;padding:var(--o5) 0}
+
+/* najsłabsza lista jest w treści pierwsza, tu wraca na swoje miejsce u dołu */
+.nightbox{flex-direction:column-reverse;gap:var(--o2)}
+
+/* ── wiersz listy jako osadzona płytka ── */
+.nrow{position:relative;gap:var(--o3);padding:var(--o2) var(--o4);
+  border-bottom:none;border-radius:var(--r3);
+  border:1px solid var(--line);
+  background:linear-gradient(178deg,var(--p2),rgba(0,0,0,.3));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 8px 22px -20px #000;
+  animation:nin .45s var(--krzywa) both}
+/* barwa listy jako świecąca listwa przy krawędzi — jak zajęte miejsce na stole */
+.nrow::before{content:'';position:absolute;left:0;top:10px;bottom:10px;width:3px;
+  border-radius:0 3px 3px 0;background:var(--pc,var(--line2))}
+.nrow.out{opacity:.52;border-style:dashed}
+.nrow.me{border-radius:var(--r3);background:
+    radial-gradient(420px 120px at 0% 50%,rgba(217,171,69,.14),transparent 70%),
+    linear-gradient(178deg,var(--p2),rgba(0,0,0,.3));
+  border-color:var(--acc);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),
+    0 0 34px -16px var(--acc)}
+/* okucia w rogach tylko na własnej liście — ma się rzucać w oczy bez czytania */
+.nrow.me::after{content:'';position:absolute;right:6px;bottom:6px;width:13px;height:13px;
+  border-bottom:1px solid var(--acc);border-right:1px solid var(--acc);
+  opacity:.6;pointer-events:none}
+
+.nrow .npos{font-size:13px;width:24px;font-weight:700;opacity:.75}
+.nrow.me .npos{color:var(--acc);opacity:1}
+/* nazwa na sztywnych 190px ucinała „Demokratyczne Porozumienie", podczas gdy
+   pasek obok miał 578px na siebie. Teraz obie kolumny dzielą się miejscem. */
+.nrow .nname{width:auto;flex:1 1 230px;min-width:120px}
+.nrow .nname b{font-size:14px;font-weight:650}
+.nrow .nname span{letter-spacing:.08em;text-transform:uppercase;font-size:9px}
+
+/* pasek z głębią i poświatą, tak jak wszystkie paski po redesignie */
+/* overflow wraca na widoczny, inaczej kreska progu ginie razem z tym,
+   co ma z niej wystawać poza pasek */
+.nrow .ntrk{position:relative;flex:2 1 200px;height:14px;border-radius:var(--r1);overflow:visible;
+  background:rgba(0,0,0,.5);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.35)}
+.nrow .ntrk i{border-radius:var(--r1);position:relative;
+  box-shadow:0 0 10px -3px currentColor}
+.nrow .ntrk i::after{content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(180deg,rgba(255,255,255,.26),transparent 62%)}
+/* kreska progu: jedyna liczba, która na nocy naprawdę boli */
+.nrow .ntrk u{position:absolute;top:-2px;bottom:-2px;width:0;
+  border-left:1px dashed rgba(244,168,159,.85);text-decoration:none;z-index:2}
+
+.nrow .npct{font-size:14.5px;width:64px}
+.nrow.out .npct{color:var(--dim2)}
+/* mandaty w tabliczce, nie gołą liczbą */
+.nrow .nseat{width:98px;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.nrow .nseat b{font-family:var(--m);font-size:21px;font-weight:700;line-height:1;
+  background:linear-gradient(180deg,#fbf3dd,#d9ab45 130%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.nrow.out .nseat b{background:none;-webkit-text-fill-color:var(--dim2);color:var(--dim2)}
+.nrow .nseat em{font-size:8.5px;letter-spacing:.14em}
+/* zmiana względem poprzednich wyborów jako pigułka, a nie doklejona liczba */
+.ndelta{flex:none;width:52px;text-align:center;font-family:var(--m);font-size:11.5px;
+  font-weight:700;padding:3px 0;border-radius:999px;border:1px solid transparent}
+.ndelta.up{color:var(--pos);background:rgba(124,180,99,.14);border-color:rgba(124,180,99,.35)}
+.ndelta.dn{color:var(--neg);background:rgba(209,85,74,.14);border-color:rgba(209,85,74,.35)}
+.ndelta.pusto{visibility:hidden}
+
+/* ── stopka pełnoekranowa (noc i wyniki dzielą jedną) ──
+   Oba ekrany są dłuższe niż okno, a przycisk, który je zamyka, musi być pod ręką
+   przez cały czas, nie dopiero na samym dole. Dlatego stopka przykleja się do
+   dolnej krawędzi, a treść przewija się za nią. */
+.ekstopka{display:flex;align-items:center;gap:var(--o2);margin-top:var(--o3);
+  position:sticky;bottom:var(--o3);z-index:3;
+  padding:var(--o2) var(--o4);border-radius:var(--r3);border:1px solid var(--line2);
+  backdrop-filter:blur(12px) saturate(1.2);
+  background:linear-gradient(180deg,rgba(22,33,23,.9),rgba(8,13,9,.92));
+  box-shadow:0 -4px 26px -14px #000,inset 0 1px 0 rgba(255,255,255,.05)}
+.ekleg{font-family:var(--m);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--dim2);font-weight:700;margin-right:auto}
+
+@media (max-width:900px){
+  .nrow{flex-wrap:wrap}
+  .nrow .nname{width:auto;flex:1}
+  .nrow .ntrk{order:9;flex-basis:100%;min-width:100%}
+  .nocczolo{gap:var(--o3)}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EKRAN WYNIKÓW
+   Mówił trzema językami naraz: nagłówek w ukośne paski, słupki prawie bez
+   redesignu i rozliczenie kadencji w szarych prostokątach. Teraz jedna płyta
+   ciągnie się przez cały ekran, a wynik czyta się dalej tak samo jak noc,
+   z której przed chwilą wyszliśmy — te same tabliczki, ta sama stopka.
+   ═══════════════════════════════════════════════════════════ */
+.wynik{border:1px solid var(--line2);border-radius:var(--r4);
+  padding:var(--o5) var(--o5) var(--o4);margin-bottom:var(--o4);
+  background:
+    radial-gradient(820px 300px at 26% -80px,rgba(217,171,69,.19),transparent 68%),
+    linear-gradient(180deg,var(--p2),rgba(0,0,0,.44));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 26px 56px -40px #000}
+/* ukośne paski ustępują mosiężnej listwie — ten sam znak co na sztandarze nocy */
+.wynik::before{inset:auto 0 0 0;height:2px;background:linear-gradient(90deg,
+    transparent,var(--acc) 18%,#f7e3aa 50%,var(--acc) 82%,transparent);opacity:.78}
+.wynik::after{content:'';position:absolute;right:10px;bottom:10px;width:16px;height:16px;
+  border-bottom:1px solid var(--acc);border-right:1px solid var(--acc);
+  opacity:.4;pointer-events:none}
+.wynczolo{display:flex;align-items:center;gap:var(--o5);flex-wrap:wrap;
+  margin-top:var(--o3);position:relative}
+.wynik .crest.l{box-shadow:0 0 0 1px rgba(255,255,255,.15),
+  0 0 30px -8px var(--acc),0 4px 12px rgba(0,0,0,.55)}
+.wynlicz{min-width:0}
+.wynik .big{filter:drop-shadow(0 8px 34px rgba(217,171,69,.3))}
+.wynpod{display:flex;align-items:center;gap:var(--o2);flex-wrap:wrap;
+  font-family:var(--m);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--dim2);margin-top:6px}
+.wynik .sub{font-size:15px;margin-top:var(--o3)}
+.wynik .tabliczki{margin:var(--o4) 0 0}
+.wynik .tabliczki>div{padding:var(--o2) var(--o4)}
+.wynik .tabliczki b{font-size:22px}
+
+/* ── słupki: tuby osadzone w płycie, nie kreski na tle ── */
+.seatchart{gap:var(--o2);padding-top:var(--o5)}
+.stube{border-radius:var(--r2) var(--r2) 0 0;border-top:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.18));
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 0 0 1px rgba(0,0,0,.35)}
+.stube i{border-radius:var(--r2) var(--r2) 0 0;position:relative;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 0 14px -4px currentColor}
+.stube i::after{content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(180deg,rgba(255,255,255,.22),transparent 55%)}
+/* kreska progu ma wyglądać jak kreska progu, a nie jak zwykła linijka siatki */
+.stube u{border-top:1px dashed rgba(244,168,159,.9);opacity:1;
+  filter:drop-shadow(0 0 4px rgba(213,84,74,.5))}
+/* własna kolumna dostaje okucie, tak jak własny wiersz na nocy */
+.scol.me .stube{box-shadow:inset 0 2px 6px rgba(0,0,0,.6),0 0 0 1px var(--acc) inset,
+  0 0 30px -14px var(--acc)}
+.scol.me{position:relative}
+.scol.me::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:2px;
+  border-radius:2px;background:var(--acc);box-shadow:var(--zloto-blask)}
+.scol .sval{font-size:13.5px;
+  background:linear-gradient(180deg,#fbf3dd,#d9ab45 135%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.scol.out .sval{background:none;-webkit-text-fill-color:var(--dim2)}
+.sfoot b{color:var(--tx);font-size:10.5px;font-weight:700}
+.scol.out .sfoot b{color:var(--dim2)}
+.majline span{opacity:.9}
+
+/* ── rozliczenie kadencji: te same płytki co wiersze nocy ── */
+.rozlicz{max-width:none}
+.przyczyny{gap:var(--o2)}
+.pz{position:relative;padding:var(--o3) var(--o4);border-radius:var(--r3);
+  border:1px solid var(--line);border-left:1px solid var(--line);
+  background:linear-gradient(178deg,var(--p2),rgba(0,0,0,.3));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 8px 22px -20px #000}
+/* kolor nie leży już w ramce, tylko w świecącej listwie przy krawędzi */
+.pz::before{content:'';position:absolute;left:0;top:10px;bottom:10px;width:3px;
+  border-radius:0 3px 3px 0;background:var(--line2)}
+.pz.plus::before{background:var(--pos);box-shadow:0 0 14px -2px var(--pos)}
+.pz.minus::before{background:var(--neg);box-shadow:0 0 14px -2px var(--neg)}
+.pz .pzv{font-size:21px;font-weight:700}
+
+/* ── legenda pod sejmem ── */
+.legend{gap:var(--o2) var(--o4);border-top:1px solid var(--line);
+  padding:var(--o3) var(--o4)}
+.legend i{box-shadow:inset 0 1px 0 rgba(255,255,255,.32),0 1px 3px rgba(0,0,0,.5)}
+
 /* ─────────── DOSTĘPNOŚĆ ───────────
    Kto ma w systemie wyłączone animacje, ten dostaje grę bez ruchu.
    Wygląd zostaje ten sam, znika wyłącznie ruch. */
