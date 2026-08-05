@@ -4192,7 +4192,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.47';
+let WERSJA='1.1.48';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4203,6 +4203,11 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.48':{data:'5 sierpnia 2026', zmiany:[
+   'MORDEDOLAR NA SWOIM MIEJSCU. Sakiewka z monetami stoi teraz przy kazdej kwocie w grze: przy PKB, przy kapitale prywatnym i pod portretami w zapleczach. Rysowany zapas przestal byc potrzebny.',
+   'Obrazek zostal przyciety do samej sakiewki i przeskalowany, bo w oryginale wiekszosc pliku to byl pusty margines — w ikonie na dwanascie pikseli sakiewka bylaby ziarnkiem w rogu.',
+ ]},
+
  '1.1.47':{data:'5 sierpnia 2026', zmiany:[
    'WYWIADY ZA DARMO W KOLKO — KONIEC. Decyzja z wlasnym oknem jest oplacona z gory, a zapis o tej oplacie sluzy do jej cofniecia. Wywiad, nabor i uklad sterow nie kasowaly go po zakonczeniu, wiec zapis przechodzil na nastepne decyzje: pierwsze „wstecz" w dowolnym kolejnym oknie oddawalo pieniadze za tamta i zdejmowalo jej limit.',
    'PORZUCONA DECYZJA NIE LICZY SIE JUZ JAKO ZUZYTA. Zamkniecie okna w inny sposob niz przyciskiem „wstecz" zostawialo decyzje policzona, choc nic z niej nie wyszlo. Teraz gra sama to rozpoznaje: nie ma okna, a oplata wisi — znaczy, ze decyzja nie doszla do skutku, wiec wraca w calosci razem z akcja i limitem.',
