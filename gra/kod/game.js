@@ -616,7 +616,7 @@ function xpPula(){
   return G.xpOs;
 }
 const xpOs=w=>(w&&xpPula()[w])||0;
-function XP(n){
+function XP(n){if(PROBA)return;
   if(!G)return;
   G.xp=(G.xp||0)+n;                 // łączny dorobek partii, do historii i rozliczeń
   const ls=G.p&&G.p[G.me]?leads(G.p[G.me]):[];
@@ -630,7 +630,15 @@ function checkDeath(){
   const p=me();
   return false;   // partii nikt już nie rozwiązuje, zostają konsekwencje
 }
-function say(t,c=''){G.log.unshift({w:`K${G.term}·T${G.week}`,t,c}); if(G.log.length>240)G.log.pop()}
+/* ═══ TRYB PRÓBY ═══
+   Skutki decyzji są imperatywne i losowe, więc nie da się ich przewidzieć
+   wzorem. Zamiast dublować logikę, odpalamy prawdziwą decyzję kilka razy na
+   kopii stanu i patrzymy, co wyszło. Przy PRÓBIE milknie wszystko, co sięga
+   poza stan gry: kronika, dymki, dźwięk, doświadczenie i przerysowanie ekranu.
+   Test test_podglad.py pilnuje, że prawdziwy stan wychodzi z podglądu
+   bajt w bajt taki sam. */
+let PROBA=0;
+function say(t,c=''){if(PROBA)return;G.log.unshift({w:`K${G.term}·T${G.week}`,t,c}); if(G.log.length>240)G.log.pop()}
 
 /* ══════════ MODEL WYBORCZY ══════════ */
 function regVotes(r){return r.pop*r.eng*G.turnout*(1+(G.gov?(G.gov.appr-50)/900:0))}
@@ -1542,7 +1550,7 @@ function endWeek(){
   aiRekonstrukcja();       // a niewygodnego koalicjanta potrafi wyrzucić
   aiOpozycja();            // opozycja rozlicza rząd bez czekania na gracza
   histPush();SFX.week();
-  G.catUsed={};G.used2={};G.lastCharge=null;   // ostatnia decyzja przechodzi na kolejny tydzień, żeby kombinacje w ogóle działały
+  G.catUsed={};G.used2={};G.lastCharge=null;podgladCache={};   // ostatnia decyzja przechodzi na kolejny tydzień, żeby kombinacje w ogóle działały
   // nastroje serwera dryfują tydzień po tygodniu, nikt nie wie, dokąd
   SID.forEach(g=>{G.mood[g]=cl(G.mood[g]+R(-.042,.042)+(1-G.mood[g])*.16,.76,1.26)});
   if(ch(.13)){const a=pick(SID);let b=pick(SID);while(b===a)b=pick(SID);
@@ -2562,7 +2570,7 @@ const leadAva=(k,sz)=>{const p=G.p[k],s=sz||38,ls=leads(p);
   return `<div style="display:flex;flex:none">${ls.map((n,i)=>
     i?`<div style="margin-left:-${ov}px">${ava(n,p.c,s2)}</div>`:ava(n,p.c,s2)).join('')}</div>`};
 
-function render(){
+function render(){if(PROBA)return;
   applyTheme();initTips();initKeys();
   if(CRE)return creator();
   if(!G)return MODE==='free'?setup():MODE==='scen'?scenScreen():modeScreen();
@@ -2938,7 +2946,7 @@ function initTips(){
 }
 /* ---- dopamina: skutki, kamienie milowe, seria ---- */
 let FX=[];
-function fxPush(t,c){FX.push({t,c})}
+function fxPush(t,c){if(PROBA)return;FX.push({t,c})}
 function fxFlush(){
   if(!FX.length||!document||!document.body)return;
   const box=document.createElement('div');box.className='fxwrap';
@@ -3833,7 +3841,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.33';
+let WERSJA='1.1.34';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -3844,6 +3852,13 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.34':{data:'5 sierpnia 2026', zmiany:[
+   'PODGLAD SKUTKOW. Najedz kursorem na decyzje, a paski cech w bocznej kolumnie pokaza ducha: zakreskowany odcinek mowi, dokad pojedzie kazda cecha, a przy liczbie staja widelki w rodzaju 62 +5...+8. Przestales klikac w ciemno.',
+   'Widelki, a nie jedna liczba, bo skutki sa losowe z zalozenia. Gra odpala prawdziwa decyzje dziewiec razy na kopii stanu i pokazuje rozrzut, jaki z tego wyszedl. Zaden wynik nie jest zmyslony ani wpisany recznie, wiec podglad nie rozjedzie sie z gra.',
+   'KRESKA RYWALA. Przy kazdym pasku stoi pionowa kreska z nazwa najlepszej partii w tej cesze, a obok twojej liczby miejsce w stawce. Samo 62 nigdy nie mowilo, czy to duzo.',
+   'Przy kontrowersji i pretensjonalnosci najlepszy znaczy najnizszy, bo tam wygrywa ten, kto ma najmniej.',
+ ]},
+
  '1.1.33':{data:'5 sierpnia 2026', zmiany:[
    'STOL TYGODNIA. Nad decyzjami stoi teraz stol z miejscami na twoje ruchy. Puste zapraszaja, zajete zostaja jako zapis tego, co zagrales, razem z liczbami, ktore ta decyzja naprawde dala. Wczesniej po zagraniu nie bylo po niej sladu poza wpisem w kronice.',
    'Decyzja za dwa albo trzy ruchy zajmuje na stole tyle miejsc, ile kosztuje, wiec od razu widac, ile tygodnia zjada.',
@@ -4402,11 +4417,35 @@ function partieTab(){
       </div>`}).join('')}
     </div></div>`;
 }
+/* Najlepszy wynik w stawce dla danej cechy. Przy kontrowersji i pretensjonalności
+   „najlepszy" znaczy najniższy — tam wygrywa ten, kto ma najmniej. */
+const CECHA_ODWROTNA={ctr:1,pret:1};
+function najlepszyRywal(k){
+  const inni=alive().filter(x=>x!==G.me&&!G.p[x].dead);
+  if(!inni.length)return null;
+  const odwr=!!CECHA_ODWROTNA[k];
+  return inni.reduce((a,x)=>{
+    const v=G.p[x][k]; if(v===undefined)return a;
+    if(!a||(odwr?v<a.v:v>a.v))return {v,ab:G.p[x].ab};
+    return a;
+  },null);
+}
 function sidebar(p,q){
   const b=(l,v,c,k)=>{const d=G.prev?v-G.prev[k]:0;
-    return `<div class="st"><div class="l"><span>${l}${statTip(k)}</span><span><b>${Math.round(v)}</b>${
-      Math.abs(d)>.6?`<span class="d ${d>0?'up':'dn'}">${d>0?'+':''}${Math.round(d)}</span>`:''}</span></div>
-      <div class="trk"><i style="width:${cl(v)}%;background:${c}"></i></div></div>`};
+    /* Kreska rywala. Sama liczba „62" nigdy nic nie znaczyła — dopiero widok,
+       gdzie stoi najlepszy w stawce, mówi, czy to dużo. */
+    const r=najlepszyRywal(k);
+    const mie=r?(()=>{const odwr=!!CECHA_ODWROTNA[k];
+      const lepsi=alive().filter(x=>x!==G.me&&!G.p[x].dead&&(odwr?G.p[x][k]<v:G.p[x][k]>v)).length;
+      return lepsi+1})():0;
+    return `<div class="st"><div class="l"><span>${l}${statTip(k)}</span><span>
+      <b class="wart" data-c="${k}" data-v="${Math.round(v)}">${Math.round(v)}</b>${
+      Math.abs(d)>.6?`<span class="d ${d>0?'up':'dn'}">${d>0?'+':''}${Math.round(d)}</span>`:''}${
+      mie?`<span class="msc" title="twoje miejsce w stawce">${mie}.</span>`:''}</span></div>
+      <div class="trk" data-c="${k}" data-v="${cl(v)}"><i style="width:${cl(v)}%;background:${c}"></i>
+      <u class="duch"></u>${
+      r?`<span class="rywal" style="left:${cl(r.v)}%" data-kto="${r.ab}"
+        title="najlepszy w stawce: ${r.ab} ${Math.round(r.v)}"></span>`:''}</div></div>`};
   const ld=lead(G.me),used=PID.reduce((a,k)=>a+G.p[k].mem,0);
   const benchAll=roster(p),swapCands=benchAll.filter(x=>!isLead(p,x));
   return `
@@ -4450,6 +4489,7 @@ function sidebar(p,q){
   </div></div>
   <div class="card kond"><div class="h"><h3>Kondycja partii</h3><span class="n">mapa</span></div><div class="b">
     ${radar(p)}
+    <div id="paskiCech">
     ${b('Sława',p.fame,'var(--acc)','fame')}
     ${b('Wiarygodność',p.cred,'var(--info)','cred')}
     ${b('Jedność',p.uni,'var(--pos)','uni')}
@@ -4458,6 +4498,7 @@ function sidebar(p,q){
     ${p.ctr>=90?`<div class="ctrwarn bad"><b>Paraliż</b> Sondaż liczony na pół, kapitał wycieka, co tydzień ktoś odchodzi. Schładzaj: przeprosiny, wyciszenie sporu, otwarte konsultacje.</div>`
       :p.ctr>=70?`<div class="ctrwarn"><b>Uwaga na kontrowersję</b> Przy 90 partia wpada w paraliż. Zostało ci ${Math.round(90-p.ctr)} punktów luzu.</div>`:''}
     ${b('Pretensjonalność',p.pret,'#d98b4a','pret')}
+    </div>
     ${(()=>{const z=znuzenie(G.me);if(!z)return '';
       const strata=Math.round(z/1.65);
       return `<div class="st"><div class="l"><span>Zmęczenie władzą</span>
@@ -4799,7 +4840,8 @@ function actCards(list,fx){
       :noShame?'dostępne tylko tuż po wpadce':(a.id==='rekr'&&G.recCd>0)?`nabór wraca za ${G.recCd} ${pl(G.recCd,'tydzień','tygodnie','tygodni')}`
       :G.ap<a.ap?'za mało akcji':G.kp<kpC?'za mało kapitału':(a.en>0&&G.en<a.en)?'za mało energii':'';
     const wym=[a.reg?'okręg':'',a.tem?'temat':'',a.tgt?'cel':'',a.seg?'grupa':''].filter(Boolean);
-    return `<button class="act" ${ok?'':'disabled'} style="--ac:${col}" onclick="doAct('${a.id}')">
+    return `<button class="act" ${ok?'':'disabled'} style="--ac:${col}" onclick="doAct('${a.id}')"
+      onmouseenter="podglad('${a.id}')" onmouseleave="podglad('')">
       <div class="ahd">
         <div style="min-width:0"><h4>${a.n}</h4>
           <div class="afx">${actFx(a.id).map(x=>`<span style="--fc:${AFXN[x][1]}"><i></i>${AFXN[x][0]}</span>`).join('')}</div></div>
@@ -5028,6 +5070,74 @@ function prezydentTab(){
     <span class="n">${ikona('akcje','sm')}${G.ap}/${G.apMax}</span></div><div class="b">
     <div class="actgrid">${actCards(A.filter(a=>a.cat==='prz'),'')}</div>
   </div></div>`;
+}
+
+/* Ile prób wystarczy, żeby zobaczyć rozrzut, a interfejs nie zamulił.
+   Decyzje losowe pokazują widełki, pewne — jedną liczbę. */
+const PROB_ILE=9;
+const PODG_CECHY=[['fame','Sława'],['cred','Wiarygodność'],['uni','Jedność'],
+                  ['act','Aktywność'],['ctr','Kontrowersja'],['pret','Pretensjonalność']];
+let podgladCache={};
+function przewidz(id){
+  const a=A.find(x=>x.id===id); if(!a||!a.f||!G)return null;
+  const klucz=id+'|'+G.term+'-'+G.week+'|'+Math.round(me().fame)+'|'+(G.used[id]||0);
+  if(podgladCache[klucz])return podgladCache[klucz];
+
+  const kopiaG=JSON.stringify(G), prawdziwe=G;
+  const wynik={};
+  PROBA=1;
+  try{
+    for(let i=0;i<PROB_ILE;i++){
+      G=JSON.parse(kopiaG);
+      const przed=snap();
+      const f=fat(a.id);
+      // losowe wymagania decyzji dobieramy sami, żeby dało się ją w ogóle odpalić
+      const r=a.reg?REG[0].id:null, tm=a.tem?TEM[0].id:null;
+      const cel=a.tgt?alive().find(k=>k!==G.me):null;
+      const seg=a.seg?SID[0]:null;
+      try{ a.f(me(),f,cel,r,seg,tm); }catch(e){ /* decyzja bez sensownego celu — pomijamy próbę */ }
+      const po=snap();
+      PODG_CECHY.forEach(([k])=>{
+        const d=po[k]-przed[k]; if(Math.abs(d)<.5)return;
+        if(!wynik[k])wynik[k]={min:d,max:d};
+        wynik[k].min=Math.min(wynik[k].min,d);
+        wynik[k].max=Math.max(wynik[k].max,d);
+      });
+    }
+  } finally {
+    G=prawdziwe;          // stan wraca zawsze, nawet gdy decyzja rzuci wyjątkiem
+    PROBA=0;
+  }
+  Object.keys(wynik).forEach(k=>{
+    wynik[k].min=Math.round(wynik[k].min); wynik[k].max=Math.round(wynik[k].max);
+  });
+  podgladCache[klucz]=wynik;
+  return wynik;
+}
+
+/* Duch na paskach w bocznej kolumnie: pokazuje, dokąd pojedzie każda cecha,
+   zanim klikniesz. Rusza samym DOM-em, bez przerysowywania ekranu. */
+function podglad(id){
+  const box=document.getElementById('paskiCech'); if(!box)return;
+  const w=id?przewidz(id):null;
+  PODG_CECHY.forEach(([k])=>{
+    const pas=box.querySelector('.trk[data-c="'+k+'"]'); if(!pas)return;
+    const duch=pas.querySelector('.duch'), et=box.querySelector('.wart[data-c="'+k+'"]');
+    const zm=w&&w[k];
+    if(!zm){duch.classList.remove('wid');if(et){et.textContent=et.dataset.v;et.style.color=''}return}
+    const od=+pas.dataset.v, sr=(zm.min+zm.max)/2;
+    const do_=cl(od+sr);
+    duch.classList.add('wid');
+    duch.classList.toggle('ujem',sr<0);
+    duch.style.left=Math.min(od,do_)+'%';
+    duch.style.width=Math.abs(do_-od)+'%';
+    if(et){
+      const wid=zm.min!==zm.max?`${zm.min>0?'+':''}${zm.min}…${zm.max>0?'+':''}${zm.max}`
+                               :`${zm.min>0?'+':''}${zm.min}`;
+      et.textContent=Math.round(od)+' '+wid;
+      et.style.color=sr>0?'var(--pos)':'var(--neg)';
+    }
+  });
 }
 
 function actTab(){
@@ -9150,7 +9260,7 @@ function dead(){
     <div style="margin-top:24px"><button class="btn" onclick="newRun()">Od nowa</button></div></div>`}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,
@@ -9162,7 +9272,7 @@ Object.assign(window,{start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,m
   setTab:k=>{if(G.tab!==k)G._we=1;G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
   signAgent,agentCost,agentFree,AGENTS,render,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
-window.__game={myGoals,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,
+window.__game={przewidz,podglad,get PROBA(){return PROBA},myGoals,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,
   openDym,pusteResorty,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
   zawiedzeniKoalicjanci,demografiaSerwera,SERVER,SERVER_MAX,AGENTS,mogeZglosic,rozwiazChance,radaKto,RESORTY,pmOsoba,pmOsoby,leads,roster,
   aiTransfery,aiOpozycja,aiObsadzRade,aiRekonstrukcja,znuzenie,hegemon,resortyPartii,leadWybrany,aiPlan,ustawPlany,

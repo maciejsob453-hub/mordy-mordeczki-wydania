@@ -73,7 +73,27 @@ h4{font-size:var(--t-baza);letter-spacing:-.004em}
 .act .dd{font-size:var(--t-drobne);line-height:1.5}
 
 /* ---- paski statystyk: cieńsze, spokojniejsze ---- */
-.trk{height:5px;border-radius:3px;background:#0a0f0a}
+.trk{height:5px;border-radius:3px;background:#0a0f0a;position:relative;overflow:visible}
+/* kreska najlepszego w stawce — punkt odniesienia dla twojej wartości */
+.trk .rywal{position:absolute;top:-4px;bottom:-4px;width:2px;border-radius:2px;
+  background:var(--dim2);opacity:.85;pointer-events:auto;cursor:help}
+.trk .rywal::after{content:attr(data-kto);position:absolute;bottom:calc(100% + 3px);left:50%;
+  transform:translateX(-50%);font-family:var(--m);font-size:7.5px;font-weight:700;
+  letter-spacing:.06em;color:var(--dim2);white-space:nowrap}
+.st .l .msc{font-family:var(--m);font-size:10px;font-weight:700;color:var(--dim2);
+  margin-left:7px;padding-left:7px;border-left:1px solid var(--line)}
+/* DUCH — dokąd pojedzie pasek, jeśli zagrasz decyzję, na którą właśnie patrzysz.
+   Zakreskowany odcinek dostawiony do bieżącej wartości; przy skutku ujemnym
+   czerwony i odmierzony w drugą stronę. */
+.trk .duch{position:absolute;top:0;bottom:0;border-radius:0 3px 3px 0;text-decoration:none;
+  opacity:0;pointer-events:none;transition:opacity .16s,left .28s var(--krzywa),width .28s var(--krzywa);
+  background:repeating-linear-gradient(115deg,rgba(255,255,255,.6) 0 3px,transparent 3px 6px);
+  border-right:2px solid #fff;animation:duchMiga 1.5s ease-in-out infinite}
+.trk .duch.wid{opacity:1}
+.trk .duch.ujem{border-right-color:var(--neg);
+  background:repeating-linear-gradient(115deg,rgba(213,84,74,.8) 0 3px,transparent 3px 6px)}
+@keyframes duchMiga{0%,100%{filter:brightness(1)}50%{filter:brightness(.5)}}
+.st .l .wart{transition:color .2s}
 .trk i{border-radius:3px;transition:width .35s cubic-bezier(.2,.7,.3,1)}
 .st{margin-bottom:var(--o3)}
 .st .l{font-size:var(--t-drobne);margin-bottom:5px}
