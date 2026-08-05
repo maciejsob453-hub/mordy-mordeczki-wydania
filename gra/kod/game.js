@@ -4235,7 +4235,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.51';
+let WERSJA='1.1.52';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4246,6 +4246,16 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.52':{data:'6 sierpnia 2026', zmiany:[
+   'MAJATEK ROSNIE REGRESYWNIE I O TO CHODZILO. Wszyscy mieli te sama stawke tygodniowa, wiec pol procenta od dwustu milionow dawalo wiecej niz ktos z tysiacami widzial przez cala kadencje — przepasc poglebiala sie sama i z dolu nikt nie ruszal z miejsca. Teraz szescdziesiat tysiecy rosnie po jakies szesc procent tygodniowo, dziesiec milionow po jeden, a cwierc miliarda po dwie dziesiate. Przez kadencje mentos urosl o 119%, kenzo o 5%.',
+   'RZAD FIRMUJE WLASNE USTAWY. Zglaszales projekt jako premier i patrzyles, jak twoi wlasni koalicjanci wstrzymuja sie albo glosuja przeciw, mimo ze umowa stala. Teraz koalicja przy dobrych relacjach glosuje za jak jeden maz, przy chlodnych czesc sie wstrzymuje, a dopiero zepsute relacje albo projekt szyty grubo pod siebie zwalniaja z dyscypliny.',
+   'MINIGRA PRZENIESIONA TAM, GDZIE MIALA BYC: do wykladow i reportazy z ustawy o MAN, nie do wywiadu. Zamiast zbierania pieniedzy sa oczka uwagi, ktore trzeba klikac, zanim zgasna, i liczy sie sama celnosc. Nagroda jest w slawie i umiarkowana — to przyprawa do ustawy, a nie sposob na granie w kolko.',
+   'NOWY DZIAL MEDIA, otwierany ustawa o mediach. Bez niej nikt na serwerze nie ma prawa niczego wydawac. Wszystko kupuje sie za prywatny majatek przewodniczacego — i to jest to, na co sie go zbiera.',
+   'WYDAWNICTWO GAZETOWE za 500 tysiecy: zyje samo i zarabia na serduszkach. Od dziesieciu wychodzi na plus, powyzej zaczyna zarabiac, a serduszek przybywa razem ze slawa partii i kompetencja redaktora. Gazete mozna nazwac i obsadzic kims ze swojego zaplecza.',
+   'WYDAWNICTWO TELEWIZYJNE za 10 milionow: nagrywasz odcinki i sam wybierasz, o czym mowisz — filozoficznie, politycznie albo smieciowo. Widownia zalezy od tego, do kogo trafia temat i jak stoi twoje dopasowanie do grup, a wplyw idzie wprost od liczby widzow.',
+   'WYDAWNICTWO KINOWE za 20 milionow: kręcisz filmy, a na seanse przychodzi tym wiecej ludzi, im glosniej o twojej partii. Bilans kazdego wydawnictwa liczy sie osobno i widac go na wspolnej liscie.',
+ ]},
+
  '1.1.51':{data:'6 sierpnia 2026', zmiany:[
    'RANGI DZIALAJA ODWROTNIE NIZ DOTAD I TAK, JAK POWINNY. Wejscie na kazdy stopien kosztowalo caly prog, wiec na starcie polowa bogaczy wykupywala sie na wyzsze polki naraz — z gospodarki znikaly setki milionow, PKB lecialo w dol, a premier obrywal absolutorium za cos, na co nie mial wplywu. Teraz Sir to szesc procent progu, a Elektor szescdziesiat, i do tego trzeba miec siedemdziesiat procent wiecej, niz wynosi jego kamien milowy. Nizsze rangi wpadaja same, wyzsze bola coraz mocniej. Kapital prywatny znowu rosnie zamiast wyparowywac.',
    'ABSOLUTORIUM W DWUNASTYM TYGODNIU, jako porzadna tabela: PKB na starcie kadencji, PKB na koniec, zmiana procentowa i wypisane co do jednego, co z tego wynika dla premiera. W ostatnim tygodniu nie wyskakuje juz zadne wydarzenie — rozliczenie z gospodarki ma byc jedyna rzecza, na ktora patrzysz.',
@@ -4893,6 +4903,7 @@ function game(){
       nv.push(['sejm','Sejm i władza']);
       nv.push(['ekonomia','Ekonomia']);
       nv.push(['sad','Sąd<span class="badge wip">wip</span>']);
+      if(lawDone('media'))nv.push(['media','Media']);
       return nv.map(([k,n])=>`<button class="${G.tab===k?'on':''}" onclick="setTab('${k}')">${n}</button>`).join('')})()}
   </div>
   <div class="layout">
@@ -4900,7 +4911,8 @@ function game(){
     <div class="widok${G._we?' wejscie':''}" data-tab="${G.tab}">${G.tab==='mapa'?kurier()+mapTab(q,AL):G.tab==='akcje'?actTab():G.tab==='partie'?partieTab():G.tab==='sondaz'?pollTab(q,AL)
       :G.tab==='cele'?goalTab():G.tab==='lider'?leadTab():G.tab==='krol'?kingTab()
       :G.tab==='premier'?premierTab():G.tab==='prezydent'?prezydentTab()
-      :G.tab==='ekonomia'?ekonomiaTab():G.tab==='sad'?sadTab():sejmTab()}</div>
+      :G.tab==='ekonomia'?ekonomiaTab():G.tab==='sad'?sadTab()
+      :G.tab==='media'?mediaTab():sejmTab()}</div>
   </div>`;
   G._we=0;
 }
@@ -5217,11 +5229,21 @@ function pkbTydzien(){
   const st=stawkaMajatkowa(), prog=progresjaWlaczona();
   const d=podzialMajatku();
   let wplyw=0;
-  /* Majątek rośnie sam, bo ludzie coś na tym serwerze robią. Podatek zjada
-     ten wzrost, a przy wysokiej stawce wychodzi już pod kreską. */
-  const wzrost=.006-st*.0011;
+  /* Majątek rośnie sam, bo ludzie coś na tym serwerze robią, ale tempo jest
+     REGRESYWNE: mała kieszeń rośnie szybko w procentach, wielka ledwie drga.
+
+     Wcześniej wszyscy mieli tę samą stawkę, więc pół procenta od dwustu
+     milionów dawało co tydzień więcej, niż ktoś z tysiącami widział przez całą
+     kadencję — przepaść pogłębiała się sama i nikt z dołu nigdy nie ruszał
+     z miejsca. Teraz sześćdziesiąt tysięcy rośnie po jakieś 6% tygodniowo,
+     dziesięć milionów po 1%, a ćwierć miliarda po jakieś 0,2%. Dogonić da się
+     tylko na początku — i o to chodzi.
+
+     Podatek zjada ten wzrost tak samo u wszystkich, więc przy wysokiej stawce
+     najpierw pod kreską lądują ci, którzy rosną najwolniej: najbogatsi. */
+  const tempoMajatku=v=>Math.max(.0010,.075*Math.pow(4e5/(4e5+Math.max(0,v)),.55));
   d.lu.forEach(({n,v})=>{
-    let nowe=v*(1+wzrost);
+    let nowe=v*(1+tempoMajatku(v)-st*.0011);
     if(st>0){
       // progresja decyduje, kogo to naprawdę boli
       const mnoz=prog?(v>=d.sr?1.7:.3):1;
@@ -5236,6 +5258,7 @@ function pkbTydzien(){
   G.pkbPop=G.pkb||pkbLicz();
   G.pkb=pkbLicz();
   G.pkbTempo=G.pkbPop?(G.pkb-G.pkbPop)/G.pkbPop:0;
+  mediaTydzien();                    // gazety same się rozliczają co tydzień
   sprawdzRangi();                    // kto przekroczył próg, ten awansuje i płaci wpisowe
   pkbZapiszOdczyt();
 }
@@ -5456,6 +5479,198 @@ function kapitalTab(){
       ${KAP_ZA_MLN} kapitału, ale kto wyłoży, ten odchodzi z partii, a jedność siada
       tym mocniej, im grubszy portfel wydoisz. Przewodniczącego nie ruszysz.</div>
     </div></div>`;
+}
+
+/* ══════════ MEDIA ══════════
+   Dział otwiera się dopiero po ustawie o mediach — bez niej nikt na serwerze
+   nie ma prawa niczego wydawać. Wszystko kupuje się za prywatny majątek
+   przewodniczącego, więc to jest to, na co się go zbiera.
+
+   Trzy rodzaje wydawnictw, każdy z inną mechaniką:
+     • gazeta  — żyje sama, zarabia na serduszkach, ale z niczego nie robi kokosów,
+     • telewizja — zarabiasz na odcinkach, w których wybierasz, o czym mówić,
+     • kino    — zarabiasz na filmach, a widownię ciągnie sława partii.
+   Bilans każdego wydawnictwa liczy się osobno i widać go na wspólnej liście. */
+const MEDIA_TYP={
+  gazeta:{n:'Wydawnictwo gazetowe',koszt:500e3,e:'📰',
+    d:'Tygodnik, który sam się utrzymuje. Serduszka czytelników to jego jedyny przychód: od dziesięciu wychodzi na plus, powyżej zaczyna zarabiać. Nie zbijesz na tym fortuny, ale pracuje bez ciebie.'},
+  tv:{n:'Wydawnictwo telewizyjne',koszt:10e6,e:'📺',
+    d:'Studio z anteną. Nagrywasz odcinki i sam wybierasz, o czym mówisz — filozoficznie, politycznie albo śmieciowo. Ile z tego wyjdzie, zależy od widowni, a widownię trzeba sobie wyrobić.'},
+  kino:{n:'Wydawnictwo kinowe',koszt:20e6,e:'🎬',
+    d:'Najdroższa zabawka na serwerze. Kręcisz filmy, a na seanse przychodzą ludzie — tym tłumniej, im głośniej o twojej partii.'},
+};
+const mediaInit=()=>{if(!G.media)G.media=[]};
+const mediaJest=()=>lawDone('media');
+const mediaMoje=()=>{mediaInit();return G.media};
+const mediaBilans=()=>mediaMoje().reduce((a,m)=>a+m.bilans,0);
+
+/* Serduszka gazety chodzą za sławą partii i kompetencją redaktora. */
+function serduszka(m){
+  const p=me(), ld=L(m.szef)||{komp:50};
+  return Math.max(0,Math.round(p.fame*.34+ld.komp*.12+(m.staz||0)*.35-6));
+}
+function mediaTydzien(){
+  if(!G||!mediaJest())return;
+  mediaInit();
+  G.media.forEach(m=>{
+    m.staz=(m.staz||0)+1;
+    if(m.typ==='gazeta'){
+      /* Od dziesięciu serduszek gazeta wychodzi na swoje, niżej dokłada się
+         do niej z kieszeni. Skala jest celowo skromna. */
+      const s=serduszka(m);
+      const zysk=Math.round((s-10)*9000);
+      m.bilans+=zysk; m.serca=s; m.ostatnio=zysk;
+      const szef=me().lead;
+      G.kapPryw[szef]=Math.max(1000,(G.kapPryw[szef]!==undefined?G.kapPryw[szef]:kapPryw(szef))+zysk);
+    }
+  });
+}
+function mediaKup(typ){
+  const t=MEDIA_TYP[typ]; if(!t)return;
+  mediaInit();
+  const p=me(), szef=p.lead;
+  if(kapPryw(szef)<t.koszt)return;
+  G.kapPryw[szef]=Math.round(kapPryw(szef)-t.koszt);
+  const nr=G.media.filter(m=>m.typ===typ).length+1;
+  G.media.push({typ,nazwa:`${t.n.split(' ')[1]||'Wydawnictwo'} ${nr}`,szef,bilans:0,staz:0,serca:0,ostatnio:0});
+  say(`<b>${t.n}</b> ruszyło. ${szef} wyłożył ${kasaSkrot(t.koszt)}.`,'good');
+  close();render();
+}
+function mediaNazwij(i){
+  const m=mediaMoje()[i]; if(!m)return;
+  modalName(null,(nazwa)=>{if(nazwa)m.nazwa=nazwa.slice(0,40);close();render()},
+    'Nazwa wydawnictwa','Jak ma się nazywać?');
+}
+function mediaSzef(i){
+  const m=mediaMoje()[i]; if(!m)return;
+  const p=me();
+  modal('Wydawnictwo','Kto to prowadzi',
+    `<p>Redaktor odpowiada za to, jak wydawnictwo sobie radzi. Liczy się kompetencja.</p>`,
+    roster(p).map(n=>({l:n,s:`kompetencja ${L(n).komp} · charyzma ${L(n).char}`,
+      f:()=>{m.szef=n;close();render()}}))
+      .concat([{l:'Zostawiam',f:close}]),close);
+}
+/* ── telewizja: odcinek ── */
+const TV_TEMAT=[
+ {id:'filo',n:'Filozoficznie',d:'Rozmowa o niczym, ale z powagą. Elita to kupuje, reszta wyłącza.',
+  w:{eli:1.9,int:1.1,ser:.25}},
+ {id:'poli',n:'Politycznie',d:'O sejmie, rządzie i tym, kto komu podpadł. Bezpiecznie i przewidywalnie.',
+  w:{eli:1.0,int:1.4,ser:.9}},
+ {id:'smiec',n:'Śmieciowo',d:'Bez tematu, za to głośno. Ogląda to pół serwera i nikt się nie przyznaje.',
+  w:{eli:.2,int:.7,ser:1.9}},
+];
+function mediaOdcinek(i){
+  const m=mediaMoje()[i]; if(!m||m.typ!=='tv')return;
+  const p=me();
+  modal('Telewizja','O czym dziś mówisz',
+    `<p>Widownia zależy od tego, kto ogląda ten serwer. Twoje dopasowanie do grup:
+     elita ${p.aff.eli.toFixed(1)}, intelektualiści ${p.aff.int.toFixed(1)}, serwerowicze ${p.aff.ser.toFixed(1)}.</p>`,
+    TV_TEMAT.map(t=>({l:t.n,s:t.d,f:()=>{close();mediaOdcinekGraj(i,t)}}))
+      .concat([{l:'Dziś nie nagrywam',f:close}]),close);
+}
+function mediaOdcinekGraj(i,t){
+  const m=mediaMoje()[i], p=me();
+  // widownia: dopasowanie tematu do składu serwera razy sława i kompetencja prowadzącego
+  let dop=0; SID.forEach(s=>dop+=segShare(s)*(t.w[s]||0)*p.aff[s]);
+  const ld=L(m.szef)||{char:50,komp:50};
+  const widz=Math.max(20,Math.round(dop*130*(1+p.fame/110)*(1+ld.char/240)*R(.72,1.34)));
+  const zysk=Math.round(widz*950);
+  m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.staz=(m.staz||0)+1;
+  const szef=p.lead;
+  G.kapPryw[szef]=Math.max(1000,(G.kapPryw[szef]!==undefined?G.kapPryw[szef]:kapPryw(szef))+zysk);
+  p.fame=cl(p.fame+Math.min(4,widz/420));
+  say(`<b>${m.nazwa}:</b> odcinek „${t.n}” obejrzało ${widz} osób. Wpływ ${kasaSkrot(zysk)}.`,'good');
+  modal('Telewizja',m.nazwa,
+    `<div class="wypodsum">
+       <div><b>${widz}</b><span>widzów</span></div>
+       <div><b>${kasaSkrot(zysk)}</b><span>wpływ</span></div>
+       <div><b>${kasaSkrot(m.bilans)}</b><span>bilans wydawnictwa</span></div>
+     </div>
+     <p>Temat „${t.n}” ${dop>1.1?'trafił w to, co serwer akurat ogląda.'
+       :dop>.6?'przeszedł bez emocji.':'nie zainteresował prawie nikogo.'}</p>`,
+    [{l:'Dobrze',f:()=>{close();render()}}]);
+}
+/* ── kino: film ── */
+const KINO_FILM=[
+ {id:'dram',n:'Dramat serwerowy',mn:1.25,d:'Dwie godziny o tym, jak ktoś komuś nie odpisał na DM.'},
+ {id:'akcja',n:'Film akcji',mn:1.0,d:'Wybuchy, pościgi i jeden bardzo zły admin.'},
+ {id:'dok',n:'Dokument o serwerze',mn:.8,d:'Poważnie, rzetelnie i bez publiczności.'},
+];
+function mediaFilm(i){
+  const m=mediaMoje()[i]; if(!m||m.typ!=='kino')return;
+  modal('Kino','Co kręcisz',
+    `<p>Na seanse przychodzi tym więcej ludzi, im głośniej o twojej partii.
+     Twoja sława: <b>${Math.round(me().fame)}</b>.</p>`,
+    KINO_FILM.map(f=>({l:f.n,s:f.d,f:()=>{close();mediaFilmGraj(i,f)}}))
+      .concat([{l:'Nie kręcę',f:close}]),close);
+}
+function mediaFilmGraj(i,f){
+  const m=mediaMoje()[i], p=me();
+  const widz=Math.max(40,Math.round(p.fame*11*f.mn*R(.7,1.4)));
+  const zysk=Math.round(widz*1450);
+  m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.staz=(m.staz||0)+1;
+  const szef=p.lead;
+  G.kapPryw[szef]=Math.max(1000,(G.kapPryw[szef]!==undefined?G.kapPryw[szef]:kapPryw(szef))+zysk);
+  p.fame=cl(p.fame+Math.min(5,widz/300));
+  say(`<b>${m.nazwa}:</b> „${f.n}” obejrzało ${widz} osób. Wpływ ${kasaSkrot(zysk)}.`,'good');
+  modal('Kino',m.nazwa,
+    `<div class="wypodsum">
+       <div><b>${widz}</b><span>widzów</span></div>
+       <div><b>${kasaSkrot(zysk)}</b><span>wpływ</span></div>
+       <div><b>${kasaSkrot(m.bilans)}</b><span>bilans wydawnictwa</span></div>
+     </div>
+     <p>Na „${f.n}” przyszło ${widz} osób — tyle, ile dziś warta jest twoja sława.</p>`,
+    [{l:'Dobrze',f:()=>{close();render()}}]);
+}
+function mediaTab(){
+  const p=me(), szef=p.lead, maj=kapPryw(szef);
+  if(!mediaJest())return `
+    <div class="card"><div class="h"><h3>Media</h3><span class="n">zamknięte</span></div><div class="b">
+      <p style="margin-top:0">Na serwerze nie wolno niczego wydawać, dopóki sejm nie uchwali
+      <b>ustawy o mediach</b>. Bez niej nie ma gazet, telewizji ani kina.</p>
+      <div class="note" style="margin:12px 0 0">Ustawę zgłasza premier albo minister
+      <b>Kultury i Rozrywki</b>. Dopiero po niej ten dział się otwiera.</div>
+    </div></div>`;
+  const lista=mediaMoje();
+  return `
+  <div class="ekoblok">
+    <div class="card"><div class="h"><h3>Twoje wydawnictwa</h3>
+      <span class="n">${lista.length} · bilans ${kasaSkrot(mediaBilans())}</span></div><div class="b">
+      <div class="tabliczki" style="margin:0 0 14px">
+        <div><b>${lista.length}</b><span>${pl(lista.length,'wydawnictwo','wydawnictwa','wydawnictw')}</span></div>
+        <div><b>${kasaSkrot(mediaBilans())}</b><span>bilans łączny</span></div>
+        <div><b>${kasaSkrot(maj)}</b><span>kieszeń ${esc(szef)}</span></div>
+      </div>
+      ${lista.length?`<div class="ekolista">${lista.map((m,i)=>{const t=MEDIA_TYP[m.typ];
+        return `<div class="ekos medw">
+          <span class="mede">${t.e}</span>
+          <span class="ekon">${esc(m.nazwa)}<em class="ekotag">${t.n} · ${esc(m.szef)}</em></span>
+          ${m.typ==='gazeta'?`<span class="medserca ${serduszka(m)>=10?'ok':'no'}">♥ ${serduszka(m)}</span>`
+            :`<span class="medserca">${m.widz?m.widz+' widzów':'brak nagrań'}</span>`}
+          <b class="ekow ${m.bilans>=0?'plus':'minus'}">${mordedolar(12)} ${m.bilans>=0?'+':''}${kasaSkrot(m.bilans)}</b>
+          <span class="medakcje">
+            ${m.typ==='tv'?`<button class="btn sm" onclick="mediaOdcinek(${i})">Nagraj odcinek</button>`:''}
+            ${m.typ==='kino'?`<button class="btn sm" onclick="mediaFilm(${i})">Nakręć film</button>`:''}
+            <button class="btn g sm" onclick="mediaNazwij(${i})">Nazwa</button>
+            <button class="btn g sm" onclick="mediaSzef(${i})">Redaktor</button>
+          </span>
+        </div>`}).join('')}</div>`
+       :'<p class="dim" style="margin:0">Nie masz jeszcze żadnego wydawnictwa.</p>'}
+    </div></div>
+
+    <div class="card"><div class="h"><h3>Załóż wydawnictwo</h3>
+      <span class="n">płaci ${esc(szef)} z własnej kieszeni</span></div><div class="b">
+      <div class="medsklep">${Object.keys(MEDIA_TYP).map(k=>{const t=MEDIA_TYP[k],stac=maj>=t.koszt;
+        return `<div class="medkafel ${stac?'':'brak'}">
+          <div class="mede duzy">${t.e}</div>
+          <b>${t.n}</b>
+          <div class="medcena">${mordedolar(13)} ${kasaSkrot(t.koszt)}</div>
+          <p>${t.d}</p>
+          <button class="btn ${stac?'':'g'}" ${stac?'':'disabled'} onclick="mediaKup('${k}')">
+            ${stac?'Zakładam':'Brakuje '+kasaSkrot(t.koszt-maj)}</button>
+        </div>`}).join('')}</div>
+    </div></div>
+  </div>`;
 }
 
 /* ── SĄD ──
@@ -6806,7 +7021,7 @@ function wywiadOdp(nr){
   WYW.reakcja={t:pula[RI(0,pula.length-1)],ok:w.ok,dzien:w.dzien,widz:w.widz};
   WYW.i++;
   if(WYW.i<WYW.pyt.length)wywiadRys();
-  else wywiadNaZywo();          // po pytaniach idzie transmisja
+  else wywiadKoniec();
 }
 /* Kręgosłup: ile różnych rejestrów poszło w eter. Jeden albo dwa to linia,
    trzy to skakanie i widać to na wiarygodności. */
@@ -6851,17 +7066,17 @@ function wywiadRys(){
   v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>wywiadOdp(+b.dataset.w));
   v.querySelector('.mdlx').onclick=actBack;
 }
-/* ── wejście na żywo ──
-   Po pytaniach idzie trzydzieści sekund transmisji. Przez ekran przelatują
-   chmurki widzów: złapana dokłada oglądalność, przegapiona ucieka. Ma to być
-   ruch, a nie kolejny wybór z listy — dlatego liczy się refleks, a nie namysł.
-   Wynik mnoży to, co wyszło z rozmowy: dobra odpowiedź przy pustej widowni
-   waży mniej niż średnia przy pełnej. */
+/* ── nagranie ──
+   Reportaż i wykład z ustawy o MAN nie kończą się na przelewie. Trzeba je
+   nagrać: przez trzydzieści sekund po planie przelatują oczka uwagi i trzeba
+   je klikać. Liczy się nie suma, tylko CELNOŚĆ — złapałeś większość, materiał
+   wyszedł; przegapiłeś połowę, wyszła sieczka. Nagroda jest w sławie i to
+   umiarkowana: to ma być przyprawa do ustawy, a nie sposób na granie w kółko. */
 let LIVE=null;
 const LIVE_SEK=30;
-function wywiadNaZywo(){
-  const p=me();
-  LIVE={do_:Date.now()+LIVE_SEK*1000, widz:0, zlapane:0, uciekle:0, chmurki:[], nast:0, id:0};
+function nagranieStart(tytul,potem){
+  LIVE={do_:Date.now()+LIVE_SEK*1000, zlapane:0, uciekle:0, chmurki:[], nast:0, id:0,
+        tytul:tytul||'Nagranie', potem:potem||null};
   liveRys();
   LIVE.petla=setInterval(liveKlatka,90);
 }
@@ -6886,10 +7101,8 @@ function liveKlatka(){
 function liveLap(id){
   if(!LIVE)return;
   const i=LIVE.chmurki.findIndex(c=>c.id===id); if(i<0)return;
-  const c=LIVE.chmurki[i];
   LIVE.chmurki.splice(i,1);
   LIVE.zlapane++;
-  LIVE.widz+=Math.round(c.w*(1+lead(G.me).char/240));
   beep(520+Math.min(300,LIVE.zlapane*11),.04,'sine',.03);
   liveRys();
 }
@@ -6897,48 +7110,73 @@ function liveRys(){
   if(!LIVE)return;
   const zost=Math.max(0,Math.ceil((LIVE.do_-Date.now())/1000));
   const teraz=Date.now();
-  const v=rysujOkno('live',`
+  const suma=LIVE.zlapane+LIVE.uciekle;
+  const cel=suma?Math.round(LIVE.zlapane/suma*100):0;
+  const v=rysujOkno('nagranie',`
     <div class="wystudio">
       <div class="wyglowa">
         <span class="livekropka"></span>
         <div style="min-width:0">
-          <div class="kick">Wejście na żywo</div>
-          <h2>${esc(lead(G.me).n)} w eterze</h2>
+          <div class="kick">Nagranie w toku</div>
+          <h2>${esc(LIVE.tytul)}</h2>
         </div>
         <div class="liveczas ${zost<=6?'malo':''}">${zost}s</div>
       </div>
       <div class="wymiary">
-        <div class="wymiara wd"><div class="wyml"><span>Oglądalność</span><b>${LIVE.widz}</b></div>
-          <div class="trk"><i style="width:${cl(LIVE.widz/9)}%"></i></div></div>
-        <div class="wymiara dz"><div class="wyml"><span>Złapane / uciekłe</span>
+        <div class="wymiara wd"><div class="wyml"><span>Celność</span><b>${cel}%</b></div>
+          <div class="trk"><i style="width:${cel}%"></i></div></div>
+        <div class="wymiara dz"><div class="wyml"><span>Złapane / przegapione</span>
           <b>${LIVE.zlapane} / ${LIVE.uciekle}</b></div>
-          <div class="trk"><i style="width:${cl(LIVE.zlapane/Math.max(1,LIVE.zlapane+LIVE.uciekle)*100)}%"></i></div></div>
+          <div class="trk"><i style="width:${cl(suma?LIVE.zlapane/suma*100:0)}%"></i></div></div>
       </div>
     </div>
     <div class="bd">
       <div class="liveplansza">
         ${LIVE.chmurki.map(c=>{const t=(teraz-c.ur)/c.zycie;
-          return `<button class="livech" data-id="${c.id}"
-            style="left:${c.x}%;bottom:${(8+t*76).toFixed(1)}%;--w:${c.w}">
-            ${mordedolar(15)}<em>+${c.w}</em></button>`}).join('')}
+          return `<button class="liveoczko" data-id="${c.id}"
+            style="left:${c.x}%;bottom:${(8+t*76).toFixed(1)}%"></button>`}).join('')}
         ${LIVE.chmurki.length?'':'<span class="livepusto">…</span>'}
       </div>
-      <div class="wypodp">Klikaj widzów, zanim uciekną z transmisji</div>
+      <div class="wypodp">Klikaj oczka, zanim zgasną — liczy się, ile z nich złapiesz</div>
     </div>`);
   if(!v)return;
-  v.querySelectorAll('.livech').forEach(b=>b.onclick=()=>liveLap(+b.dataset.id));
+  v.querySelectorAll('.liveoczko').forEach(b=>b.onclick=()=>liveLap(+b.dataset.id));
+}
+/* Rozliczenie nagrania z ustawy o MAN. Sława jest tu przyprawą, nie daniem
+   głównym — całe przedsięwzięcie i tak zapłaciło już swoje w efekcie ustawy. */
+function nagranieMAN(w,celnosc){
+  const p=me();
+  const proc=Math.round(celnosc*100);
+  const slawa=Math.round(celnosc*7);
+  const wiar=celnosc>=.7?2:0;
+  p.fame=cl(p.fame+slawa); if(wiar)p.cred=cl(p.cred+wiar);
+  if(celnosc<.35){p.pret=cl(p.pret+3)}
+  const ocena=celnosc>=.8?'Materiał wyszedł znakomicie.'
+    :celnosc>=.55?'Materiał wyszedł porządnie.'
+    :celnosc>=.35?'Da się to puścić, ale bez szału.'
+    :'Z tego wyszła sieczka.';
+  say(`<b>${w.n}</b> nagrany: celność ${proc}%. ${ocena} Sława +${slawa}.`,celnosc>=.55?'good':'');
+  modal('Nagranie',w.n,
+    `<div class="wypodsum">
+       <div><b>${proc}%</b><span>celność</span></div>
+       <div><b>+${slawa}</b><span>sława</span></div>
+       <div><b>${wiar?'+'+wiar:'—'}</b><span>wiarygodność</span></div>
+     </div>
+     <p>${ocena} ${celnosc<.35?'Przy takiej robocie łatwo wyjść na kogoś, kto się wywyższa bez pokrycia.'
+       :'Efekt samej ustawy i tak już zadziałał — to jest dokładka za to, jak poszło nagranie.'}</p>`,
+    [{l:'Dobrze',f:()=>{close();render()}}]);
 }
 function liveKoniec(){
   if(!LIVE)return;
   clearInterval(LIVE.petla);
-  const w=LIVE.widz, cel=LIVE.zlapane+LIVE.uciekle;
-  const celnosc=cel?LIVE.zlapane/cel:0;
+  const suma=LIVE.zlapane+LIVE.uciekle;
+  const celnosc=suma?LIVE.zlapane/suma:0;
+  const potem=LIVE.potem;
   LIVE=null;
   close();
-  wywiadKoniec({widz:w,celnosc});
+  if(potem)potem(celnosc);
 }
-
-function wywiadKoniec(live){
+function wywiadKoniec(){
   const p=me(), ld=lead(G.me);
   const traf=WYW.traf, ile=WYW.pyt.length;
   const kreg=wywiadKregoslup();
@@ -6946,11 +7184,7 @@ function wywiadKoniec(live){
      wrażenie niż cztery trafione odpowiedzi wygłoszone czterema różnymi głosami. */
   const bonus=kreg===1?9:kreg===2?3:-7;
   const komp=ld.komp>=78?6:ld.komp>=60?3:0;      // wygadany lider ratuje słabszy dzień
-  /* Transmisja dokłada swoje: pełna widownia podbija każdą odpowiedź,
-     pusta sprawia, że nawet dobra rozmowa przechodzi bez echa. */
-  const L=live||{widz:0,celnosc:0};
-  const zEteru=Math.round(cl(L.widz/9,0,100)*.28+L.celnosc*14);
-  const ocena=Math.round((WYW.dzien+WYW.widz)/2+bonus+komp+zEteru);
+  const ocena=Math.round((WYW.dzien+WYW.widz)/2+bonus+komp);
   const udany=ocena>=52;
   const dzien=Math.round(WYW.dzien), widz=Math.round(WYW.widz);
   const opisKreg=kreg===1?'Trzymałeś jedną linię przez cały wywiad.'
@@ -6962,14 +7196,14 @@ function wywiadKoniec(live){
   const podsum=`<div class="wypodsum">
       <div><b>${traf}/${ile}</b><span>trafione rejestry</span></div>
       <div><b>${dzien}</b><span>dziennikarz</span></div>
-      <div><b>${L.widz}</b><span>oglądalność</span></div>
+      <div><b>${widz}</b><span>widownia</span></div>
       <div><b>${ocena}</b><span>ocena łączna</span></div>
     </div>`;
   if(udany){
     /* Nagroda idzie tam, skąd przyszła: dziennikarz robi wiarygodność,
        widownia robi sławę. Dzięki temu dwa dobre wywiady potrafią wyjść
        zupełnie inaczej. */
-    const gf=Math.round(2+widz/14+L.widz/26), gc=Math.round(2+dzien/16);
+    const gf=Math.round(2+widz/14), gc=Math.round(2+dzien/16);
     p.fame=cl(p.fame+gf);p.cred=cl(p.cred+gc);
     if(ocena>=72)p.ctr=cl(p.ctr-3);
     if(p.marg&&ch(.5))p.marg=0;
@@ -7889,6 +8123,21 @@ function lawVote(id,opcje,wnioskodawca,mojGlos){
     }
     const wRzadzie=!!(G.gov&&G.gov.parties.includes(k));
     const rel=G.rel[k][przez];
+    /* Umowa koalicyjna to nie sondaż. Rząd firmuje swoje ustawy — inaczej
+       zgłaszasz projekt jako premier i patrzysz, jak twoi właśni koalicjanci
+       wstrzymują się albo głosują przeciw, mimo że dogadałeś się z nimi tydzień
+       wcześniej. Wpływ zostaje, ale przez relacje: dobre to głos pewny, chłodne
+       to wstrzymanie, a dopiero naprawdę zepsute zwalniają z dyscypliny. */
+    const wnioskZRzadu=!!(G.gov&&G.gov.parties.includes(przez));
+    if(wRzadzie&&wnioskZRzadu&&k!==przez){
+      const skrajna=rad>.78&&rel<45;      // pod projekt szyty grubo pod siebie nikt nie podpisze się w ciemno
+      if(rel>=10&&!skrajna){za+=s;by[k]='za';return}
+      if(rel>=-15&&!skrajna){
+        if(ch(.72)){za+=s;by[k]='za'} else {wstrzym+=s;by[k]='wstrzymał się'}
+        return;
+      }
+      // relacje pod kreską albo projekt nie do obrony — koalicjant głosuje jak reszta sejmu
+    }
     // resort w rękach koalicjanta kupuje jego głos — ale samo bycie w rządzie waży więcej
     const maResort=Object.values(G.rada||{}).some(n=>partiaOsoby(n)===k);
     /* Opozycja nie firmuje sukcesów rządu. Dawna baza .34 sprawiała, że nawet wrogowie
@@ -8200,6 +8449,10 @@ function applyLaw(id,opcje){
       G.kapPryw[szef]=Math.max(1000,Math.round(kapPryw(szef)-koszt));
       const msg=w.ef(p);
       say(`<b>${w.n}</b> — ${szef} wyłożył <b>${kasaSkrot(koszt)}</b> z własnej kieszeni. ${msg}`,'good');
+      /* Wykład i reportaż trzeba jeszcze nagrać. Sama ustawa daje swoje,
+         a nagranie dokłada od siebie tyle, ile uda się złapać. */
+      if(id==='man'&&typeof document!=='undefined')
+        setTimeout(()=>nagranieStart(w.n,c=>nagranieMAN(w,c)),80);
     }
   }
   /* Ordynacja rusza wyłącznie próg wyborczy. Zmiana liczby mandatów w środku
@@ -10761,7 +11014,7 @@ function dead(){
   ${ekstopka('koniec tej rozgrywki','<button class="btn" onclick="newRun()">Od nowa</button>')}`)}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,
@@ -10778,7 +11031,9 @@ Object.assign(window,{slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,
   zarobekLidera,zarobekTydzien,pkbWykres,openWariant,wariantyUstawy,wariantPo,
   majatekSzefa,panelGlosowania,nextCandidate,pkbZapiszOdczyt,
   RANGI,ranga,rangaNr,nastepnaRanga,mnoznikRangi,rangiStart,sprawdzRangi,absolutorium,
-  rangaKoszt,rangaWymog,oknoAbsolutorium,sadTab,sadSklad,wywiadNaZywo,liveLap,DANINA_ZA_PUNKT,
+  rangaKoszt,rangaWymog,oknoAbsolutorium,sadTab,sadSklad,nagranieStart,liveLap,DANINA_ZA_PUNKT,
+  mediaTab,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,mediaTydzien,mediaBilans,
+  mediaOdcinekGraj,mediaFilmGraj,serduszka,MEDIA_TYP,nagranieMAN,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
   get KRE(){return KRE}, SCEN, kreatorDane,
