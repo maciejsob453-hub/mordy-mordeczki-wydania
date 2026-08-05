@@ -4095,7 +4095,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.38';
+let WERSJA='1.1.39';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4106,6 +4106,10 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.39':{data:'5 sierpnia 2026', zmiany:[
+   'Liczby nad wyborem partii siedza wreszcie w tabliczkach. Poprzednie wydanie mialo ten styl napisany na zla klase, wiec nie mial czego zlapac i rzad liczb zostal plaski.',
+ ]},
+
  '1.1.38':{data:'5 sierpnia 2026', zmiany:[
    'EKRAN WYBORU PARTII w tym samym jezyku co ekran trybow. Karta partii jest teraz osadzona plyta z mosiezna listwa u gory i okuciem w rogu, liczby nad nia stoja w tabliczkach, a kafle partii unosza sie pod kursorem i swieca barwa swojego ugrupowania.',
    'Wybrana partia dostaje okucie w rogu, dokladnie takie jak karta trybu, wiec oba ekrany mowia tym samym.',

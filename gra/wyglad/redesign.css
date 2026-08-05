@@ -610,17 +610,18 @@ body::after{
    więc pełne potraktowanie: osadzona płyta, mosiężna listwa, okucia.
    ═══════════════════════════════════════════════════════════ */
 
-/* liczby nad wyborem partii czyta się jak tabliczki, nie jak luźny rząd */
-.mstats{display:flex;flex-wrap:wrap;gap:1px;margin:var(--o4) 0 var(--o5);padding:0;
+/* Liczby nad wyborem partii czyta się jak tabliczki, nie jak luźny rząd.
+   Ten ekran używa klasy .fact, a nie .mstats — pomiar ekranu to wychwycił,
+   bo styl pisany na .mstats nie miał tu czego złapać. */
+.facts{display:flex;flex-wrap:wrap;gap:1px;margin:var(--o4) 0 var(--o5);padding:0;
   border:1px solid var(--line);border-radius:var(--r3);overflow:hidden;
-  background:var(--line);border-top:1px solid var(--line)}
-.mstats>div{flex:1 1 160px;padding:var(--o3) var(--o4);
+  background:var(--line)}
+.fact{flex:1 1 160px;padding:var(--o3) var(--o4);
   background:linear-gradient(180deg,var(--p2),var(--p1));
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
-.mstats b{font-size:24px;margin-bottom:5px;
-  background:linear-gradient(180deg,#fbf3dd,#d9ab45 130%);
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
-.mstats span{font-size:8.5px;letter-spacing:.16em}
+.fact::after{display:none}          /* pionowa kreska zastąpiona odstępem siatki */
+.fact b{font-size:24px;margin-bottom:5px}
+.fact span{font-size:8.5px;letter-spacing:.16em}
 
 /* ── karta wybranej partii ── */
 .pickmain{position:relative;overflow:hidden;border-radius:var(--r4);
