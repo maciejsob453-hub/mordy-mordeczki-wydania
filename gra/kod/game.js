@@ -4235,7 +4235,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.52';
+let WERSJA='1.1.53';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4246,6 +4246,14 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.53':{data:'6 sierpnia 2026', zmiany:[
+   'DZIAL MEDIA WIDAC ZAWSZE, nad Sadem. Bez ustawy o mediach po prostu nic sie w nim nie otworzy — zamiast znikac z nawigacji bez slowa, stoi z etykieta „zamk." i tlumaczy, czego brakuje.',
+   'GAZETA TO SZYLD, A NIE JEDNA GAZETA. Pod jednym wydawnictwem wychodza kolejne numery, co dwa tygodnie, i kazdy zbiera tyle serduszek, na ile stac twoja slawe, kompetencje redaktora i staz szyldu. Od dziesieciu numer wychodzi na swoje, ponizej dokladasz do niego z kieszeni.',
+   'WIDOWNIA ZESZLA NA ZIEMIE. Odcinek ogladalo dziewiecset osob przy serwerze liczacym szescset siedemdziesiat — teraz przed ekranem siada dwadziescia kilka osob, a przy filmie dwadziescia do czterdziestu. Za to kazdy widz jest sporo wart, wiec pieniadze wychodza podobne, tylko liczby wreszcie znacza to, co powinny.',
+   'Telewizja i kino maja przerwe tygodniowa, gazeta dwutygodniowa — przy kazdym wydawnictwie widac wprost, ile jeszcze zostalo do nastepnego wydania.',
+   'Przy kazdym wydawnictwie widac tez, ile numerow albo wydan juz z niego wyszlo.',
+ ]},
+
  '1.1.52':{data:'6 sierpnia 2026', zmiany:[
    'MAJATEK ROSNIE REGRESYWNIE I O TO CHODZILO. Wszyscy mieli te sama stawke tygodniowa, wiec pol procenta od dwustu milionow dawalo wiecej niz ktos z tysiacami widzial przez cala kadencje — przepasc poglebiala sie sama i z dolu nikt nie ruszal z miejsca. Teraz szescdziesiat tysiecy rosnie po jakies szesc procent tygodniowo, dziesiec milionow po jeden, a cwierc miliarda po dwie dziesiate. Przez kadencje mentos urosl o 119%, kenzo o 5%.',
    'RZAD FIRMUJE WLASNE USTAWY. Zglaszales projekt jako premier i patrzyles, jak twoi wlasni koalicjanci wstrzymuja sie albo glosuja przeciw, mimo ze umowa stala. Teraz koalicja przy dobrych relacjach glosuje za jak jeden maz, przy chlodnych czesc sie wstrzymuje, a dopiero zepsute relacje albo projekt szyty grubo pod siebie zwalniaja z dyscypliny.',
@@ -4902,8 +4910,10 @@ function game(){
       if(hasPrez())nv.push(['prezydent','Prezydent'+(lawsToSign().length?`<span class="badge">${lawsToSign().length}</span>`:'')]);
       nv.push(['sejm','Sejm i władza']);
       nv.push(['ekonomia','Ekonomia']);
+      // Media stoją nad Sądem i widać je zawsze — bez ustawy po prostu nie da
+      // się w nich niczego otworzyć, zamiast znikać z nawigacji bez słowa.
+      nv.push(['media','Media'+(mediaJest()?'':'<span class="badge wip">zamk.</span>')]);
       nv.push(['sad','Sąd<span class="badge wip">wip</span>']);
-      if(lawDone('media'))nv.push(['media','Media']);
       return nv.map(([k,n])=>`<button class="${G.tab===k?'on':''}" onclick="setTab('${k}')">${n}</button>`).join('')})()}
   </div>
   <div class="layout">
@@ -5507,23 +5517,18 @@ const mediaBilans=()=>mediaMoje().reduce((a,m)=>a+m.bilans,0);
 /* Serduszka gazety chodzą za sławą partii i kompetencją redaktora. */
 function serduszka(m){
   const p=me(), ld=L(m.szef)||{komp:50};
-  return Math.max(0,Math.round(p.fame*.34+ld.komp*.12+(m.staz||0)*.35-6));
+  return Math.max(0,Math.round(p.fame*.42+ld.komp*.10+(m.staz||0)*.6-6));
 }
+/* Ile tygodni musi minąć między wydaniami. Gazeta wychodzi co dwa tygodnie,
+   antena i ekran co tydzień — inaczej dałoby się klikać w kółko bez końca. */
+const MEDIA_PRZERWA={gazeta:2,tv:1,kino:1};
+const mediaGotowe=m=>absWeek()-(m.ostatnieWyd||-99)>=MEDIA_PRZERWA[m.typ];
+const mediaZa=m=>Math.max(0,MEDIA_PRZERWA[m.typ]-(absWeek()-(m.ostatnieWyd||-99)));
 function mediaTydzien(){
   if(!G||!mediaJest())return;
   mediaInit();
-  G.media.forEach(m=>{
-    m.staz=(m.staz||0)+1;
-    if(m.typ==='gazeta'){
-      /* Od dziesięciu serduszek gazeta wychodzi na swoje, niżej dokłada się
-         do niej z kieszeni. Skala jest celowo skromna. */
-      const s=serduszka(m);
-      const zysk=Math.round((s-10)*9000);
-      m.bilans+=zysk; m.serca=s; m.ostatnio=zysk;
-      const szef=me().lead;
-      G.kapPryw[szef]=Math.max(1000,(G.kapPryw[szef]!==undefined?G.kapPryw[szef]:kapPryw(szef))+zysk);
-    }
-  });
+  // samo istnienie wydawnictwa nic nie daje — liczy się to, co z niego wychodzi
+  G.media.forEach(m=>{m.staz=(m.staz||0)+1});
 }
 function mediaKup(typ){
   const t=MEDIA_TYP[typ]; if(!t)return;
@@ -5550,6 +5555,37 @@ function mediaSzef(i){
       f:()=>{m.szef=n;close();render()}}))
       .concat([{l:'Zostawiam',f:close}]),close);
 }
+/* ── gazeta: numer ──
+   Wydawnictwo to szyld, a nie jedna gazeta. Pod nim wychodzą kolejne numery,
+   co dwa tygodnie, i każdy zbiera tyle serduszek, na ile stać twoją sławę.
+   Od dziesięciu numer wychodzi na swoje, poniżej dokładasz do niego z kieszeni. */
+function mediaNumer(i){
+  const m=mediaMoje()[i]; if(!m||m.typ!=='gazeta'||!mediaGotowe(m))return;
+  const p=me();
+  const s=serduszka(m)+RI(-3,3);
+  const serca=Math.max(0,s);
+  const zysk=Math.round((serca-10)*18000);
+  m.bilans+=zysk; m.serca=serca; m.ostatnio=zysk;
+  m.numery=(m.numery||0)+1; m.ostatnieWyd=absWeek();
+  const szef=p.lead;
+  G.kapPryw[szef]=Math.max(1000,(G.kapPryw[szef]!==undefined?G.kapPryw[szef]:kapPryw(szef))+zysk);
+  if(serca>=18)p.fame=cl(p.fame+1);
+  say(`<b>${m.nazwa}</b> nr ${m.numery}: ${serca} ${pl(serca,'serduszko','serduszka','serduszek')}, `
+     +`${zysk>=0?'zysk':'strata'} ${kasaSkrot(Math.abs(zysk))}.`,zysk>=0?'good':'bad');
+  modal('Gazeta',`${m.nazwa} nr ${m.numery}`,
+    `<div class="wypodsum">
+       <div><b>${serca}</b><span>serduszek</span></div>
+       <div><b>${zysk>=0?'+':'−'}${kasaSkrot(Math.abs(zysk))}</b><span>na tym numerze</span></div>
+       <div><b>${kasaSkrot(m.bilans)}</b><span>bilans szyldu</span></div>
+     </div>
+     <p>${serca>=25?'Numer poszedł znakomicie — czytają cię nawet ci, którzy nie lubią.'
+       :serca>=10?'Numer wyszedł na swoje.'
+       :'Za mało serduszek, żeby to się spięło. Numer dokłada do interesu.'}</p>
+     <p class="dim" style="font-size:12.5px;margin-top:10px">Serduszek przybywa razem ze sławą partii,
+     kompetencją redaktora i stażem szyldu. Następny numer za dwa tygodnie.</p>`,
+    [{l:'Dobrze',f:()=>{close();render()}}]);
+}
+
 /* ── telewizja: odcinek ── */
 const TV_TEMAT=[
  {id:'filo',n:'Filozoficznie',d:'Rozmowa o niczym, ale z powagą. Elita to kupuje, reszta wyłącza.',
@@ -5560,7 +5596,7 @@ const TV_TEMAT=[
   w:{eli:.2,int:.7,ser:1.9}},
 ];
 function mediaOdcinek(i){
-  const m=mediaMoje()[i]; if(!m||m.typ!=='tv')return;
+  const m=mediaMoje()[i]; if(!m||m.typ!=='tv'||!mediaGotowe(m))return;
   const p=me();
   modal('Telewizja','O czym dziś mówisz',
     `<p>Widownia zależy od tego, kto ogląda ten serwer. Twoje dopasowanie do grup:
@@ -5573,12 +5609,16 @@ function mediaOdcinekGraj(i,t){
   // widownia: dopasowanie tematu do składu serwera razy sława i kompetencja prowadzącego
   let dop=0; SID.forEach(s=>dop+=segShare(s)*(t.w[s]||0)*p.aff[s]);
   const ld=L(m.szef)||{char:50,komp:50};
-  const widz=Math.max(20,Math.round(dop*130*(1+p.fame/110)*(1+ld.char/240)*R(.72,1.34)));
-  const zysk=Math.round(widz*950);
-  m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.staz=(m.staz||0)+1;
+  /* Serwer ma 670 osób, a przed ekranem siada garstka — dwadzieścia osób przy
+     jednym odcinku to na tym serwerze naprawdę dużo. Dlatego widownia liczy się
+     w dziesiątkach, a nie w setkach, za to każdy widz jest sporo wart. */
+  const widz=Math.max(3,Math.round(dop*2.2*(1+p.fame/110)*(1+ld.char/240)*R(.72,1.34)));
+  const zysk=Math.round(widz*90000);
+  m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.ostatnieWyd=absWeek();
+  m.numery=(m.numery||0)+1;
   const szef=p.lead;
   G.kapPryw[szef]=Math.max(1000,(G.kapPryw[szef]!==undefined?G.kapPryw[szef]:kapPryw(szef))+zysk);
-  p.fame=cl(p.fame+Math.min(4,widz/420));
+  p.fame=cl(p.fame+Math.min(4,widz/9));
   say(`<b>${m.nazwa}:</b> odcinek „${t.n}” obejrzało ${widz} osób. Wpływ ${kasaSkrot(zysk)}.`,'good');
   modal('Telewizja',m.nazwa,
     `<div class="wypodsum">
@@ -5597,7 +5637,7 @@ const KINO_FILM=[
  {id:'dok',n:'Dokument o serwerze',mn:.8,d:'Poważnie, rzetelnie i bez publiczności.'},
 ];
 function mediaFilm(i){
-  const m=mediaMoje()[i]; if(!m||m.typ!=='kino')return;
+  const m=mediaMoje()[i]; if(!m||m.typ!=='kino'||!mediaGotowe(m))return;
   modal('Kino','Co kręcisz',
     `<p>Na seanse przychodzi tym więcej ludzi, im głośniej o twojej partii.
      Twoja sława: <b>${Math.round(me().fame)}</b>.</p>`,
@@ -5606,12 +5646,13 @@ function mediaFilm(i){
 }
 function mediaFilmGraj(i,f){
   const m=mediaMoje()[i], p=me();
-  const widz=Math.max(40,Math.round(p.fame*11*f.mn*R(.7,1.4)));
-  const zysk=Math.round(widz*1450);
-  m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.staz=(m.staz||0)+1;
+  const widz=Math.max(4,Math.round(p.fame*.30*f.mn*R(.7,1.4)));
+  const zysk=Math.round(widz*110000);
+  m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.ostatnieWyd=absWeek();
+  m.numery=(m.numery||0)+1;
   const szef=p.lead;
   G.kapPryw[szef]=Math.max(1000,(G.kapPryw[szef]!==undefined?G.kapPryw[szef]:kapPryw(szef))+zysk);
-  p.fame=cl(p.fame+Math.min(5,widz/300));
+  p.fame=cl(p.fame+Math.min(5,widz/11));
   say(`<b>${m.nazwa}:</b> „${f.n}” obejrzało ${widz} osób. Wpływ ${kasaSkrot(zysk)}.`,'good');
   modal('Kino',m.nazwa,
     `<div class="wypodsum">
@@ -5642,15 +5683,20 @@ function mediaTab(){
         <div><b>${kasaSkrot(maj)}</b><span>kieszeń ${esc(szef)}</span></div>
       </div>
       ${lista.length?`<div class="ekolista">${lista.map((m,i)=>{const t=MEDIA_TYP[m.typ];
+        const gotowe=mediaGotowe(m), za=mediaZa(m);
+        const akcja={gazeta:['mediaNumer','Wydaj numer'],tv:['mediaOdcinek','Nagraj odcinek'],
+                     kino:['mediaFilm','Nakręć film']}[m.typ];
         return `<div class="ekos medw">
           <span class="mede">${t.e}</span>
-          <span class="ekon">${esc(m.nazwa)}<em class="ekotag">${t.n} · ${esc(m.szef)}</em></span>
+          <span class="ekon">${esc(m.nazwa)}<em class="ekotag">${t.n} · ${esc(m.szef)}${
+            m.numery?` · ${m.numery} ${m.typ==='gazeta'?pl(m.numery,'numer','numery','numerów')
+              :pl(m.numery,'wydanie','wydania','wydań')}`:' · nic jeszcze nie wyszło'}</em></span>
           ${m.typ==='gazeta'?`<span class="medserca ${serduszka(m)>=10?'ok':'no'}">♥ ${serduszka(m)}</span>`
-            :`<span class="medserca">${m.widz?m.widz+' widzów':'brak nagrań'}</span>`}
+            :`<span class="medserca">${m.widz?m.widz+' widzów':'brak wydań'}</span>`}
           <b class="ekow ${m.bilans>=0?'plus':'minus'}">${mordedolar(12)} ${m.bilans>=0?'+':''}${kasaSkrot(m.bilans)}</b>
           <span class="medakcje">
-            ${m.typ==='tv'?`<button class="btn sm" onclick="mediaOdcinek(${i})">Nagraj odcinek</button>`:''}
-            ${m.typ==='kino'?`<button class="btn sm" onclick="mediaFilm(${i})">Nakręć film</button>`:''}
+            <button class="btn ${gotowe?'':'g'} sm" ${gotowe?'':'disabled'}
+              onclick="${akcja[0]}(${i})">${gotowe?akcja[1]:`za ${za} ${pl(za,'tydzień','tygodnie','tygodni')}`}</button>
             <button class="btn g sm" onclick="mediaNazwij(${i})">Nazwa</button>
             <button class="btn g sm" onclick="mediaSzef(${i})">Redaktor</button>
           </span>
@@ -11014,7 +11060,7 @@ function dead(){
   ${ekstopka('koniec tej rozgrywki','<button class="btn" onclick="newRun()">Od nowa</button>')}`)}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,
@@ -11033,7 +11079,7 @@ Object.assign(window,{mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slep
   RANGI,ranga,rangaNr,nastepnaRanga,mnoznikRangi,rangiStart,sprawdzRangi,absolutorium,
   rangaKoszt,rangaWymog,oknoAbsolutorium,sadTab,sadSklad,nagranieStart,liveLap,DANINA_ZA_PUNKT,
   mediaTab,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,mediaTydzien,mediaBilans,
-  mediaOdcinekGraj,mediaFilmGraj,serduszka,MEDIA_TYP,nagranieMAN,
+  mediaOdcinekGraj,mediaFilmGraj,serduszka,MEDIA_TYP,nagranieMAN,mediaNumer,mediaGotowe,mediaZa,mediaJest,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
   get KRE(){return KRE}, SCEN, kreatorDane,
