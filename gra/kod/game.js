@@ -3445,6 +3445,13 @@ function krePole(k,pole,v){
 }
 function kreWyczysc(k){if(KRE){delete KRE.partie[k];if(KRE.wybrana===k)KRE.wybrana=null;kreatorRys()}}
 const kreIleZmian=k=>Object.keys((KRE&&KRE.partie[k])||{}).length;
+/* Kreator odpala się sprzed gry: z kafla na ekranie startowym i z listy
+   scenariuszy. Żadna rozgrywka wtedy nie stoi, więc nie wolno mu pytać o G.
+   Brał alive() i G.p[k], przez co kliknięcie kafla wywalało się na nullu
+   i ekran po prostu nie wchodził — kreator „nic nie robił". Sięga teraz do
+   stałej tablicy partii, dokładnie tak jak robi to crest(). */
+const krePartieLista=()=>Object.keys(BASE);
+const krePartiaDane=k=>(G&&G.p&&G.p[k])||BASE[k]||{n:k,ab:k,c:'#8a8a8a'};
 /* ── kreator scenariuszy ──
    Był ciasnym oknem z listą kilkunastu suwaków, po której nie dało się poznać,
    co właściwie powstaje. Teraz to pełny ekran: po lewej ustawienia w sekcjach,
@@ -3509,13 +3516,13 @@ function kreatorEkran(){
           <div class="note" style="margin:0 0 11px">Te zmiany dochodzą do tego, co wyżej.
           Możesz komuś dołożyć mandatów, kogoś pogrążyć, a reszty sceny nie ruszać.</div>
           <div class="krepartie">
-            ${alive().map(k=>{const ile=kreIleZmian(k);
+            ${krePartieLista().map(k=>{const ile=kreIleZmian(k);
               return `<button class="krep ${KRE.wybrana===k?'on':''} ${ile?'ma':''}"
-                onclick="krePartia('${k}')" title="${esc(G.p[k].n)}">
-                ${crest(k,'s')}<span>${G.p[k].ab}</span>${ile?`<i>${ile}</i>`:''}</button>`}).join('')}
+                onclick="krePartia('${k}')" title="${esc(krePartiaDane(k).n)}">
+                ${crest(k,'s')}<span>${krePartiaDane(k).ab}</span>${ile?`<i>${ile}</i>`:''}</button>`}).join('')}
           </div>
           ${KRE.wybrana?`<div class="krebox">
-            <div class="krehd"><b>${esc(G.p[KRE.wybrana].n)}</b>
+            <div class="krehd"><b>${esc(krePartiaDane(KRE.wybrana).n)}</b>
               <button class="btn g sm" onclick="kreWyczysc('${KRE.wybrana}')">Wyczyść</button></div>
             ${KRE_PARTIA.map(([pole,opis,mini,maks])=>{
               const w=(KRE.partie[KRE.wybrana]||{})[pole]||0;
@@ -3541,7 +3548,7 @@ function kreatorEkran(){
             ${op.zasady.length?`<div class="sterlab" style="margin-top:12px">Zasady</div>
               <ul class="krelista">${op.zasady.map(x=>'<li>'+x+'</li>').join('')}</ul>`:''}
             ${op.osobne.length?`<div class="sterlab" style="margin-top:12px">Osobno ustawione</div>
-              <ul class="krelista">${op.osobne.map(k=>`<li><b>${G.p[k].ab}</b> — ${kreIleZmian(k)}
+              <ul class="krelista">${op.osobne.map(k=>`<li><b>${krePartiaDane(k).ab}</b> — ${kreIleZmian(k)}
                 ${pl(kreIleZmian(k),'zmiana','zmiany','zmian')}</li>`).join('')}</ul>`:''}`}
         </div></div>
 
@@ -3602,7 +3609,7 @@ function kreatorDane(){
     const z=KRE.partie[k];
     if(z&&Object.keys(z).length){
       mod.efekty.partie[k]=z;
-      zmiany.push(`${G.p[k]?G.p[k].ab:k}: `+Object.keys(z).map(p=>`${p} ${z[p]>0?'+':''}${z[p]}`).join(', '));
+      zmiany.push(`${krePartiaDane(k).ab}: `+Object.keys(z).map(p=>`${p} ${z[p]>0?'+':''}${z[p]}`).join(', '));
     }
   });
   mod.zmiany=zmiany.join(' · ')||'Bez zmian względem zwykłej gry.';
@@ -3660,6 +3667,27 @@ async function modUsun(plik){
 }
 
 /* ══════════ 1.6 TEST · FALA 2 ══════════ */
+
+/* ─── wspólne klocki ekranów pełnoekranowych ───
+   Cała ścieżka po wyborach — dzień, obie noce, wyniki, prezydium, premier —
+   jest zbudowana z tych samych trzech rzeczy: sztandaru z tabliczkami,
+   płyty na treść i przyklejonej stopki z przyciskiem. Trzymamy je w jednym
+   miejscu, żeby nie przepisywać sztandaru w dziewięciu ekranach z osobna
+   i żeby zmiana wyglądu szła wszędzie naraz. */
+function sztandar(kick,tytul,tresc,tabl){
+  return `<div class="nocsz">
+    <div class="kick">${kick}</div>
+    <h1>${tytul}</h1>
+    ${tresc?`<p>${tresc}</p>`:''}
+    ${tabl&&tabl.length?`<div class="tabliczki">${tabl.map(t=>
+      `<div><b>${t[0]}</b><span>${t[1]}</span></div>`).join('')}</div>`:''}
+  </div>`;
+}
+function ekstopka(legenda,przyciski){
+  return `<div class="ekstopka">${legenda?`<span class="ekleg">${legenda}</span>`:''}${przyciski}</div>`;
+}
+const ekran=tresc=>`<div class="nocekran">${tresc}</div>`;
+
 /* ---- noc wyborcza ---- */
 function startNight(){
   const {votes}=G.result;
@@ -4148,7 +4176,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.43';
+let WERSJA='1.1.44';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4159,6 +4187,13 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.44':{data:'5 sierpnia 2026', zmiany:[
+   'KREATOR SCENARIUSZY WRESZCIE SIE OTWIERA. Kafel na ekranie startowym nie robil nic: kreator pytal o partie tak, jakby jakas gra juz stala, a stal przed nia, wiec leciał na pustym miejscu i ekran nie wchodzil. Bral teraz liste partii ze stalej tablicy, tak jak robia to herby. Bylo zepsute od czasu, kiedy kreator trafil na ekran startowy.',
+   'PREZYDIUM SEJMU I WYBOR PREMIERA na plytach: sztandar z tabliczkami, tresc na plycie i przyklejona stopka z przyciskiem. Wybor premiera mial gesty akapit z czterema liczbami — teraz stoja w tabliczkach: ile glosow do wiekszosci, ile mandatow w sejmie, ktora tura i jaka presja na poslow.',
+   'WYBORY PREZYDENCKIE w calosci: wystawienie kandydata, noc, dogrywka i final. Caly ciag od dnia wyborow do zaprzysiezenia mowi teraz jednym jezykiem.',
+   'EKRAN KONCA GRY dostal sztandar i tabliczki: ile kadencji, ktory tydzien, ilu ludzi zostalo i jaki dorobek.',
+ ]},
+
  '1.1.43':{data:'5 sierpnia 2026', zmiany:[
    'NOC PREZYDENCKA tym samym jezykiem co wyborcza: sztandar z tabliczkami, rzad komisji, palac czekajacy na zwyciezce i tory kandydatow jako osadzone plytki. Meta 50% to teraz mosiezna kreska, a nie szara linijka.',
    'Portrety kandydatow przestaly mrugac. Ranking zmienia sie co klatke liczenia i razem z nim przestawiala sie cala lista, wiec awatar co chwile wczytywal sie od nowa. Teraz tor kandydata stoi w miejscu, a przesuwa go tylko kolejnosc — wynik widac lepiej, bo wiersze realnie jada w gore i w dol.',
@@ -8868,28 +8903,30 @@ function marChoiceScreen(m,label,poolLabel){
     // druga tura wicemarszałka rozstrzyga się wyłącznie między innymi ugrupowaniami
   }
   if(!canRun){
-    app.innerHTML=`
-    <div class="intro" style="padding:36px 0 14px">
-      <div class="kick">Kadencja ${G.term} · prezydium sejmu</div>
-      <h1>Wyścig o ${label}</h1>
-      <p>Kandydować mogą ${poolLabel}. Twoja partia się nie kwalifikuje, wyścig rozstrzygnie się bez ciebie.</p>
-    </div>
-    <div class="card"><div class="h"><h3>Startujący</h3></div><div class="b">
+    app.innerHTML=ekran(`
+    ${sztandar(`Kadencja ${G.term} · prezydium sejmu`,`Wyścig o ${label}`,
+      `Kandydować mogą ${poolLabel}. Twoja partia się nie kwalifikuje, wyścig rozstrzygnie się bez ciebie.`,
+      [[m.pool.length,pl(m.pool.length,'startujący','startujących','startujących')],
+       [G.p[G.me].seats,'wasze mandaty'],
+       ['—','wasz kandydat']])}
+    <div class="nocplyta"><div class="card" style="border:none;background:none;box-shadow:none">
+      <div class="h"><h3>Startujący</h3></div><div class="b">
       ${m.pool.map(k=>{const r=bestRep(k);return `<div class="minrow"><span style="flex:1"><b>${r?r.n:G.p[k].lead}</b>
         <span class="dim">${G.p[k].ab} · ${G.p[k].seats} mand.</span></span></div>`}).join('')||'<span class="dim">Brak kandydatów.</span>'}
-    </div></div>
-    <div style="text-align:center;margin-top:18px"><button class="btn" onclick="marDeclare(false,null,0)">Rozstrzygnij wyścig →</button></div>`;
+    </div></div></div>
+    ${ekstopka('wyścig idzie bez was',
+      '<button class="btn" onclick="marDeclare(false,null,0)">Rozstrzygnij wyścig →</button>')}`);
     return;
   }
   const pool=ownPool(G.me);
   if(!G.marWho||!pool.includes(G.marWho))G.marWho=pool[0];
-  app.innerHTML=`
-  <div class="intro" style="padding:36px 0 14px">
-    <div class="kick">Kadencja ${G.term} · prezydium sejmu</div>
-    <h1>Wyścig o ${label}</h1>
-    <p>Kandydować mogą ${poolLabel}. Twoja partia się kwalifikuje, wybierz, kto was reprezentuje,
-       i ewentualnie dołóż kapitału do kampanii. Zwycięzcą wyścigu zostaje ten, kto zbierze najwyższy wynik, bez dogrywek.</p>
-  </div>
+  app.innerHTML=ekran(`
+  ${sztandar(`Kadencja ${G.term} · prezydium sejmu`,`Wyścig o ${label}`,
+    `Kandydować mogą ${poolLabel}. Twoja partia się kwalifikuje, więc wybierz, kto was reprezentuje,
+     i ewentualnie dołóż kapitału do kampanii. Wygrywa najwyższy wynik, bez dogrywek.`,
+    [[m.pool.length,pl(m.pool.length,'startujący','startujących','startujących')],
+     [my.seats,'wasze mandaty'],
+     [Math.round(G.kp),'kapitału w kasie']])}
   <div class="card" style="margin-bottom:14px"><div class="h"><h3>Kto startuje z ${my.ab}?</h3></div><div class="b">
     <div style="display:flex;gap:10px;flex-wrap:wrap">
     ${pool.map(n=>{const x=L(n),on=G.marWho===n;
@@ -8906,70 +8943,73 @@ function marChoiceScreen(m,label,poolLabel){
       <b>Kampania za 70 kapitału</b><span>Bardzo mocne wsparcie.</span></button>
     <button class="opt" onclick="marDeclare(false,null,0)"><b>Nie startuję</b>
       <span>Wyścig odbędzie się bez was, inna partia obejmie urząd.</span></button>
-  </div></div>`;
+  </div></div>
+  ${ekstopka('wygrywa najwyższy wynik, bez dogrywek','')}`);
 }
 function marResultScreen(m,label){
-  app.innerHTML=`
-  <div class="intro" style="padding:34px 0 12px">
-    <div class="kick">Kadencja ${G.term} · prezydium sejmu</div>
-    <h1>${m.winner?m.who+', '+label:'Urząd nieobsadzony'}</h1>
-    <p>${m.winner?(m.winner===G.me?'<b class="ok">Wygraliście wyścig.</b>':`Wygrywa ${G.p[m.winner].n}.`):'Nikt się nie zgłosił.'}</p>
-  </div>
-  <div class="card" style="max-width:620px"><div class="h"><h3>Wynik wyścigu</h3></div><div class="b">
+  const moje=m.winner===G.me;
+  app.innerHTML=ekran(`
+  ${sztandar(`Kadencja ${G.term} · prezydium sejmu`,
+    m.winner?m.who+', '+label:'Urząd nieobsadzony',
+    m.winner?(moje?'<b class="ok">Wygraliście wyścig.</b>':`Wygrywa ${G.p[m.winner].n}.`):'Nikt się nie zgłosił.',
+    [[(m.result||[]).length,pl((m.result||[]).length,'kandydat','kandydatów','kandydatów')],
+     [m.winner?G.p[m.winner].ab:'—','urząd bierze'],
+     [m.result&&m.result.length?fmt(Math.max(...m.result.map(x=>x.pct)))+'%':'—','wynik zwycięzcy']])}
+  <div class="nocplyta"><div class="card" style="border:none;background:none;box-shadow:none">
+    <div class="h"><h3>Wynik wyścigu</h3></div><div class="b">
     ${(m.result||[]).map(marRaceBar).join('')||'<span class="dim">Brak kandydatów.</span>'}
-  </div></div>
-  <div style="text-align:center;margin-top:18px"><button class="btn" onclick="marContinue()">Dalej →</button></div>`;
+  </div></div></div>
+  ${ekstopka(moje?'urząd wasz':'prezydium się układa',
+    '<button class="btn" onclick="marContinue()">Dalej →</button>')}`);
 }
 function marCountPromptScreen(){
-  app.innerHTML=`
-  <div class="intro" style="padding:36px 0 14px">
-    <div class="kick">Kadencja ${G.term} · prezydium sejmu</div>
-    <h1>Ilu ma być wicemarszałków?</h1>
-    <p>Sejm głosuje w trzech etapach: najpierw nad <b>dwoma</b> wicemarszałkami, jeśli odrzuci, nad <b>jednym</b>,
-       a jeśli i to przepadnie, wicemarszałków <b>nie będzie</b>, praktycznie jednogłośnie. Każdy etap to osobne głosowanie.</p>
-  </div>
-  <div style="text-align:center"><button class="btn" onclick="marContinue()">Zaczynamy głosowanie →</button></div>`;
+  app.innerHTML=ekran(`
+  ${sztandar(`Kadencja ${G.term} · prezydium sejmu`,'Ilu ma być wicemarszałków?',
+    `Sejm głosuje w trzech etapach: najpierw nad <b>dwoma</b> wicemarszałkami, jeśli odrzuci, nad <b>jednym</b>,
+     a jeśli i to przepadnie, wicemarszałków <b>nie będzie</b>, praktycznie jednogłośnie.`,
+    [[3,'etapy głosowania'],[2,'najpierw tylu'],[MAJ,'głosów do przyjęcia']])}
+  ${ekstopka('każdy etap to osobne głosowanie',
+    '<button class="btn" onclick="marContinue()">Zaczynamy głosowanie →</button>')}`);
 }
 function marCountVoteScreen(){
   const m=G.mar;
   const label = m.stage==='countA'?'dwóch wicemarszałków':'jednego wicemarszałka';
   if(!m.countVote){
-    app.innerHTML=`
-    <div class="intro" style="padding:34px 0 12px">
-      <div class="kick">Kadencja ${G.term} · prezydium sejmu</div>
-      <h1>Głosowanie: ${label}</h1>
-      <p>${m.stage==='countB'?'Poprzednia propozycja (dwóch wicemarszałków) nie przeszła. Sejm głosuje teraz nad jednym.':'Pierwsze głosowanie tej kadencji w sprawie prezydium.'}</p>
-    </div>
-    <div style="text-align:center"><button class="btn" onclick="marContinue()">Głosujemy →</button></div>`;
+    app.innerHTML=ekran(`
+    ${sztandar(`Kadencja ${G.term} · prezydium sejmu`,`Głosowanie: ${label}`,
+      m.stage==='countB'?'Poprzednia propozycja (dwóch wicemarszałków) nie przeszła. Sejm głosuje teraz nad jednym.'
+        :'Pierwsze głosowanie tej kadencji w sprawie prezydium.',
+      [[MAJ,'głosów do przyjęcia'],[TOTAL_SEATS,'mandatów w sejmie'],
+       [m.stage==='countB'?'2 z 3':'1 z 3','etap']])}
+    ${ekstopka('wstrzymanie się liczy się przeciw',
+      '<button class="btn" onclick="marContinue()">Głosujemy →</button>')}`);
     return;
   }
-  app.innerHTML=`
-  <div class="intro" style="padding:34px 0 12px">
-    <div class="kick">Kadencja ${G.term} · prezydium sejmu</div>
-    <h1>${m.countVote.pass?'Przyjęto':'Odrzucono'}</h1>
-    <p>Głosowanie nad ${label}: ${m.countVote.yes} za, ${m.countVote.no} przeciw.</p>
-  </div>
-  ${voteBox(m.countVote,G.me)}
-  <div style="text-align:center;margin-top:18px"><button class="btn" onclick="marContinue()">Dalej →</button></div>`;
+  app.innerHTML=ekran(`
+  ${sztandar(`Kadencja ${G.term} · prezydium sejmu`,m.countVote.pass?'Przyjęto':'Odrzucono',
+    `Głosowanie nad ${label}.`,
+    [[m.countVote.yes,'za'],[m.countVote.no,'przeciw'],[MAJ,'trzeba było']])}
+  <div class="nocplyta">${voteBox(m.countVote,G.me)}</div>
+  ${ekstopka(m.countVote.pass?'propozycja przeszła':'propozycja przepadła',
+    '<button class="btn" onclick="marContinue()">Dalej →</button>')}`);
 }
 function marCountResultScreen(){
   const m=G.mar;
-  app.innerHTML=`
-  <div class="intro" style="padding:34px 0 12px">
-    <div class="kick">Kadencja ${G.term} · prezydium sejmu</div>
-    <h1>Będzie ${m.count===2?'dwóch wicemarszałków':'jeden wicemarszałek'}</h1>
-    <p>Teraz rozstrzygną się wyścigi o te miejsca.</p>
-  </div>
-  <div style="text-align:center"><button class="btn" onclick="marContinue()">Wybieramy wicemarszałka →</button></div>`;
+  app.innerHTML=ekran(`
+  ${sztandar(`Kadencja ${G.term} · prezydium sejmu`,
+    `Będzie ${m.count===2?'dwóch wicemarszałków':'jeden wicemarszałek'}`,
+    'Teraz rozstrzygną się wyścigi o te miejsca.',
+    [[m.count,pl(m.count,'miejsce','miejsca','miejsc')],[6,'partie mogą startować']])}
+  ${ekstopka('',
+    '<button class="btn" onclick="marContinue()">Wybieramy wicemarszałka →</button>')}`);
 }
 function marZeroScreen(){
-  app.innerHTML=`
-  <div class="intro" style="padding:36px 0 14px">
-    <div class="kick">Kadencja ${G.term} · prezydium sejmu</div>
-    <h1>Wicemarszałków nie będzie</h1>
-    <p>Obie propozycje przepadły. Sejm przyjął to praktycznie jednogłośnie, prezydium ograniczy się do marszałka.</p>
-  </div>
-  <div style="text-align:center"><button class="btn" onclick="marContinue()">Kończymy prezydium →</button></div>`;
+  app.innerHTML=ekran(`
+  ${sztandar(`Kadencja ${G.term} · prezydium sejmu`,'Wicemarszałków nie będzie',
+    'Obie propozycje przepadły. Sejm przyjął to praktycznie jednogłośnie, prezydium ograniczy się do marszałka.',
+    [[0,'wicemarszałków'],[1,'marszałek']])}
+  ${ekstopka('prezydium zamknięte',
+    '<button class="btn" onclick="marContinue()">Kończymy prezydium →</button>')}`);
 }
 function marScreen(){
   const m=G.mar;
@@ -8994,18 +9034,18 @@ function pmScreen(){
   if(pr.vote&&pr.vote.pass)return pmDone();
   const pool=alive().filter(k=>G.p[k].seats>0&&!pr.tries.map(t=>t.cand).includes(k));
   const cand=pr.cand;
-  app.innerHTML=`
-  <div class="intro" style="padding:38px 0 14px">
-    <div class="kick">Kadencja ${G.term} · głosowanie ${pr.round} z 3</div>
-    <h1>Kto zostanie premierem?</h1>
-    <p>Premierem może zostać wyłącznie lider partii. Wymagana jest <b>bezwzględna większość ${MAJ} z ${TOTAL_SEATS}</b> ,
-       wstrzymanie się liczy się przeciwko kandydatowi.
-       ${pr.round===1?'Desygnacja należy do zwycięzcy wyborów.'
-        :pr.round%3===2?'<b style="color:var(--roy)">Kandydata wskazuje Król Mordeczka</b>, nie musi to być ktoś z koalicji.'
-        :'Sejm wybiera swobodnie.'}
-       Głosowania trwają, dopóki ktoś nie zbierze ${MAJ} głosów, a każdy tydzień bez rządu kosztuje cały serwer.
-       ${pr.round>1?`<br><b style="color:var(--acc)">Presja po ${pr.round-1} ${pl(pr.round-1,'nieudanej turze','nieudanych turach','nieudanych turach')}: +${(pr.round-1)*9}</b> do skłonności posłów.`:''}</p>
-  </div>
+  // gęsty akapit z czterema liczbami rozbity na tabliczki — czyta się je raz,
+  // a nie za każdą desygnacją od nowa
+  app.innerHTML=ekran(`
+  ${sztandar(`Kadencja ${G.term} · głosowanie ${pr.round} z 3`,'Kto zostanie premierem?',
+    `Premierem może zostać wyłącznie lider partii, a wstrzymanie się liczy się przeciwko niemu.
+     ${pr.round===1?'Desygnacja należy do zwycięzcy wyborów.'
+      :pr.round%3===2?'<b style="color:var(--roy)">Kandydata wskazuje Król Mordeczka</b>, nie musi to być ktoś z koalicji.'
+      :'Sejm wybiera swobodnie.'}
+     Głosowania trwają, dopóki ktoś nie zbierze większości, a każdy tydzień bez rządu kosztuje cały serwer.`,
+    [[MAJ,'głosów do większości'],[TOTAL_SEATS,'mandatów w sejmie'],
+     [pr.round,'tura desygnacji'],
+     [`+${(pr.round-1)*9}`,'presja na posłów']])}
   ${pr.lista?`<div class="card" style="margin-bottom:14px"><div class="h"><h3>Lista Króla Mordeczki</h3>
     <span class="n">kolejność desygnacji</span></div><div class="b">
     ${pr.lista.map((k,i)=>{const odp=pr.tries.some(t=>t.cand===k&&!t.pass);
@@ -9048,7 +9088,7 @@ function pmScreen(){
         <button class="btn" onclick="pmVote(0)">Kontynuuj</button></div>`}
     </div></div>`
    :`<div class="card"><div class="b"><p>Nie ma już kandydatów. Przedterminowe wybory.</p>
-      <button class="btn" onclick="pmNext()">Dalej →</button></div></div>`}`;
+      <button class="btn" onclick="pmNext()">Dalej →</button></div></div>`}`);
 }
 function predict(k){let y=0;alive().forEach(x=>{if(G.p[x].seats&&stance(x,'pm',k,k)>12)y+=G.p[x].seats});return y}
 function voteBox(v,cand){
@@ -9426,15 +9466,14 @@ function prezScreen(){
   if(!st){
     const pool=prezPool(G.me);
     if(!G.prezWho)G.prezWho=pool.map(L).sort((a,b)=>(b.char*.6+b.komp*.4)-(a.char*.6+a.komp*.4))[0].n;
-    app.innerHTML=`
-    <div class="intro" style="padding:40px 0 14px">
-      <div class="kick">Kadencja ${G.term}, tydzień ${G.week} · wybory prezydenckie</div>
-      <h1>Serwer wybiera prezydenta</h1>
-      <p>Kandydować może przewodniczący albo ktokolwiek z zaplecza, ale nie urzędujący premier.
-         Słabe partie zwykle w ogóle nikogo nie wystawiają, więc stawka bywa krótka i faworyt potrafi
-         zgarnąć grubo ponad 25% już w pierwszej turze. Prezydent daje dodatkową akcję w tygodniu,
-         kapitał, weto wobec rządu i orędzia. Głosuje cały serwer, nie sejm.</p>
-    </div>
+    app.innerHTML=ekran(`
+    ${sztandar(`Kadencja ${G.term}, tydzień ${G.week} · wybory prezydenckie`,'Serwer wybiera prezydenta',
+      `Kandydować może przewodniczący albo ktokolwiek z zaplecza, ale nie urzędujący premier.
+       Słabe partie zwykle w ogóle nikogo nie wystawiają, więc stawka bywa krótka i faworyt
+       potrafi zgarnąć grubo ponad 25% już w pierwszej turze.`,
+      [[SERVER,'głosuje cały serwer'],['50%','próg pierwszej tury'],
+       [pool.length,pl(pool.length,'wasz kandydat','waszych kandydatów','waszych kandydatów')],
+       [Math.round(G.kp),'kapitału w kasie']])}
     <div class="card" style="margin-bottom:14px"><div class="h"><h3>Kogo wystawiasz?</h3>
       <span class="n">liczy się charyzma i kompetencja</span></div><div class="b">
       <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -9454,7 +9493,8 @@ function prezScreen(){
         <b>Kampania za 60 kapitału</b><span>Bardzo mocne wsparcie. Drogo.</span></button>
       <button class="opt" onclick="prezGo(-1)"><b>Nie wystawiam nikogo</b>
         <span>Prezydentem zostanie ktoś inny, i będzie ci to utrudniał.</span></button>
-    </div></div>`;
+    </div></div>
+    ${ekstopka('prezydent daje akcję, kapitał, weto i orędzia','')}`);
     return;
   }
   const {r1,runoff,winner}=st;
@@ -9464,30 +9504,33 @@ function prezScreen(){
     <div class="b racebox">${list.map(x=>raceBar(x,voteTotal)).join('')}</div></div>`;
   if(st.stage===1&&!st.decided){
     const [a,b]=r1, mine=[a.k,b.k].includes(G.me);
-    app.innerHTML=`
-    <div class="intro" style="padding:38px 0 12px">
-      <div class="kick">Wybory prezydenckie · kadencja ${G.term} · pierwsza tura</div>
-      <h1>Nikt nie przekroczył 50%</h1>
-      <p>Do drugiej tury przechodzą <b>${a.who}</b> (${G.p[a.k].ab}) i <b>${b.who}</b> (${G.p[b.k].ab}).
-         Głosowanie za tydzień, do tego czasu głosy odpadłych kandydatów są do wzięcia.
-         ${mine?'<b class="ok">Jesteś w grze.</b> Masz jeden tydzień, żeby dorzucić do kampanii.'
-           :'Ciebie już nie ma w stawce, ale wybór prezydenta wpłynie na twoją kadencję.'}</p>
-    </div>
+    app.innerHTML=ekran(`
+    ${sztandar(`Wybory prezydenckie · kadencja ${G.term} · pierwsza tura`,'Nikt nie przekroczył 50%',
+      `Do drugiej tury przechodzą <b>${a.who}</b> (${G.p[a.k].ab}) i <b>${b.who}</b> (${G.p[b.k].ab}).
+       Głosowanie za tydzień, do tego czasu głosy odpadłych kandydatów są do wzięcia.
+       ${mine?'<b class="ok">Jesteś w grze.</b> Masz jeden tydzień, żeby dorzucić do kampanii.'
+         :'Ciebie już nie ma w stawce, ale wybór prezydenta wpłynie na twoją kadencję.'}`,
+      [[fmt(a.pct)+'%',a.who],[fmt(b.pct)+'%',b.who],
+       [fmt(100-a.pct-b.pct)+'%','głosów do wzięcia'],[1,'tydzień do dogrywki']])}
     ${race(r1,'Wyścig o pałac, pierwsza tura')}
-    <div style="text-align:center;margin-top:20px"><button class="btn" onclick="prezWait()">
-      Wracam do kampanii (tydzień do drugiej tury) →</button></div>`;
+    ${ekstopka(mine?'jesteś w dogrywce':'dogrywka bez ciebie',
+      '<button class="btn" onclick="prezWait()">Wracam do kampanii →</button>')}`);
     return;
   }
-  app.innerHTML=`
-  <div class="intro" style="padding:38px 0 12px">
-    <div class="kick">Wybory prezydenckie · kadencja ${G.term} · ${runoff?'druga tura':'rozstrzygnięcie w pierwszej turze'}</div>
-    <h1>${st.who[winner]||G.p[winner].lead} prezydentem</h1>
-    <p>${winner===G.me?'<b class="ok">Pałac jest twój.</b> Odblokowane zostały decyzje prezydenckie.'
-      :`Pałac przejmuje ${G.p[winner].n}.${G.gov&&!G.gov.parties.includes(winner)?' Rząd będzie miał z nim pod górkę.':''}`}</p>
+  const zw=runoff?runoff.find(x=>x.k===winner):r1.find(x=>x.k===winner);
+  app.innerHTML=ekran(`
+  ${sztandar(`Wybory prezydenckie · kadencja ${G.term} · ${runoff?'druga tura':'rozstrzygnięcie w pierwszej turze'}`,
+    `${st.who[winner]||G.p[winner].lead} prezydentem`,
+    winner===G.me?'<b class="ok">Pałac jest twój.</b> Odblokowane zostały decyzje prezydenckie.'
+      :`Pałac przejmuje ${G.p[winner].n}.${G.gov&&!G.gov.parties.includes(winner)?' Rząd będzie miał z nim pod górkę.':''}`,
+    [[zw?fmt(zw.pct)+'%':'—','wynik zwycięzcy'],[G.p[winner].ab,'partia prezydenta'],
+     [runoff?2:1,pl(runoff?2:1,'tura','tury','tur')],[voteTotal,'oddanych głosów']])}
+  <div class="nocplyta">
+    ${runoff?race(runoff,'Dogrywka, dwóch na mecie'):''}
+    <div style="margin-top:${runoff?'14px':'0'}">${race(r1,runoff?'Pierwsza tura, jak się tam znaleźli':'Wyścig o pałac, rozstrzygnięty od razu')}</div>
   </div>
-  ${runoff?race(runoff,'Dogrywka, dwóch na mecie'):''}
-  <div style="margin-top:${runoff?'14px':'0'}">${race(r1,runoff?'Pierwsza tura, jak się tam znaleźli':'Wyścig o pałac, rozstrzygnięty od razu')}</div>
-  <div style="text-align:center;margin-top:20px"><button class="btn" onclick="prezDone()">Wracam do kampanii →</button></div>`;
+  ${ekstopka(winner===G.me?'pałac wasz':'pałac idzie gdzie indziej',
+    '<button class="btn" onclick="prezDone()">Wracam do kampanii →</button>')}`);
 }
 function prezGo(kp,who){
   const pool=prezPool(G.me);
@@ -9668,15 +9711,17 @@ function summary(){
     {l:'Kod zapisu',s:'Skopiuj i wróć do tej rozgrywki kiedy indziej',f:()=>{close();openSave()}},
     {l:'Nowa gra',s:'Wybór partii od początku',f:()=>{close();G=null;render()}}])}
 function dead(){
-  app.innerHTML=`<div class="intro"><div class="kick">Koniec</div>
-    <h1>${G.deadWhy==='samorozwiazanie'?'Partia rozwiązana':['elita','kontrowersja','dlugi','krol'].includes(G.deadWhy)?'Administracja rozwiązała partię':'Partia przestała istnieć'}</h1>
-    <p>${({
+  app.innerHTML=ekran(`${sztandar('Koniec',
+    G.deadWhy==='samorozwiazanie'?'Partia rozwiązana':['elita','kontrowersja','dlugi','krol'].includes(G.deadWhy)?'Administracja rozwiązała partię':'Partia przestała istnieć',
+    ({
       kontrowersja:`Kontrowersja doszła do 100. Administracja uznała ${me().n} za źródło ciągłej awantury i zamknęła kanały partii.`,
       dlugi:`Kapitał polityczny spadł do ${Math.round(G.kp)}. Partia utonęła w długach, nikt już nie chciał finansować kampanii, a wierzyciele rozeszli się do konkurencji.`,
       samorozwiazanie:`<b>${me().lead}</b> postanowił rozwiązać partię przez znikomą sławę i aktywność. Kanał zamilkł na dobre, zero rozgłosu, zero ruchu, nikt już nie miał po co zostawać.`,
       elita:`Elita stanowiła ${Math.round(ratio(me(),'eli')*100)}% składu i kontrowersja wymknęła się spod kontroli.`
-    })[G.deadWhy] || `${me().n} rozwiązana w kadencji ${G.term}, tydzień ${G.week}. Kanał zarchiwizowany, rola usunięta, nikt nie napisał pożegnalnego posta.`}</p>
-    <div style="margin-top:24px"><button class="btn" onclick="newRun()">Od nowa</button></div></div>`}
+    })[G.deadWhy] || `${me().n} rozwiązana w kadencji ${G.term}, tydzień ${G.week}. Kanał zarchiwizowany, rola usunięta, nikt nie napisał pożegnalnego posta.`,
+    [[G.term,pl(G.term,'kadencja','kadencje','kadencji')],[G.week,'tydzień'],
+     [Math.round(me().mem),'osób w partii'],[Math.round(G.xp||0),'dorobku']])}
+  ${ekstopka('koniec tej rozgrywki','<button class="btn" onclick="newRun()">Od nowa</button>')}`)}
 
 /* ---- eksport uchwytów ---- */
 Object.assign(window,{slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
