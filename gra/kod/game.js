@@ -574,6 +574,7 @@ function newGame(id){
   G.free={eli:13,int:Math.round(fr*.24),ser:0};       // elita jest rzadkim towarem
   G.free.ser=fr-G.free.eli-G.free.int;
   G.mood={eli:1,int:1,ser:1};
+  G.pkb=PKB_START; G.kapPryw={};
   makeNoise();
   G.prev=snap();
   say(`Kadencja 1. Do wyborów ${G.weeks} tygodni. Prezydentem jest <b>${G.prez.lead}</b> (${G.p[G.prez.party].ab}).`,'roy');
@@ -4176,7 +4177,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.44';
+let WERSJA='1.1.45';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4187,6 +4188,12 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.45':{data:'5 sierpnia 2026', zmiany:[
+   'NOWY DZIAL: EKONOMIA — i od razu mowi o sobie, ze jest NIEDOKONCZONY. Widac PKB serwera i kapital prywatny kazdej osoby z zaplecz, ale nic z tego jeszcze nie dziala: PKB stoi w miejscu, nikt nie zarabia, nikt nie traci, a przyciski ustawy podatkowej sa wylaczone. Dzial jest po to, zeby zobaczyc liczby i dopiero na nich zdecydowac, jak ma dzialac.',
+   'KAPITAL PRYWATNY POD PORTRETAMI. Kazdy z zaplecza ma wlasny majatek, osobny od kapitalu partii, widoczny pod avatarem w zakladce Partie i we wlasnym zapleczu. Rozrzut jest ostry celowo: garstka bogatych i duzo biednych, bo na tym ma stac spor, kogo opodatkowac.',
+   'Znak mordedolara jest na razie zastepczy — czeka na wlasciwa emotke.',
+ ]},
+
  '1.1.44':{data:'5 sierpnia 2026', zmiany:[
    'KREATOR SCENARIUSZY WRESZCIE SIE OTWIERA. Kafel na ekranie startowym nie robil nic: kreator pytal o partie tak, jakby jakas gra juz stala, a stal przed nia, wiec leciał na pustym miejscu i ekran nie wchodzil. Bral teraz liste partii ze stalej tablicy, tak jak robia to herby. Bylo zepsute od czasu, kiedy kreator trafil na ekran startowy.',
    'PREZYDIUM SEJMU I WYBOR PREMIERA na plytach: sztandar z tabliczkami, tresc na plycie i przyklejona stopka z przyciskiem. Wybor premiera mial gesty akapit z czterema liczbami — teraz stoja w tabliczkach: ile glosow do wiekszosci, ile mandatow w sejmie, ktora tura i jaka presja na poslow.',
@@ -4754,13 +4761,15 @@ function game(){
       if(isPM())nv.push(['premier','Premier'+(lawsPending()?'<span class="badge">!</span>':'')]);
       if(hasPrez())nv.push(['prezydent','Prezydent'+(lawsToSign().length?`<span class="badge">${lawsToSign().length}</span>`:'')]);
       nv.push(['sejm','Sejm i władza']);
+      nv.push(['ekonomia','Ekonomia<span class="badge wip">wip</span>']);
       return nv.map(([k,n])=>`<button class="${G.tab===k?'on':''}" onclick="setTab('${k}')">${n}</button>`).join('')})()}
   </div>
   <div class="layout">
     <div style="display:flex;flex-direction:column;gap:14px">${sidebar(p,q)}</div>
     <div class="widok${G._we?' wejscie':''}" data-tab="${G.tab}">${G.tab==='mapa'?kurier()+mapTab(q,AL):G.tab==='akcje'?actTab():G.tab==='partie'?partieTab():G.tab==='sondaz'?pollTab(q,AL)
       :G.tab==='cele'?goalTab():G.tab==='lider'?leadTab():G.tab==='krol'?kingTab()
-      :G.tab==='premier'?premierTab():G.tab==='prezydent'?prezydentTab():sejmTab()}</div>
+      :G.tab==='premier'?premierTab():G.tab==='prezydent'?prezydentTab()
+      :G.tab==='ekonomia'?ekonomiaTab():sejmTab()}</div>
   </div>`;
   G._we=0;
 }
@@ -4805,13 +4814,124 @@ function partieTab(){
           <span class="pill">${sklad.length} ${pl(sklad.length,'osoba','osoby','osób')}</span>
         </div>
         <div class="benchgrid">
-          ${sklad.map(n=>`<div class="bperson ${isLead(p,n)?'lead':''}" title="${esc(n)}${isLead(p,n)?' — przewodnictwo':''}">
-            ${ava(n,p.c,34)}<span>${n}</span></div>`).join('')
+          ${sklad.map(n=>`<div class="bperson ${isLead(p,n)?'lead':''}" title="${esc(n)}${isLead(p,n)?' — przewodnictwo':''} — kapitał prywatny ${kasa(kapPryw(n))}">
+            ${ava(n,p.c,34)}<span>${n}</span>
+            <em class="kappryw">${mordedolar(11)} ${kasaSkrot(kapPryw(n))}</em></div>`).join('')
             ||'<span class="dim">Nikogo poza przewodniczącym.</span>'}
         </div>
       </div>`}).join('')}
     </div></div>`;
 }
+/* ══════════ EKONOMIA — DZIAŁ NIEDOKOŃCZONY ══════════
+   Szkielet, nie mechanika. Nic tu jeszcze nie wpływa na rozgrywkę: PKB stoi
+   w miejscu, kapitał prywatny nikomu nie przybywa ani nie ubywa, a wszystkie
+   przyciski w dziale są wyłączone. Chodzi o to, żeby liczby dało się zobaczyć
+   i dopiero na nich zdecydować, jak to ma naprawdę działać.
+
+   Otwarte pytanie, które trzeba rozstrzygnąć przed napisaniem reszty:
+   skąd PKB ma brać wzrost i co dokładnie ma z nim robić ustawa podatkowa.  */
+const PKB_START=51894432103;
+
+/* Mordedolar. Znak waluty jest na razie zastępczy — rysowany kółkiem z „M",
+   bo prawdziwej emotki jeszcze nie mam w plikach gry. Kiedy trafi do
+   gra/obrazki, wystarczy podmienić ciało tej jednej funkcji. */
+const mordedolar=(px)=>{const s=px||13;
+  return `<svg class="mdol" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true"
+    style="vertical-align:-2px"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor"
+    stroke-width="1.6"/><path d="M7.5 16.5V8l4.5 5 4.5-5v8.5" fill="none" stroke="currentColor"
+    stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`};
+
+/* Duże liczby czyta się tylko z odstępami co trzy cyfry. */
+const kasa=v=>Math.round(v||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+const kasaSkrot=v=>{v=Math.abs(v||0);
+  return v>=1e9?(v/1e9).toFixed(2)+' mld':v>=1e6?(v/1e6).toFixed(1)+' mln':
+         v>=1e3?(v/1e3).toFixed(1)+' tys.':Math.round(v)+''};
+
+/* Kapitał prywatny liczymy raz na osobę i zapamiętujemy w stanie gry, żeby
+   nie skakał przy każdym rysowaniu. Wysokość bierze się z tego, kim ta osoba
+   jest: autorytet i kompetencja robią z niej kogoś zamożnego. Rozrzut jest
+   celowo ostry — na tym ma stać spór, czy opodatkować niewielu bogatych,
+   czy wielu biednych. */
+function kapPryw(n){
+  if(!G||!n)return 0;
+  if(!G.kapPryw)G.kapPryw={};
+  if(G.kapPryw[n]===undefined){
+    const x=L(n);
+    let ziarno=0; for(let i=0;i<n.length;i++)ziarno=(ziarno*31+n.charCodeAt(i))%100000;
+    const baza=1.4e6+(ziarno%900)*1e4;                     // stała dla danej osoby
+    const mnoznik=Math.pow(1+(x.autor+x.komp)/100,3.1);    // zamożność rośnie stromo
+    G.kapPryw[n]=Math.round(baza*mnoznik);
+  }
+  return G.kapPryw[n];
+}
+const wszyscyZaplecze=()=>[...new Set(alive().flatMap(k=>roster(G.p[k])))];
+const kapPrywRazem=()=>wszyscyZaplecze().reduce((a,n)=>a+kapPryw(n),0);
+/* Próg „bogatego" stawiamy na średniej — powyżej niej jest garstka, poniżej reszta.
+   Dokładnie ten podział ma być stawką ustawy podatkowej. */
+function podzialMajatku(){
+  const lu=wszyscyZaplecze().map(n=>({n,v:kapPryw(n)})).sort((a,b)=>b.v-a.v);
+  const suma=lu.reduce((a,x)=>a+x.v,0), sr=lu.length?suma/lu.length:0;
+  const bogaci=lu.filter(x=>x.v>=sr), biedni=lu.filter(x=>x.v<sr);
+  return {lu,suma,sr,bogaci,biedni};
+}
+
+function ekonomiaTab(){
+  if(!G.pkb)G.pkb=PKB_START;        // zapisy sprzed tej wersji nie mają jeszcze PKB
+  const d=podzialMajatku();
+  const udzial=G.pkb?d.suma/G.pkb*100:0;
+  const wiersz=(x,i)=>`<div class="ekos">
+    <span class="ekopoz">${i+1}</span>${ava(x.n,'#6f7a6b',26)}
+    <span class="ekon">${x.n}</span>
+    <b class="ekow">${mordedolar(12)} ${kasaSkrot(x.v)}</b></div>`;
+  return `
+  <div class="ekoblok">
+    <div class="ekotasma">NIEDOKOŃCZONE! Dział jest wyłączony — liczby są, mechaniki jeszcze nie ma.</div>
+
+    <div class="card"><div class="h"><h3>Produkt krajowy brutto</h3>
+      <span class="n">stan na kadencję ${G.term}, tydzień ${G.week}</span></div><div class="b">
+      <div class="pkbplyta">
+        <div class="pkbduza">${mordedolar(30)} ${kasa(G.pkb)}</div>
+        <div class="pkbpod">mld · wartość nie zmienia się jeszcze z niczego</div>
+      </div>
+      <div class="tabliczki" style="margin:14px 0 0">
+        <div><b>${kasaSkrot(d.suma)}</b><span>kapitał prywatny razem</span></div>
+        <div><b>${udzial.toFixed(2)}%</b><span>tyle to z PKB</span></div>
+        <div><b>${d.bogaci.length}</b><span>powyżej średniej</span></div>
+        <div><b>${d.biedni.length}</b><span>poniżej średniej</span></div>
+      </div>
+      <div class="note" style="margin-top:14px"><b>Czego tu jeszcze nie ma.</b>
+        PKB stoi w miejscu — nic go nie podnosi ani nie obniża. Nie wiadomo jeszcze,
+        skąd ma brać wzrost ani co dokładnie robi z nim ustawa podatkowa. Kapitał
+        prywatny jest policzony i widoczny, ale nikt go nie zarabia i nikt go nie traci.</div>
+    </div></div>
+
+    <div class="card"><div class="h"><h3>Ustawa podatkowa</h3>
+      <span class="n">zablokowane</span></div><div class="b">
+      <p class="dim" style="font-size:13.5px;margin-top:0">Pomysł jest taki: sejm głosuje,
+      kogo opodatkować. Bogatych jest <b>${d.bogaci.length}</b> i mają razem
+      <b>${kasaSkrot(d.bogaci.reduce((a,x)=>a+x.v,0))}</b>, ale to oni siedzą w sejmie i sami sobie
+      tego nie uchwalą. Biednych jest <b>${d.biedni.length}</b>, mają razem
+      <b>${kasaSkrot(d.biedni.reduce((a,x)=>a+x.v,0))}</b> i są łatwiejsi do przegłosowania,
+      tylko że jest ich więcej przy urnach.</p>
+      <div class="ekowyl">
+        <button class="btn" disabled>Podatek od bogatych</button>
+        <button class="btn" disabled>Podatek od biednych</button>
+        <button class="btn g" disabled>Podatek liniowy</button>
+      </div>
+      <div class="dim" style="font-size:12px;margin-top:10px">Przyciski są martwe do czasu,
+      aż zapadnie decyzja, jak liczyć PKB.</div>
+    </div></div>
+
+    <div class="card"><div class="h"><h3>Najbogatsi na serwerze</h3>
+      <span class="n">${d.lu.length} ${pl(d.lu.length,'osoba','osoby','osób')} w zapleczach</span></div><div class="b">
+      <div class="ekolista">${d.lu.slice(0,12).map(wiersz).join('')}</div>
+      ${d.lu.length>12?`<div class="dim" style="font-size:12px;margin-top:10px">
+        …i ${d.lu.length-12} ${pl(d.lu.length-12,'osoba','osoby','osób')} niżej.
+        Średnia to ${kasaSkrot(d.sr)}, mediana ${kasaSkrot(d.lu[Math.floor(d.lu.length/2)].v)}.</div>`:''}
+    </div></div>
+  </div>`;
+}
+
 /* Najlepszy wynik w stawce dla danej cechy. Przy kontrowersji i pretensjonalności
    „najlepszy" znaczy najniższy — tam wygrywa ten, kto ma najmniej. */
 const CECHA_ODWROTNA={ctr:1,pret:1};
@@ -4927,8 +5047,9 @@ function sidebar(p,q){
   </div></div>
   <div class="card skl"><div class="h"><h3>Zaplecze</h3><span class="n">${benchAll.length} ${pl(benchAll.length,'osoba','osoby','osób')}</span></div><div class="b">
     <div class="benchgrid">
-      ${benchAll.map(n=>`<div class="bperson ${isLead(p,n)?'lead':''}" title="${n}">
-        ${ava(n,p.c,34)}<span>${n}</span></div>`).join('')||'<span class="dim">Nikogo poza przewodniczącym.</span>'}
+      ${benchAll.map(n=>`<div class="bperson ${isLead(p,n)?'lead':''}" title="${n} — kapitał prywatny ${kasa(kapPryw(n))}">
+        ${ava(n,p.c,34)}<span>${n}</span>
+        <em class="kappryw">${mordedolar(11)} ${kasaSkrot(kapPryw(n))}</em></div>`).join('')||'<span class="dim">Nikogo poza przewodniczącym.</span>'}
     </div>
   </div></div>
   <div class="card rel"><div class="h"><h3>Relacje</h3></div><div class="b">
@@ -9735,6 +9856,7 @@ Object.assign(window,{slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,
      kliknięciu. Animacja ma się odpalić tylko przy realnej zmianie widoku. */
   setTab:k=>{if(G.tab!==k)G._we=1;G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
   signAgent,agentCost,agentFree,AGENTS,render,
+  ekonomiaTab,kapPryw,kapPrywRazem,podzialMajatku,PKB_START,kasa,kasaSkrot,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
   get KRE(){return KRE}, SCEN, kreatorDane,
