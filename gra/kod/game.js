@@ -465,11 +465,15 @@ function kingFactors(k){
     {n:'Aktywność',        v:Math.round(p.act),  w:(p.act-45)*.34,  d:'Martwa partia nie utrzyma rządu.'},
     {n:'Kontrowersja',     v:Math.round(p.ctr),  w:-p.ctr*.26,      d:'Skandale przeszkadzają, ale Król widział już gorsze rzeczy.'},
     {n:'Stosunki z dworem',v:me2?Math.round(G.king.rel):50, w:me2?(G.king.rel-50)*.34:0, d:'To, co ustaliliście na osobności, przez ustawy, daninę i przysługi.'},
-    {n:'Danina',           v:me2?G.king.paid:0,  w:me2?G.king.paid/(G.krolTryb?3.5:7):0, d:'Kapitałem da się go przekonać, ale drogo.'},
+    {n:'Danina',           v:me2?G.king.paid:0,  w:me2?G.king.paid/(G.krolTryb?8:DANINA_ZA_PUNKT):0, d:'Kapitałem da się go przekonać, ale bardzo drogo.'},
   ];
   if(isLead(p,'Mnem'))out.push({n:'Młoda krew',v:'Mnem',w:10,d:'„Jam jest młody i młodością was zabije.” Tupet i świeżość imponują dworowi niezależnie od reszty.'});
   return out;
 }
+/* Ile kapitału idzie na jeden punkt u Króla. Za siedem monet dawało się kupić
+   przychylność zbyt tanio — desygnacja robiła się kwestią zbierania kasy,
+   a nie polityki. */
+const DANINA_ZA_PUNKT=16;
 function kingScore(k){return kingFactors(k).reduce((a,x)=>a+x.w,0)}
 function kingFav(k){return kingScore(k)*(G&&G.krolTryb?2:1)}
 function kingRel(d,why){
@@ -1437,6 +1441,10 @@ function buildEvents(){
      nie ma wtedy czym na nie odpowiedzieć. */
   if(G.phase==='elect'||G.phase==='result'||G.phase==='prez'||G.phase==='pmvote'
      ||G.phase==='marszalek'||G.prez2||G.prezState)return [];
+  /* Ostatni tydzień kadencji należy do absolutorium. Nic innego nie ma prawa
+     wyskoczyć, bo rozliczenie premiera z gospodarki ma być jedyną rzeczą,
+     na którą gracz wtedy patrzy. */
+  if(G.week>=G.weeks)return [];
   const pool=EV.map(e=>({e,w:e.w()})).filter(x=>x.w>0);
   const n=ch(.14)?2:ch(.62)?1:0,q=[];
   for(let i=0;i<n;i++){
@@ -1595,7 +1603,7 @@ function endWeek(){
     }
     else if(p.ctr>=70)say(`<b>Kontrowersja ${Math.round(p.ctr)}/100.</b> Przy 90 partia wpada w paraliż: sondaż na pół, kapitał na minus, ludzie wychodzą.`,'bad');
     else if(p.fame<=9&&p.act<=9)say(`<b>${p.lead} ma dość.</b> Sława ${Math.round(p.fame)}, aktywność ${Math.round(p.act)}, o partii nikt już nie pamięta. Rozwiązać cię nikt nie rozwiąże, ale tak się nie wygrywa wyborów.`,'bad');
-    if(ostatniTydzien)G.phase='finalcamp';
+    if(ostatniTydzien){G.phase='finalcamp';absolutorium()}
     else if(G.prez2&&G.week>=G.prez2.week){runRunoff();return}
     else if(G.week===6&&G.term%2===0&&(!G.prez||G.term>=G.prez.until)){G.phase='prez';G.prezState=null}
   }
@@ -4227,7 +4235,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.50';
+let WERSJA='1.1.51';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4238,6 +4246,15 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.51':{data:'6 sierpnia 2026', zmiany:[
+   'RANGI DZIALAJA ODWROTNIE NIZ DOTAD I TAK, JAK POWINNY. Wejscie na kazdy stopien kosztowalo caly prog, wiec na starcie polowa bogaczy wykupywala sie na wyzsze polki naraz — z gospodarki znikaly setki milionow, PKB lecialo w dol, a premier obrywal absolutorium za cos, na co nie mial wplywu. Teraz Sir to szesc procent progu, a Elektor szescdziesiat, i do tego trzeba miec siedemdziesiat procent wiecej, niz wynosi jego kamien milowy. Nizsze rangi wpadaja same, wyzsze bola coraz mocniej. Kapital prywatny znowu rosnie zamiast wyparowywac.',
+   'ABSOLUTORIUM W DWUNASTYM TYGODNIU, jako porzadna tabela: PKB na starcie kadencji, PKB na koniec, zmiana procentowa i wypisane co do jednego, co z tego wynika dla premiera. W ostatnim tygodniu nie wyskakuje juz zadne wydarzenie — rozliczenie z gospodarki ma byc jedyna rzecza, na ktora patrzysz.',
+   'WEJSCIE NA ZYWO W WYWIADZIE. Po pytaniach idzie trzydziesci sekund transmisji: przez ekran przelatuja widzowie, ktorych trzeba lapac, zanim uciekna. Ogladalnosc mnozy to, co wyszlo z rozmowy — dobra odpowiedz przy pustej widowni wazy mniej niz srednia przy pelnej sali. Im dalej w transmisje, tym gescej i szybciej.',
+   'USTAWA O ORDYNACJI NIE RUSZA JUZ MANDATOW. Zmiana wielkosci sejmu w srodku kadencji rozdawala mandaty od nowa i rozjezdzala wszystko, co liczy sie od stalej wielkosci izby. Zostal sam prog wyborczy.',
+   'PRZEKUPIENIE KROLA WYRAZNIE PODROZALO: punkt przychylnosci kosztuje teraz szesnascie kapitalu zamiast siedmiu. Desygnacja przestala byc kwestia zbierania kasy.',
+   'NOWA ZAKLADKA SAD, na razie jako podglad. Sklad sadu administracyjnego bierze sie wprost z ustawy o sadach: bez niej sadu nie ma, a sedziow obsadza resort Sprawiedliwosci, wiec kto go trzyma, ten ustawia lawe. Sprawy, odwolania i wyroki dopiero powstaja — dzial stoi z etykieta wip, zeby bylo jasne, ze liczby sa prawdziwe, a mechaniki jeszcze nie ma.',
+ ]},
+
  '1.1.50':{data:'5 sierpnia 2026', zmiany:[
    'STOPNIE RANG. Majatek prywatny ma teraz kamienie milowe: od Sira za milion, przez Barona, Magnata i Ksiecia, az po Elektora za miliard. Przekroczenie progu kosztuje dokladnie tyle, ile ten prog wynosi — placisz wpisowe — ale od tej pory zarabiasz o osiemnascie procent wiecej za kazdy stopien. Kto wchodzi do gry z gotowym majatkiem, ma rangi nadane i nie placi za nie nic: loof ze 150 mln jest Ksieciem i zbiera na Wielkiego Ksiecia, a mentos z 59 tysiacami nie ma zadnej i idzie na Sira. Najwyzsza ranga stoi pod portretem, tam gdzie kapital prywatny.',
    'NOWA DECYZJA: ZAROB KAPITAL PRYWATNY (Organizacja). Przewodniczacy odpuszcza polityke na tydzien i zajmuje sie wlasnym interesem. Partia nie dostaje z tego nic — ani slawy, ani jednosci — za to w kieszeni robi sie grubiej. Rozrzut jest szeroki, wiec raz wyjdzie 700 tysiecy, a raz trzynascie milionow.',
@@ -4875,6 +4892,7 @@ function game(){
       if(hasPrez())nv.push(['prezydent','Prezydent'+(lawsToSign().length?`<span class="badge">${lawsToSign().length}</span>`:'')]);
       nv.push(['sejm','Sejm i władza']);
       nv.push(['ekonomia','Ekonomia']);
+      nv.push(['sad','Sąd<span class="badge wip">wip</span>']);
       return nv.map(([k,n])=>`<button class="${G.tab===k?'on':''}" onclick="setTab('${k}')">${n}</button>`).join('')})()}
   </div>
   <div class="layout">
@@ -4882,7 +4900,7 @@ function game(){
     <div class="widok${G._we?' wejscie':''}" data-tab="${G.tab}">${G.tab==='mapa'?kurier()+mapTab(q,AL):G.tab==='akcje'?actTab():G.tab==='partie'?partieTab():G.tab==='sondaz'?pollTab(q,AL)
       :G.tab==='cele'?goalTab():G.tab==='lider'?leadTab():G.tab==='krol'?kingTab()
       :G.tab==='premier'?premierTab():G.tab==='prezydent'?prezydentTab()
-      :G.tab==='ekonomia'?ekonomiaTab():sejmTab()}</div>
+      :G.tab==='ekonomia'?ekonomiaTab():G.tab==='sad'?sadTab():sejmTab()}</div>
   </div>`;
   G._we=0;
 }
@@ -5120,6 +5138,18 @@ const RANGI=[
  {n:'Kniaź',          prog:500e6,  e:'🦁'},
  {n:'Elektor',        prog:1e9,    e:'☀️'},
 ];
+/* Symetria rang. Wcześniej wejście na każdy stopień kosztowało cały próg, więc
+   na starcie połowa bogaczy wykupywała się na wyższe półki naraz — z gospodarki
+   znikały setki milionów, PKB leciało w dół, a premier obrywał absolutorium za
+   coś, na co nie miał wpływu.
+
+   Teraz jest odwrotnie i tak, jak być powinno: niskie rangi są tanie i wpadają
+   same, wysokie kosztują coraz dotkliwiej i wymagają zapasu ponad sam próg.
+   Sir to sześć procent progu, Elektor sześćdziesiąt — i do tego trzeba mieć
+   siedemdziesiąt procent więcej, niż wynosi jego kamień milowy. */
+const rangaUdzial=i=>.06+i/(RANGI.length-1)*.54;
+const rangaWymog=i=>Math.round(RANGI[i].prog*(1+i*.05));
+const rangaKoszt=i=>Math.round(RANGI[i].prog*rangaUdzial(i));
 const rangaNr=n=>(G&&G.rangi&&G.rangi[n]!==undefined)?G.rangi[n]:-1;
 const ranga=n=>{const i=rangaNr(n);return i>=0?RANGI[i]:null};
 const nastepnaRanga=n=>RANGI[rangaNr(n)+1]||null;
@@ -5139,15 +5169,15 @@ function rangiStart(){
 function sprawdzRangi(){
   if(!G.rangi)rangiStart();
   wszyscyZaplecze().forEach(n=>{
-    let nast=nastepnaRanga(n);
-    while(nast&&kapPryw(n)>=nast.prog){
-      const i=rangaNr(n)+1;
+    let i=rangaNr(n)+1;
+    // jeden awans na sprawdzenie: wyższe stopnie mają boleć, nie sypać się seriami
+    if(i<RANGI.length&&kapPryw(n)>=rangaWymog(i)){
+      const koszt=rangaKoszt(i);
       G.rangi[n]=i;
-      G.kapPryw[n]=Math.max(1000,Math.round(kapPryw(n)-nast.prog));
+      G.kapPryw[n]=Math.max(1000,Math.round(kapPryw(n)-koszt));
       if(n===me().lead)
-        say(`<b>${n} zostaje ${nast.n}.</b> ${kasaSkrot(nast.prog)} poszło na wpisowe, `
-           +`ale od teraz zarabia o ${Math.round(((mnoznikRangi(n)/(1+i*.18))-1)*100+18)}% więcej.`,'roy');
-      nast=nastepnaRanga(n);
+        say(`<b>${n} zostaje ${RANGI[i].n}.</b> Wpisowe ${kasaSkrot(koszt)}, `
+           +`za to zarobek rośnie do ${mnoznikRangi(n).toFixed(2)}× podstawy.`,'roy');
     }
   });
 }
@@ -5216,33 +5246,61 @@ function pkbTydzien(){
    a nie druzgocąca — zła gospodarka ma boleć, nie kończyć rozgrywki. */
 function absolutorium(){
   if(!G||!G.gov||!G.pmOk)return;
+  if(G.absolutorium&&G.absolutorium.term===G.term)return;   // raz na kadencję
   const h=(G.pkbHist||[]).filter(x=>x.t===G.term);
   if(h.length<2)return;
   const start=h[0].v, koniec=h[h.length-1].v;
   if(!start||!koniec)return;
   const zm=(koniec-start)/start*100;
-  G.absolutorium={term:G.term,zm,udzielone:zm>=0};
   const pmK=G.gov.pm, pmP=G.p[pmK]; if(!pmP||pmP.dead)return;
   const szef=G.gov.pmLead||pmP.lead;
-  if(zm>=0){
+  const udzielone=zm>=0;
+  const zmiany=[];
+  if(udzielone){
     pmP.cred=cl(pmP.cred+4);pmP.fame=cl(pmP.fame+2);
-    if(pmK===G.me)say(`<b>Sejm udzielił absolutorium.</b> PKB przez kadencję ${G.term} urosło o ${zm.toFixed(1)}%, `
-      +`${szef} wychodzi z tego z podniesioną głową.`,'good');
-    return;
+    zmiany.push(['Wiarygodność',4],['Sława',2]);
+  }else{
+    // spadek: wszystko w dół, ale proporcjonalnie do tego, jak głęboko
+    const s=Math.min(3.2,Math.abs(zm)/6);
+    const d=[['Wiarygodność',-(3+s*2.4),'cred'],['Sława',-(2+s*1.6),'fame'],
+             ['Jedność',-(2+s*2.0),'uni'],['Aktywność',-(1+s*1.4),'act'],
+             ['Kontrowersja',(3+s*2.8),'ctr']];
+    d.forEach(([n,v,k])=>{const w=Math.round(v);pmP[k]=cl(pmP[k]+w);zmiany.push([n,w])});
+    G.gov.appr=cl(G.gov.appr-Math.round(4+s*3));
+    zmiany.push(['Poparcie rządu',-Math.round(4+s*3)]);
   }
-  // spadek: wszystko w dół, ale proporcjonalnie do tego, jak głęboko
-  const s=Math.min(3.2,Math.abs(zm)/6);
-  pmP.cred=cl(pmP.cred-Math.round(3+s*2.4));
-  pmP.fame=cl(pmP.fame-Math.round(2+s*1.6));
-  pmP.uni =cl(pmP.uni -Math.round(2+s*2.0));
-  pmP.act =cl(pmP.act -Math.round(1+s*1.4));
-  pmP.ctr =cl(pmP.ctr +Math.round(3+s*2.8));
-  if(G.gov)G.gov.appr=cl(G.gov.appr-Math.round(4+s*3));
-  if(pmK===G.me)
-    say(`<b>Sejm odmówił absolutorium.</b> PKB przez kadencję ${G.term} spadło o ${Math.abs(zm).toFixed(1)}%. `
-       +`${szef} obrywa za gospodarkę: wiarygodność, sława, jedność i aktywność w dół, kontrowersja w górę.`,'bad');
-  else
-    say(`<b>${G.p[pmK].ab} bez absolutorium.</b> PKB spadło o ${Math.abs(zm).toFixed(1)}%, rząd ${szef} obrywa za gospodarkę.`,'');
+  G.absolutorium={term:G.term,zm,udzielone,pm:pmK,szef,start,koniec,zmiany};
+  say(pmK===G.me
+    ?(udzielone?`<b>Sejm udzielił absolutorium.</b> PKB przez kadencję ${G.term} urosło o ${zm.toFixed(1)}%.`
+              :`<b>Sejm odmówił absolutorium.</b> PKB spadło o ${Math.abs(zm).toFixed(1)}%, ${szef} obrywa za gospodarkę.`)
+    :`<b>${G.p[pmK].ab}: ${udzielone?'absolutorium udzielone':'absolutorium odmówione'}.</b> PKB ${zm>=0?'urosło':'spadło'} o ${Math.abs(zm).toFixed(1)}%.`,
+    udzielone?'good':'bad');
+  if(typeof document!=='undefined')setTimeout(oknoAbsolutorium,60);
+}
+/* Tabela rozliczenia — jedyny wyskok dwunastego tygodnia. */
+function oknoAbsolutorium(){
+  const a=G&&G.absolutorium; if(!a||a.pokazane)return;
+  a.pokazane=1;
+  const wiersz=([n,v])=>`<tr><td>${n}</td>
+    <td class="${v>0?'ok':v<0?'bad':''}">${v>0?'+':''}${v}</td></tr>`;
+  modal('Sejm · koniec kadencji '+a.term,
+    a.udzielone?'Absolutorium udzielone':'Absolutorium odmówione',
+    `<div class="absopl ${a.udzielone?'ok':'no'}">
+       <div class="absznak">${a.udzielone?'✓':'✕'}</div>
+       <div><b>${a.szef}</b><span>premier rozliczony z gospodarki</span></div>
+     </div>
+     <table class="abstab">
+       <tr><th>PKB na starcie kadencji</th><td>${kasa(a.start)}</td></tr>
+       <tr><th>PKB na koniec</th><td>${kasa(a.koniec)}</td></tr>
+       <tr class="absrazem"><th>Zmiana</th>
+         <td class="${a.zm>=0?'ok':'bad'}">${a.zm>=0?'+':''}${a.zm.toFixed(2)}%</td></tr>
+     </table>
+     <div class="absnag">Co z tego wynika dla premiera</div>
+     <table class="abstab">${a.zmiany.map(wiersz).join('')}</table>
+     <p class="dim" style="font-size:12.5px;margin-top:12px">${a.udzielone
+       ? 'Gospodarka urosła, więc sejm nie ma się do czego przyczepić.'
+       : 'To nie jest wotum nieufności — rząd stoi dalej. Ale zostaje na papierze i widać to na wszystkim.'}</p>`,
+    [{l:'Przyjmuję do wiadomości',f:()=>{close();render()}}]);
 }
 
 /* Jeden odczyt na tydzień, bez duplikatów — dopisuje i koniec tygodnia,
@@ -5398,6 +5456,77 @@ function kapitalTab(){
       ${KAP_ZA_MLN} kapitału, ale kto wyłoży, ten odchodzi z partii, a jedność siada
       tym mocniej, im grubszy portfel wydoisz. Przewodniczącego nie ruszysz.</div>
     </div></div>`;
+}
+
+/* ── SĄD ──
+   Dział na razie tylko pokazuje. Skład sądu bierze się wprost z ustawy
+   o sądach administracyjnych: dopóki sejm jej nie uchwali, żadnego sądu nie ma
+   i nie ma kto rozpatrywać odwołań. Sędziów wyznacza resort Sprawiedliwości,
+   więc kto go trzyma, ten obsadza ławę.
+
+   Co jest gotowe: skład, źródło jego powołania i podgląd, kto ma wpływ.
+   Czego nie ma: samych spraw, odwołań od decyzji administracji, wyroków
+   i tego, żeby sąd cokolwiek realnie blokował. Dlatego dział stoi z etykietą
+   „wip” — żeby było jasne, że liczby są prawdziwe, a mechaniki jeszcze nie ma. */
+function sadSklad(){
+  if(!G||!lawDone('sady'))return [];
+  /* Ława to trzy osoby: minister Sprawiedliwości z urzędu, a do tego dwoje
+     o najwyższej kompetencji spośród tych, którzy nie prowadzą własnej partii —
+     sędzia z fotelem przewodniczącego byłby sędzią we własnej sprawie. */
+  const res=RESORTY.find(r=>r.id==='spraw');
+  const min=res?radaKto(res.id):null;
+  const wolni=wszyscyZaplecze()
+    .filter(n=>n!==min&&!alive().some(k=>isLead(G.p[k],n)))
+    .sort((a,b)=>L(b).komp-L(a).komp).slice(0,2);
+  const ludzie=[];
+  if(min)ludzie.push({n:min,rola:'Przewodniczący składu',skad:'z urzędu, resort Sprawiedliwości'});
+  wolni.forEach(n=>ludzie.push({n,rola:'Sędzia',skad:'powołany za kompetencję'}));
+  return ludzie;
+}
+function sadTab(){
+  const jest=lawDone('sady');
+  const sklad=sadSklad();
+  const res=RESORTY.find(r=>r.id==='spraw');
+  const kto=res?radaKto(res.id):null;
+  const mojResort=!!(res&&mojeResorty().includes('spraw'));
+  return `
+  <div class="ekoblok">
+    <div class="ekotasma">NIEDOKOŃCZONE! Skład jest prawdziwy, spraw i wyroków jeszcze nie ma.</div>
+
+    <div class="card"><div class="h"><h3>Sąd administracyjny</h3>
+      <span class="n">${jest?'powołany':'nie istnieje'}</span></div><div class="b">
+      ${jest?`
+        <div class="tabliczki" style="margin:0 0 14px">
+          <div><b>${sklad.length}</b><span>${pl(sklad.length,'sędzia','sędziów','sędziów')}</span></div>
+          <div><b>${kto?G.p[partiaOsoby(kto)]?G.p[partiaOsoby(kto)].ab:'—':'wakat'}</b><span>obsadza ławę</span></div>
+          <div><b>${sklad.length?Math.round(sklad.reduce((a,x)=>a+L(x.n).komp,0)/sklad.length):0}</b><span>średnia kompetencja</span></div>
+        </div>
+        <div class="ekolista">${sklad.map((x,i)=>`<div class="ekos">
+          <span class="ekopoz">${i+1}</span>${ava(x.n,me().c,26)}
+          <span class="ekon">${x.n}<em class="ekotag">${x.rola}</em></span>
+          <b class="ekow">kompetencja ${L(x.n).komp}</b>
+          <span class="ekodaje">${x.skad}</span>
+        </div>`).join('')||'<div class="dim">Nie ma kogo powołać.</div>'}</div>`
+       :`<p style="margin-top:0">Sądu nie ma, bo sejm nie uchwalił <b>ustawy o sądach
+         administracyjnych</b>. Dopóki jej nie ma, decyzje administracji są ostateczne
+         i nie ma od nich odwołania.</p>
+         <div class="note" style="margin:12px 0 0">Ustawę zgłasza premier albo
+         <b>minister Sprawiedliwości</b>${kto?` — teraz jest nim <b>${kto}</b>`:', a resort stoi pusty'}.
+         ${mojResort?'Resort trzymasz ty, więc możesz ją wnieść.':''}</div>`}
+    </div></div>
+
+    <div class="card"><div class="h"><h3>Czego tu jeszcze nie ma</h3>
+      <span class="n">plan działu</span></div><div class="b">
+      <ul class="krelista">
+        <li><b>Sprawy i odwołania</b> — od banów, od decyzji administracji, od wyników głosowań.</li>
+        <li><b>Wyroki</b> — sąd utrzymuje albo uchyla, a uchylenie realnie cofa skutek.</li>
+        <li><b>Skład jako stawka polityczna</b> — kto obsadzi ławę, ten wygrywa spory zanim się zaczną.</li>
+        <li><b>Koszt procesu</b> — odwołanie ma kosztować kapitał i czas, żeby nie było darmowe.</li>
+      </ul>
+      <div class="dim" style="font-size:12px;margin-top:11px">Skład powyżej liczy się naprawdę
+      i zmienia się razem z obsadą resortu — reszta dopiero powstaje.</div>
+    </div></div>
+  </div>`;
 }
 
 function ekonomiaTab(){
@@ -6677,7 +6806,7 @@ function wywiadOdp(nr){
   WYW.reakcja={t:pula[RI(0,pula.length-1)],ok:w.ok,dzien:w.dzien,widz:w.widz};
   WYW.i++;
   if(WYW.i<WYW.pyt.length)wywiadRys();
-  else wywiadKoniec();
+  else wywiadNaZywo();          // po pytaniach idzie transmisja
 }
 /* Kręgosłup: ile różnych rejestrów poszło w eter. Jeden albo dwa to linia,
    trzy to skakanie i widać to na wiarygodności. */
@@ -6722,7 +6851,94 @@ function wywiadRys(){
   v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>wywiadOdp(+b.dataset.w));
   v.querySelector('.mdlx').onclick=actBack;
 }
-function wywiadKoniec(){
+/* ── wejście na żywo ──
+   Po pytaniach idzie trzydzieści sekund transmisji. Przez ekran przelatują
+   chmurki widzów: złapana dokłada oglądalność, przegapiona ucieka. Ma to być
+   ruch, a nie kolejny wybór z listy — dlatego liczy się refleks, a nie namysł.
+   Wynik mnoży to, co wyszło z rozmowy: dobra odpowiedź przy pustej widowni
+   waży mniej niż średnia przy pełnej. */
+let LIVE=null;
+const LIVE_SEK=30;
+function wywiadNaZywo(){
+  const p=me();
+  LIVE={do_:Date.now()+LIVE_SEK*1000, widz:0, zlapane:0, uciekle:0, chmurki:[], nast:0, id:0};
+  liveRys();
+  LIVE.petla=setInterval(liveKlatka,90);
+}
+function liveKlatka(){
+  if(!LIVE)return;
+  const zost=Math.max(0,LIVE.do_-Date.now());
+  // nowa chmurka co jakiś czas; im dalej w transmisję, tym gęściej
+  const postep=1-zost/(LIVE_SEK*1000);
+  if(Date.now()>=LIVE.nast){
+    LIVE.nast=Date.now()+Math.max(260,760-postep*430);
+    LIVE.chmurki.push({id:++LIVE.id, x:R(6,86), y:100, w:R(9,22), ur:Date.now(),
+      zycie:Math.max(1700,3100-postep*1100)});
+  }
+  const teraz=Date.now();
+  LIVE.chmurki=LIVE.chmurki.filter(c=>{
+    if(teraz-c.ur>c.zycie){LIVE.uciekle++;return false}
+    return true;
+  });
+  if(zost<=0)return liveKoniec();
+  liveRys();
+}
+function liveLap(id){
+  if(!LIVE)return;
+  const i=LIVE.chmurki.findIndex(c=>c.id===id); if(i<0)return;
+  const c=LIVE.chmurki[i];
+  LIVE.chmurki.splice(i,1);
+  LIVE.zlapane++;
+  LIVE.widz+=Math.round(c.w*(1+lead(G.me).char/240));
+  beep(520+Math.min(300,LIVE.zlapane*11),.04,'sine',.03);
+  liveRys();
+}
+function liveRys(){
+  if(!LIVE)return;
+  const zost=Math.max(0,Math.ceil((LIVE.do_-Date.now())/1000));
+  const teraz=Date.now();
+  const v=rysujOkno('live',`
+    <div class="wystudio">
+      <div class="wyglowa">
+        <span class="livekropka"></span>
+        <div style="min-width:0">
+          <div class="kick">Wejście na żywo</div>
+          <h2>${esc(lead(G.me).n)} w eterze</h2>
+        </div>
+        <div class="liveczas ${zost<=6?'malo':''}">${zost}s</div>
+      </div>
+      <div class="wymiary">
+        <div class="wymiara wd"><div class="wyml"><span>Oglądalność</span><b>${LIVE.widz}</b></div>
+          <div class="trk"><i style="width:${cl(LIVE.widz/9)}%"></i></div></div>
+        <div class="wymiara dz"><div class="wyml"><span>Złapane / uciekłe</span>
+          <b>${LIVE.zlapane} / ${LIVE.uciekle}</b></div>
+          <div class="trk"><i style="width:${cl(LIVE.zlapane/Math.max(1,LIVE.zlapane+LIVE.uciekle)*100)}%"></i></div></div>
+      </div>
+    </div>
+    <div class="bd">
+      <div class="liveplansza">
+        ${LIVE.chmurki.map(c=>{const t=(teraz-c.ur)/c.zycie;
+          return `<button class="livech" data-id="${c.id}"
+            style="left:${c.x}%;bottom:${(8+t*76).toFixed(1)}%;--w:${c.w}">
+            ${mordedolar(15)}<em>+${c.w}</em></button>`}).join('')}
+        ${LIVE.chmurki.length?'':'<span class="livepusto">…</span>'}
+      </div>
+      <div class="wypodp">Klikaj widzów, zanim uciekną z transmisji</div>
+    </div>`);
+  if(!v)return;
+  v.querySelectorAll('.livech').forEach(b=>b.onclick=()=>liveLap(+b.dataset.id));
+}
+function liveKoniec(){
+  if(!LIVE)return;
+  clearInterval(LIVE.petla);
+  const w=LIVE.widz, cel=LIVE.zlapane+LIVE.uciekle;
+  const celnosc=cel?LIVE.zlapane/cel:0;
+  LIVE=null;
+  close();
+  wywiadKoniec({widz:w,celnosc});
+}
+
+function wywiadKoniec(live){
   const p=me(), ld=lead(G.me);
   const traf=WYW.traf, ile=WYW.pyt.length;
   const kreg=wywiadKregoslup();
@@ -6730,7 +6946,11 @@ function wywiadKoniec(){
      wrażenie niż cztery trafione odpowiedzi wygłoszone czterema różnymi głosami. */
   const bonus=kreg===1?9:kreg===2?3:-7;
   const komp=ld.komp>=78?6:ld.komp>=60?3:0;      // wygadany lider ratuje słabszy dzień
-  const ocena=Math.round((WYW.dzien+WYW.widz)/2+bonus+komp);
+  /* Transmisja dokłada swoje: pełna widownia podbija każdą odpowiedź,
+     pusta sprawia, że nawet dobra rozmowa przechodzi bez echa. */
+  const L=live||{widz:0,celnosc:0};
+  const zEteru=Math.round(cl(L.widz/9,0,100)*.28+L.celnosc*14);
+  const ocena=Math.round((WYW.dzien+WYW.widz)/2+bonus+komp+zEteru);
   const udany=ocena>=52;
   const dzien=Math.round(WYW.dzien), widz=Math.round(WYW.widz);
   const opisKreg=kreg===1?'Trzymałeś jedną linię przez cały wywiad.'
@@ -6742,14 +6962,14 @@ function wywiadKoniec(){
   const podsum=`<div class="wypodsum">
       <div><b>${traf}/${ile}</b><span>trafione rejestry</span></div>
       <div><b>${dzien}</b><span>dziennikarz</span></div>
-      <div><b>${widz}</b><span>widownia</span></div>
+      <div><b>${L.widz}</b><span>oglądalność</span></div>
       <div><b>${ocena}</b><span>ocena łączna</span></div>
     </div>`;
   if(udany){
     /* Nagroda idzie tam, skąd przyszła: dziennikarz robi wiarygodność,
        widownia robi sławę. Dzięki temu dwa dobre wywiady potrafią wyjść
        zupełnie inaczej. */
-    const gf=Math.round(2+widz/14), gc=Math.round(2+dzien/16);
+    const gf=Math.round(2+widz/14+L.widz/26), gc=Math.round(2+dzien/16);
     p.fame=cl(p.fame+gf);p.cred=cl(p.cred+gc);
     if(ocena>=72)p.ctr=cl(p.ctr-3);
     if(p.marg&&ch(.5))p.marg=0;
@@ -6885,7 +7105,7 @@ function naborPublikuj(){
 function danina(v){
   if(!G||G.kp<v)return;
   G.kp-=v;G.king.paid+=v;
-  say(`<b>Danina ${v} kapitału dla Mordeczki.</b> Punktacja u Króla +${(v/7).toFixed(0)}.`,'roy');
+  say(`<b>Danina ${v} kapitału dla Mordeczki.</b> Punktacja u Króla +${(v/DANINA_ZA_PUNKT).toFixed(1)}.`,'roy');
   render();
 }
 function openTrain(){
@@ -7566,11 +7786,11 @@ const LAWPAR={
   opis:{eli:'Składka elity',int:'Składka intelektualisty',ser:'Składka serwerowicza'},
   jedn:'kapitału tygodniowo'},
  ordyn:{
-  baza:{prog:5,mandaty:40},
+  baza:{prog:5},
   // próg powyżej ośmiu procent wycinał przy kilkunastu partiach cały sejm
-  zakres:{prog:[0,8],mandaty:[20,60]},
-  krok:{prog:1,mandaty:2},
-  opis:{prog:'Próg wyborczy',mandaty:'Mandatów w sejmie'},
+  zakres:{prog:[0,8]},
+  krok:{prog:1},
+  opis:{prog:'Próg wyborczy'},
   jedn:''},
  podatki:{
   // progresja 0 = każdy płaci tyle samo, 1 = bogatsi dokładają za resztę
@@ -7591,7 +7811,7 @@ function lawParams(id){
    Nie wszystko waży tyle samo: przy ordynacji ruszanie liczby mandatów przewraca
    cały sejm, a sam próg to znacznie mniejsza sprawa. Punktem odniesienia jest
    stan obecny, nie pierwotny — inaczej każda kolejna poprawka byłaby coraz trudniejsza. */
-const LAWWAGI={ordyn:{prog:.75,mandaty:2.1}};
+const LAWWAGI={ordyn:{prog:.75}};
 function radykalnosc(id,o){
   const P=LAWPAR[id];if(!P||!o)return 0;
   const teraz=(G&&G.law&&typeof G.law[id]==='object')?G.law[id]:P.baza;
@@ -7982,20 +8202,11 @@ function applyLaw(id,opcje){
       say(`<b>${w.n}</b> — ${szef} wyłożył <b>${kasaSkrot(koszt)}</b> z własnej kieszeni. ${msg}`,'good');
     }
   }
-  if(id==='ordyn'&&opcje){
-    THR.base=cl(opcje.prog,0,8);
-    const cel=cl(opcje.mandaty,20,60);
-    // różnicę dokładamy albo zdejmujemy z okręgów, zostawiając im proporcje
-    let brak=cel-TOTAL_SEATS_LIVE();
-    let i=0;
-    while(brak!==0&&i<400){
-      const r=REG[i%REG.length];
-      if(brak>0){r.seats++;brak--}
-      else if(r.seats>1){r.seats--;brak++}
-      i++;
-    }
-    DIST_SEATS=REG.reduce((a,r)=>a+r.seats,0);
-  }
+  /* Ordynacja rusza wyłącznie próg wyborczy. Zmiana liczby mandatów w środku
+     rozgrywki przewracała cały sejm: mandaty rozdzielały się od nowa, a wszystko,
+     co liczy się od stałej wielkości izby — większość, progi list, rozliczenie
+     kadencji — przestawało się zgadzać z tym, co gracz miał przed oczami. */
+  if(id==='ordyn'&&opcje)THR.base=cl(opcje.prog,0,8);
 }
 const TOTAL_SEATS_LIVE=()=>REG.reduce((a,r)=>a+r.seats,0)+TOPUP;
 
@@ -9058,12 +9269,12 @@ function kingTab(){
   </div></div>
   <div class="card"><div class="h"><h3>Skarbiec</h3><span class="n">masz ${Math.round(G.kp)} kapitału</span></div><div class="b">
     <p class="dim" style="font-size:13px;margin-bottom:10px">Kapitał przekazany Królowi liczy się wprost do desygnacji ,
-      jeden punkt za każde siedem monet. Dotychczas przekazałeś <b style="color:var(--acc)">${G.king.paid}</b>,
-      co daje <b style="color:var(--acc)">+${(G.king.paid/7).toFixed(1)}</b> punktu.</p>
+      jeden punkt za każde ${DANINA_ZA_PUNKT} monet. Dotychczas przekazałeś <b style="color:var(--acc)">${G.king.paid}</b>,
+      co daje <b style="color:var(--acc)">+${(G.king.paid/DANINA_ZA_PUNKT).toFixed(1)}</b> punktu.</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      ${[60,140,260,500].map(v=>`<button class="btn ${G.kp>=v?'':'g'}" ${G.kp>=v?'':'disabled'}
+      ${[140,320,650,1200].map(v=>`<button class="btn ${G.kp>=v?'':'g'}" ${G.kp>=v?'':'disabled'}
         style="flex:1;min-width:120px;padding:11px 8px" onclick="danina(${v})">
-        ${v} kapitału<br><span style="font-size:11px;opacity:.75">+${(v/7).toFixed(1)} punktu</span></button>`).join('')}
+        ${v} kapitału<br><span style="font-size:11px;opacity:.75">+${(v/DANINA_ZA_PUNKT).toFixed(1)} punktu</span></button>`).join('')}
     </div>
   </div></div>
   <div class="card"><div class="h"><h3>Co liczy się u Króla</h3><span class="n">7 czynników</span></div><div class="b">
@@ -10155,7 +10366,6 @@ function startTerm(){
       say('<b>Czwarta kadencja u steru bez żadnej ustawy.</b> Ludzie zaczynają pytać, co właściwie robisz. Jeszcze dwie i jedność poleci.','bad');
     }
   }
-  absolutorium();
   naliczZnuzenie();
   // stan składu na starcie kadencji — od niego liczy się, jak głęboko partia może osunąć
   G.memStart={};alive().forEach(k=>{G.memStart[k]=G.p[k].mem});
@@ -10568,6 +10778,7 @@ Object.assign(window,{slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,
   zarobekLidera,zarobekTydzien,pkbWykres,openWariant,wariantyUstawy,wariantPo,
   majatekSzefa,panelGlosowania,nextCandidate,pkbZapiszOdczyt,
   RANGI,ranga,rangaNr,nastepnaRanga,mnoznikRangi,rangiStart,sprawdzRangi,absolutorium,
+  rangaKoszt,rangaWymog,oknoAbsolutorium,sadTab,sadSklad,wywiadNaZywo,liveLap,DANINA_ZA_PUNKT,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
   get KRE(){return KRE}, SCEN, kreatorDane,

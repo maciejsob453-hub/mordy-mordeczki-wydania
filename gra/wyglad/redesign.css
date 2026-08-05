@@ -1242,6 +1242,65 @@ body::after{
 .gp.ok::before{background:var(--pos)} .gp.no::before{background:var(--neg)}
 .gp.ja{box-shadow:0 0 0 1px var(--acc),0 0 18px -8px var(--acc)}
 
+/* taśma jak na budowie — jedyne miejsce w grze, gdzie coś krzyczy */
+.ekotasma{padding:11px var(--o4);border-radius:var(--r3);font-family:var(--m);
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+  color:#241c05;text-align:center;margin-bottom:var(--o4);
+  border:1px solid rgba(217,171,69,.5);
+  background:repeating-linear-gradient(135deg,#d9ab45 0 16px,#1a1305 16px 32px);
+  text-shadow:0 1px 0 rgba(255,255,255,.25)}
+
+/* ── wejście na żywo ──
+   Trzydzieści sekund, w których liczy się refleks. Plansza musi być czytelna
+   od pierwszej sekundy, więc chmurki są duże, kontrastowe i same się wznoszą. */
+.livekropka{width:12px;height:12px;border-radius:50%;background:var(--neg);flex:none;
+  box-shadow:0 0 14px -1px var(--neg);animation:naZywo 1.1s ease-in-out infinite}
+@keyframes naZywo{0%,100%{opacity:1}50%{opacity:.35}}
+.liveczas{margin-left:auto;flex:none;font-family:var(--m);font-size:24px;font-weight:700;
+  color:var(--acc);min-width:56px;text-align:right}
+.liveczas.malo{color:var(--neg);animation:naZywo .7s ease-in-out infinite}
+.liveplansza{position:relative;height:260px;border-radius:var(--r3);overflow:hidden;
+  border:1px solid var(--line);
+  background:
+    radial-gradient(520px 200px at 50% 120%,rgba(217,171,69,.1),transparent 70%),
+    linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.16))}
+.livepusto{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  color:var(--dim2);font-size:22px;letter-spacing:.4em}
+.livech{position:absolute;transform:translateX(-50%);border:none;cursor:pointer;
+  display:flex;align-items:center;gap:5px;padding:6px 10px 6px 7px;border-radius:999px;
+  background:linear-gradient(180deg,var(--p3),rgba(0,0,0,.5));
+  border:1px solid var(--acc2);color:var(--acc);
+  box-shadow:0 0 20px -6px var(--acc),inset 0 1px 0 rgba(255,255,255,.09);
+  transition:transform .1s var(--sprezyna)}
+.livech em{font-style:normal;font-family:var(--m);font-size:12px;font-weight:700}
+.livech:hover{transform:translateX(-50%) scale(1.12)}
+.livech:active{transform:translateX(-50%) scale(.94)}
+
+/* ── absolutorium ── */
+.absopl{display:flex;align-items:center;gap:var(--o4);padding:var(--o3) var(--o4);
+  border-radius:var(--r3);border:1px solid var(--line);margin-bottom:var(--o4);
+  background:linear-gradient(178deg,var(--p2),rgba(0,0,0,.32))}
+.absopl.ok{border-color:rgba(124,180,99,.5)}
+.absopl.no{border-color:rgba(209,85,74,.5)}
+.absznak{width:42px;height:42px;flex:none;border-radius:var(--r2);display:grid;place-items:center;
+  font-size:22px;font-weight:700;border:1px solid var(--line2);
+  background:linear-gradient(180deg,var(--p3),rgba(0,0,0,.4))}
+.absopl.ok .absznak{color:var(--pos);box-shadow:0 0 22px -8px var(--pos)}
+.absopl.no .absznak{color:var(--neg);box-shadow:0 0 22px -8px var(--neg)}
+.absopl b{display:block;font-family:var(--fd);font-size:19px;font-weight:600}
+.absopl span{font-family:var(--m);font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--dim2)}
+.abstab{width:100%;border-collapse:collapse;font-size:13.5px}
+.abstab th{text-align:left;font-weight:500;color:var(--dim);padding:7px 0;
+  border-bottom:1px solid var(--line)}
+.abstab td{text-align:right;font-family:var(--m);padding:7px 0;
+  border-bottom:1px solid var(--line)}
+.abstab td.ok{color:var(--pos)} .abstab td.bad{color:var(--neg)}
+.abstab tr.absrazem th,.abstab tr.absrazem td{font-weight:700;color:var(--tx);
+  border-bottom:none;font-size:15px}
+.absnag{font-family:var(--m);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--acc);font-weight:700;margin:var(--o4) 0 var(--o2)}
+
 /* odznaka rangi pod portretem — mała, bo to podpis, nie tytuł */
 .ranga{display:block;font-family:var(--m);font-size:8.5px;letter-spacing:.06em;
   font-weight:700;color:var(--acc);margin-top:2px;white-space:nowrap;
