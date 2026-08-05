@@ -680,6 +680,14 @@ function score(k,r,s){
   // aktywność waży więcej niż wcześniej: partia, która nic nie robi, ma to widzieć w sondażu
   v*=(0.38+p.act/100);
   v*=(0.52+ld.char/140);
+  /* MOST MIĘDZY GOSPODARKĄ A POLITYKĄ.
+     Media nie były do niczego politycznie potrzebne: kupowałeś je za prywatne
+     pieniądze, zarabiały prywatne pieniądze i cała gospodarka kręciła się obok
+     właściwej gry. Teraz zasięg wydawnictw wchodzi wprost do sondażu — kto ma
+     gazetę, antenę i ekran, ten dociera do ludzi także wtedy, gdy nie zrobił
+     w tym tygodniu nic innego. To jest realna przewaga za pieniądze, i tak samo
+     realnie da się ją stracić razem z wydawnictwami. */
+  v*=(1+zasiegMediow(k)/100);
   v*=(1+(p.mom||0)/150);
   v*=moodOf(s.id);
   v*=(1+(p.rally||0)*0.09+(p.laws||0)*0.03);
@@ -1003,8 +1011,8 @@ const A=[
   const g=Math.round(R(14,24)*(0.75+lead(G.me).komp/200)*(hasT('negocjator')?1.5:1)*dm);
   G.rel[G.me][t]=cl(G.rel[G.me][t]+g,-100,100);G.rel[t][G.me]=cl(G.rel[t][G.me]+g,-100,100);
   return `Relacje z <b>${G.p[t].ab}</b> +${g} (teraz ${Math.round(G.rel[G.me][t])}).`}},
-{id:'zarob',cat:'org',n:'Zarób kapitał prywatny',ap:1,kp:0,en:12,
- d:'Przewodniczący odpuszcza politykę na tydzień i zajmuje się własnym interesem. Partia nie zyskuje na tym nic — ani sławy, ani jedności — ale w kieszeni robi się grubiej. Ile dokładnie, zależy od pozycji, rangi i tego, jak akurat stoi gospodarka. Bywa chudo i bywa tłusto.',
+{id:'zarob',cat:'org',n:'Zarób kapitał prywatny',ap:0,kp:0,en:22,
+ d:'Przewodniczący odpuszcza politykę na tydzień i zajmuje się własnym interesem. Partia nie zyskuje na tym nic — ani sławy, ani jedności — ale w kieszeni robi się grubiej. Nie kosztuje akcji, bo to jego prywatna sprawa, za to zjada sporo energii. Ile dokładnie wpadnie, zależy od pozycji, rangi i tego, jak akurat stoi gospodarka.',
  f:(p,f)=>{
    const szef=p.lead;
    /* Zarobek jest tu wyraźnie inny niż tygodniowy: to jednorazowy strzał
@@ -1018,7 +1026,7 @@ const A=[
      :los>1?'Zwyczajnie, ale uczciwie.':'Zeszło się na niczym.';
    return `${jak} <b>${szef}</b> zarobił <b>${kasaSkrot(kwota)}</b> do własnej kieszeni.`
      +` Partia z tego nie ma nic.`}},
-{id:'zrzutka',cat:'org',n:'Zrzutka z prywatnych kieszeni',ap:1,kp:0,en:10,
+{id:'zrzutka',cat:'org',n:'Zrzutka z prywatnych kieszeni',ap:0,kp:0,en:20,
  d:'Prosisz kogoś ze swojego zaplecza, żeby wyłożył własne pieniądze na partię. Milion prywatnego majątku to jeden punkt kapitału. Nikt nie robi tego z radości: jedność leci w dół, a ten, kogo wydoisz, odchodzi z partii z pretensjami. Im więcej bierzesz, tym gorzej to wygląda.',
  f:()=>{openZrzutka();return null}},
 {id:'werb',cat:'dyp',n:'Werbunek działacza',ap:2,kp:22,en:14,
@@ -1771,6 +1779,7 @@ function ai(){
   alive().forEach(k=>{
     if(k===G.me)return;const p=G.p[k],ld=lead(k);
     aiZrzutka(k);          // po prywatne pieniądze sięga tylko partia pod kreską
+    aiMedia(k);            // boty prowadzą własne wydawnictwa i też mają z nich zasięg
     const n=Math.max(1, 1+Math.round(p.act/34)+Math.round((p.uni-46)/26));   // rozsypana partia działa wolniej
     const wagi=aiWagi(k,p);
     for(let i=0;i<n;i++){
@@ -4235,7 +4244,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.53';
+let WERSJA='1.1.54';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4246,6 +4255,16 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.54':{data:'6 sierpnia 2026', zmiany:[
+   'GOSPODARKA WESZLA DO POLITYKI. Media byly zamknieta petla obok gry: kupowales je za prywatne pieniadze, zarabialy prywatne pieniadze i nic z tego nie wracalo do rdzenia. Teraz zasieg wydawnictw wchodzi WPROST DO SONDAZU — kto ma gazete, antene i ekran, ten dociera do ludzi takze wtedy, gdy nie zrobil w tygodniu nic innego. Zasieg liczy sie tylko z wydawnictw, ktore realnie cos wydaja, i wygasa sam, wiec media trzeba karmic, a nie kupic raz i zapomniec.',
+   'DA SIE PRZEGRAC PRZEZ GOSPODARKE. Kieszen przewodniczacego moze zejsc pod kreske, a wtedy dlug rosnie sam o dziewiec procent tygodniowo, co tydzien zabiera wiarygodnosc i jednosc oraz podbija kontrowersje. Po trzech tygodniach pod kreska komornik zabiera wydawnictwa, jedno po drugim, zaczynajac od najdrozszego — z licytacji wraca niecala polowa. Do tego kazdy szyld ma koszty stale, wiec media, z ktorych nic nie wychodzi, po prostu topia pieniadze.',
+   'BOTY GRAJA W GOSPODARKE. Partie prowadzone przez komputer zakladaja teraz wlasne wydawnictwa, kiedy je na to stac, i regularnie z nich wydaja — wiec ich zasieg tez wchodzi do sondazu. Twoja przewaga przestala rosnac sama z tego, ze nikt inny nawet nie probuje.',
+   'SLAWA PRZESTALA BYC WALUTA WSZYSTKIEGO. Kazdy system ciagnie teraz z czego innego: serduszka gazety z WIARYGODNOSCI i kompetencji redaktora, widownia telewizji z AKTYWNOSCI i charyzmy prowadzacego, kino nadal ze slawy, a zarobek przewodniczacego z AUTORYTETU i mandatow. Optymalna gra przestala sie sprowadzac do podbijania jednego suwaka.',
+   'DECYZJE GOSPODARCZE NIE ZJADAJA JUZ AKCJI. Zarobek i zrzutka to prywatne sprawy przewodniczacego, wiec kosztuja zero akcji, za to sporo energii. Nowe systemy przestaly konkurowac z polityka o te same trzydziesci szesc ruchow na kadencje.',
+   'SAD ZSZEDL POD SEJM jako karta. Trzynascie dzialow na trzy akcje w tygodniu to bylo za duzo — teraz jest ich dziesiec.',
+   'NAGRANIE MA TRZY TRYBY, losowane za kazdym razem: Uwaga widowni z oczkami wznoszacymi sie od dolu, Trema z gestymi oczkami gasnacymi blyskawicznie i Potok pytan, w ktorym oczka przelatuja z boku na bok. Jedno klikanie w kolko przestalo byc jedynym, co tam jest.',
+ ]},
+
  '1.1.53':{data:'6 sierpnia 2026', zmiany:[
    'DZIAL MEDIA WIDAC ZAWSZE, nad Sadem. Bez ustawy o mediach po prostu nic sie w nim nie otworzy — zamiast znikac z nawigacji bez slowa, stoi z etykieta „zamk." i tlumaczy, czego brakuje.',
    'GAZETA TO SZYLD, A NIE JEDNA GAZETA. Pod jednym wydawnictwem wychodza kolejne numery, co dwa tygodnie, i kazdy zbiera tyle serduszek, na ile stac twoja slawe, kompetencje redaktora i staz szyldu. Od dziesieciu numer wychodzi na swoje, ponizej dokladasz do niego z kieszeni.',
@@ -4912,8 +4931,9 @@ function game(){
       nv.push(['ekonomia','Ekonomia']);
       // Media stoją nad Sądem i widać je zawsze — bez ustawy po prostu nie da
       // się w nich niczego otworzyć, zamiast znikać z nawigacji bez słowa.
+      // Sąd zszedł pod Sejm jako karta. Trzynaście działów na trzy akcje w tygodniu
+      // to było za dużo: nowe systemy konkurowały nie o uwagę, tylko o te same ruchy.
       nv.push(['media','Media'+(mediaJest()?'':'<span class="badge wip">zamk.</span>')]);
-      nv.push(['sad','Sąd<span class="badge wip">wip</span>']);
       return nv.map(([k,n])=>`<button class="${G.tab===k?'on':''}" onclick="setTab('${k}')">${n}</button>`).join('')})()}
   </div>
   <div class="layout">
@@ -4921,8 +4941,8 @@ function game(){
     <div class="widok${G._we?' wejscie':''}" data-tab="${G.tab}">${G.tab==='mapa'?kurier()+mapTab(q,AL):G.tab==='akcje'?actTab():G.tab==='partie'?partieTab():G.tab==='sondaz'?pollTab(q,AL)
       :G.tab==='cele'?goalTab():G.tab==='lider'?leadTab():G.tab==='krol'?kingTab()
       :G.tab==='premier'?premierTab():G.tab==='prezydent'?prezydentTab()
-      :G.tab==='ekonomia'?ekonomiaTab():G.tab==='sad'?sadTab()
-      :G.tab==='media'?mediaTab():sejmTab()}</div>
+      :G.tab==='ekonomia'?ekonomiaTab()
+      :G.tab==='media'?mediaTab():sejmTab()+sadTab()}</div>
   </div>`;
   G._we=0;
 }
@@ -5214,7 +5234,9 @@ const rangaOdznaka=n=>{const r=ranga(n);
 function zarobekLidera(k){
   const p=G.p[k]; if(!p||p.dead)return 0;
   const ld=lead(k);
-  const baza=90e3+p.fame*9e3+ld.autor*7e3+p.seats*22e3;
+  /* Przewodniczący dorabia się na POZYCJI, a nie na rozgłosie: autorytet
+     i mandaty ważą tu najwięcej, sława zostaje dodatkiem. */
+  const baza=90e3+p.fame*3e3+ld.autor*13e3+p.seats*26e3;
   const urzad=(G.gov&&G.gov.pm===k?2.1:1)*(G.gov&&G.gov.parties&&G.gov.parties.includes(k)?1.35:1)
     *(G.prez&&G.prez.party===k?1.4:1);
   const wstyd=cl(1-p.ctr/170,.28,1);
@@ -5260,7 +5282,8 @@ function pkbTydzien(){
       const pobrane=Math.round(v*(st/100)*mnoz/12);       // stawka jest roczna
       nowe-=pobrane; wplyw+=pobrane;
     }
-    G.kapPryw[n]=Math.max(1000,Math.round(nowe));
+    // dług nie „rośnie" sam ku dodatnim — od tego jest dlugTydzien
+    G.kapPryw[n]=v<0?Math.round(v):Math.max(1000,Math.round(nowe));
   });
   if(wplyw>0)G.skarb=(G.skarb||0)+wplyw;
   G.podatekOstatnio=wplyw;
@@ -5268,7 +5291,8 @@ function pkbTydzien(){
   G.pkbPop=G.pkb||pkbLicz();
   G.pkb=pkbLicz();
   G.pkbTempo=G.pkbPop?(G.pkb-G.pkbPop)/G.pkbPop:0;
-  mediaTydzien();                    // gazety same się rozliczają co tydzień
+  mediaTydzien();                    // wydawnictwa naliczają swoje koszty stałe
+  dlugTydzien();                     // kto wszedł pod kreskę, ten zaczyna tonąć
   sprawdzRangi();                    // kto przekroczył próg, ten awansuje i płaci wpisowe
   pkbZapiszOdczyt();
 }
@@ -5452,6 +5476,42 @@ function zrzutkaWez(n){
      a ${n} wypisał się z ${p.ab} tego samego dnia.</p>`,
     [{l:'Rozumiem',f:()=>{close();render()}}]);
 }
+/* ── boty w gospodarce ──
+   Do tej pory nowe systemy były wyłącznie twoje: boty nie zakładały mediów,
+   nie wydawały numerów i nie miały z gospodarki nic. Twoja przewaga rosła sama,
+   bo nikt inny nawet nie próbował. Teraz partie prowadzone przez komputer robią
+   to samo co ty — kupują wydawnictwa, kiedy je na to stać, i regularnie z nich
+   wydają, więc ich zasięg też wchodzi do sondażu. */
+function aiMedia(k){
+  if(!mediaJest())return;
+  if(!G.aiMedia)G.aiMedia={};
+  if(!G.aiMedia[k])G.aiMedia[k]=[];
+  const p=G.p[k]; if(!p||p.dead)return;
+  const szef=p.lead, maj=kapPryw(szef), moje=G.aiMedia[k];
+  // zakup: rzadko i tylko wtedy, gdy zostaje wyraźny zapas
+  if(moje.length<3&&ch(.16)){
+    const chce=Object.keys(MEDIA_TYP)
+      .filter(t=>maj>MEDIA_TYP[t].koszt*2.2&&!moje.some(m=>m.typ===t))
+      .sort((a,b)=>MEDIA_TYP[b].koszt-MEDIA_TYP[a].koszt)[0];
+    if(chce){
+      G.kapPryw[szef]=Math.round(maj-MEDIA_TYP[chce].koszt);
+      moje.push({typ:chce,nazwa:`${p.ab} ${MEDIA_TYP[chce].e}`,szef,bilans:0,staz:0,ostatnieWyd:absWeek()});
+      say(`<b>${p.ab} zakłada ${MEDIA_TYP[chce].n.toLowerCase()}.</b> ${szef} wyłożył ${kasaSkrot(MEDIA_TYP[chce].koszt)}.`,'');
+    }
+  }
+  // wydawanie: bot pilnuje swoich terminów tak samo jak gracz
+  moje.forEach(m=>{
+    m.staz=(m.staz||0)+1;
+    if(absWeek()-(m.ostatnieWyd||-99)<MEDIA_PRZERWA[m.typ])return;
+    if(!ch(.7))return;
+    const ld=L(m.szef)||{komp:50,char:50};
+    const skala={gazeta:.9,tv:1.6,kino:1.9}[m.typ]||1;
+    const zysk=Math.round((p.cred*.5+p.act*.4+ld.komp*.3-18)*skala*22000*R(.7,1.3));
+    m.bilans+=zysk; m.ostatnieWyd=absWeek();
+    G.kapPryw[m.szef]=Math.round((G.kapPryw[m.szef]!==undefined?G.kapPryw[m.szef]:kapPryw(m.szef))+zysk);
+  });
+}
+
 /* AI robi to samo, ale wyłącznie z rozpaczy — kiedy kasa jest pod kreską. */
 function aiZrzutka(k){
   const p=G.p[k];
@@ -5510,32 +5570,101 @@ const MEDIA_TYP={
     d:'Najdroższa zabawka na serwerze. Kręcisz filmy, a na seanse przychodzą ludzie — tym tłumniej, im głośniej o twojej partii.'},
 };
 const mediaInit=()=>{if(!G.media)G.media=[]};
+/* ── zasięg ──
+   Ile procent przewagi w sondażu daje własna prasa i antena. Liczy się nie sam
+   fakt posiadania, tylko to, czy z wydawnictwa cokolwiek wychodzi: szyld, który
+   nie wydał nic od miesiąca, nie dociera do nikogo. Zasięg wygasa sam, więc
+   media trzeba karmić, a nie kupić raz i zapomnieć. */
+const MEDIA_ZASIEG={gazeta:3.5,tv:7,kino:5};
+function zasiegMediow(k){
+  const kto=k||G.me;
+  const lista=kto===G.me?(G.media||[]):((G.aiMedia&&G.aiMedia[kto])||[]);
+  if(!lista.length)return 0;
+  return lista.reduce((a,m)=>{
+    const odKiedy=absWeek()-(m.ostatnieWyd!==undefined?m.ostatnieWyd:-99);
+    const swiezosc=odKiedy<=1?1:odKiedy<=3?.6:odKiedy<=6?.25:0;
+    return a+(MEDIA_ZASIEG[m.typ]||0)*swiezosc;
+  },0);
+}
 const mediaJest=()=>lawDone('media');
 const mediaMoje=()=>{mediaInit();return G.media};
 const mediaBilans=()=>mediaMoje().reduce((a,m)=>a+m.bilans,0);
 
 /* Serduszka gazety chodzą za sławą partii i kompetencją redaktora. */
+/* Serduszka to nie popularność, tylko zaufanie: gazetę czyta się wtedy, gdy
+   wierzy się w to, co pisze. Dlatego ciągnie z WIARYGODNOŚCI partii
+   i kompetencji redaktora, a sława dokłada tu najmniej. Bez tego wszystkie
+   cztery systemy jechały na samej sławie i optymalna gra sprowadzała się
+   do podbijania jednego suwaka. */
 function serduszka(m){
   const p=me(), ld=L(m.szef)||{komp:50};
-  return Math.max(0,Math.round(p.fame*.42+ld.komp*.10+(m.staz||0)*.6-6));
+  return Math.max(0,Math.round(p.cred*.46+ld.komp*.22+(m.staz||0)*.5+p.fame*.08-14));
 }
 /* Ile tygodni musi minąć między wydaniami. Gazeta wychodzi co dwa tygodnie,
    antena i ekran co tydzień — inaczej dałoby się klikać w kółko bez końca. */
 const MEDIA_PRZERWA={gazeta:2,tv:1,kino:1};
 const mediaGotowe=m=>absWeek()-(m.ostatnieWyd||-99)>=MEDIA_PRZERWA[m.typ];
 const mediaZa=m=>Math.max(0,MEDIA_PRZERWA[m.typ]-(absWeek()-(m.ostatnieWyd||-99)));
+/* Utrzymanie wydawnictwa. Wcześniej samo posiadanie nic nie kosztowało, więc
+   media były darmową maszynką: kupujesz raz i tylko zbierasz. Teraz każdy szyld
+   ma koszty stałe i płaci je przewodniczący ze swojej kieszeni — jeśli z niego
+   nic nie wychodzi, po prostu topi pieniądze. */
+const MEDIA_UTRZYMANIE={gazeta:35e3,tv:420e3,kino:700e3};
 function mediaTydzien(){
-  if(!G||!mediaJest())return;
+  if(!G)return;
   mediaInit();
-  // samo istnienie wydawnictwa nic nie daje — liczy się to, co z niego wychodzi
-  G.media.forEach(m=>{m.staz=(m.staz||0)+1});
+  if(!G.media.length)return;
+  let koszt=0;
+  G.media.forEach(m=>{m.staz=(m.staz||0)+1;koszt+=MEDIA_UTRZYMANIE[m.typ]||0;
+    m.bilans-=MEDIA_UTRZYMANIE[m.typ]||0});
+  if(koszt>0)kieszenSzefa(-koszt);
+}
+/* Wspólne wejście do kieszeni przewodniczącego — także pod kreskę. */
+function kieszenSzefa(delta){
+  const szef=me().lead; if(!szef)return 0;
+  const teraz=(G.kapPryw[szef]!==undefined?G.kapPryw[szef]:kapPryw(szef));
+  G.kapPryw[szef]=Math.round(teraz+delta);
+  return G.kapPryw[szef];
+}
+/* ── dług i spirala ──
+   Do tej pory gospodarki nie dało się przegrać: majątek miał sztywne dno,
+   absolutorium bolało i tyle. Teraz kieszeń może zejść pod kreskę, a wtedy
+   dług sam rośnie o odsetki, co tydzień odbiera wiarygodność i podbija
+   kontrowersję, a przy dostatecznie głębokim dołku wierzyciele zabierają
+   wydawnictwa. To jest ta spirala: im dłużej tkwisz, tym trudniej wyjść. */
+const DLUG_ODSETKI=.09;
+function dlugTydzien(){
+  if(!G)return;
+  const szef=me().lead; if(!szef)return;
+  const stan=(G.kapPryw[szef]!==undefined?G.kapPryw[szef]:kapPryw(szef));
+  if(stan>=0){G.dlugTygodni=0;return}
+  const p=me();
+  G.dlugTygodni=(G.dlugTygodni||0)+1;
+  G.kapPryw[szef]=Math.round(stan*(1+DLUG_ODSETKI));      // dług rośnie sam
+  const glebokosc=Math.min(4,Math.abs(stan)/8e6);
+  p.cred=cl(p.cred-Math.round(2+glebokosc*1.6));
+  p.ctr =cl(p.ctr +Math.round(3+glebokosc*2.2));
+  p.uni =cl(p.uni -Math.round(1+glebokosc));
+  say(`<b>${szef} tonie w długach.</b> Na koncie ${kasa(G.kapPryw[szef])}, `
+     +`odsetki ${Math.round(DLUG_ODSETKI*100)}% tygodniowo. Wiarygodność w dół, kontrowersja w górę.`,'bad');
+  /* Po trzech tygodniach pod kreską wierzyciele zabierają wydawnictwa — jedno
+     po drugim, zaczynając od najdroższego. */
+  if(G.dlugTygodni>=3&&(G.media||[]).length){
+    const i=G.media.map((m,j)=>({j,c:MEDIA_TYP[m.typ].koszt})).sort((a,b)=>b.c-a.c)[0].j;
+    const m=G.media[i];
+    G.media.splice(i,1);
+    G.kapPryw[szef]=Math.round(G.kapPryw[szef]+MEDIA_TYP[m.typ].koszt*.45);
+    p.fame=cl(p.fame-4);
+    say(`<b>Komornik zabiera ${m.nazwa}.</b> Wydawnictwo poszło za długi, `
+       +`z licytacji wróciło ${kasaSkrot(MEDIA_TYP[m.typ].koszt*.45)}.`,'bad');
+  }
 }
 function mediaKup(typ){
   const t=MEDIA_TYP[typ]; if(!t)return;
   mediaInit();
   const p=me(), szef=p.lead;
   if(kapPryw(szef)<t.koszt)return;
-  G.kapPryw[szef]=Math.round(kapPryw(szef)-t.koszt);
+  kieszenSzefa(-t.koszt);
   const nr=G.media.filter(m=>m.typ===typ).length+1;
   G.media.push({typ,nazwa:`${t.n.split(' ')[1]||'Wydawnictwo'} ${nr}`,szef,bilans:0,staz:0,serca:0,ostatnio:0});
   say(`<b>${t.n}</b> ruszyło. ${szef} wyłożył ${kasaSkrot(t.koszt)}.`,'good');
@@ -5568,7 +5697,7 @@ function mediaNumer(i){
   m.bilans+=zysk; m.serca=serca; m.ostatnio=zysk;
   m.numery=(m.numery||0)+1; m.ostatnieWyd=absWeek();
   const szef=p.lead;
-  G.kapPryw[szef]=Math.max(1000,(G.kapPryw[szef]!==undefined?G.kapPryw[szef]:kapPryw(szef))+zysk);
+  kieszenSzefa(zysk);
   if(serca>=18)p.fame=cl(p.fame+1);
   say(`<b>${m.nazwa}</b> nr ${m.numery}: ${serca} ${pl(serca,'serduszko','serduszka','serduszek')}, `
      +`${zysk>=0?'zysk':'strata'} ${kasaSkrot(Math.abs(zysk))}.`,zysk>=0?'good':'bad');
@@ -5612,12 +5741,13 @@ function mediaOdcinekGraj(i,t){
   /* Serwer ma 670 osób, a przed ekranem siada garstka — dwadzieścia osób przy
      jednym odcinku to na tym serwerze naprawdę dużo. Dlatego widownia liczy się
      w dziesiątkach, a nie w setkach, za to każdy widz jest sporo wart. */
-  const widz=Math.max(3,Math.round(dop*2.2*(1+p.fame/110)*(1+ld.char/240)*R(.72,1.34)));
+  /* Antenę ogląda się wtedy, gdy coś się na niej dzieje — więc telewizja
+     ciągnie z AKTYWNOŚCI partii i charyzmy prowadzącego, nie ze sławy. */
+  const widz=Math.max(3,Math.round(dop*2.2*(1+p.act/95)*(1+ld.char/190)*R(.72,1.34)));
   const zysk=Math.round(widz*90000);
   m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.ostatnieWyd=absWeek();
   m.numery=(m.numery||0)+1;
-  const szef=p.lead;
-  G.kapPryw[szef]=Math.max(1000,(G.kapPryw[szef]!==undefined?G.kapPryw[szef]:kapPryw(szef))+zysk);
+  kieszenSzefa(zysk);
   p.fame=cl(p.fame+Math.min(4,widz/9));
   say(`<b>${m.nazwa}:</b> odcinek „${t.n}” obejrzało ${widz} osób. Wpływ ${kasaSkrot(zysk)}.`,'good');
   modal('Telewizja',m.nazwa,
@@ -5650,8 +5780,7 @@ function mediaFilmGraj(i,f){
   const zysk=Math.round(widz*110000);
   m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.ostatnieWyd=absWeek();
   m.numery=(m.numery||0)+1;
-  const szef=p.lead;
-  G.kapPryw[szef]=Math.max(1000,(G.kapPryw[szef]!==undefined?G.kapPryw[szef]:kapPryw(szef))+zysk);
+  kieszenSzefa(zysk);
   p.fame=cl(p.fame+Math.min(5,widz/11));
   say(`<b>${m.nazwa}:</b> „${f.n}” obejrzało ${widz} osób. Wpływ ${kasaSkrot(zysk)}.`,'good');
   modal('Kino',m.nazwa,
@@ -7121,20 +7250,33 @@ function wywiadRys(){
 let LIVE=null;
 const LIVE_SEK=30;
 function nagranieStart(tytul,potem){
+  const tryb=NAGR_TRYBY[RI(0,NAGR_TRYBY.length-1)];
   LIVE={do_:Date.now()+LIVE_SEK*1000, zlapane:0, uciekle:0, chmurki:[], nast:0, id:0,
-        tytul:tytul||'Nagranie', potem:potem||null};
+        tytul:tytul||'Nagranie', potem:potem||null, tryb};
   liveRys();
   LIVE.petla=setInterval(liveKlatka,90);
 }
+/* Trzy tryby, żeby nagranie nie było w kółko tym samym klikaniem.
+   Losowany przy każdym uruchomieniu:
+     • uwaga — oczka wznoszą się z dołu, klasyka,
+     • trema — oczka stoją w miejscu, ale gasną szybko i pojawiają się gęsto,
+     • potok — oczka lecą z boku na bok, dużo, za to żyją długo. */
+const NAGR_TRYBY=[
+ {id:'uwaga',n:'Uwaga widowni',d:'Oczka wznoszą się od dołu. Łap je, zanim znikną u góry.',
+  tempo:(pos)=>Math.max(260,760-pos*430), zycie:(pos)=>Math.max(1700,3100-pos*1100), ruch:'gora'},
+ {id:'trema',n:'Trema',d:'Oczka pojawiają się gęsto i gasną błyskawicznie. Liczy się sam refleks.',
+  tempo:(pos)=>Math.max(170,430-pos*220), zycie:()=>1150, ruch:'stoi'},
+ {id:'potok',n:'Potok pytań',d:'Oczka przelatują z boku na bok. Jest ich dużo, ale dają się dogonić.',
+  tempo:(pos)=>Math.max(200,520-pos*260), zycie:()=>2900, ruch:'bok'},
+];
 function liveKlatka(){
   if(!LIVE)return;
   const zost=Math.max(0,LIVE.do_-Date.now());
-  // nowa chmurka co jakiś czas; im dalej w transmisję, tym gęściej
   const postep=1-zost/(LIVE_SEK*1000);
+  const t=LIVE.tryb;
   if(Date.now()>=LIVE.nast){
-    LIVE.nast=Date.now()+Math.max(260,760-postep*430);
-    LIVE.chmurki.push({id:++LIVE.id, x:R(6,86), y:100, w:R(9,22), ur:Date.now(),
-      zycie:Math.max(1700,3100-postep*1100)});
+    LIVE.nast=Date.now()+t.tempo(postep);
+    LIVE.chmurki.push({id:++LIVE.id, x:R(6,86), y:R(12,80), ur:Date.now(), zycie:t.zycie(postep)});
   }
   const teraz=Date.now();
   LIVE.chmurki=LIVE.chmurki.filter(c=>{
@@ -7163,7 +7305,7 @@ function liveRys(){
       <div class="wyglowa">
         <span class="livekropka"></span>
         <div style="min-width:0">
-          <div class="kick">Nagranie w toku</div>
+          <div class="kick">Nagranie w toku · ${LIVE.tryb.n}</div>
           <h2>${esc(LIVE.tytul)}</h2>
         </div>
         <div class="liveczas ${zost<=6?'malo':''}">${zost}s</div>
@@ -7179,11 +7321,13 @@ function liveRys(){
     <div class="bd">
       <div class="liveplansza">
         ${LIVE.chmurki.map(c=>{const t=(teraz-c.ur)/c.zycie;
-          return `<button class="liveoczko" data-id="${c.id}"
-            style="left:${c.x}%;bottom:${(8+t*76).toFixed(1)}%"></button>`}).join('')}
+          const poz=LIVE.tryb.ruch==='gora'?`left:${c.x}%;bottom:${(8+t*76).toFixed(1)}%`
+                   :LIVE.tryb.ruch==='bok' ?`left:${(4+t*88).toFixed(1)}%;bottom:${c.y}%`
+                                           :`left:${c.x}%;bottom:${c.y}%`;
+          return `<button class="liveoczko ${LIVE.tryb.id}" data-id="${c.id}" style="${poz}"></button>`}).join('')}
         ${LIVE.chmurki.length?'':'<span class="livepusto">…</span>'}
       </div>
-      <div class="wypodp">Klikaj oczka, zanim zgasną — liczy się, ile z nich złapiesz</div>
+      <div class="wypodp">${esc(LIVE.tryb.d)}</div>
     </div>`);
   if(!v)return;
   v.querySelectorAll('.liveoczko').forEach(b=>b.onclick=()=>liveLap(+b.dataset.id));
@@ -11077,8 +11221,9 @@ Object.assign(window,{mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,med
   zarobekLidera,zarobekTydzien,pkbWykres,openWariant,wariantyUstawy,wariantPo,
   majatekSzefa,panelGlosowania,nextCandidate,pkbZapiszOdczyt,
   RANGI,ranga,rangaNr,nastepnaRanga,mnoznikRangi,rangiStart,sprawdzRangi,absolutorium,
-  rangaKoszt,rangaWymog,oknoAbsolutorium,sadTab,sadSklad,nagranieStart,liveLap,DANINA_ZA_PUNKT,
+  rangaKoszt,rangaWymog,oknoAbsolutorium,sadTab,sadSklad,nagranieStart,liveLap,DANINA_ZA_PUNKT,NAGR_TRYBY,
   mediaTab,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,mediaTydzien,mediaBilans,
+  zasiegMediow,aiMedia,dlugTydzien,kieszenSzefa,MEDIA_ZASIEG,MEDIA_UTRZYMANIE,absWeek,tally,
   mediaOdcinekGraj,mediaFilmGraj,serduszka,MEDIA_TYP,nagranieMAN,mediaNumer,mediaGotowe,mediaZa,mediaJest,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
