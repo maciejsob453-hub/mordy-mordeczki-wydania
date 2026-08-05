@@ -786,7 +786,14 @@ body::after{
    Dwunasty tydzień wyglądał dokładnie jak drugi. Teraz kadencja ma kształt:
    widać przebyte tygodnie, bieżący i odliczanie do urny.
    ═══════════════════════════════════════════════════════════ */
+/* Łuk stoi pod paskiem władzy, a kropki tygodni mają własne z-index, żeby
+   siedzieć nad kreską. Przez to wchodziły na podpowiedzi rozwijane z pasku:
+   `backdrop-filter` w .hud robi własny kontekst nakładania, więc z-index
+   podpowiedzi nie sięgał poza pasek. Pasek dostaje wyższą warstwę niż łuk
+   i podpowiedzi znów są na wierzchu. */
+.hud{z-index:20}
 .luk{display:flex;align-items:center;gap:var(--o4);margin:var(--o3) 0 0;
+  position:relative;z-index:1;
   padding:9px var(--o4);border-radius:var(--r3);border:1px solid var(--line);
   background:linear-gradient(180deg,rgba(0,0,0,.34),rgba(0,0,0,.12))}
 .luke{font-family:var(--m);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
@@ -1234,6 +1241,12 @@ body::after{
   border-radius:0 3px 3px 0;background:var(--line2)}
 .gp.ok::before{background:var(--pos)} .gp.no::before{background:var(--neg)}
 .gp.ja{box-shadow:0 0 0 1px var(--acc),0 0 18px -8px var(--acc)}
+
+/* odznaka rangi pod portretem — mała, bo to podpis, nie tytuł */
+.ranga{display:block;font-family:var(--m);font-size:8.5px;letter-spacing:.06em;
+  font-weight:700;color:var(--acc);margin-top:2px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.bperson.lead .ranga{color:#f7e3aa}
 
 /* wykres PKB */
 .pkbwyk{margin-top:var(--o4);border:1px solid var(--line);border-radius:var(--r3);
