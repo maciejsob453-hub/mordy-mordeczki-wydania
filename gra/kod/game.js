@@ -4148,7 +4148,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.42';
+let WERSJA='1.1.43';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4159,6 +4159,13 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.43':{data:'5 sierpnia 2026', zmiany:[
+   'NOC PREZYDENCKA tym samym jezykiem co wyborcza: sztandar z tabliczkami, rzad komisji, palac czekajacy na zwyciezce i tory kandydatow jako osadzone plytki. Meta 50% to teraz mosiezna kreska, a nie szara linijka.',
+   'Portrety kandydatow przestaly mrugac. Ranking zmienia sie co klatke liczenia i razem z nim przestawiala sie cala lista, wiec awatar co chwile wczytywal sie od nowa. Teraz tor kandydata stoi w miejscu, a przesuwa go tylko kolejnosc — wynik widac lepiej, bo wiersze realnie jada w gore i w dol.',
+   'RAPORT KADENCJI WRACA NA EKRAN WYNIKOW. Ocena literowa calej kadencji z szesciu obszarow byla napisana w grze od dawna, ale zaden ekran jej nie pokazywal. Teraz stoi pod wynikiem jako pieczec, a obszary jako plytki. Od drugiej kadencji, bo polowa pol to zmiana wzgledem poprzedniej.',
+   'DZIEN WYBOROW dostal ten sam sztandar, a progi list stoja w tabliczkach zamiast w akapicie. Cala sciezka wyborcza — dzien, noc, wyniki — czyta sie teraz jako jedno.',
+ ]},
+
  '1.1.42':{data:'5 sierpnia 2026', zmiany:[
    'NOC WYBORCZA OD NOWA. Byla tabelka na karcie. Teraz to studio: sztandar z tabliczkami, ktore rosna w trakcie liczenia, rzad komisji zapalajacych sie barwa swojej listy i cokol zwyciezcy, ktory stoi pusty od pierwszej sekundy i czeka, az ktos go zajmie. Kazda lista to osadzona plytka ze swiecaca listwa w swoim kolorze, a mandaty stoja w zlotej tabliczce.',
    'Na pasku poparcia widac wreszcie prog tej listy. Od razu wiadomo, kto siadl tuz pod kreska, a kto ja przeskoczyl — listy, ktore nie weszly, sa wygaszone.',
@@ -8576,12 +8583,20 @@ function preElect(){
   const wolne=alive().filter(k=>k!==G.me&&!G.p[k].coal);
   const listy=Object.keys(G.coal).filter(c=>G.coal[c].m.length&&c!==my);
   const nSel=sel.filter(k=>!G.p[k].coal&&listWill(k)>=28).length;
-  app.innerHTML=`<div class="intro" style="padding:44px 0 18px">
+  // ten sam sztandar co obie noce wyborcze — dzień wyborów jest ich początkiem,
+  // a progi czyta się z tabliczek szybciej niż z akapitu
+  app.innerHTML=`<div class="nocekran">
+  <div class="nocsz">
     <div class="kick">Kadencja ${G.term} · cisza wyborcza</div>
     <h1>Dzień wyborów</h1>
-    <p>Poprzednie listy właśnie wygasły. Zanim otworzą się urny, partie dogadują się na nowo:
-       wspólna lista kumuluje głosy, ale podnosi próg. Sam startujesz przy <b>${THR.base}%</b>,
-       we dwójkę przy <b>${THR.base+3}%</b>, w trójkę i większym gronie przy <b>${THR.base+8}%</b>.</p>
+    <p>Poprzednie listy właśnie wygasły. Zanim otworzą się urny, partie dogadują się
+       na nowo: wspólna lista kumuluje głosy, ale podnosi próg.</p>
+    <div class="tabliczki">
+      <div><b>${THR.base}%</b><span>próg w pojedynkę</span></div>
+      <div><b>${THR.base+3}%</b><span>próg we dwójkę</span></div>
+      <div><b>${THR.base+8}%</b><span>próg w trójkę i więcej</span></div>
+      <div><b>${listy.length}</b><span>${pl(listy.length,'lista przeciwników','listy przeciwników','list przeciwników')}</span></div>
+    </div>
   </div>
   <div class="layout" style="grid-template-columns:1fr 1fr">
     <div class="card"><div class="h"><h3>Twoja lista</h3>
@@ -8608,7 +8623,11 @@ function preElect(){
         ||'<span class="dim">Nikt się nie dogadał, wszyscy startują sami.</span>'}
     </div></div>
   </div>
-  <div style="text-align:center;margin-top:22px"><button class="btn" onclick="runElection()">Otwórz urny →</button></div>`}
+  <div class="ekstopka">
+    <span class="ekleg">${my?'idziesz wspólną listą':'startujesz sam'}</span>
+    <button class="btn" onclick="runElection()">Otwórz urny →</button>
+  </div>
+  </div>`}
 
 let govSel=[],govPay=0;
 /* ══════════ ROZLICZENIE KADENCJI ══════════
@@ -8702,6 +8721,11 @@ function results(){
       <div><b>${Math.round(total/SERVER*100)}%</b><span>frekwencja</span></div>
     </div>
   </div>
+  <!-- Raport kadencji był napisany, wyeksportowany i nigdy nie rysowany: żaden
+       ekran go nie wywoływał. Wraca tu, bo to naturalne miejsce — najpierw ile
+       masz, potem jak ci poszło, dopiero potem dlaczego. Od drugiej kadencji,
+       bo połowa jego pól to zmiana względem poprzedniej. -->
+  ${G.hist.length>1?raport():''}
   ${rozliczenieKadencji()}
   <div style="max-width:440px;margin:0 auto 6px">${hemi(arr,440)}</div>
   <div class="legend" style="border:none;padding:0 0 14px;justify-content:center">
@@ -9290,10 +9314,15 @@ function startTerm(){
 }
 
 /* ---- wybory prezydenckie ---- */
-function raceBar(x,total){
+/* Kolejność kandydatów w treści jest stała, a przesuwa ich wyłącznie `order`.
+   Przy liczeniu ranking zmienia się co klatkę i gdyby zmieniała się razem z nim
+   kolejność w treści, zszywanie wpisywałoby portret w cudzy wiersz — czyli
+   trzynaście razy z rzędu podmieniałoby src obrazka i awatary by mrugały. */
+function raceBar(x,total,poz){
   const w=cl(x.pct*2,2.5,100), me2=x.k===G.me;
   const votes=total?Math.round(x.pct/100*total):null;
-  return `<div class="lane ${me2?'me':''}">
+  return `<div class="lane ${me2?'me':''}" style="order:${poz===undefined?0:poz};--pc:${G.p[x.k].c}">
+    ${poz===undefined?'':`<div class="lpoz">${poz+1}</div>`}
     <div class="lname">${ava(x.who||G.p[x.k].lead,G.p[x.k].c,34)}
       <div style="min-width:0"><b>${x.who||G.p[x.k].lead}</b><span>${G.p[x.k].ab}</span></div></div>
     <div class="ltrack">
@@ -9317,26 +9346,57 @@ function prezJitter(rows,t){
 function prezNightScreen(){
   const N=G.prezNight, settled=N.i>=N.frames, remain=N.frames-N.i;
   const t=settled?1:N.i/N.frames;
-  const order=settled?N.rows.slice().sort((a,b)=>b.pct-a.pct):prezJitter(N.rows,t).sort((a,b)=>b.pct-a.pct);
-  const lead0=order[0];
+  const teraz=settled?N.rows.slice():prezJitter(N.rows,t);
+  /* Ranking liczymy osobno od kolejności w treści: wiersze zostają na swoich
+     miejscach, a o tym, kto stoi wyżej, decyduje `order`. Patrz komentarz
+     przy raceBar — inaczej portrety mrugałyby przy każdej klatce liczenia. */
+  const kolejnosc=teraz.map((x,i)=>({i,pct:x.pct})).sort((a,b)=>b.pct-a.pct);
+  const miejsce={}; kolejnosc.forEach((r,j)=>{miejsce[r.i]=j});
+  const lead0=kolejnosc.length?teraz[kolejnosc[0].i]:null;
+  const policzone=Math.round(N.total*t);
   app.innerHTML=`
-  <div class="intro" style="padding:38px 0 8px">
-    <div class="kick">Wybory prezydenckie · kadencja ${G.term} · liczenie głosów</div>
-    <h1>${remain===1?'Ostatnie komisje się zgłaszają…':'Serwer głosuje'}</h1>
-    <p>${N.total} ${pl(N.total,'głos','głosy','głosów')} spływa z całego serwera. ${settled?'Wszystko policzone.':'Komisje wciąż liczą, wynik jeszcze się rusza…'}</p>
-  </div>
-  ${settled?`<div class="card win" style="margin-bottom:14px;text-align:center;padding:16px">
-    <div class="dim" style="font-size:11.5px;letter-spacing:.14em;text-transform:uppercase">Prowadzi po zliczeniu</div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:6px">
-      ${ava(lead0.who||G.p[lead0.k].lead,G.p[lead0.k].c,40)}
-      <b style="font-size:19px;color:${lead0.k===G.me?'var(--acc)':'var(--tx)'}">${lead0.who||G.p[lead0.k].lead}</b>
-      <span class="m dim">${fmt(lead0.pct)}%${lead0.pct>=50?' · większość w pierwszej turze':''}</span>
-    </div></div>`:''}
-  <div class="card"><div class="h"><h3>Wyścig o pałac</h3><span class="n">meta to 50%, kto jej nie dotknie, idzie do dogrywki</span></div>
-    <div class="b racebox ${settled?'':'jittering'}">${order.map(x=>raceBar(x,N.total)).join('')}</div></div>
-  <div style="display:flex;gap:10px;justify-content:center;margin-top:18px">
-    ${settled?`<button class="btn" onclick="prezNightEnd()">Przechodzę do wyników →</button>`
-      :`<button class="btn g" onclick="prezNightSkip()">Pokaż wynik od razu</button>`}
+  <div class="nocekran">
+    <div class="nocsz">
+      <div class="kick">Wybory prezydenckie · kadencja ${G.term}</div>
+      <h1>${settled?'Wszystko policzone':remain<=1?'Ostatnie komisje się zgłaszają…':'Serwer głosuje'}</h1>
+      <p>${settled?'Protokoły zamknięte. Tak zagłosował serwer.'
+        :'Głosuje cały serwer, nie sejm. Wynik jeszcze się rusza.'}</p>
+      <div class="tabliczki">
+        <div><b>${policzone}</b><span>policzone głosy</span></div>
+        <div><b>${Math.round(t*100)}%</b><span>protokołów</span></div>
+        <div><b>${teraz.length}</b><span>${pl(teraz.length,'kandydat','kandydatów','kandydatów')}</span></div>
+        <div><b>50%</b><span>próg pierwszej tury</span></div>
+      </div>
+      <div class="nockom">
+        <span class="luke">komisje</span>
+        <div class="nockomt">${Array.from({length:N.frames},(_,j)=>
+          `<i class="${j<N.i?'on':''}"></i>`).join('')}</div>
+        <span class="luke">${settled?'wszystkie podały':`zostało ${remain}`}</span>
+      </div>
+    </div>
+
+    <div class="noccokol ${settled?'jest':''}">
+      <div class="mramka"></div>
+      <div class="luke">Prezydent serwera</div>
+      ${settled&&lead0?`<div class="nocczolo" id="palac-jest">
+          <div class="ncrest">${ava(lead0.who||G.p[lead0.k].lead,G.p[lead0.k].c,48)}</div>
+          <div class="noccn"><b>${lead0.who||G.p[lead0.k].lead}</b><span>${G.p[lead0.k].ab}</span></div>
+          <div class="noccp"><b>${fmt(lead0.pct)}%</b><em>${
+            lead0.pct>=50?'większość w I turze':'idzie do dogrywki'}</em></div>
+        </div>`
+       :`<div class="noccpusto" id="palac-pusty">Pałac czeka. Komisje jeszcze liczą.</div>`}
+    </div>
+
+    <div class="nocplyta">
+      <div class="racebox ${settled?'':'jittering'}">${
+        teraz.map((x,i)=>raceBar(x,N.total,miejsce[i])).join('')}</div>
+    </div>
+
+    <div class="ekstopka">
+      <span class="ekleg">meta to 50% — kto jej nie dotknie, idzie do dogrywki</span>
+      <button class="btn ${settled?'':'g'}" onclick="${settled?'prezNightEnd()':'prezNightSkip()'}">${
+        settled?'Przechodzę do wyników →':'Pokaż wynik od razu'}</button>
+    </div>
   </div>`;
   if(!settled)setTimeout(prezNightStep,remain<=1?950:remain<=2?560:280);
 }

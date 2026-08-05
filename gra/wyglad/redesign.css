@@ -1031,6 +1031,44 @@ body::after{
 }
 
 /* ═══════════════════════════════════════════════════════════
+   NOC PREZYDENCKA
+   Rodzeństwo nocy wyborczej, więc dzieli z nią sztandar, cokół i stopkę —
+   nowe są tu tylko tory. Kandydaci stoją w treści w stałej kolejności,
+   a przesuwa ich `order`: dzięki temu przy trzynastu klatkach liczenia węzeł
+   kandydata nigdy nie zmienia właściciela i portrety przestały mrugać.
+   ═══════════════════════════════════════════════════════════ */
+.racebox{display:flex;flex-direction:column;gap:var(--o2);padding-top:0}
+.lane{position:relative;gap:var(--o3);padding:var(--o2) var(--o4);border-radius:var(--r3);
+  border:1px solid var(--line);
+  background:linear-gradient(178deg,var(--p2),rgba(0,0,0,.3));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 8px 22px -20px #000}
+.lane::before{content:'';position:absolute;left:0;top:10px;bottom:10px;width:3px;
+  border-radius:0 3px 3px 0;background:var(--pc,var(--line2))}
+.lane.me{border-color:var(--acc);background:
+    radial-gradient(420px 120px at 0% 50%,rgba(217,171,69,.14),transparent 70%),
+    linear-gradient(178deg,var(--p2),rgba(0,0,0,.3));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 34px -16px var(--acc)}
+.lane.me::after{content:'';position:absolute;right:6px;bottom:6px;width:13px;height:13px;
+  border-bottom:1px solid var(--acc);border-right:1px solid var(--acc);
+  opacity:.6;pointer-events:none}
+.lpoz{font-family:var(--m);font-size:13px;font-weight:700;width:22px;flex:none;
+  text-align:right;color:var(--dim2)}
+.lane.me .lpoz{color:var(--acc)}
+.lane .lname{width:clamp(150px,16vw,210px)}
+
+/* tor jako wgłębienie, nie prostokąt w paski */
+.ltrack{height:26px;border:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.22));
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 0 0 1px rgba(0,0,0,.35)}
+.lfill{box-shadow:inset 0 1px 0 rgba(255,255,255,.26),0 0 20px -5px currentColor}
+/* przy liczeniu paski mają skakać razem z klatkami; dopiero wynik dojeżdża płynnie */
+.racebox:not(.jittering) .lfill{transition:width .6s var(--krzywa)}
+/* meta 50% to najważniejsza kreska tego ekranu, więc mosiądz, nie szara linijka */
+.lgoal i{border-left:2px dashed var(--acc);opacity:.9;
+  filter:drop-shadow(0 0 6px rgba(217,171,69,.6))}
+.lgoal em{opacity:1;font-weight:700;letter-spacing:.1em}
+
+/* ═══════════════════════════════════════════════════════════
    EKRAN WYNIKÓW
    Mówił trzema językami naraz: nagłówek w ukośne paski, słupki prawie bez
    redesignu i rozliczenie kadencji w szarych prostokątach. Teraz jedna płyta
@@ -1102,6 +1140,39 @@ body::after{
 .pz.plus::before{background:var(--pos);box-shadow:0 0 14px -2px var(--pos)}
 .pz.minus::before{background:var(--neg);box-shadow:0 0 14px -2px var(--neg)}
 .pz .pzv{font-size:21px;font-weight:700}
+
+/* ── raport kadencji: ocena jako pieczęć, obszary jako płytki ── */
+.raport{margin-top:var(--o4)}
+.rgrade{gap:var(--o5);padding-bottom:var(--o4);margin-bottom:var(--o4)}
+/* litera siedziała w zwykłym kwadracie z obwódką; teraz to pieczęć odciśnięta
+   w płycie — podwójna ramka, światło z góry, poświata w kolorze oceny */
+.rletter{position:relative;width:106px;padding:var(--o4) 0;border-radius:var(--r3);
+  font-family:var(--fd);font-size:52px;border-width:1px;
+  background:linear-gradient(180deg,var(--p3),rgba(0,0,0,.42));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 26px -20px #000}
+.rletter::before{content:'';position:absolute;inset:5px;pointer-events:none;
+  border:1px solid currentColor;opacity:.3;border-radius:var(--r2)}
+.rletter.ok{background:
+    radial-gradient(140px 90px at 50% -14px,rgba(217,171,69,.26),transparent 70%),
+    linear-gradient(180deg,var(--p3),rgba(0,0,0,.44));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 44px -12px var(--acc)}
+.rletter.bad{box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 40px -16px var(--neg)}
+.rgrade b{font-family:var(--fd);font-size:19px;font-weight:600}
+
+.rgrid{gap:var(--o2)}
+.rcell{position:relative;border-radius:var(--r3);padding:var(--o3) var(--o4);
+  border:1px solid var(--line);
+  background:linear-gradient(178deg,var(--p2),rgba(0,0,0,.3));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 8px 22px -20px #000}
+/* listwa w barwie oceny — ten sam znak co na wierszach nocy i w rozliczeniu */
+.rcell::before{content:'';position:absolute;left:0;top:10px;bottom:10px;width:3px;
+  border-radius:0 3px 3px 0;background:var(--line2)}
+.rcell:has(b.ok)::before{background:var(--pos);box-shadow:0 0 14px -2px var(--pos)}
+.rcell:has(b.bad)::before{background:var(--neg);box-shadow:0 0 14px -2px var(--neg)}
+.rtop b{font-family:var(--m);font-weight:700}
+.rbar{height:6px;border-radius:var(--r1);background:rgba(0,0,0,.5);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.65)}
+.rbar i{border-radius:var(--r1);box-shadow:0 0 10px -3px var(--acc)}
 
 /* ── legenda pod sejmem ── */
 .legend{gap:var(--o2) var(--o4);border-top:1px solid var(--line);
