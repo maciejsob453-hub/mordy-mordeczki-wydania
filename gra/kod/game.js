@@ -2266,9 +2266,22 @@ function nextCandidate(){
     return;
   }
   if(pr.round===1){
-    pr.by='Zezwolenie Króla Mordeczki';
-    pr.cand=pr.lista[0]||null; pr.choose=false;
-    if(pr.cand&&G.gov)G.gov.pm=pr.cand;
+    /* Pierwsza desygnacja należy do rządu, o ile rząd w ogóle stoi: koalicja
+       zawiązała się wokół konkretnego premiera i to jego zgłasza.
+
+       Wcześniej brany był ulubieniec Króla z całej izby i — co gorsza — od razu
+       nadpisywał G.gov.pm. Stąd trzy dziwactwa naraz: rząd desygnował kogoś
+       spoza siebie, gubił po drodze własnego kandydata, a potem karnie głosował
+       za obcym, bo dyscyplina koalicyjna patrzy właśnie na G.gov.pm. */
+    const zRzadu=(G.gov&&G.gov.parties)?pr.lista.filter(k=>G.gov.parties.includes(k)):[];
+    if(G.gov&&G.gov.pm&&zRzadu.includes(G.gov.pm)){
+      pr.by='Koalicja'; pr.cand=G.gov.pm;
+    }else if(zRzadu.length){
+      pr.by='Koalicja'; pr.cand=zRzadu[0]; G.gov.pm=pr.cand;
+    }else{
+      pr.by='Zezwolenie Króla Mordeczki'; pr.cand=pr.lista[0]||null;
+    }
+    pr.choose=false;
   }else if(pr.round%3===2){
     pr.by='Król Mordeczka';
     pr.cand=pr.lista[0]||null; pr.choose=false;
@@ -4192,7 +4205,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.48';
+let WERSJA='1.1.49';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4203,6 +4216,18 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.49':{data:'5 sierpnia 2026', zmiany:[
+   'RZAD DESYGNUJE WRESZCIE SWOJEGO PREMIERA. W pierwszej rundzie kandydata brano z calej izby wedlug przychylnosci Krola i — co gorsza — od razu nadpisywano nim premiera koalicji. Stad trzy dziwactwa naraz: rzad zglaszal kogos spoza siebie, gubil wlasnego kandydata, a potem karnie glosowal za obcym, bo dyscyplina koalicyjna patrzy wlasnie na premiera rzadu. Teraz pierwsza desygnacja nalezy do koalicji, a Krol wchodzi dopiero wtedy, gdy rzadu nie ma.',
+   'PRZEWODNICZACY ZARABIA. Co tydzien wplywa mu prywatny majatek: tym wiecej, im wieksza slawa, autorytet, liczba mandatow i urzedy. Premier obraca cudzymi pieniedzmi i czesc z tego zostaje przy nim. Kontrowersja dziala odwrotnie — nikt nie robi interesow z kims, kto co tydzien jest w awanturze.',
+   'KAPITAL PRYWATNY W PASKU WLADZY, obok akcji, kapitalu i mandatow, ze znakiem mordedolara. Pod kursorem rozpisuje sie na kieszenie zaplecza i pokazuje tygodniowy zarobek przewodniczacego.',
+   'USTAWA O UTWORZENIU EVENTU. Sejm powoluje event, a placi za niego przewodniczacy z wlasnej kieszeni: teleturniej telewizyjny za 38 mln, event o grze komputerowej za 19 mln albo event o przemowie za 7 mln. Kazdy daje co innego — teleturniej slawe i obecnosc wszedzie, gra serwerowiczow i awanture o zasady, przemowa wiarygodnosc i jednosc.',
+   'USTAWA O MAN ORGANIZUJE. Do stopni i tytulow doszedl wybor, co Akademia robi na otwarcie: wyklad o intelektualnych zagwozdkach za 26 mln (elita zachwycona), reportaz o serwerze za 14 mln (po rowno slawa i wiarygodnosc) albo wyklad o smieciach za 5 mln (tanio i bez pretensji). Obie ustawy zglasza premier albo minister od wlasciwego resortu.',
+   'Koszt schodzi z prywatnego majatku dopiero wtedy, gdy sejm ustawe uchwali — przepadly projekt nie kosztuje ani grosza.',
+   'MNOZNIK OBROTU JEST WYMAGAJACY. Stabilnosc wychodzi na plus dopiero ponizej 40 kontrowersji, a inwestycje dopiero powyzej 50 aktywnosci. Wczesniej oba progi stały tam, gdzie serwer stoi sam z siebie, wiec wszystko bylo na plusie bez wysilku. „Zaufanie przedsiebiorcow" nazywa sie teraz po ludzku: zadowolenie ludzi.',
+   'WYKRES PKB w dziale Ekonomia: ostatnie dwadziescia cztery tygodnie, zielony przy wzroscie, czerwony przy spadku, z odczytem zmiany procentowej.',
+   'GLOSOWANIA NAD USTAWAMI WYGLADAJA JAK ROZSTRZYGNIECIE, a nie jak wiersz tekstu. Werdykt to pieczec ze znakiem przybitym w plakietce, obok trzy liczby w tabliczkach, a przy przegranej widac wprost, ilu glosow zabraklo do progu. Kazda partia dostala listwe w barwie swojego glosu.',
+ ]},
+
  '1.1.48':{data:'5 sierpnia 2026', zmiany:[
    'MORDEDOLAR NA SWOIM MIEJSCU. Sakiewka z monetami stoi teraz przy kazdej kwocie w grze: przy PKB, przy kapitale prywatnym i pod portretami w zapleczach. Rysowany zapas przestal byc potrzebny.',
    'Obrazek zostal przyciety do samej sakiewki i przeskalowany, bo w oryginale wiekszosc pliku to byl pusty margines — w ikonie na dwanascie pikseli sakiewka bylaby ziarnkiem w rogu.',
@@ -4767,6 +4792,18 @@ function game(){
     <!-- mandaty zdobyte w ostatnich wyborach, nie prognoza z bieżącego przeliczenia:
          liczba ma się zgadzać z tym, co pokazuje sejm, i zmieniać dopiero po urnach -->
     <div class="rs" title="Mandaty zdobyte w ostatnich wyborach. Zmienią się dopiero po następnych."><i class="ic ic-mandat" aria-hidden="true"></i><div class="rv"><b>${p.seats}</b><span>mandaty</span></div></div>
+    ${(()=>{const kp=roster(p).reduce((a,n)=>a+kapPryw(n),0), z=G.zarobekOstatnio||0;
+      return `<div class="rs tip">${mordedolar(19)}<div class="rv"><b>${kasaSkrot(kp)}</b><span>kapitał prywatny</span></div>
+      <div class="tipbox">
+        <div style="font-family:var(--m);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px">Kieszenie zaplecza</div>
+        ${roster(p).sort((a,b)=>kapPryw(b)-kapPryw(a)).slice(0,5).map(n=>
+          `<div class="l"><span>${n}${isLead(p,n)?' · przewodnictwo':''}</span><b>${kasaSkrot(kapPryw(n))}</b></div>`).join('')}
+        ${z?`<div class="l" style="border-top:1px solid var(--line);padding-top:6px;margin-top:6px">
+          <span>Zarobek przewodniczącego w tygodniu</span><b style="color:var(--pos)">+${kasaSkrot(z)}</b></div>`:''}
+        <div class="tot"><span>Razem</span><b class="m" style="color:var(--acc)">${kasaSkrot(kp)}</b></div>
+        <div style="color:var(--dim2);font-size:11.5px;margin-top:6px">Milion prywatnego majątku zamienisz
+        na ${KAP_ZA_MLN} kapitału decyzją <b>Zrzutka z prywatnych kieszeni</b>, ale kto wyłoży, ten odchodzi.</div>
+      </div></div>`})()}
     </div>
     ${streakBox()}
     <div class="hudend">
@@ -4999,13 +5036,19 @@ function pkbCzynniki(){
   const kompMF=mf?L(mf).komp:45;
   const kompPM=pm?L(pm).komp:40;
   const st=stawkaMajatkowa();
+  /* Progi są celowo wymagające: gospodarka ma być czymś, co trzeba wypracować,
+     a nie stanem domyślnym. Stabilność wychodzi na plus dopiero, gdy średnia
+     kontrowersja spadnie poniżej 40, a inwestycje dopiero powyżej 50 aktywności.
+     Wcześniej obie siedziały na 45, czyli mniej więcej tam, gdzie serwer stoi
+     sam z siebie, i wszystko było na plusie bez żadnego wysiłku. */
+  const stab=40, inw=50;
   return [
-   {n:'Minister finansów', v:(kompMF-50)*.18, o:mf?`${mf}, kompetencja ${kompMF}`:'wakat na resorcie'},
-   {n:'Premier',           v:(kompPM-50)*.12, o:pm?`${pm}, kompetencja ${kompPM}`:'brak rządu'},
-   {n:'Stabilność',        v:(45-ktr)*.14+(G.gov&&G.pmOk?3:-6),
-    o:`średnia kontrowersja ${Math.round(ktr)}${G.gov&&G.pmOk?', rząd stoi':', rządu nie ma'}`},
-   {n:'Inwestycje',        v:(akt-45)*.16, o:`średnia aktywność ${Math.round(akt)}`},
-   {n:'Zaufanie przedsiębiorców', v:12-st*1.9, o:st?`podatek ${st}%`:'podatku od majątku nie ma'},
+   {n:'Minister finansów', v:(kompMF-55)*.20, o:mf?`${mf}, kompetencja ${kompMF}`:'wakat na resorcie'},
+   {n:'Premier',           v:(kompPM-55)*.14, o:pm?`${pm}, kompetencja ${kompPM}`:'brak rządu'},
+   {n:'Stabilność',        v:(stab-ktr)*.34+(G.gov&&G.pmOk?4:-9),
+    o:`kontrowersja ${Math.round(ktr)} z ${stab} progu${G.gov&&G.pmOk?', rząd stoi':', rządu nie ma'}`},
+   {n:'Inwestycje',        v:(akt-inw)*.30, o:`aktywność ${Math.round(akt)} z ${inw} progu`},
+   {n:'Zadowolenie ludzi', v:9-st*2.4, o:st?`podatek ${st}%`:'podatku od majątku nie ma'},
   ];
 }
 const pkbMnoznik=()=>{
@@ -5014,11 +5057,36 @@ const pkbMnoznik=()=>{
 };
 const pkbLicz=()=>Math.round(kapPrywRazem()*pkbMnoznik());
 
+/* ── zarobek przewodniczącego ──
+   Lider partii dorabia się na swojej pozycji: im wyżej stoi i im głośniej o nim
+   na serwerze, tym więcej mu wpada. Urzędy płacą najlepiej — premier obraca
+   cudzymi pieniędzmi i część z tego zostaje przy nim. Kontrowersja działa
+   odwrotnie: nikt nie robi interesów z kimś, kto co tydzień jest w awanturze. */
+function zarobekLidera(k){
+  const p=G.p[k]; if(!p||p.dead)return 0;
+  const ld=lead(k);
+  const baza=90e3+p.fame*9e3+ld.autor*7e3+p.seats*22e3;
+  const urzad=(G.gov&&G.gov.pm===k?2.1:1)*(G.gov&&G.gov.parties&&G.gov.parties.includes(k)?1.35:1)
+    *(G.prez&&G.prez.party===k?1.4:1);
+  const wstyd=cl(1-p.ctr/170,.28,1);
+  const rynek=1+(pkbMnoznik()-PKB_MNOZNIK_BAZA)/260;   // dobra gospodarka podnosi wszystkich
+  return Math.round(baza*urzad*wstyd*rynek);
+}
+function zarobekTydzien(){
+  alive().forEach(k=>{
+    const kto=G.p[k].lead; if(!kto)return;
+    const z=zarobekLidera(k); if(z<=0)return;
+    G.kapPryw[kto]=(G.kapPryw[kto]!==undefined?G.kapPryw[kto]:kapPryw(kto))+z;
+    if(k===G.me)G.zarobekOstatnio=z;
+  });
+}
+
 /* Tygodniowy ruch gospodarki: fiskus strzyże konta, majątek sam z siebie
    rośnie albo maleje, a PKB przelicza się z tego, co zostało. */
 function pkbTydzien(){
   if(!G)return;
   if(!G.kapPryw)G.kapPryw={};
+  zarobekTydzien();                  // najpierw przewodniczący zarabiają, potem fiskus
   const st=stawkaMajatkowa(), prog=progresjaWlaczona();
   const d=podzialMajatku();
   let wplyw=0;
@@ -5041,6 +5109,46 @@ function pkbTydzien(){
   G.pkbPop=G.pkb||pkbLicz();
   G.pkb=pkbLicz();
   G.pkbTempo=G.pkbPop?(G.pkb-G.pkbPop)/G.pkbPop:0;
+  // historia do wykresu: trzymamy ostatnie trzy kadencje tygodni i nic więcej
+  if(!G.pkbHist)G.pkbHist=[];
+  G.pkbHist.push({t:G.term,w:G.week,v:G.pkb,k:d.suma});
+  if(G.pkbHist.length>36)G.pkbHist.shift();
+}
+
+/* Wykres PKB. Rysowany ścieżką SVG, bo to jedna linia i nie ma po co
+   ściągać biblioteki. Skala pionowa jest przycięta do zakresu danych —
+   przy wzroście rzędu procenta linia od zera byłaby płaska jak stół. */
+function pkbWykres(){
+  const h=(G.pkbHist||[]).slice(-24);
+  if(h.length<2)return `<div class="dim" style="font-size:12.5px;padding:18px 0;text-align:center">
+    Wykres pojawi się po drugim tygodniu — na razie jest jeden odczyt.</div>`;
+  const W=680,H=150,pad=6;
+  const vs=h.map(x=>x.v), min=Math.min(...vs), max=Math.max(...vs);
+  const roz=Math.max(1,max-min);
+  const x=i=>pad+i/(h.length-1)*(W-pad*2);
+  const y=v=>H-pad-(v-min)/roz*(H-pad*2);
+  const linia=h.map((p,i)=>`${i?'L':'M'}${x(i).toFixed(1)} ${y(p.v).toFixed(1)}`).join(' ');
+  const pole=`${linia} L${x(h.length-1).toFixed(1)} ${H} L${x(0).toFixed(1)} ${H} Z`;
+  const rosnie=h[h.length-1].v>=h[0].v;
+  const zm=(h[h.length-1].v-h[0].v)/Math.max(1,h[0].v)*100;
+  return `<div class="pkbwyk">
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img"
+      aria-label="Wykres PKB z ostatnich ${h.length} tygodni">
+      <defs><linearGradient id="pkbgrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${rosnie?'#7cb463':'#d1554a'}" stop-opacity=".34"/>
+        <stop offset="100%" stop-color="${rosnie?'#7cb463':'#d1554a'}" stop-opacity="0"/>
+      </linearGradient></defs>
+      <path d="${pole}" fill="url(#pkbgrad)"/>
+      <path d="${linia}" fill="none" stroke="${rosnie?'var(--pos)':'var(--neg)'}"
+        stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+      <circle cx="${x(h.length-1).toFixed(1)}" cy="${y(h[h.length-1].v).toFixed(1)}" r="3.5"
+        fill="${rosnie?'var(--pos)':'var(--neg)'}"/>
+    </svg>
+    <div class="pkbwyko">
+      <span>${kasaSkrot(min)}</span>
+      <b class="${rosnie?'up':'dn'}">${zm>0?'+':''}${zm.toFixed(1)}% przez ${h.length} ${pl(h.length,'tydzień','tygodnie','tygodni')}</b>
+      <span>${kasaSkrot(max)}</span>
+    </div></div>`;
 }
 /* Bezpartyjni też mają kieszenie — i to najpłytsze ze wszystkich. Bez nich
    zestawienie majątków pokazywałoby wyłącznie tych, którzy już się gdzieś
@@ -5174,6 +5282,7 @@ function ekonomiaTab(){
         <div><b>${mn.toFixed(1)}×</b><span>mnożnik obrotu</span></div>
         <div><b>${kasaSkrot(G.skarb||0)}</b><span>zebrane do skarbu</span></div>
       </div>
+      ${pkbWykres()}
       <div class="note" style="margin-top:14px"><b>PKB liczy się z majątku.</b>
         Bierzemy sumę wszystkich prywatnych kont i mnożymy przez obrót — ile razy
         w roku te same pieniądze zmienią właściciela. Dlatego konta stoją
@@ -5753,6 +5862,7 @@ function startLaw(id){
      żeby nie dało się przepchnąć całego programu w jeden wieczór.</p>`,
     [{l:'Rozumiem',f:close}],close);
   if(lawEdytowalna(id))return openEdycja(id);
+  if(l.warianty)return openWariant(id);
   const w=lawVote(id);   // podgląd nastrojów, zanim gracz zdecyduje
   modal('Sejm',l.n,
     `<p>${l.d}</p><p><b>Skutek:</b> ${l.skutek}</p>
@@ -5765,6 +5875,28 @@ function startLaw(id){
       f:()=>proposeLaw(id)},
      {l:'Jeszcze nie teraz',s:'Wrócisz do tego później',f:close}],close);
 }
+/* ── ustawy z wariantem ──
+   Niektóre ustawy nie są jednym przełącznikiem, tylko wyborem, co konkretnie
+   powstanie: jaki event, jakie przedsięwzięcie Akademii. Płaci za nie
+   przewodniczący z własnego majątku, nie partia — stąd biorą się pieniądze
+   z zarabiania kapitału prywatnego i stąd ma sens go zbierać. */
+const wariantyUstawy=id=>{const l=lawById(id);return (l&&l.warianty)||null};
+const wariantPo=(id,w)=>(wariantyUstawy(id)||[]).find(x=>x.id===w)||null;
+const majatekSzefa=()=>{const n=G&&G.p&&G.p[G.me]?G.p[G.me].lead:null;return n?kapPryw(n):0};
+function openWariant(id){
+  const l=lawById(id), maj=majatekSzefa(), szef=me().lead;
+  modal('Sejm',l.n,
+    `<p>${l.d}</p>
+     <p style="margin-top:10px"><b>${szef}</b> ma w kieszeni <b>${kasa(maj)}</b>.
+     Koszt schodzi z prywatnego majątku przewodniczącego dopiero wtedy, gdy sejm ustawę uchwali.</p>`,
+    l.warianty.map(w=>{const stac=maj>=w.mln*1e6;
+      return {l:`${w.n} — ${w.mln} mln`,
+        s:stac?w.d:`Nie stać cię: brakuje ${kasaSkrot(w.mln*1e6-maj)}`,
+        dis:!stac, f:()=>proposeLaw(id,{wariant:w.id})}})
+      .concat([{l:'Jeszcze nie teraz',s:'Wrócisz do tego później',f:close}]),
+    close);
+}
+
 /* Jedno okno do wszystkich ustaw z pokrętłami — i przy zgłaszaniu, i przy poprawianiu. */
 let EDYT=null;
 function openEdycja(id){
@@ -7280,8 +7412,44 @@ const LAWS=[
   d:'Instancja odwoławcza od decyzji administracji: terminy, procedura i papier na wszystko.',
   skutek:'Brudne zagrywki kosztują wnioskodawcę o połowę mniej kontrowersji i pretensjonalności.'},
  {id:'man',n:'Ustawa o MAN',kat:'ustrój',prog:.5,resort:'edu',
-  d:'Mordeczkowa Akademia Nauk: stopnie, tytuły i ścieżka awansu dla tych, którzy piszą dłużej niż zdanie.',
-  skutek:'Raz na kadencję wnioskodawca przekuwa dwóch intelektualistów w elitę. Reszcie dochodzi jeden po latach.'},
+  d:'Mordeczkowa Akademia Nauk: stopnie, tytuły i ścieżka awansu dla tych, którzy piszą dłużej niż zdanie. Przy okazji ustalasz, co Akademia organizuje na otwarcie — i płacisz za to z własnej kieszeni.',
+  skutek:'Raz na kadencję wnioskodawca przekuwa dwóch intelektualistów w elitę. Reszcie dochodzi jeden po latach. Do tego skutek wybranego przedsięwzięcia.',
+  warianty:[
+   {id:'zagwozdki',n:'Wykład o intelektualnych zagwozdkach',mln:26,
+    d:'Trzy godziny o niczym i wszystkim naraz. Elita wychodzi zachwycona, reszta serwera nie wie, co się stało.',
+    ef:p=>{p.cred=cl(p.cred+11);p.aff.eli=Math.max(.1,p.aff.eli+.5);p.pret=cl(p.pret+7);
+      p.fame=cl(p.fame+4);M(p,4);return 'Elita mówi o tym tygodniami. Wiarygodność mocno w górę, sympatia elity też.'}},
+   {id:'reportaz',n:'Reportaż o serwerze',mln:14,
+    d:'Godzinny materiał o tym, jak to wszystko działa. Ogląda go pół serwera i nikt nie ma pretensji.',
+    ef:p=>{p.cred=cl(p.cred+6);p.fame=cl(p.fame+7);p.act=cl(p.act+4);
+      p.aff.int=Math.max(.1,p.aff.int+.3);M(p,3);
+      return 'Materiał obejrzeli wszyscy. Sława i wiarygodność w górę po równo.'}},
+   {id:'smieci',n:'Wykład o śmieciach',mln:5,
+    d:'Temat żaden, prowadzący przypadkowy, ale wstęp wolny i sala pełna.',
+    ef:p=>{p.fame=cl(p.fame+4);p.act=cl(p.act+3);p.aff.ser=Math.max(.1,p.aff.ser+.25);
+      p.pret=cl(p.pret-3);M(p,2);
+      return 'Tanio, wesoło i bez pretensji. Serwerowicze to zapamiętali.'}},
+  ]},
+ {id:'event',n:'Ustawa o utworzeniu eventu',kat:'ustrój',prog:.5,resort:'kultura',
+  d:'Sejm powołuje wielki event serwerowy, a ty go finansujesz z własnych pieniędzy. Wybierasz, co to będzie — i za to płacisz z prywatnego majątku przewodniczącego.',
+  skutek:'Skutek zależy od wybranego eventu. Płaci przewodniczący z własnej kieszeni, nie partia.',
+  warianty:[
+   {id:'teleturniej',n:'Teleturniej telewizyjny',mln:38,
+    d:'Studio, światła, nagrody i pół serwera przed ekranami. Najdroższa rzecz, jaką można tu zrobić, i najgłośniejsza.',
+    ef:p=>{p.fame=cl(p.fame+16);p.act=cl(p.act+7);p.uni=cl(p.uni+5);M(p,7);
+      REG.forEach(r=>p.pres[r.id]=cl(p.pres[r.id]+14));
+      return 'Oglądał to cały serwer. Sława mocno w górę i obecność rośnie wszędzie.'}},
+   {id:'gra',n:'Event o grze komputerowej',mln:19,
+    d:'Turniej z zapisami, drabinką i awanturą o zasady. Serwerowicze żyją tym tygodniami.',
+    ef:p=>{p.fame=cl(p.fame+9);p.act=cl(p.act+9);p.aff.ser=Math.max(.1,p.aff.ser+.55);
+      p.ctr=cl(p.ctr+4);M(p,6);
+      return 'Turniej wciągnął pół serwera. Serwerowicze są twoi, ale o zasady był spór.'}},
+   {id:'przemowa',n:'Event o przemowie',mln:7,
+    d:'Wychodzisz, mówisz, schodzisz. Bez scenografii i bez budżetu, za to własnymi słowami.',
+    ef:p=>{p.cred=cl(p.cred+8);p.uni=cl(p.uni+7);p.fame=cl(p.fame+3);
+      p.ctr=cl(p.ctr-3);
+      return 'Bez fajerwerków, za to szczerze. Wiarygodność i jedność w górę.'}},
+  ]},
  {id:'kodeks',n:'Nowelizacja kodeksu karnego',kat:'ustrój',prog:.5,resort:'spraw',
   d:'Nowa taryfa kar: mniej banów za drobiazgi, twardziej za awantury.',
   skutek:'Co kadencję dochodzą serwerowicze i intelektualista, a kontrowersja wnioskodawcy spada o 4.'},
@@ -7515,10 +7683,25 @@ function panelGlosowania(d){
     if(typeof v==='number')return v>0?'za':v<0?'przeciw':'wstrzymał się';
     return v;};
 
+  const brakowalo=Math.max(0,potrzeba-za);
   return `<div class="glos">
-    <div class="glosgl ${przeszlo?'ok':'no'}">
-      <b>${przeszlo?'Przeszło':'Przepadło'}</b>
-      <span>${za} : ${przeciw}${wstrzym?` · ${wstrzym} wstrzymanych`:''} · próg ${potrzeba}</span>
+    <div class="glospieczec ${przeszlo?'ok':'no'}">
+      <div class="glosznak">${przeszlo
+        ? `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5.5 5.5L20 7" fill="none"
+             stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+        : `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none"
+             stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>`}</div>
+      <div class="glostyt">
+        <b>${przeszlo?'Przeszło':'Przepadło'}</b>
+        <span>${przeszlo?`próg ${potrzeba} zebrany z zapasem ${za-potrzeba}`
+          :brakowalo?`zabrakło ${brakowalo} ${pl(brakowalo,'głosu','głosów','głosów')} do progu ${potrzeba}`
+          :`próg ${potrzeba}`}</span>
+      </div>
+      <div class="glosliczby">
+        <div class="ok"><b>${za}</b><span>za</span></div>
+        <div><b>${wstrzym}</b><span>wstrzym.</span></div>
+        <div class="no"><b>${przeciw}</b><span>przeciw</span></div>
+      </div>
     </div>
     <div class="glospas">
       ${za?`<i class="za" style="width:${proc(za)}%">${za}</i>`:''}
@@ -7695,6 +7878,17 @@ function applyLaw(id,opcje){
   lawsInit();
   // ustawy z pokrętłami zapamiętują nastawy, reszcie wystarczy sam fakt uchwalenia
   G.law[id]=opcje||(lawEdytowalna(id)?Object.assign({},LAWPAR[id].baza):1);
+  /* Wariant rozlicza się tu, a nie przy zgłoszeniu: przepadła ustawa nie może
+     kosztować przewodniczącego ani grosza. */
+  if(opcje&&opcje.wariant){
+    const w=wariantPo(id,opcje.wariant);
+    if(w){
+      const p=me(), szef=p.lead, koszt=w.mln*1e6;
+      G.kapPryw[szef]=Math.max(1000,Math.round(kapPryw(szef)-koszt));
+      const msg=w.ef(p);
+      say(`<b>${w.n}</b> — ${szef} wyłożył <b>${kasaSkrot(koszt)}</b> z własnej kieszeni. ${msg}`,'good');
+    }
+  }
   if(id==='ordyn'&&opcje){
     THR.base=cl(opcje.prog,0,8);
     const cel=cl(opcje.mandaty,20,60);
@@ -10277,6 +10471,8 @@ Object.assign(window,{slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,
   ekonomiaTab,kapitalTab,kapPryw,kapPrywRazem,podzialMajatku,kasa,kasaSkrot,
   rolaOsoby,pkbTydzien,pkbLicz,pkbMnoznik,pkbCzynniki,stawkaMajatkowa,
   wszyscyZaplecze,alive,openZrzutka,zrzutkaWez,zrzutkaDaje,aiZrzutka,
+  zarobekLidera,zarobekTydzien,pkbWykres,openWariant,wariantyUstawy,wariantPo,
+  majatekSzefa,panelGlosowania,nextCandidate,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
   get KRE(){return KRE}, SCEN, kreatorDane,
