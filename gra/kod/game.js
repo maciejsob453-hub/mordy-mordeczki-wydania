@@ -4095,7 +4095,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.37';
+let WERSJA='1.1.38';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4106,6 +4106,11 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.38':{data:'5 sierpnia 2026', zmiany:[
+   'EKRAN WYBORU PARTII w tym samym jezyku co ekran trybow. Karta partii jest teraz osadzona plyta z mosiezna listwa u gory i okuciem w rogu, liczby nad nia stoja w tabliczkach, a kafle partii unosza sie pod kursorem i swieca barwa swojego ugrupowania.',
+   'Wybrana partia dostaje okucie w rogu, dokladnie takie jak karta trybu, wiec oba ekrany mowia tym samym.',
+ ]},
+
  '1.1.37':{data:'5 sierpnia 2026', zmiany:[
    'EKRAN TRYBOW OD NOWA. Byly trzy plaskie prostokaty na czarnym tle. Teraz ekran jest zbudowany z plyt jak w grach Paradoxu: sztandar z mosiezna listwa, liczby w osadzonych tabliczkach, karty z okuciami w rogach i ikonami w plakietkach.',
    'TRZY NOWE KARTY. Kreator scenariuszy i Wczytaj scenariusz weszly prosto na ekran startowy, wiec nie trzeba ich juz szukac. Doszedl tez Slepy los: gra sama dobiera scenariusz i partie, a dowiadujesz sie, kim grasz, dopiero po starcie.',

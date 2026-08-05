@@ -603,6 +603,71 @@ body::after{
   .sztandar .seal{align-self:flex-start;width:88px}
 }
 
+/* ═══════════════════════════════════════════════════════════
+   EKRAN WYBORU PARTII — ten sam język co ekran trybów
+   Karta partii jest tu najważniejszym elementem w całej grze przed startem:
+   to na niej gracz decyduje, kim będzie przez kilkanaście godzin. Dostaje
+   więc pełne potraktowanie: osadzona płyta, mosiężna listwa, okucia.
+   ═══════════════════════════════════════════════════════════ */
+
+/* liczby nad wyborem partii czyta się jak tabliczki, nie jak luźny rząd */
+.mstats{display:flex;flex-wrap:wrap;gap:1px;margin:var(--o4) 0 var(--o5);padding:0;
+  border:1px solid var(--line);border-radius:var(--r3);overflow:hidden;
+  background:var(--line);border-top:1px solid var(--line)}
+.mstats>div{flex:1 1 160px;padding:var(--o3) var(--o4);
+  background:linear-gradient(180deg,var(--p2),var(--p1));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.mstats b{font-size:24px;margin-bottom:5px;
+  background:linear-gradient(180deg,#fbf3dd,#d9ab45 130%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.mstats span{font-size:8.5px;letter-spacing:.16em}
+
+/* ── karta wybranej partii ── */
+.pickmain{position:relative;overflow:hidden;border-radius:var(--r4);
+  border:1px solid var(--line2);padding:var(--o5);
+  background:
+    radial-gradient(520px 220px at 76% -50px,rgba(217,171,69,.1),transparent 70%),
+    linear-gradient(160deg,var(--p2),rgba(0,0,0,.48));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 26px 56px -40px #000}
+.pickmain::before{content:'';position:absolute;left:0;right:0;top:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--acc) 20%,#f7e3aa 50%,var(--acc) 80%,transparent);
+  opacity:.7}
+/* okucia jak na kartach trybów, żeby oba ekrany mówiły tym samym językiem */
+.pickmain::after{content:'';position:absolute;right:9px;bottom:9px;width:18px;height:18px;
+  border-bottom:1px solid var(--acc);border-right:1px solid var(--acc);opacity:.45;pointer-events:none}
+.pickhd h2{font-family:var(--fd);font-size:28px;font-weight:600;letter-spacing:.005em}
+.pickhd .crest{box-shadow:0 0 0 1px rgba(255,255,255,.15),0 0 26px -8px var(--pc,var(--acc)),
+  0 4px 12px rgba(0,0,0,.55)}
+.pickhd .meta{font-size:11px;letter-spacing:.08em}
+
+/* paski cech partii dostają tę samą głębię co w grze */
+.pickstat{gap:var(--o3) var(--o5);margin:var(--o4) 0 var(--o2)}
+.pickstat .row .l{font-size:12px;margin-bottom:5px}
+.pickstat .trk{height:6px;box-shadow:inset 0 1px 3px rgba(0,0,0,.7)}
+
+/* ── siatka partii ── */
+.picklist{gap:var(--o3)}
+.pickcell{border-radius:var(--r3);padding:var(--o3) var(--o2) var(--o3);
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,var(--p2),rgba(0,0,0,.4));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+  transition:transform .16s var(--krzywa),border-color .16s,box-shadow .2s}
+.pickcell .crest{transition:transform .16s var(--sprezyna)}
+.pickcell:hover{transform:translateY(-3px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 18px 38px -28px #000,
+             0 0 30px -16px var(--pc,var(--acc))}
+.pickcell:hover .crest{transform:scale(1.06)}
+/* wybrana partia dostaje okucia w rogach — tak jak karta trybu */
+.pickcell.on{border-color:var(--acc);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 0 0 1px rgba(216,168,62,.4),
+             0 0 34px -14px var(--acc)}
+.pickcell.on::before{content:'';position:absolute;left:5px;top:5px;width:13px;height:13px;
+  border-top:1px solid var(--acc);border-left:1px solid var(--acc);z-index:2;pointer-events:none}
+.pcseat{font-family:var(--m);font-size:11px;letter-spacing:.04em}
+
+/* przycisk wejścia do gry ma być najcięższym elementem ekranu */
+.pickmain>.btn,.pickmain .btn.pri{width:100%;justify-content:center;padding:13px 22px;font-size:15px}
+
 /* ─────────── EKRAN STARTOWY ───────────
    Pierwsze, co gracz widzi, a wyglądało jak tekst na czarnym tle. Tytuł ma
    świecić, liczby mają ważyć, karty trybów mają zapraszać do kliknięcia. */
