@@ -4095,7 +4095,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.39';
+let WERSJA='1.1.40';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4106,6 +4106,10 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.40':{data:'5 sierpnia 2026', zmiany:[
+   'KARTY W CALEJ GRZE jako plyty, tym samym jezykiem co ekrany startowe: krawedz swiatla u gory, listwa w barwie dzialu pod naglowkiem i okucie w rogu, ktore zapala sie pod kursorem. Jedna zmiana przeszla naraz na Sejm, Sondaz, Partie, Lidera i Cele.',
+ ]},
+
  '1.1.39':{data:'5 sierpnia 2026', zmiany:[
    'Liczby nad wyborem partii siedza wreszcie w tabliczkach. Poprzednie wydanie mialo ten styl napisany na zla klase, wiec nie mial czego zlapac i rzad liczb zostal plaski.',
  ]},

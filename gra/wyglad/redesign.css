@@ -489,9 +489,23 @@ body::after{
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .lstat span{font-size:8px;letter-spacing:.04em;white-space:nowrap}
 
-/* ─────────── GŁĘBIA WARSTW ───────────
-   Po pogłębieniu tła karty mogą wreszcie rzucać cień, który coś znaczy. */
-.card{box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 14px 34px -26px #000, 0 3px 10px -6px rgba(0,0,0,.7)}
+/* ═══════════════════════════════════════════════════════════
+   KARTA JAKO PŁYTA — ten sam język, co ekrany startowe
+   Karta jest klockiem, z którego zbudowana jest cała gra, więc to na niej
+   najbardziej opłaca się zmienić wygląd: jedna reguła przechodzi na Sejm,
+   Sondaż, Partie, Lidera i Cele naraz. Płyta ma krawędź światła u góry,
+   listwę w barwie działu i okucie w rogu — dokładnie jak karty trybów.
+   ═══════════════════════════════════════════════════════════ */
+.card{box-shadow:inset 0 1px 0 rgba(255,255,255,.055),
+  0 18px 40px -30px #000, 0 3px 10px -6px rgba(0,0,0,.7)}
+/* listwa działu biegnie pod nagłówkiem w barwie karty */
+.card>.h::after{height:2px;opacity:.6;
+  background:linear-gradient(90deg,transparent,var(--kolor,var(--acc)) 22%,
+    var(--kolor,var(--acc)) 78%,transparent)}
+/* okucie w prawym dolnym rogu zastępuje dawny narożnik z cieńszą kreską */
+.card::after{width:14px;height:14px;bottom:7px;right:7px;opacity:.4;
+  border-radius:0;transition:opacity .2s}
+.card:hover::after{opacity:.85}
 .card>.b{background:linear-gradient(180deg,rgba(255,255,255,.012),transparent 90px)}
 .klocek,.okr,.bperson,.agent{background:linear-gradient(180deg,var(--p2),var(--p1))}
 
