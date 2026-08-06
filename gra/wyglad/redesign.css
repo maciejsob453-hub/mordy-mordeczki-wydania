@@ -2111,3 +2111,22 @@ img,svg,canvas{max-width:100%}
   .pick.v3 .pickmain{grid-column:1;grid-row:1;position:static}
   .pick.v3>div:not(.pickmain){grid-row:2}
 }
+
+/* ═══════════════════════════════════════════════════════════
+   PORZĄDKI: JEDEN EKRAN GŁÓWNY, JEDNO WCZYTYWANIE, ZERO PRZEWIJANIA
+   Menu główne to ekran tytułowy, a nie strona — ma się mieścić w oknie
+   co do piksela i nie dawać się przewinąć. Ekran trybów przestał być drugim
+   ekranem głównym: nie ma już własnego wielkiego tytułu ani wizytówki serwera,
+   bo to jest jedno i to samo, tylko powtórzone.
+   ═══════════════════════════════════════════════════════════ */
+/* menu tytułowe nie przewija się w żadną stronę */
+html:has(.mg),body:has(.mg){overflow:hidden;height:100%}
+body:has(.mg) .wrap{padding:0;max-width:none;overflow:hidden}
+.mg{height:100vh;min-height:0;margin-left:0;margin-right:0;width:100%}
+.mg .mgtresc{max-height:100vh;overflow:hidden}
+
+/* nagłówek podstrony — mniejszy od tytułu w menu, żeby było widać hierarchię */
+.podnag{margin-bottom:var(--o5)}
+.podnag h2{font-family:"EB Garamond","Playfair Display",var(--fd);
+  font-size:clamp(24px,2.4vw,34px);font-weight:600;margin:4px 0 0;
+  letter-spacing:.02em}

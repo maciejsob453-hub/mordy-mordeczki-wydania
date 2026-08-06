@@ -3416,7 +3416,7 @@ function scenScreen(){
       </button>`}).join('')}
   </div>
   <div class="scennarz">
-    <button class="btn g sm" onclick="backToMode()">← Tryby gry</button>
+    <button class="btn g sm" onclick="backToMode()">← Wstecz</button>
     <button class="btn sm" onclick="openKreator()">Kreator scenariuszy</button>
     <button class="btn g sm" onclick="wczytajScenPlik()">Wczytaj z pliku…</button>
     ${MODY.length?`<span class="dim" style="font-size:12px;margin-left:auto">
@@ -4232,31 +4232,14 @@ function modeScreen(){
 
   app.innerHTML=`
   <div class="startekran">
-  <button class="btn g sm" style="margin-bottom:14px" onclick="backToMenu()">← Menu główne</button>
-  <div class="sztandar">
-    <div class="sztlewa">
-      <div class="kick">Mordy Mordeczki · roleplay polityczny</div>
-      <h1>Sejm</h1>
-      <p>Prowadzisz partię na serwerze liczącym 670 osób. Dwanaście tygodni kampanii,
-         wybory, rząd albo opozycja, i tak w kółko. Wybierz, od kiedy zaczynasz.</p>
-    </div>
-    <svg class="seal" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <g fill="none" stroke="var(--acc2)" stroke-width="1.1">
-        <circle cx="50" cy="50" r="43"/><circle cx="50" cy="50" r="36"/>
-        <path d="M50 14 L54 24 L50 22 L46 24 Z" fill="var(--acc2)" stroke="none"/>
-        <g opacity=".85"><path d="M28 62 Q50 78 72 62"/><path d="M30 58 Q50 72 70 58"/></g>
-      </g></svg>
+  <button class="btn g sm" style="margin-bottom:14px" onclick="backToMenu()">← Wstecz</button>
+  <!-- Ekran trybów jest podstroną, a nie drugim ekranem głównym. Wielki tytuł,
+       godło i wizytówka serwera zostały w menu — tutaj jest tylko nagłówek
+       mówiący, gdzie jesteś, i sama lista. -->
+  <div class="podnag">
+    <div class="kick">Nowa gra</div>
+    <h2>Od czego zaczynasz</h2>
   </div>
-
-  <div class="tabliczki">
-    <div><b>670</b><span>osób na serwerze</span></div>
-    <div><b>40</b><span>mandatów</span></div>
-    <div><b>14</b><span>partii</span></div>
-    <div><b>12</b><span>tygodni kadencji</span></div>
-    <div><b>∞</b><span>kadencji</span></div>
-  </div>
-
-  <div class="dzialnag"><span>Od czego zaczynasz</span></div>
   <!-- Układ menu wzięty z proporcji Victorii: kolumna przycisków 310x55 po lewej,
        odstęp 5 w grupie i 25 między grupami, a po prawej panel z opisem tego,
        na co akurat patrzysz. Same kafle zostają — zmienia się tylko to, jak stoją. -->
@@ -4273,20 +4256,14 @@ function modeScreen(){
     ${karta({i:'kre',akcja:'openKreator()',tag:'twoje',n:'Kreator scenariuszy',
       d:'Ustawiasz, jak wygląda serwer w chwili startu: kto ile ma mandatów, jak duże są partie, ile trwa kadencja. Gotowy scenariusz zapiszesz jako plik.',
       stopka:'pełny edytor',akcjaN:'Buduję →'})}
-    ${karta({i:'plik',akcja:'wczytajScenPlik()',tag:'twoje',n:'Wczytaj scenariusz',
+    ${karta({i:'plik',akcja:'wczytajScenPlik()',tag:'twoje',n:'Scenariusz z pliku',
       d:'Ktoś przysłał ci plik <b>.mmscen</b>? Wczytaj go tutaj, a stanie na liście obok wbudowanych i zagrasz nim od razu.',
-      stopka:'plik .mmscen',akcjaN:'Wczytuję →'})}
+      stopka:'plik .mmscen',akcjaN:'Otwieram →'})}
     ${karta({i:'upad',wyl:1,kl:'wkrotce',tag:'scenariusz',data:'25 kwietnia 2025',n:'Upadek Republikanów',
       d:'Zaczynasz szesnaście miesięcy wcześniej, w tygodniu, w którym niebieski sztandar poszedł w dół, a jego ludzie rozeszli się po całym serwerze.',
       stopka:'w przygotowaniu',akcjaN:'Wkrótce'})}
   </div>
 
-  <div class="loadbar">
-    <input class="ta2" id="loadCodeInp" placeholder="Masz kod zapisu? Wklej go tutaj (MM...) i wczytaj rozgrywkę">
-    <button class="btn g sm" onclick="tryLoadFromSetup()">Wczytaj zapis</button>
-  </div>
-  <div id="loadErr" style="font-size:12px;color:var(--neg);margin-top:6px"></div>
-  ${creditsBox()}
   </div>`;
   /* Panel po prawej startuje od karty głównej. Ustawiamy go po klatce, bo
      przeglądarka potrafi w międzyczasie sama komuś nadać fokus i podmienić
@@ -4302,7 +4279,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.61';
+let WERSJA='1.1.62';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4853,12 +4830,10 @@ function setup(){
       <div class="fact"><b>${MAJ}</b><span>mandatów na większość</span></div>
       <div class="fact"><b>∞</b><span>kadencji</span></div>
     </div>
-    <div class="loadbar">
-      <input class="ta2" id="loadCodeInp" placeholder="Masz kod zapisu? Wklej go tutaj (MM...) i wczytaj rozgrywkę">
-      <button class="btn g sm" onclick="tryLoadFromSetup()">Wczytaj zapis</button>
-      <button class="btn g sm" onclick="backToMode()">← Tryby gry</button>
+    <div class="ekstopka">
+      <span class="ekleg">wczytywanie zapisów jest w menu głównym</span>
+      <button class="btn g sm" onclick="backToMode()">← Wstecz</button>
     </div>
-    <div id="loadErr" style="font-size:12px;color:var(--neg);margin-top:6px"></div>
   </div>
   <!-- Układ z ekranu startu Victorii: lista po lewej, panel wybranego po prawej.
        Ich wiersze mają 560x105, panel boczny 420, odstęp 5 — te proporcje
