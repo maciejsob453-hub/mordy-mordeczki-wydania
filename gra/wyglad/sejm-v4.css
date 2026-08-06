@@ -213,3 +213,97 @@ body:not(:has(.mg)) .mdl .op{border-top:1px solid rgba(214,170,88,.2);background
 @media (prefers-reduced-motion:reduce){
   body:not(:has(.mg)) *{scroll-behavior:auto!important}
 }
+
+/* WERSJA 1.1.72 — pulpit gry i ekrany startu. Te reguły są na samym końcu,
+   bo wcześniejsze warstwy odziedziczyły po sobie kilka sprzecznych układów. */
+
+/* Zasoby nie są już zlepionymi cyframi. Każdy ma własny, równy kaseton, a oba
+   bloki czytają się jako: środki działania oraz pozycja polityczna. */
+body:not(:has(.mg)) .hud .rgroup{
+  gap:3px;padding:3px;border:1px solid rgba(214,170,88,.22);border-radius:3px;
+  background:rgba(3,12,9,.5);box-shadow:inset 0 1px rgba(255,255,255,.035);
+}
+body:not(:has(.mg)) .hud .rgroup .rs{
+  min-width:94px;padding:6px 10px;border:1px solid transparent;border-radius:2px;
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(0,0,0,.18));
+}
+body:not(:has(.mg)) .hud .rgroup .rs+.rs::before{display:none}
+body:not(:has(.mg)) .hud .rgroup .rs.tip:hover{border-color:rgba(214,170,88,.42);background:rgba(214,170,88,.1)}
+body:not(:has(.mg)) .hud .rgroup .rs .rv{gap:2px}
+body:not(:has(.mg)) .hud .rgroup .rs .rv b{font-size:18px;color:#f6ebcf;-webkit-text-fill-color:#f6ebcf;background:none}
+body:not(:has(.mg)) .hud .rgroup .rs .rv b .plus{color:var(--pos);-webkit-text-fill-color:var(--pos)}
+body:not(:has(.mg)) .hud .rgroup .rs .rv>span:not(.plus):not(.of){display:block;color:var(--v4-muted);font-size:8px;letter-spacing:.14em}
+
+/* Kondycja jest centrum dowodzenia, nie czwartą kartą na końcu bocznej listy. */
+body:not(:has(.mg)) .sidebar>.kond{order:-20;border-color:rgba(143,195,109,.52)}
+body:not(:has(.mg)) .sidebar>.lead{order:-19}
+body:not(:has(.mg)) .sidebar>.skl{order:-18}
+body:not(:has(.mg)) .sidebar>.mods{order:-17}
+body:not(:has(.mg)) .sidebar>.kronika{order:-16}
+body:not(:has(.mg)) .sidebar .kond>.b{padding:14px 16px 17px;background:linear-gradient(180deg,rgba(6,18,13,.42),transparent)}
+/* Tło wykresu wypełnia całą kartę. Wcześniejszy limit 186px zostawiał czarny
+   klocek pośrodku i wizualnie wyglądał jak ucięty błąd. */
+body:not(:has(.mg)) .sidebar .kond .radar{display:block;width:100%;max-width:none;height:auto;margin:0 0 12px;padding:8px;box-sizing:border-box;border:1px solid rgba(214,170,88,.13);border-radius:2px;background:linear-gradient(180deg,rgba(0,0,0,.32),rgba(0,0,0,.12))}
+body:not(:has(.mg)) .sidebar .leadbox{margin-bottom:10px}
+body:not(:has(.mg)) .sidebar .hint{font-size:12px;line-height:1.45}
+body:not(:has(.mg)) .sidebar .modw{grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:8px 0}
+body:not(:has(.mg)) .sidebar .modl span{font-size:11px;line-height:1.35}
+body:not(:has(.mg)) .sidebar .kronika .log{max-height:250px}
+
+/* Wybór partii: najpierw pełny profil wybranego ugrupowania, potem krótka
+   tablica szyldów. Nie ma już absurdalnej listy po jednej stronie i karty po
+   drugiej, między którymi trzeba skakać wzrokiem. */
+body:not(:has(.mg)) .pick.v3.partyselect{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:18px;max-width:1460px;margin:0 auto;
+}
+body:not(:has(.mg)) .pick.v3.partyselect>.pickmain{
+  grid-column:1;grid-row:1;position:relative;top:auto;min-height:0;padding:24px 28px 22px;
+  background:radial-gradient(480px 190px at 100% 0,rgba(214,170,88,.12),transparent 70%),linear-gradient(135deg,rgba(30,50,41,.98),rgba(13,27,21,.99));
+}
+body:not(:has(.mg)) .pick.v3.partyselect>.partyroster{grid-column:1;grid-row:2}
+body:not(:has(.mg)) .partyselect .pickhd{display:flex;align-items:center;gap:16px;padding:0 0 14px;margin-bottom:14px}
+body:not(:has(.mg)) .partyselect .pickhd h2{font-size:30px;line-height:1.05}
+body:not(:has(.mg)) .partyselect .partyblurb{max-width:850px;color:#c6d0c6!important}
+body:not(:has(.mg)) .partyselect .partystats{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:12px 18px;max-width:950px;margin:18px 0 10px}
+body:not(:has(.mg)) .partyselect .partystats .row{padding:8px 10px;border:1px solid rgba(214,170,88,.14);background:rgba(0,0,0,.18)}
+body:not(:has(.mg)) .partyselect .partyfacts{gap:0!important;margin-top:12px!important;border-top:1px solid rgba(214,170,88,.18);border-bottom:1px solid rgba(214,170,88,.18)}
+body:not(:has(.mg)) .partyselect .partyfacts span{padding:9px 16px 9px 0;margin-right:16px;white-space:nowrap}
+body:not(:has(.mg)) .partyselect .partyleader{max-width:760px;margin-top:15px}
+body:not(:has(.mg)) .partyselect .pickstart{
+  width:auto!important;min-width:290px!important;border-color:#f7df94!important;
+  background:linear-gradient(180deg,#f0cf77,#b9822d)!important;color:#1b1408!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.68),0 0 0 3px rgba(214,170,88,.13)!important;
+}
+body:not(:has(.mg)) .partyselect .pickstart:hover{background:linear-gradient(180deg,#f9dd91,#cb963c)!important}
+body:not(:has(.mg)) .partyrosterhead{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 9px;padding:0 2px;color:var(--v4-brass);font-family:var(--m);font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+body:not(:has(.mg)) .partyrosterhead span{color:var(--v4-muted);font-size:9px;letter-spacing:.1em}
+body:not(:has(.mg)) .partyselect .picklist{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:6px;background:rgba(4,14,10,.72)}
+body:not(:has(.mg)) .partyselect .pickcell{min-height:68px;padding:8px 12px;grid-template-columns:42px minmax(0,1fr) auto;gap:1px 9px;border-color:rgba(214,170,88,.12);background:rgba(255,255,255,.018)}
+body:not(:has(.mg)) .partyselect .pickcell:hover{transform:translateY(-1px);background:rgba(214,170,88,.09)}
+body:not(:has(.mg)) .partyselect .pcimg .crest{width:36px;height:36px}
+body:not(:has(.mg)) .partyselect .pcname{font-size:14px;line-height:1.13}
+body:not(:has(.mg)) .partyselect .pcrow{font-size:10px}
+
+/* Scenariusze dostają ten sam porządek: wybrany świat jest pierwszą kartą,
+   a pozostałe są krótką listą wyboru, nie długą kolumną formularza. */
+body:not(:has(.mg)) .pick.v3.scenv3{grid-template-columns:minmax(0,1fr);gap:15px;max-width:1280px;margin:0 auto}
+body:not(:has(.mg)) .pick.v3.scenv3>.pickmain{grid-column:1;grid-row:1;position:static;min-height:0;padding:24px 28px}
+body:not(:has(.mg)) .pick.v3.scenv3>div:not(.pickmain){grid-column:1;grid-row:2}
+body:not(:has(.mg)) .scenv3 .picklist{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:6px}
+body:not(:has(.mg)) .pick.v3.scenv3 .scenrow{min-height:74px;padding:12px 14px;border-color:rgba(214,170,88,.16);background:rgba(6,18,13,.58)}
+body:not(:has(.mg)) .scenv3 .pickmain>.btn{width:auto!important;min-width:260px;border-color:#f7df94;background:linear-gradient(180deg,#f0cf77,#b9822d);color:#1b1408}
+
+/* X tylko tam, gdzie można bezpiecznie przerwać własne okno. Gdy jest, stoi
+   w prawym górnym rogu nagłówka — nigdy na środku całego panelu. */
+body:not(:has(.mg)) .mdl>.mdlx{top:12px;right:12px;transform:none}
+body:not(:has(.mg)) .mdl>.mdlx:hover{transform:rotate(90deg)}
+
+@media (max-width:1180px){
+  body:not(:has(.mg)) .partyselect .picklist,body:not(:has(.mg)) .scenv3 .picklist{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body:not(:has(.mg)) .partyselect .partystats{grid-template-columns:repeat(2,minmax(140px,1fr))}
+}
+@media (max-width:720px){
+  body:not(:has(.mg)) .partyselect .picklist,body:not(:has(.mg)) .scenv3 .picklist{grid-template-columns:1fr}
+  body:not(:has(.mg)) .partyselect>.pickmain,body:not(:has(.mg)) .pick.v3.scenv3>.pickmain{padding:18px}
+  body:not(:has(.mg)) .partyrosterhead span{display:none}
+}

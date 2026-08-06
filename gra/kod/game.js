@@ -2771,7 +2771,7 @@ function pickMain(){
   box.innerHTML=`
     <div style="position:absolute;right:-70px;top:-70px;width:280px;height:280px;border-radius:50%;
       background:radial-gradient(circle,${p.c}55,transparent 70%);filter:blur(6px)"></div>
-    <div class="pickhd">
+    <div class="pickhd partyherohead">
       <img class="crest" style="width:74px;height:74px;padding:3px;border-radius:5px" src="${LOGOS[SEL]||''}" alt="">
       <div style="min-width:0">
         <h2>${p.n}</h2>
@@ -2779,17 +2779,17 @@ function pickMain(){
           <span style="color:var(--acc)">${'★'.repeat(p.diff)}${'☆'.repeat(5-p.diff)}</span></div>
       </div>
     </div>
-    <p style="color:var(--dim);font-size:14px;line-height:1.55;margin:0">${p.blurb}</p>
-    <div class="pickstat">
+    <p class="partyblurb" style="color:var(--dim);font-size:14px;line-height:1.55;margin:0">${p.blurb}</p>
+    <div class="pickstat partystats">
       ${st('Sława',p.fame,'var(--acc)')}${st('Wiarygodność',p.cred,'var(--info)')}
       ${st('Jedność',p.uni,'var(--pos)')}${st('Aktywność',p.act,'#9b7fd4')}
     </div>
-    <div style="display:flex;gap:18px;font-family:var(--m);font-size:11.5px;color:var(--dim);margin-top:6px;flex-wrap:wrap">
+    <div class="partyfacts" style="display:flex;gap:18px;font-family:var(--m);font-size:11.5px;color:var(--dim);margin-top:6px;flex-wrap:wrap">
       <span>osób <b style="color:var(--tx)">${p.mem}</b></span>
       <span>skład <b style="color:var(--tx)">${p.comp0[0]}·${p.comp0[1]}·${p.comp0[2]}</b> elita/inteligencja/serwerowicze</span>
       <span>sufit <b style="color:var(--tx)">${p.pot}</b></span>
     </div>
-    <div class="leadchip">
+    <div class="leadchip partyleader">
       ${ava(lp.main[0],p.c,42)}
       <div style="flex:1;min-width:0">
         <div class="n">${isDuo?lp.main[0]+' / '+lp.main[1]+' (współprzewodnictwo)':lp.main.join(' · ')}</div>
@@ -2799,7 +2799,7 @@ function pickMain(){
     </div>
     <div style="font-size:12.5px;color:var(--dim2);margin-top:10px">
       Zaplecze: ${lp.bench.length?lp.bench.join(', '):'<span style="color:var(--neg)">brak</span>'}</div>
-    <button class="btn" style="width:100%;margin-top:15px;padding:12px" onclick="start('${SEL}')">
+    <button class="btn pickstart" style="width:100%;margin-top:15px;padding:12px" onclick="start('${SEL}')">
       Prowadzę ${p.ab} →</button>`;
 }
 /* ══════════ KREATOR WŁASNEJ PARTII ══════════ */
@@ -4111,7 +4111,7 @@ function modyfikatory(){
   if(G.absolutorium&&G.absolutorium.term===G.term-1&&!G.absolutorium.udzielone)
     m.push({n:'Brak absolutorium',v:'z poprzedniej kadencji',zle:1,
       zr:'PKB spadło, a sejm to zapisał.'});
-  return `<div class="card"><div class="h"><h3>Co na ciebie działa</h3>
+  return `<div class="card mods"><div class="h"><h3>Co na ciebie działa</h3>
     <span class="n">${m.length} ${pl(m.length,'modyfikator','modyfikatory','modyfikatorów')}</span></div><div class="b">
     ${m.length?`<div class="modlista">${m.map(x=>`<div class="modw ${x.zle?'zle':'ok'}">
       <div class="modl"><b>${x.n}</b><span>${x.zr}</span></div>
@@ -4558,7 +4558,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.71';
+let WERSJA='1.1.72';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4569,6 +4569,11 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.72':{data:'7 sierpnia 2026', zmiany:[
+   'WYBOR PARTII I SCENARIUSZA DOSTAL NOWY UKLAD. Najpierw widzisz pelny profil wybranej opcji, a potem krotka tablice szyldow zamiast absurdalnej listy obok panelu.',
+   'PULPIT I BOCZNY PANEL SA CZYTELNIEJSZE: zasoby maja rowne kasetony, kondycja partii stoi na gorze, a wykres wypelnia cala szerokosc karty.',
+   'MAPA MA DZIEWIEC ROZNYCH KSZTALTOW OKREGOW I NIE MA FILTROW. Cofniecie decyzji przywraca tez znacznik tygodnia, kombinacje i limity.',
+ ]},
  '1.1.71':{data:'7 sierpnia 2026', zmiany:[
    'PELNE UDWIEKOWIENIE GRY. Klikniecia, wybory, decyzje, tygodnie, pieniadze, transfery, media, modale, cele i nagrania maja teraz wlasne lekkie brzmienia zamiast kilku przypadkowych pikniec.',
    'SEJM MA WLASNY RYTM: osobno slychac glosowanie, przejscie albo upadek ustawy, pieczec podpisu i weto prezydenta. Dzwieki sa ciche, nie zagluszaja muzyki i podlegaja temu samemu przyciskowi wyciszenia.',
@@ -5129,10 +5134,10 @@ function setup(){
   <!-- Układ z ekranu startu Victorii: lista po lewej, panel wybranego po prawej.
        Ich wiersze mają 560x105, panel boczny 420, odstęp 5 — te proporcje
        przenosimy tutaj, samą grafikę rysujemy po swojemu. -->
-  <div class="pick v3">
+  <div class="pick v3 partyselect">
     <div class="pickmain" id="pmain"></div>
-    <div>
-      <div style="font-family:var(--m);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim2);margin-bottom:10px">${PID.length} ugrupowań · kliknij, żeby obejrzeć</div>
+    <div class="partyroster">
+      <div class="partyrosterhead">${PID.length} ugrupowań <span>wybierz szyld, po prawej dostajesz pełny profil</span></div>
       <div class="picklist">
         ${PID.map(k=>{const st=START_SEATS[k]||0,d=BASE[k].diff||3;
           return `<button class="pickcell ${k===SEL?'on':''}" onclick="pickParty('${k}')" style="--pc:${BASE[k].c}">
@@ -5296,7 +5301,7 @@ function game(){
       return nv.map(([k,n])=>`<button class="${G.tab===k?'on':''}" onclick="setTab('${k}')">${n}</button>`).join('')})()}
   </div>
   <div class="layout">
-    <div style="display:flex;flex-direction:column;gap:14px">${sidebar(p,q)}</div>
+    <div class="sidebar" style="display:flex;flex-direction:column;gap:14px">${sidebar(p,q)}</div>
     <div class="widok${G._we?' wejscie':''}" data-tab="${G.tab}">${G.tab==='mapa'?kurier()+mapTab(q,AL):G.tab==='akcje'?actTab():G.tab==='partie'?partieTab():G.tab==='sondaz'?pollTab(q,AL)
       :G.tab==='cele'?goalTab():G.tab==='lider'?leadTab():G.tab==='krol'?kingTab()
       :G.tab==='premier'?premierTab():G.tab==='prezydent'?prezydentTab()
@@ -6614,32 +6619,29 @@ function presArc(cx,cy,r,frac){
   return `M ${(cx+r*Math.cos(a0)).toFixed(2)} ${(cy+r*Math.sin(a0)).toFixed(2)} `
     +`A ${r} ${r} 0 ${frac>.5?1:0} 1 ${(cx+r*Math.cos(a1)).toFixed(2)} ${(cy+r*Math.sin(a1)).toFixed(2)}`;
 }
-/* Soczewki mapy — wzięte z paska widoków Victorii. Kanałów jest dziewięć,
-   a na każdy przypada kilka liczb; do tej pory widać było naraz tylko jedną.
-   Soczewka przełącza to, co maluje heks: kto tu dominuje, gdzie masz obecność,
-   ile jest mandatów i jak duży jest kanał. */
-const SOCZEWKI=[
- {id:'dom', n:'Dominacja',  d:'Kto ma w kanale największą obecność.'},
- {id:'ja',  n:'Twoja obecność', d:'Ile masz w każdym kanale, od 0 do 100.'},
- {id:'mand',n:'Mandaty',    d:'Ile foteli rozdaje się w kanale.'},
- {id:'ludz',n:'Wielkość',   d:'Ilu ludzi siedzi w kanale.'},
+/* Kanały są różnymi miejscami, nie kaflami z jednej planszy. Stałe, lekko
+   nieregularne obrysy dają każdemu własny kształt, ale mieszczą się w dawnym
+   promieniu heksa, więc nie nachodzą na siebie ani na podpisy. */
+const OKREG_KSZTALTY=[
+  [[0,-1], [.72,-.72], [1,-.08], [.78,.66], [.18,.97], [-.68,.78], [-.96,.18], [-.83,-.55], [-.3,-.94]],
+  [[-.2,-1], [.62,-.78], [1,-.26], [.92,.48], [.37,.94], [-.46,.92], [-.94,.36], [-.9,-.44], [-.48,-.9]],
+  [[0,-1], [.78,-.64], [.95,.13], [.58,.88], [-.05,.98], [-.78,.66], [-1,.03], [-.67,-.76]],
+  [[-.46,-.9], [.35,-1], [.92,-.48], [1,.26], [.45,.92], [-.38,.96], [-.94,.45], [-.86,-.38]],
+  [[0,-1], [.68,-.8], [1,-.15], [.86,.54], [.34,.98], [-.44,.9], [-.96,.4], [-.9,-.33], [-.46,-.86]],
+  [[-.15,-1], [.68,-.73], [1,-.02], [.68,.72], [.02,1], [-.74,.7], [-.98,.02], [-.72,-.7]],
+  [[0,-1], [.82,-.52], [.96,.24], [.54,.9], [-.22,.98], [-.9,.56], [-1,-.16], [-.55,-.88]],
+  [[-.32,-.95], [.5,-.9], [.98,-.34], [.88,.46], [.28,.98], [-.58,.82], [-1,.22], [-.8,-.58]],
+  [[.08,-1], [.78,-.62], [1,.1], [.66,.8], [-.1,.98], [-.8,.64], [-.96,-.18], [-.56,-.86]],
 ];
-function setSoczewka(id){G.socz=id;render()}
-const soczewka=()=>G.socz||'dom';
+function okregPts(cx,cy,r,i){
+  return OKREG_KSZTALTY[i%OKREG_KSZTALTY.length]
+    .map(([x,y])=>`${(cx+x*r).toFixed(1)},${(cy+y*r).toFixed(1)}`).join(' ')
+}
 function mapTab(q,AL){
   const p=me(),r=REG.find(x=>x.id===G.sel);
   const ld=Object.fromEntries(REG.map(x=>[x.id,leader(x.id,q.res)]));
-  const SOC=soczewka();
-  const maxLudz=Math.max(...REG.map(x=>x.pop||1));
-  const maxMand=Math.max(...REG.map(x=>x.seats||1));
   return `
   <div class="mapwrap">
-    <div class="soczpasek">
-      <span class="wazneet">Widok mapy</span>
-      ${SOCZEWKI.map(x=>`<button class="socz ${SOC===x.id?'on':''}"
-        onclick="setSoczewka('${x.id}')" title="${esc(x.d)}">${x.n}</button>`).join('')}
-      <span class="soczopis">${esc((SOCZEWKI.find(x=>x.id===SOC)||SOCZEWKI[0]).d)}</span>
-    </div>
     <div class="card">
       <div class="h"><h3>Okręgi wyborcze</h3><span class="n">${DIST_SEATS} w okręgach + ${TOPUP} z listy</span></div>
       <div class="b" style="padding:8px">
@@ -6654,32 +6656,22 @@ function mapTab(q,AL){
         </defs>
         <rect x="0" y="0" width="800" height="620" fill="url(#grid)" rx="12"/>
         <rect x="0" y="0" width="800" height="620" fill="url(#vig)" rx="12"/>
-        ${REG.map(x=>{
+        ${REG.map((x,i)=>{
           const Lk=alive().reduce((a,k2)=>G.p[k2].pres[x.id]>G.p[a].pres[x.id]?k2:a,G.me);
           const c=G.p[Lk].c,pr=p.pres[x.id],on=x.id===G.sel,crestSrc=(G.p[Lk].logo&&LOGOS[G.p[Lk].logo])||LOGOS[Lk]||'';
-          const R0=102, arc=presArc(x.x,x.y,R0+7,cl(pr,0,100)/100);
+          const R0=94, shape=okregPts(x.x,x.y,R0,i), arc=presArc(x.x,x.y,R0+7,cl(pr,0,100)/100);
           const dom=Lk, dp=G.p[dom].pres[x.id], darc=presArc(x.x,x.y,R0+15,cl(dp,0,100)/100);
           const glosy=ld[x.id];
           return `<g class="hex" onclick="setSel('${x.id}')">
-            <polygon class="hglow" points="${hexPts(x.x,x.y,R0)}" fill="${c}" filter="url(#soft)"/>
-            <polygon class="hf" points="${hexPts(x.x,x.y,R0)}" fill="${
-              SOC==='ja'?p.c:SOC==='mand'?'var(--acc)':SOC==='ludz'?'#5a8bb0':c}" fill-opacity="${
-              (SOC==='ja'?(.10+cl(pr,0,100)/125)
-               :SOC==='mand'?(.10+(x.seats/maxMand)*.62)
-               :SOC==='ludz'?(.10+((x.pop||1)/maxLudz)*.62)
-               :(.17+dp/155)).toFixed(3)}"
+            <polygon class="hglow" points="${shape}" fill="${c}" filter="url(#soft)"/>
+            <polygon class="hf" points="${shape}" fill="${c}" fill-opacity="${(.17+dp/155).toFixed(3)}"
               stroke="${on?'var(--acc)':c}" stroke-width="${on?3.6:1.6}" stroke-opacity="${on?1:.72}"/>
             <path d="${darc}" fill="none" stroke="${G.p[dom].c}" stroke-width="${(3+dp/22).toFixed(1)}" stroke-linecap="round" stroke-opacity=".85"/>
             ${dom===G.me?'':`<path d="${arc}" fill="none" stroke="${p.c}" stroke-width="3" stroke-linecap="round" stroke-opacity="${(.35+pr/190).toFixed(2)}"/>`}
             <rect x="${x.x-19}" y="${x.y-72}" width="38" height="38" rx="7" fill="#f4f1ea" fill-opacity=".93"/>
             <image class="hcrest" href="${crestSrc}" x="${x.x-17}" y="${x.y-70}" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>
             <text x="${x.x}" y="${x.y-12}" text-anchor="middle" fill="var(--tx)" font-size="17.5" font-weight="660">${x.n}</text>
-            <text x="${x.x}" y="${x.y+9}" text-anchor="middle" fill="${
-              SOC==='ja'?p.c:SOC==='mand'?'var(--acc)':SOC==='ludz'?'#8fb8d6':c}" font-size="13" font-weight="650" letter-spacing=".04em">${
-              SOC==='ja'?`twoja obecność ${Math.round(pr)}`
-              :SOC==='mand'?`${x.seats} ${pl(x.seats,'mandat','mandaty','mandatów')}`
-              :SOC==='ludz'?`${x.pop} ${pl(x.pop,'osoba','osoby','osób')}`
-              :`${G.p[Lk].ab} dominuje`}</text>
+            <text x="${x.x}" y="${x.y+9}" text-anchor="middle" fill="${c}" font-size="13" font-weight="650" letter-spacing=".04em">${G.p[Lk].ab} dominuje</text>
             ${Array.from({length:x.seats}).map((_,i)=>`<rect x="${x.x-(x.seats*11-3)/2+i*11}" y="${x.y+20}" width="8" height="8" rx="4"
               fill="var(--acc)" fill-opacity=".95" stroke="rgba(0,0,0,.5)" stroke-width=".6"/>`).join('')}
             <text x="${x.x}" y="${x.y+50}" text-anchor="middle" fill="var(--dim)" font-size="12" font-family="ui-monospace,monospace">${G.p[glosy].ab} bierze głosy · ty ${Math.round(pr)}/100</text>
@@ -7273,7 +7265,14 @@ function fire(a,t,r,s,tm){
   const f=fat(a.id);G.used[a.id]=(G.used[a.id]||0)+1;
   // limity zapisujemy razem z kosztem, żeby rezygnacja w oknie cofnęła jedno i drugie
   G.lastCharge={ap:a.ap,kp:Math.round(a.kp*kpMul),en:(a.en>0?a.en*enMul:a.en),id:a.id,cat:a.cat,
-                term1:limitStad,once:razStad};
+                term1:limitStad,once:razStad,
+                /* Cofnięcie musi przywrócić nie tylko walutę. Te trzy pola
+                   sterują karą za pusty tydzień, kombinacją i limitem dwa razy
+                   na tydzień; bez ich poprzedniego stanu cofnięta decyzja nadal
+                   była liczona jako zagrana. */
+                used2Przed:a.tydz2?((G.used2&&G.used2[a.id])||1)-1:null,
+                lastActPrzed:G.lastAct,
+                actedWeekPrzed:G.actedWeek};
   const msg=a.f(me(),f,t,r,s,tm);
   if(msg)G.lastCharge=null;
   const p=me();
@@ -7375,12 +7374,17 @@ function oddajOplate(){
   G.ap+=c.ap;G.kp+=c.kp;G.en=cl(G.en+c.en);
   if(G.used[c.id])G.used[c.id]--;
   if(G.catUsed[c.cat])G.catUsed[c.cat]--;
+  if(c.used2Przed!==null&&G.used2){
+    if(c.used2Przed)G.used2[c.id]=c.used2Przed;
+    else delete G.used2[c.id];
+  }
   /* Limit „raz na kadencję” zużywa się dopiero wtedy, gdy gracz naprawdę coś
      zatwierdzi. Wcześniej wystarczyło zajrzeć w zmianę przewodniczącego
      i wycofać się, żeby stracić ją na całą kadencję. */
   if(c.term1)delete G.useTerm[c.id];
   if(c.once)delete G.once[c.id];
-  if(G.lastAct===c.id)G.lastAct=null;
+  if(G.lastAct===c.id)G.lastAct=c.lastActPrzed||null;
+  if(G.actedWeek===G.term+'-'+G.week)G.actedWeek=c.actedWeekPrzed||null;
   G.lastCharge=null;
 }
 function actBack(){   // rezygnacja w oknie decyzji oddaje to, co pobrała sama decyzja
@@ -10061,7 +10065,7 @@ function sejmTab(){
     </tbody></table></div></div>`;
 }
 function feed(n){
-  return `<div class="card"><div class="h"><h3>Kronika</h3><span class="n">K${G.term}·T${G.week}</span></div>
+  return `<div class="card kronika"><div class="h"><h3>Kronika</h3><span class="n">K${G.term}·T${G.week}</span></div>
   <div class="b log" style="max-height:${n?520:300}px;padding-top:4px">${G.log.slice(0,n||14).map(l=>
     `<div class="e ${l.c}" style="font-size:12.5px;padding:8px 0"><span class="w">${l.w}</span>${l.t}</div>`).join('')
     ||'<span class="dim">Cisza. Zrób coś, a serwer zacznie gadać.</span>'}</div></div>`;
@@ -10244,13 +10248,13 @@ function modal(k,t,b,o,onX){
   close();
   const v=document.createElement('div');v.className='veil';v.id='veil';
   v.innerHTML=`<div class="mdl" role="dialog" aria-modal="true">
-    <button class="mdlx" type="button" aria-label="Zamknij">×</button>
+    ${onX?'<button class="mdlx" type="button" aria-label="Zamknij">×</button>':''}
     <div class="h"><div class="k">${k}</div><h2>${t}</h2></div>
     <div class="bd">${b}</div>
     <div class="op">${o.map((x,i)=>`<button class="opt" data-i="${i}" ${x.dis?'disabled':''}><b>${x.l}</b><span>${x.s||''}</span></button>`).join('')}</div></div>`;
   document.body.appendChild(v);
   v.querySelectorAll('.opt').forEach(b2=>b2.onclick=()=>o[+b2.dataset.i].f());
-  v.querySelector('.mdlx').onclick=onX||close;
+  const x=v.querySelector('.mdlx');if(x)x.onclick=onX;
 }
 function close(){const v=document.getElementById('veil');if(v)v.remove()}
 function shortFree(sh,self){
@@ -11681,7 +11685,7 @@ function dead(){
   ${ekstopka('koniec tej rozgrywki','<button class="btn" onclick="newRun()">Od nowa</button>')}`)}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{grupyTab,zadowolenie,radykalowie,grupaWobecUstawy,iskra,setSoczewka,SOCZEWKI,waznePozycje,waznePasek,modyfikatory,podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{grupyTab,zadowolenie,radykalowie,grupaWobecUstawy,iskra,waznePozycje,waznePasek,modyfikatory,podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,
