@@ -2725,7 +2725,7 @@ const leadAva=(k,sz)=>{const p=G.p[k],s=sz||38,ls=leads(p);
     i?`<div style="margin-left:-${ov}px">${ava(n,p.c,s2)}</div>`:ava(n,p.c,s2)).join('')}</div>`};
 
 function render(){if(PROBA)return;
-  applyTheme();initTips();initKeys();
+  applyTheme();initTips();initKeys();initDzwiek();
   /* Decyzja z własnym oknem jest opłacona z góry, a zapis o opłacie służy do
      jej cofnięcia. Zamknięcie okna w dowolny inny sposób niż przyciskiem
      „wstecz" zostawiało ten zapis wiszący: decyzja liczyła się jako zużyta
@@ -3149,16 +3149,64 @@ function beep(f,d,type,vol,slide){
   }catch(e){}
 }
 const seq=(arr,step)=>arr.forEach((x,i)=>setTimeout(()=>beep(x[0],x[1]||.12,x[2]||'sine',x[3]||.05),i*(step||90)));
+/* Krótki szum robi z interfejsu przedmiot: papier, pieczęć i przesuwanie żetonu
+   nie brzmią jak kolejna nutka z syntezatora. Jest celowo cichy i filtrowany,
+   żeby po kilkudziesięciu kliknięciach nie męczył ani nie zjadał muzyki. */
+function szum(d,vol,filtr=1200){
+  if(PROBA||!sndOn())return;const c=ac();if(!c)return;
+  try{
+    const t=c.currentTime,b=c.createBuffer(1,Math.max(1,Math.ceil(c.sampleRate*d)),c.sampleRate);
+    const a=b.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=(Math.random()*2-1)*(1-i/a.length);
+    const z=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();
+    z.buffer=b;f.type='bandpass';f.frequency.value=filtr;f.Q.value=.65;
+    g.gain.setValueAtTime(Math.max(.0001,vol),t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    z.connect(f);f.connect(g);g.connect(c.destination);z.start(t);z.stop(t+d+.02);
+  }catch(e){}
+}
+/* Nie pozwalamy jednemu kliknięciu odpalić dwóch dźwięków: część przycisków ma
+   własną reakcję, a cały interfejs dostaje też dyskretny dźwięk z nasłuchu. */
+const SND_OSTATNIE={};
+function sndRaz(k,ms=45){const n=Date.now();if((SND_OSTATNIE[k]||0)+ms>n)return false;SND_OSTATNIE[k]=n;return true}
 const SFX={
-  click:()=>beep(520,.045,'triangle',.035),
-  ok:()=>seq([[660,.09,'sine',.045],[900,.12,'sine',.04]],65),
-  bad:()=>beep(200,.2,'sawtooth',.045,-90),
-  week:()=>seq([[330,.07,'square',.028],[440,.09,'square',.026]],80),
-  coin:()=>seq([[900,.05,'square',.03],[1320,.07,'square',.028]],55),
-  mile:()=>seq([[523,.16],[659,.16],[784,.16],[1047,.3]],85),
-  elect:()=>seq([[392,.22,'triangle',.05],[523,.22,'triangle',.05],[659,.22,'triangle',.05],[784,.42,'triangle',.05]],130),
-  gong:()=>seq([[196,.5,'sine',.06],[294,.4,'sine',.04]],40),
+  ui:()=>{if(!sndRaz('ui',38))return;beep(610,.035,'triangle',.022,35);szum(.028,.006,2400)},
+  click:()=>SFX.ui(),
+  modal:()=>{if(!sndRaz('modal',90))return;beep(294,.08,'triangle',.025,65);szum(.045,.008,1450)},
+  select:()=>{if(!sndRaz('select',55))return;beep(740,.045,'sine',.025,35)},
+  ok:()=>seq([[554,.07,'sine',.035],[740,.09,'triangle',.033],[988,.15,'sine',.029]],58),
+  bad:()=>{beep(245,.13,'sawtooth',.03,-72);szum(.09,.012,380)},
+  warn:()=>seq([[340,.08,'square',.022],[300,.11,'square',.02]],85),
+  week:()=>{szum(.055,.012,720);seq([[294,.06,'triangle',.024],[392,.09,'triangle',.026]],78)},
+  coin:()=>seq([[980,.035,'square',.021],[1450,.055,'triangle',.024],[1960,.07,'sine',.018]],48),
+  transfer:()=>{szum(.07,.014,980);seq([[392,.06,'triangle',.024],[587,.11,'sine',.028]],70)},
+  media:()=>{szum(.055,.012,1950);seq([[660,.04,'triangle',.021],[880,.075,'sine',.02]],55)},
+  vote:()=>{szum(.04,.014,560);beep(220,.1,'triangle',.026,25)},
+  lawPass:()=>{szum(.09,.018,720);seq([[392,.08,'triangle',.028],[523,.09,'triangle',.03],[784,.18,'sine',.033]],74)},
+  lawFail:()=>{szum(.11,.017,410);seq([[330,.08,'sawtooth',.023],[247,.16,'sawtooth',.026]],80)},
+  seal:()=>{szum(.12,.026,440);beep(156,.22,'sine',.035,18);setTimeout(()=>beep(624,.11,'triangle',.022),65)},
+  veto:()=>{szum(.12,.02,330);seq([[233,.1,'sawtooth',.026],[196,.18,'sawtooth',.03]],86)},
+  mile:()=>seq([[523,.12,'sine',.032],[659,.12,'triangle',.032],[784,.15,'triangle',.03],[1047,.28,'sine',.035]],82),
+  goal:()=>{SFX.mile();setTimeout(()=>szum(.11,.016,1200),260)},
+  enter:()=>{szum(.08,.014,820);seq([[196,.18,'sine',.032],[294,.18,'triangle',.029]],58)},
+  elect:()=>{szum(.1,.014,580);seq([[392,.16,'triangle',.034],[523,.16,'triangle',.034],[659,.18,'triangle',.034],[784,.35,'sine',.036]],118)},
+  gong:()=>{szum(.12,.016,510);seq([[196,.38,'sine',.043],[294,.34,'sine',.033]],42)},
+  action:(cat,zle)=>{
+    if(zle)return SFX.bad();
+    if(cat==='bru')return SFX.warn();
+    if(cat==='kam')return SFX.media();
+    if(cat==='org')return SFX.transfer();
+    if(cat==='spe')return SFX.coin();
+    SFX.ok();
+  },
 };
+let DZWIEK_GOTOWY=false;
+function initDzwiek(){
+  if(DZWIEK_GOTOWY||typeof document==='undefined')return;DZWIEK_GOTOWY=true;
+  document.addEventListener('click',e=>{
+    const b=e.target&&e.target.closest&&e.target.closest('button,.act,.law,.resort,.agent,.pickcell,.modecard');
+    if(!b||b.disabled||b.getAttribute('aria-disabled')==='true'||b.classList.contains('sndbtn'))return;
+    SFX.ui();
+  },true);
+}
 /* ---- muzyka ----
    Kawałki z serwera, każdy przypisany do jednej chwili w grze. Grają cicho i
    pojedynczo: druga piosenka przerywa pierwszą, zamiast nakładać się na nią.
@@ -4510,7 +4558,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.70';
+let WERSJA='1.1.71';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4521,6 +4569,12 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.71':{data:'7 sierpnia 2026', zmiany:[
+   'PELNE UDWIEKOWIENIE GRY. Klikniecia, wybory, decyzje, tygodnie, pieniadze, transfery, media, modale, cele i nagrania maja teraz wlasne lekkie brzmienia zamiast kilku przypadkowych pikniec.',
+   'SEJM MA WLASNY RYTM: osobno slychac glosowanie, przejscie albo upadek ustawy, pieczec podpisu i weto prezydenta. Dzwieki sa ciche, nie zagluszaja muzyki i podlegaja temu samemu przyciskowi wyciszenia.',
+   'PODGLAD SKUTKOW POZOSTAJE NIEMY. Proba decyzji nie odpala zadnego dzwieku, tak samo jak wczesniej nie otwiera okien ani nie sypie efektami.',
+ ]},
+
  '1.1.70':{data:'7 sierpnia 2026', zmiany:[
    'NOWY WYGLAD CALEJ GRY POZA MENU GLOWNYM. Zasoby sa teraz ciezka belka urzedowa, zakladki tworza boczny grzbiet ksiegi, a karty, ustawy i okna maja jeden jezyk ciemnego archiwum z mosiadznymi detalami.',
    'WYBOR PARTII, MAPA, SEJM I NOC WYBORCZA DOSTALY WLASNA HIERARCHIE. Najwazniejsza tresc bierze miejsce, lista jest narzedziem, a nie sciana takich samych kafli.',
@@ -5102,7 +5156,7 @@ function setup(){
 function start(k){
   newGame(k);
   if(SCENSEL&&SCEN[SCENSEL]){G.scen=SCENSEL;try{SCEN[SCENSEL].apply()}catch(e){}}
-  histPush();SFX.gong();render();
+  histPush();SFX.enter();render();
   if(k==='PPP')graj('petarda');   // hymn Partii Pana Prezesa na powitanie
 }
 function tryLoadFromSetup(){
@@ -5984,6 +6038,7 @@ function mediaKup(typ){
   kieszenSzefa(-t.koszt);
   G.media.push({typ,nazwa:`${t.n.split(' ')[1]||'Wydawnictwo'} ${p.ab}`,szef,
                 bilans:0,staz:0,serca:0,ostatnio:0,numery:0});
+  SFX.coin();
   say(`<b>${t.n}</b> ruszyło. ${szef} wyłożył ${kasaSkrot(t.koszt)}.`,'good');
   close();render();
 }
@@ -5992,7 +6047,7 @@ function mediaNazwij(i){
   /* Własne okno, bo modalName jest od bloków wyborczych i wymaga listy partii —
      podanie mu null wywracało się na pierwszym odwołaniu i nazwy nie dało się
      zmienić w ogóle. */
-  close();
+  SFX.modal();close();
   const v=document.createElement('div');v.className='veil';v.id='veil';
   v.innerHTML=`<div class="mdl"><button class="mdlx" type="button" aria-label="Zamknij">×</button>
     <div class="h"><div class="k">${MEDIA_TYP[m.typ].n}</div><h2>Jak ma się nazywać?</h2></div>
@@ -6030,6 +6085,7 @@ function mediaNumer(i){
   m.numery=(m.numery||0)+1; m.ostatnieWyd=absWeek();
   const szef=p.lead;
   kieszenSzefa(zysk);
+  SFX.media();
   if(serca>=18)p.fame=cl(p.fame+1);
   say(`<b>${m.nazwa}</b> nr ${m.numery}: ${serca} ${pl(serca,'serduszko','serduszka','serduszek')}, `
      +`${zysk>=0?'zysk':'strata'} ${kasaSkrot(Math.abs(zysk))}.`,zysk>=0?'good':'bad');
@@ -6080,6 +6136,7 @@ function mediaOdcinekGraj(i,t){
   m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.ostatnieWyd=absWeek();
   m.numery=(m.numery||0)+1;
   kieszenSzefa(zysk);
+  SFX.media();
   p.fame=cl(p.fame+Math.min(4,widz/9));
   say(`<b>${m.nazwa}:</b> odcinek „${t.n}” obejrzało ${widz} osób. Wpływ ${kasaSkrot(zysk)}.`,'good');
   modal('Telewizja',m.nazwa,
@@ -6113,6 +6170,7 @@ function mediaFilmGraj(i,f){
   m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.ostatnieWyd=absWeek();
   m.numery=(m.numery||0)+1;
   kieszenSzefa(zysk);
+  SFX.media();
   p.fame=cl(p.fame+Math.min(5,widz/11));
   say(`<b>${m.nazwa}:</b> „${f.n}” obejrzało ${widz} osób. Wpływ ${kasaSkrot(zysk)}.`,'good');
   modal('Kino',m.nazwa,
@@ -7252,7 +7310,9 @@ function fire(a,t,r,s,tm){
   G.lastAct=a.id;
   G.catUsed[a.cat]=(G.catUsed[a.cat]||0)+1;
   if(msg)say(`<b>${a.n}.</b> ${msg}`);
-  if(p.fame<f0-4||p.ctr>c0+10){SFX.bad();shake()}else SFX.ok();
+  const decyzjaZla=p.fame<f0-4||p.ctr>c0+10;
+  if(decyzjaZla)shake();
+  SFX.action(a.cat,decyzjaZla);
   {  // skutki na ekran, żeby było widać, co ta decyzja zrobiła
     const df=p.fame-f0, dm=p.mem-m0;
     const dpr=REG.reduce((a2,x)=>a2+Math.max(0,p.pres[x.id]-prs0[x.id]),0);
@@ -7684,7 +7744,7 @@ function liveLap(id){
   const i=LIVE.chmurki.findIndex(c=>c.id===id); if(i<0)return;
   LIVE.chmurki.splice(i,1);
   LIVE.zlapane++;
-  beep(520+Math.min(300,LIVE.zlapane*11),.04,'sine',.03);
+  SFX.select();
   liveRys();
 }
 function liveRys(){
@@ -8795,6 +8855,7 @@ function proposeLaw(id,opcje){
   const w=lawVote(id,opcje);
   close();
   if(!w.ok){
+    SFX.lawFail();
     me().ctr=cl(me().ctr+3);
     G.lawTerm[id]=1;      // przegrane głosowanie to zużyte podejście
     sprawczosc(false,G.me);
@@ -8809,6 +8870,7 @@ function proposeLaw(id,opcje){
       [{l:'Rozumiem',f:()=>{close();render()}}]);
     return;
   }
+  SFX.lawPass();
   sprawczosc(true,G.me);
   if(G.przekupiony&&G.przekupiony.doTerm===G.term)G.przekupiony=null;
   G.lawPend={id,opcje:opcje||null,za:w.za,przeciw:w.przeciw,wstrzym:w.wstrzym,by:w.by,przez:G.me,odTerm:G.term,odWeek:G.week};
@@ -8951,11 +9013,13 @@ function openGlosowanie(law,opcje,pm){
 function rozstrzygnijUstawe(id,opcje,pm,mojGlos,relZmiana){
   const law=lawById(id);
   const w=lawVote(id,opcje,pm,mojGlos);
+  SFX.vote();
   if(relZmiana&&G.rel[G.me]&&G.rel[G.me][pm]!==undefined){
     G.rel[G.me][pm]=cl(G.rel[G.me][pm]+relZmiana,-100,100);
     G.rel[pm][G.me]=cl(G.rel[pm][G.me]+relZmiana,-100,100);
   }
   if(!w.ok){
+    SFX.lawFail();
     G.lawTerm[id]=1;
     sprawczosc(false,pm);
     if(G.przekupiony&&G.przekupiony.doTerm===G.term)G.przekupiony=null;
@@ -8970,6 +9034,7 @@ function rozstrzygnijUstawe(id,opcje,pm,mojGlos,relZmiana){
       [{l:'Rozumiem',f:()=>{close();render()}}]);
     render();return;
   }
+  SFX.lawPass();
   sprawczosc(true,pm);
   if(G.przekupiony&&G.przekupiony.doTerm===G.term)G.przekupiony=null;
   G.lawPend={id,opcje:opcje||null,za:w.za,przeciw:w.przeciw,wstrzym:w.wstrzym,by:w.by,przez:pm,odTerm:G.term,odWeek:G.week};
@@ -9144,8 +9209,9 @@ function signLaw(ok,cicho){
   const pmK=G.lawPend.przez||(G.gov?G.gov.pm:null);
   const glosyPrzed=G.lawPend;
   G.lawPend=null;
-  if(!ok){odrzucenieWeta(id,opcje,pmK,glosyPrzed);return}
+  if(!ok){SFX.veto();odrzucenieWeta(id,opcje,pmK,glosyPrzed);return}
   if(ok){
+    SFX.seal();
     applyLaw(id,opcje);
     if(pmK===G.me)G.bezUstaw=0;      // licznik bezczynności zerujemy przy każdej swojej ustawie
     // kto ustawę przepchnął, ten czerpie z niej najwięcej do końca rozgrywki
@@ -9701,7 +9767,7 @@ function doGoal(id){
   G.goals[id]=1;GOALS[id].run();G.prest+=14;XP(30);applyGoals();
   const p=me(),g=GOALS[id],renamed=p.n!==nameBefore;
   render();
-  SFX.elect();burst(['#d9ab45','#f7e3aa','#c9a227','#8c6d1f'],130,1);
+  SFX.goal();burst(['#d9ab45','#f7e3aa','#c9a227','#8c6d1f'],130,1);
   modal('Cel wypełniony',typeof g.n==='function'?g.n():g.n,
     `<p>${renamed?`Gratulacje, jesteś teraz <b style="color:${p.c}">${p.n}</b>.`:'Gratulacje, cel partyjny wypełniony.'}</p>`,
     [{l:'Wspaniale',s:'',f:close}]);
@@ -10174,6 +10240,7 @@ function modal(k,t,b,o,onX){
      więc okna wyskakiwały same z siebie, a że pamięć podglądu kasuje się co
      tydzień, sypało nimi na starcie każdego tygodnia. */
   if(PROBA)return;
+  SFX.modal();
   close();
   const v=document.createElement('div');v.className='veil';v.id='veil';
   v.innerHTML=`<div class="mdl" role="dialog" aria-modal="true">
