@@ -2539,3 +2539,81 @@ body{font-size:15px}
 .podnag h2{font-size:30px}
 .mgtytul{font-size:clamp(52px,6vw,96px)}   /* sam ekran tytułowy może oddychać */
 .mgpoz{font-size:19px}
+
+/* ═══════════════════════════════════════════════════════════
+   COFNIĘCIE TEGO, CO POPSUŁEM
+   Trzy rzeczy poszły w złą stronę i wracają:
+
+   1. Dwa i trzy pasy w dziale. Mapa okręgów zjeżdżała do połówki, a obok niej
+      stała karta z opisem tej samej wielkości — czyli to, co najważniejsze,
+      robiło się najmniejsze. Dział wraca do jednego pasa, gdzie treść główna
+      ma całą szerokość.
+   2. Rząd przyrostów nad paskiem władzy. Cztery zielone liczby nad sześcioma
+      innymi liczbami to nie pulpit, tylko bałagan.
+   3. Odwrócona hierarchia. Podpis przy kanale był większy od nagłówka karty.
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width:1450px){
+  .widok{display:block}
+  .widok>*{margin-bottom:var(--o4)}
+}
+@media (min-width:2100px){ .widok{display:block} }
+
+/* pasek władzy: jeden rząd, przycisk tury zawsze widoczny i najcięższy */
+.hud,.wrap:has(>.nav)>.hud{padding:8px 18px 8px 10px;flex-wrap:nowrap}
+.hud .rgroup{flex-wrap:nowrap}
+.hudend{flex:none;margin-left:auto;gap:var(--o2)}
+.hud .btn.tura{
+  min-width:170px;background:linear-gradient(180deg,#e8c25f,#a9822c);
+  color:#1a1305;border-color:#f7e3aa;font-weight:700;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 0 26px -8px var(--acc)}
+.hud .btn.tura:not(:disabled):hover{background:linear-gradient(180deg,#f7d97e,#c09733)}
+
+/* HIERARCHIA: nagłówek karty jest największy, treść średnia, podpisy małe */
+.card>.h h3{font-size:19px;letter-spacing:.03em}
+.card>.h .n{font-size:11px;opacity:.8}
+.card .b{font-size:14px}
+.card .b p,.card .b .dim{font-size:13.5px;line-height:1.6}
+.note{font-size:13px;line-height:1.55}
+/* opisy pomocnicze nie mają prawa być większe od treści */
+.okr .regbox p,.okr .regbox .dim,.mix+*,.legend span{font-size:12.5px}
+/* liczby kluczowe zostają duże */
+.card .b b.m,.rs .rv b,.tabliczki b{font-size:inherit}
+
+/* MAPA: okręgi są tu najważniejsze i mają być największe */
+.mapwrap{display:grid;grid-template-columns:minmax(0,1fr) clamp(300px,24vw,400px);
+  gap:var(--o4);align-items:start}
+.mapwrap>.card:first-child{grid-column:1}
+.mapwrap>.card.okr{grid-column:2;position:sticky;top:var(--o3)}
+.hexsvg{width:100%;height:auto;min-height:clamp(380px,46vh,620px)}
+/* pasek soczewek schodzi do rozmiaru filtra, a nie panelu */
+.soczpasek{padding:5px var(--o3);gap:4px}
+.socz{padding:3px 11px;font-size:11.5px}
+.soczpasek .wazneet{font-size:8.5px}
+@media (max-width:1200px){
+  .mapwrap{grid-template-columns:minmax(0,1fr)}
+  .mapwrap>.card.okr{grid-column:1;position:static}
+}
+/* WYBÓR PARTII: wiersze były na 105 pikseli i zajmowały pół ekranu na jedną
+   partię. Schodzą do rozmiaru wiersza listy, a panel wybranej zostaje duży —
+   bo to on jest treścią, a lista tylko wyborem. */
+.pick.v3 .pickcell{min-height:56px;padding:8px var(--o4);gap:2px var(--o3)}
+.pick.v3 .pcimg .crest{width:34px;height:34px}
+.pick.v3 .pickcell{grid-template-columns:38px minmax(0,1fr) auto}
+.pick.v3 .pickcell>span:first-of-type{font-size:10px;letter-spacing:.14em}
+.pick.v3 .pcname{font-size:14px}
+.pick.v3 .picklist{gap:3px}
+.pick.v3 .pcrow{gap:2px}
+.pcseat{font-size:10.5px}
+
+/* Treść gry była zakuta w 1400 pikseli — na monitorze 1920 marnowało się pół
+   metra ekranu, a mapa okręgów, która ma być największa, gniotła się w czterystu.
+   Szerokość idzie teraz za oknem, z sensownym sufitem. */
+.wrap{max-width:min(1800px,96vw)}
+@supports selector(:has(*)){
+  .wrap:has(>.nav){max-width:min(1900px,98vw)}
+}
+/* karta z mapą bierze szeroką kolumnę, panel okręgu wąską — kolejność w treści
+   nie może o tym decydować */
+.mapwrap>.card{grid-column:1}
+.mapwrap>.card.okr{grid-column:2}
+.hexsvg{min-height:clamp(420px,52vh,760px)}

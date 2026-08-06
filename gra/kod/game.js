@@ -352,7 +352,7 @@ const BASE={
    aff:{eli:6,int:9,ser:2}, comp0:[1,6,19],
    blurb:'Najbardziej profesjonalna partia w grze. I wszyscy jej to wypominają.',
    flaw:'Pretensjonalność 74. Memiarze i nowicjusze, czyli 9 mandatów, cię odrzucają.'},
- PLR :{n:'Concordia',ab:'PLR',c:'#a92fd0',founded:'10.10.2025',pull:1.500,
+ PLR :{n:'Concordia',ab:'CC',c:'#a92fd0',founded:'10.10.2025',pull:1.500,
    fame:62,cred:55,uni:58,act:55,ctr:30,pret:34,mem:24,pot:88,diff:3,
    aff:{eli:4,int:7,ser:5}, comp0:[0,5,19],
    blurb:'Dawni „Postępowcy”. Sufit potencjału 88, najwyższy w grze. Nikt go jeszcze nie dotknął.',
@@ -4480,7 +4480,7 @@ function modeScreen(){
   <!-- Układ menu wzięty z proporcji Victorii: kolumna przycisków 310x55 po lewej,
        odstęp 5 w grupie i 25 między grupami, a po prawej panel z opisem tego,
        na co akurat patrzysz. Same kafle zostają — zmienia się tylko to, jak stoją. -->
-  <div class="modes v3">
+  <div class="modes">
     ${karta({i:'tut',akcja:"pickMode('tut')",tag:'dla nowych',n:'Samouczek',
       d:'Prowadzę cię krok po kroku przez pierwszą kadencję Stronnictwem Reisei: obecność w kanałach, kolejność decyzji, transfery, cele partyjne i wybory.',
       stopka:'ok. 10 minut',akcjaN:'Zaczynam →'})}
@@ -4510,7 +4510,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.68';
+let WERSJA='1.1.69';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -5117,18 +5117,9 @@ function game(){
   <div class="hud" style="--partia:${p.c}">
     <div class="id">${crest(G.me,'m')}<div style="min-width:0"><h2>${p.n}</h2>
       <div class="sub">${p.lead} · <span class="rola ${role.toLowerCase()}">${role}</span>${hasPrez()?' · <span class="rola prezydent">PREZYDENT</span>':''}</div></div></div>
-    <div class="hudtabl">
     <!-- Górny poziom paska: co PRZYBĘDZIE w tym tygodniu, na zielono.
          Dolny: stan na teraz. Dokładnie ten układ, co w pasku Victorii —
          najpierw przyrosty, pod nimi zasoby, wszystko w jednym pancerzu. -->
-    ${(()=>{const i=income(),eg=enGain(),z=zarobekLidera(G.me),mom=Math.round(p.mom||0);
-      const wiersz=[[ikona('kapital'),'+'+i.total,'kapitał tygodniowo'],
-                    [ikona('energia'),'+'+eg,'regeneracja energii'],
-                    [mordedolar(14),'+'+kasaSkrot(z),'zarobek przewodniczącego'],
-                    [ikona('sondaz'),(mom>0?'+':'')+mom,'momentum']];
-      return `<div class="hudgora">${wiersz.map(([ic,v,t])=>
-        `<span class="hudpr ${String(v).startsWith('-')?'dol':''}" title="${t}">${ic}<b>${v}</b></span>`
-      ).join('')}</div>`})()}
     <div class="rgroup">
     <div class="rs">${ikona('akcje')}<div class="rv"><b>${G.ap}<span class="of">/${G.apMax}</span></b><span>akcje</span></div></div>
     ${(()=>{const i=income();return `<div class="rs tip">${ikona('kapital')}<div class="rv"><b class="${G.kp<0?'ujem':''}">${Math.round(G.kp)}<span class="plus">+${i.total}</span></b><span>kapitał</span></div>
@@ -5199,7 +5190,6 @@ function game(){
         <div style="color:var(--dim2);font-size:11.5px;margin-top:6px">Milion prywatnego majątku zamienisz
         na ${KAP_ZA_MLN} kapitału <b>Zrzutką z prywatnych kieszeni</b> — ale kto wyłoży, ten odchodzi.</div>
       </div></div>`})()}
-    </div>
     </div>
     ${streakBox()}
     <div class="hudend">
@@ -7298,8 +7288,13 @@ function stolWpis(a,przed){
   const klucz=G.term+'-'+G.week;
   if(!G.stol||G.stolTyg!==klucz){G.stol=[];G.stolTyg=klucz}
   const po=snap(), zm={};
+  /* Wszystko poniżej pół punktu zaokrąglało się do zera i znikało ze stołu —
+     decyzja realnie dawała +0,4 sławy, a gracz widział, że nie dała nic.
+     Drobne przyrosty pokazujemy więc z jednym miejscem po przecinku. */
   ['fame','cred','uni','act','mem'].forEach(k=>{
-    const d=Math.round(po[k]-(przed?przed[k]:po[k])); if(d)zm[k]=d});
+    const d=po[k]-(przed?przed[k]:po[k]);
+    if(Math.abs(d)>=1)zm[k]=Math.round(d);
+    else if(Math.abs(d)>=0.12)zm[k]=Math.round(d*10)/10;});
   G.stol.push({id:a.id,n:a.n,kat:a.cat,ap:a.ap,zm});
 }
 /* Decyzja okienkowa doszła do skutku — dopiero teraz ląduje na stole. */
