@@ -3961,6 +3961,116 @@ function initKeys(){
   });
 }
 
+
+/* Iskra — miniaturowy wykres wklejany wprost w podpowiedź. U nich dymki
+   pokazują historię obok liczby, więc widać nie tylko ile, ale i dokąd to
+   idzie. Rysowany jako SVG w treści, bez żadnej biblioteki. */
+function iskra(dane,kolor,W,H){
+  const d=(dane||[]).filter(x=>isFinite(x));
+  if(d.length<2)return '';
+  W=W||240;H=H||46;
+  const mn=Math.min(...d),mx=Math.max(...d),roz=Math.max(1e-9,mx-mn);
+  const x=i=>(i/(d.length-1)*(W-4)+2).toFixed(1);
+  const y=v=>(H-4-((v-mn)/roz)*(H-10)).toFixed(1);
+  const linia=d.map((v,i)=>`${i?'L':'M'}${x(i)},${y(v)}`).join(' ');
+  const pole=`M${x(0)},${H} L`+d.map((v,i)=>`${x(i)},${y(v)}`).join(' L')+` L${x(d.length-1)},${H} Z`;
+  const k=kolor||'var(--acc)';
+  return `<svg class="iskra" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+    <path d="${pole}" fill="${k}" fill-opacity=".14"/>
+    <path d="${linia}" fill="none" stroke="${k}" stroke-width="1.8"
+      stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${x(d.length-1)}" cy="${y(d[d.length-1])}" r="2.6" fill="${k}"/>
+  </svg>`;
+}
+
+/* ══════════ LISTA WAŻNYCH AKCJI ══════════
+   Wzięte z paska alertów Victorii: rząd znaczników, z których każdy mówi
+   „tu czeka na ciebie decyzja". Wcześniej trzeba było obejść wszystkie działy,
+   żeby sprawdzić, czy gdzieś czegoś nie przegapiłeś — ustawa do podpisu,
+   sytuacja bez rozstrzygnięcia, gotowy cel, wydawnictwo gotowe do wydania.
+   Teraz wszystko woła samo, a kliknięcie prowadzi wprost tam, gdzie trzeba. */
+function waznePozycje(){
+  if(!G||!G.p||!G.p[G.me])return [];
+  const w=[];
+  if(hasPrez()&&lawsToSign().length)
+    w.push({i:'✒',n:'Ustawa czeka na podpis',d:'Prezydent musi ją podpisać albo zawetować.',t:'prezydent',pilne:1});
+  if(isPM()&&lawsPending())
+    w.push({i:'§',n:'Możesz zgłosić ustawę',d:'Żadna nie jest w toku — sejm czeka.',t:'premier'});
+  (G.sits||[]).filter(x=>!x.done).forEach(x=>{
+    const S=SITS[x.id];
+    w.push({i:'!',n:S?S.k:'Sytuacja na serwerze',d:S?S.n:'Coś się dzieje i czeka na rozstrzygnięcie.',t:'sejm',pilne:1});
+  });
+  if(goalReady())
+    w.push({i:'★',n:'Cel partyjny gotowy',d:'Warunki spełnione — możesz go odebrać.',t:'cele',pilne:1});
+  if(leads(G.p[G.me]).some(n=>xpOs(n)>=35))
+    w.push({i:'▲',n:'Doświadczenie do wydania',d:'Przewodniczący może podnieść cechę albo kupić nową.',t:'lider'});
+  if(kingFav(G.me)<0)
+    w.push({i:'♛',n:'Król jest na ciebie zły',d:'Przy ujemnej przychylności desygnacja przejdzie obok ciebie.',t:'krol',pilne:1});
+  if(G.ap>0)
+    w.push({i:'●',n:`${G.ap} ${pl(G.ap,'ruch','ruchy','ruchów')} do wykorzystania`,d:'Niewykorzystane akcje przepadają z końcem tygodnia.',t:'akcje'});
+  if(mediaJest())(G.media||[]).filter(m=>mediaGotowe(m)).forEach(m=>
+    w.push({i:'📰',n:`${m.nazwa} czeka na wydanie`,d:'Wydawnictwo jest gotowe, a nic z niego nie wychodzi.',t:'media'}));
+  const p=me();
+  if(p.ctr>=82)w.push({i:'✖',n:'Kontrowersja pod sufitem',d:`${Math.round(p.ctr)}/100. Przy 90 partia wpada w paraliż.`,t:'mapa',pilne:1});
+  const szef=p.lead, kies=szef?kapPryw(szef):0;
+  if(kies<0)w.push({i:'✖',n:'Przewodniczący pod kreską',d:`Dług rośnie o ${Math.round(DLUG_ODSETKI*100)}% tygodniowo.`,t:'ekonomia',pilne:1});
+  return w;
+}
+function waznePasek(){
+  const w=waznePozycje(); if(!w.length)return '';
+  return `<div class="wazne">
+    <span class="wazneet">Czeka na ciebie</span>
+    <div class="waznelista">${w.map(x=>
+      `<button class="waz ${x.pilne?'pilne':''}" onclick="setTab('${x.t}')" title="${esc(x.d)}">
+        <i>${x.i}</i><span>${esc(x.n)}</span></button>`).join('')}</div>
+  </div>`;
+}
+
+/* ══════════ PANEL MODYFIKATORÓW ══════════
+   U nich to lista wszystkiego, co aktualnie działa na kraj, razem ze źródłem.
+   U nas siedziała kupa liczb, których gracz nie widział na oczy: znużenie
+   władzą, momentum, przewaga po zjeździe, inflacja, zmęczenie decyzją,
+   mnożnik rangi i zasięg mediów. Tu wszystko stoi w jednym miejscu. */
+function modyfikatory(){
+  const p=me(),m=[];
+  const z=znuzenie(G.me);
+  if(z>0.5)m.push({n:'Zmęczenie władzą',v:`−${Math.round(z/1.65)}% poparcia`,zle:1,
+    zr:'Każda kadencja u steru dokłada, kadencja w opozycji zdejmuje.'});
+  if(Math.abs(p.mom||0)>1)m.push({n:'Momentum',v:`${(p.mom||0)>0?'+':''}${Math.round(p.mom||0)}`,zle:(p.mom||0)<0,
+    zr:'Wygrane debaty, udane afery i owacyjne wiece. Wygasa o 17% tygodniowo.'});
+  if(p.rally)m.push({n:'Przewaga po zjeździe',v:`+${p.rally*9}% do wyborów`,
+    zr:'Zjazd partii. Trzyma do końca kadencji.'});
+  if(p.laws)m.push({n:'Dorobek ustawodawczy',v:`+${(p.laws*3)}% do wyniku`,
+    zr:'Ustawy, które przepchnąłeś. Zostają na zawsze.'});
+  const inf=inflacjaProc();
+  if(inf>0)m.push({n:'Inflacja',v:`decyzje +${inf}% drożej`,zle:1,
+    zr:`Kapitał ponad ${INFLACJA_PROG}. Im większy zapas leży w kasie, tym drożej.`});
+  const sf=sizeF(p);
+  if(sf.lab)m.push({n:sf.lab,v:`koszt ×${sf.kp.toFixed(2)}`,zle:sf.kp>1,
+    zr:'Im większa partia, tym drożej się nią rusza.'});
+  const zas=zasiegMediow();
+  if(zas>0)m.push({n:'Zasięg mediów',v:`+${zas.toFixed(1)}% w sondażu`,
+    zr:'Wydawnictwa, z których coś wychodzi. Zasięg wygasa, jeśli nic nie wydajesz.'});
+  const mr=mnoznikRangi(p.lead);
+  if(mr>1)m.push({n:`Ranga: ${(ranga(p.lead)||{}).n||'—'}`,v:`zarobek ×${mr.toFixed(2)}`,
+    zr:'Każdy zdobyty stopień to +18% do tego, co przewodniczący zarabia.'});
+  const uz=Object.keys(G.used||{}).filter(k=>G.used[k]>0);
+  if(uz.length)m.push({n:'Zmęczenie decyzjami',v:`${uz.length} ${pl(uz.length,'powtórzona','powtórzone','powtórzonych')}`,zle:1,
+    zr:'Ta sama zagrywka w kółko działa coraz słabiej. Odpuszczenie ją regeneruje.'});
+  (G.sits||[]).filter(x=>!x.done).forEach(x=>{const S=SITS[x.id];
+    if(S)m.push({n:S.k,v:'trwa',zle:1,zr:S.n})});
+  if(G.absolutorium&&G.absolutorium.term===G.term-1&&!G.absolutorium.udzielone)
+    m.push({n:'Brak absolutorium',v:'z poprzedniej kadencji',zle:1,
+      zr:'PKB spadło, a sejm to zapisał.'});
+  return `<div class="card"><div class="h"><h3>Co na ciebie działa</h3>
+    <span class="n">${m.length} ${pl(m.length,'modyfikator','modyfikatory','modyfikatorów')}</span></div><div class="b">
+    ${m.length?`<div class="modlista">${m.map(x=>`<div class="modw ${x.zle?'zle':'ok'}">
+      <div class="modl"><b>${x.n}</b><span>${x.zr}</span></div>
+      <div class="modv">${x.v}</div></div>`).join('')}</div>`
+     :'<p class="dim" style="margin:0">Nic szczególnego. Czysta kartka.</p>'}
+  </div></div>`;
+}
+
 /* ══════════ SYTUACJE CZASOWE ══════════ */
 const absWeek=()=>((G.term-1)*12+G.week);
 function sitDate(abs){const d=new Date(2026,7,1);d.setDate(d.getDate()+(abs-1)*7);return d}
@@ -4289,7 +4399,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.65';
+let WERSJA='1.1.66';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4941,6 +5051,9 @@ function game(){
     </div>
     <div class="rgroup">
     <div class="rs tip">${ikona('sondaz')}<div class="rv"><b>${fmt(shown(G.me,sh))}%<span class="plus" style="color:var(--info);-webkit-text-fill-color:var(--info)">?</span></b><span>sondaż</span></div>
+      ${(()=>{const h=(G.polls||[]).map(r=>r.s&&r.s[G.me]).filter(x=>isFinite(x));
+        return h.length>1?`<div class="iskrabox">${iskra(h,'var(--acc)')}
+          <span>ostatnie ${h.length} ${pl(h.length,'odczyt','odczyty','odczytów')}</span></div>`:''})()}
       <div class="tipbox" style="width:330px">
         <div style="font-family:var(--m);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px">Co realnie rusza sondażem</div>
         <div class="l"><span><b>Liczba i skład partii</b>, decyduje najmocniej</span></div>
@@ -4961,6 +5074,9 @@ function game(){
     <div class="rs" title="Mandaty zdobyte w ostatnich wyborach. Zmienią się dopiero po następnych."><i class="ic ic-mandat" aria-hidden="true"></i><div class="rv"><b>${p.seats}</b><span>mandaty</span></div></div>
     ${(()=>{const kp=roster(p).reduce((a,n)=>a+kapPryw(n),0), z=G.zarobekOstatnio||0;
       return `<div class="rs tip">${mordedolar(19)}<div class="rv"><b>${kasaSkrot(kp)}</b><span>kapitał prywatny</span></div>
+      ${(()=>{const h=(G.pkbHist||[]).map(x=>x.k).filter(x=>isFinite(x));
+        return h.length>1?`<div class="iskrabox">${iskra(h,'var(--acc)')}
+          <span>majątek zaplecza przez ${h.length} ${pl(h.length,'tydzień','tygodnie','tygodni')}</span></div>`:''})()}
       <div class="tipbox">
         <div style="font-family:var(--m);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px">Kieszenie zaplecza</div>
         ${roster(p).sort((a,b)=>kapPryw(b)-kapPryw(a)).slice(0,5).map(n=>
@@ -5000,6 +5116,7 @@ function game(){
         : '<span class="dim" style="margin-left:auto;font-size:12.5px">Nie ma cię w dogrywce.</span>'}
     </div></div>`:''}
   ${lukKadencji()}
+  ${waznePasek()}
   <div class="nav">
     ${(()=>{const nv=[['mapa','Mapa okręgów'],['akcje','Decyzje'+(G.ap?`<span class="badge">${G.ap}</span>`:'')],
        ['lider','Lider'+(leads(G.p[G.me]).some(n=>xpOs(n)>=35)?'<span class="badge">!</span>':'')],['krol','Król'+(kingFav(G.me)<0?'<span class="badge">!</span>':'')],['partie','Partie'],['sondaz','Sondaż']];
@@ -6156,6 +6273,7 @@ function sidebar(p,q){
       border-left:2px solid var(--acc2);padding:8px 10px;border-radius:0 5px 5px 0;line-height:1.45">
       Partia niemal wyłącznie serwerowicka, jedność leci w dół, kontrowersja w górę.</div>`:''}
   </div></div>
+  ${modyfikatory()}
   <div class="card kond"><div class="h"><h3>Kondycja partii</h3><span class="n">mapa</span></div><div class="b">
     ${radar(p)}
     <div id="paskiCech">
@@ -6329,11 +6447,32 @@ function presArc(cx,cy,r,frac){
   return `M ${(cx+r*Math.cos(a0)).toFixed(2)} ${(cy+r*Math.sin(a0)).toFixed(2)} `
     +`A ${r} ${r} 0 ${frac>.5?1:0} 1 ${(cx+r*Math.cos(a1)).toFixed(2)} ${(cy+r*Math.sin(a1)).toFixed(2)}`;
 }
+/* Soczewki mapy — wzięte z paska widoków Victorii. Kanałów jest dziewięć,
+   a na każdy przypada kilka liczb; do tej pory widać było naraz tylko jedną.
+   Soczewka przełącza to, co maluje heks: kto tu dominuje, gdzie masz obecność,
+   ile jest mandatów i jak duży jest kanał. */
+const SOCZEWKI=[
+ {id:'dom', n:'Dominacja',  d:'Kto ma w kanale największą obecność.'},
+ {id:'ja',  n:'Twoja obecność', d:'Ile masz w każdym kanale, od 0 do 100.'},
+ {id:'mand',n:'Mandaty',    d:'Ile foteli rozdaje się w kanale.'},
+ {id:'ludz',n:'Wielkość',   d:'Ilu ludzi siedzi w kanale.'},
+];
+function setSoczewka(id){G.socz=id;render()}
+const soczewka=()=>G.socz||'dom';
 function mapTab(q,AL){
   const p=me(),r=REG.find(x=>x.id===G.sel);
   const ld=Object.fromEntries(REG.map(x=>[x.id,leader(x.id,q.res)]));
+  const SOC=soczewka();
+  const maxLudz=Math.max(...REG.map(x=>x.pop||1));
+  const maxMand=Math.max(...REG.map(x=>x.seats||1));
   return `
   <div class="mapwrap">
+    <div class="soczpasek">
+      <span class="wazneet">Widok mapy</span>
+      ${SOCZEWKI.map(x=>`<button class="socz ${SOC===x.id?'on':''}"
+        onclick="setSoczewka('${x.id}')" title="${esc(x.d)}">${x.n}</button>`).join('')}
+      <span class="soczopis">${esc((SOCZEWKI.find(x=>x.id===SOC)||SOCZEWKI[0]).d)}</span>
+    </div>
     <div class="card">
       <div class="h"><h3>Okręgi wyborcze</h3><span class="n">${DIST_SEATS} w okręgach + ${TOPUP} z listy</span></div>
       <div class="b" style="padding:8px">
@@ -6356,14 +6495,24 @@ function mapTab(q,AL){
           const glosy=ld[x.id];
           return `<g class="hex" onclick="setSel('${x.id}')">
             <polygon class="hglow" points="${hexPts(x.x,x.y,R0)}" fill="${c}" filter="url(#soft)"/>
-            <polygon class="hf" points="${hexPts(x.x,x.y,R0)}" fill="${c}" fill-opacity="${(.17+dp/155).toFixed(3)}"
+            <polygon class="hf" points="${hexPts(x.x,x.y,R0)}" fill="${
+              SOC==='ja'?p.c:SOC==='mand'?'var(--acc)':SOC==='ludz'?'#5a8bb0':c}" fill-opacity="${
+              (SOC==='ja'?(.10+cl(pr,0,100)/125)
+               :SOC==='mand'?(.10+(x.seats/maxMand)*.62)
+               :SOC==='ludz'?(.10+((x.pop||1)/maxLudz)*.62)
+               :(.17+dp/155)).toFixed(3)}"
               stroke="${on?'var(--acc)':c}" stroke-width="${on?3.6:1.6}" stroke-opacity="${on?1:.72}"/>
             <path d="${darc}" fill="none" stroke="${G.p[dom].c}" stroke-width="${(3+dp/22).toFixed(1)}" stroke-linecap="round" stroke-opacity=".85"/>
             ${dom===G.me?'':`<path d="${arc}" fill="none" stroke="${p.c}" stroke-width="3" stroke-linecap="round" stroke-opacity="${(.35+pr/190).toFixed(2)}"/>`}
             <rect x="${x.x-19}" y="${x.y-72}" width="38" height="38" rx="7" fill="#f4f1ea" fill-opacity=".93"/>
             <image class="hcrest" href="${crestSrc}" x="${x.x-17}" y="${x.y-70}" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>
             <text x="${x.x}" y="${x.y-12}" text-anchor="middle" fill="var(--tx)" font-size="17.5" font-weight="660">${x.n}</text>
-            <text x="${x.x}" y="${x.y+9}" text-anchor="middle" fill="${c}" font-size="13" font-weight="650" letter-spacing=".04em">${G.p[Lk].ab} dominuje</text>
+            <text x="${x.x}" y="${x.y+9}" text-anchor="middle" fill="${
+              SOC==='ja'?p.c:SOC==='mand'?'var(--acc)':SOC==='ludz'?'#8fb8d6':c}" font-size="13" font-weight="650" letter-spacing=".04em">${
+              SOC==='ja'?`twoja obecność ${Math.round(pr)}`
+              :SOC==='mand'?`${x.seats} ${pl(x.seats,'mandat','mandaty','mandatów')}`
+              :SOC==='ludz'?`${x.pop} ${pl(x.pop,'osoba','osoby','osób')}`
+              :`${G.p[Lk].ab} dominuje`}</text>
             ${Array.from({length:x.seats}).map((_,i)=>`<rect x="${x.x-(x.seats*11-3)/2+i*11}" y="${x.y+20}" width="8" height="8" rx="4"
               fill="var(--acc)" fill-opacity=".95" stroke="rgba(0,0,0,.5)" stroke-width=".6"/>`).join('')}
             <text x="${x.x}" y="${x.y+50}" text-anchor="middle" fill="var(--dim)" font-size="12" font-family="ui-monospace,monospace">${G.p[glosy].ab} bierze głosy · ty ${Math.round(pr)}/100</text>
@@ -9493,8 +9642,16 @@ function aiPrzemiana(id,kto,warunek,zmien){
 }
 function goalCard(id){
   const g=GOALS[id],done=goalDone(id),all=goalOk(id);
-  return `<div class="card" style="margin-bottom:14px"><div class="h"><h3>${typeof g.n==='function'?g.n():g.n}</h3>
-    <span class="n">${done?'wypełniony':all?'gotowy':'w trakcie'}</span></div><div class="b">
+  /* Wpis dziennika, a nie sama lista warunków: ile z nich jest odhaczonych
+     i jak daleko do końca widać od razu w nagłówku, tak jak w dzienniku
+     Victorii. Wcześniej trzeba było przelecieć wzrokiem wszystkie ptaszki. */
+  const wym=reqOf(id), zrob=done?wym.length:wym.filter(r=>r.ok()).length;
+  const proc=wym.length?Math.round(zrob/wym.length*100):0;
+  return `<div class="card dziennik ${done?'zrobiony':all?'gotowy':''}" style="margin-bottom:14px">
+    <div class="h"><h3>${typeof g.n==='function'?g.n():g.n}</h3>
+    <span class="n">${done?'wypełniony':all?'gotowy':zrob+' z '+wym.length}</span></div><div class="b">
+    <div class="dzpostep"><div class="trk"><i style="width:${proc}%"></i></div>
+      <b>${done?'✓':proc+'%'}</b></div>
     <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px">
       <img src="${LOGOS[g.logo]||''}" alt="" style="width:92px;height:92px;object-fit:contain;background:#f4f1ea;border-radius:var(--r2);padding:6px;flex:none;border:1px solid rgba(0,0,0,.3)">
       <div style="flex:1;min-width:220px">
@@ -11337,7 +11494,7 @@ function dead(){
   ${ekstopka('koniec tej rozgrywki','<button class="btn" onclick="newRun()">Od nowa</button>')}`)}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{iskra,setSoczewka,SOCZEWKI,waznePozycje,waznePasek,modyfikatory,podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,

@@ -2420,3 +2420,89 @@ button[disabled],.act[disabled],.opt[disabled]{
 /* kronika i dymki */
 .log,.feed,.fx{border-radius:var(--v3-r-mala)}
 .log .l,.feed .l{border-bottom:1px solid rgba(74,59,28,.45)}
+
+/* ═══════════════════════════════════════════════════════════
+   LISTA WAŻNYCH AKCJI I PANEL MODYFIKATORÓW
+   Pasek alertów stoi nad nawigacją i jest jedynym miejscem, w którym gra
+   sama się dopomina. Pilne świecą czerwienią, reszta mosiądzem.
+   ═══════════════════════════════════════════════════════════ */
+.wazne{display:flex;align-items:center;gap:var(--o3);margin:var(--o3) 0 0;
+  padding:8px var(--o4);border-radius:var(--v3-r);border:1px solid #4a3b1c;
+  background:linear-gradient(180deg,rgba(247,227,170,.05),rgba(0,0,0,.28));
+  box-shadow:inset 0 1px 0 rgba(247,227,170,.10)}
+.wazneet{font-family:var(--m);font-size:9px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--dim2);font-weight:700;flex:none}
+.waznelista{display:flex;gap:5px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+.waznelista::-webkit-scrollbar{height:0}
+.waz{display:inline-flex;align-items:center;gap:7px;flex:none;cursor:pointer;
+  padding:5px 12px;border-radius:999px;
+  border:1px solid rgba(107,85,42,.7);
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(0,0,0,.26));
+  color:var(--tx);font-size:12px;
+  transition:border-color .16s,transform .14s var(--krzywa),background .16s}
+.waz i{font-style:normal;font-size:13px;color:var(--acc);line-height:1}
+.waz:hover{transform:translateY(-1px);border-color:var(--acc);
+  background:linear-gradient(180deg,rgba(247,227,170,.12),rgba(0,0,0,.22))}
+.waz.pilne{border-color:rgba(209,85,74,.6);
+  background:linear-gradient(180deg,rgba(209,85,74,.14),rgba(0,0,0,.24))}
+.waz.pilne i{color:#f4a89f}
+.waz.pilne:hover{border-color:var(--neg)}
+
+.modlista{display:flex;flex-direction:column;gap:5px}
+.modw{display:flex;align-items:center;gap:var(--o3);position:relative;
+  padding:8px var(--o3) 8px var(--o4);border-radius:var(--v3-r-mala);
+  border:1px solid rgba(74,59,28,.65);
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(0,0,0,.2))}
+.modw::before{content:'';position:absolute;left:0;top:9px;bottom:9px;width:3px;
+  border-radius:0 3px 3px 0}
+.modw.ok::before{background:var(--pos)} .modw.zle::before{background:var(--neg)}
+.modl{flex:1;min-width:0}
+.modl b{display:block;font-size:13px}
+.modl span{font-size:11px;color:var(--dim2);line-height:1.4}
+.modv{flex:none;font-family:var(--m);font-size:12.5px;font-weight:700;
+  text-align:right;white-space:nowrap}
+.modw.ok .modv{color:var(--pos)} .modw.zle .modv{color:var(--neg)}
+/* pasek soczewek nad mapą */
+.soczpasek{display:flex;align-items:center;gap:6px;margin-bottom:var(--o3);
+  padding:7px var(--o4);border-radius:var(--v3-r);border:1px solid #4a3b1c;
+  background:linear-gradient(180deg,rgba(247,227,170,.05),rgba(0,0,0,.26));
+  flex-wrap:wrap}
+.socz{padding:5px 14px;border-radius:999px;cursor:pointer;font-size:12px;
+  border:1px solid rgba(107,85,42,.6);color:var(--dim);
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,.22));
+  transition:.16s}
+.socz:hover{color:var(--tx);border-color:var(--acc2)}
+.socz.on{color:#f7e3aa;border-color:var(--acc);
+  background:linear-gradient(180deg,rgba(217,171,69,.22),rgba(0,0,0,.18));
+  box-shadow:inset 0 1px 0 rgba(247,227,170,.2),0 0 18px -9px var(--acc)}
+.soczopis{margin-left:auto;font-size:11.5px;color:var(--dim2)}
+@media (max-width:900px){.soczopis{display:none}}
+/* wpis dziennika: pasek postępu w nagłówku i barwa stanu na krawędzi */
+.dziennik>.h::after{background:linear-gradient(90deg,transparent,var(--line2) 20%,var(--line2) 80%,transparent)}
+.dziennik.gotowy>.h::after{background:linear-gradient(90deg,transparent,var(--acc) 10%,#f7e3aa 50%,var(--acc) 90%,transparent)}
+.dziennik.zrobiony>.h::after{background:linear-gradient(90deg,transparent,var(--pos) 10%,#bfe0a8 50%,var(--pos) 90%,transparent)}
+.dzpostep{display:flex;align-items:center;gap:var(--o3);margin:0 0 var(--o4)}
+.dzpostep .trk{flex:1;height:8px}
+.dzpostep .trk i{background:linear-gradient(90deg,var(--acc2),var(--acc));height:100%;display:block}
+.dziennik.zrobiony .dzpostep .trk i{background:linear-gradient(90deg,#4e7a3c,var(--pos))}
+.dzpostep b{font-family:var(--m);font-size:13px;color:var(--acc);flex:none;min-width:42px;text-align:right}
+.dziennik.zrobiony .dzpostep b{color:var(--pos)}
+/* wykres w podpowiedzi */
+.iskrabox{margin-top:9px;padding-top:9px;border-top:1px solid rgba(107,85,42,.5)}
+.iskra{display:block;width:100%;height:46px;
+  background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.1));
+  border-radius:var(--v3-r-mala);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.5)}
+.iskrabox span{display:block;margin-top:5px;font-family:var(--m);font-size:9.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--dim2)}
+
+/* ── outliner: co śledzisz, zawsze pod ręką ── */
+.outliner{margin-top:var(--o3)}
+.outliner .card>.b{padding:var(--o3)}
+.outl{display:flex;align-items:center;gap:var(--o2);padding:6px var(--o2);
+  border-radius:var(--v3-r-mala);font-size:12px;cursor:pointer;
+  border:1px solid transparent;transition:.15s}
+.outl:hover{border-color:rgba(107,85,42,.7);background:rgba(247,227,170,.06)}
+.outl i{font-style:normal;color:var(--acc);flex:none}
+.outl b{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.outl span{flex:none;font-family:var(--m);font-size:11px;color:var(--dim2)}
