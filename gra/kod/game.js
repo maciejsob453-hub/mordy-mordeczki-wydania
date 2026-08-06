@@ -2737,6 +2737,7 @@ function render(){if(PROBA)return;
     oddajOplate();
   if(CRE)return creator();
   if(KRE)return kreatorEkran();
+  if(!G&&MENU)return menuGlowne();
   if(!G)return MODE==='free'?setup():MODE==='scen'?scenScreen():modeScreen();
   if(G.phase==='dead')return dead();
   if(G.phase==='result'&&G.night&&!G.night.done)return nightScreen();
@@ -4139,6 +4140,43 @@ function sitModal(kick,tyt,body,opts){
 
 /* ══════════ TRYBY GRY I SAMOUCZEK ══════════ */
 let MODE=null;
+/* Menu główne stoi PRZED wyborem trybu. Wzorzec kinowy: tło na całą szerokość,
+   a po lewej sam tekst — bez ramek, bez kafli, bez płyt. Reszta gry zostaje
+   w języku Victorii, ale ten jeden ekran ma być pusty i ma robić wrażenie. */
+let MENU=true;
+function menuIdz(gdzie){
+  if(gdzie==='nowa'){MENU=false;render();return}
+  if(gdzie==='wczytaj'){openSave();return}
+  if(gdzie==='kreator'){openKreator();return}
+  if(gdzie==='tworcy'){modal('Mordy Mordeczki','Twórcy',creditsBox(),
+    [{l:'Zamykam',f:()=>{close();render()}}]);return}
+  if(gdzie==='wyjdz'){
+    const a=(window.pywebview&&window.pywebview.api)||null;
+    if(a&&a.zamknij){try{a.zamknij();return}catch(e){}}
+    try{window.close()}catch(e){}
+  }
+}
+function menuGlowne(){
+  const poz=[['nowa','Nowa gra'],['wczytaj','Wczytaj grę'],['kreator','Kreator scenariuszy'],
+             ['tworcy','Twórcy'],['wyjdz','Wyjdź']];
+  app.innerHTML=`
+  <div class="mg">
+    <div class="mgtlo"></div>
+    <div class="mgcien"></div>
+    <div class="mgtresc">
+      <div class="mgznak">Mordy Mordeczki</div>
+      <h1 class="mgtytul">Sejm</h1>
+      <div class="mgkreska"></div>
+      <nav class="mgmenu">
+        ${poz.map(([id,n])=>`<button class="mgpoz" onclick="menuIdz('${id}')">${n}</button>`).join('')}
+      </nav>
+      <div class="mgkreska dol"></div>
+    </div>
+    <div class="mgwersja">wersja ${WERSJA}</div>
+  </div>`;
+  if(patchDoPokazania())setTimeout(pokazPatch,600);
+}
+function backToMenu(){MENU=true;MODE=null;SCENSEL=null;render()}
 function pickMode(m){MODE=m;SFX.click();if(m==='tut'){SCENSEL=null;return startTutorial()}if(m==='free')SCENSEL=null;render()}
 function backToMode(){MODE=null;render()}
 /* Ikony trybów. Jedna definicja, żeby karty miały wspólny język i grubość kreski. */
@@ -4194,6 +4232,7 @@ function modeScreen(){
 
   app.innerHTML=`
   <div class="startekran">
+  <button class="btn g sm" style="margin-bottom:14px" onclick="backToMenu()">← Menu główne</button>
   <div class="sztandar">
     <div class="sztlewa">
       <div class="kick">Mordy Mordeczki · roleplay polityczny</div>
@@ -4263,7 +4302,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.60';
+let WERSJA='1.1.61';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -11253,7 +11292,7 @@ function doLobby(){
      albo plik zapisu — wtedy wczytasz ją później dokładnie w tym miejscu.</p>
      <p class="dim" style="font-size:12.5px">Kadencja ${G.term}, tydzień ${G.week}, ${me().ab}.</p>`,
     [{l:'Tak, wychodzę do menu',s:'Rozgrywka się kończy',f:()=>{
-        close();G=null;MODE=null;SCENSEL=null;CRE=null;render();
+        close();G=null;MODE=null;SCENSEL=null;CRE=null;MENU=true;render();
       }},
      {l:'Zostaję w grze',s:'Nic się nie dzieje',f:close}],close);
 }
@@ -11313,7 +11352,7 @@ function dead(){
   ${ekstopka('koniec tej rozgrywki','<button class="btn" onclick="newRun()">Od nowa</button>')}`)}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,
@@ -11334,7 +11373,7 @@ Object.assign(window,{opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaO
   mediaTab,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,mediaTydzien,mediaBilans,
   zasiegMediow,aiMedia,dlugTydzien,kieszenSzefa,MEDIA_ZASIEG,MEDIA_UTRZYMANIE,absWeek,tally,
   mediaOdcinekGraj,mediaFilmGraj,serduszka,MEDIA_TYP,nagranieMAN,mediaNumer,mediaGotowe,mediaZa,mediaJest,
-  setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
+  setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;MENU=true;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
   get KRE(){return KRE}, SCEN, kreatorDane,
   myGoals,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,

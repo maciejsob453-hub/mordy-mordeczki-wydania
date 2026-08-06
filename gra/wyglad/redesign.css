@@ -1822,3 +1822,292 @@ h1,h2,h3,h4,.card>.h h3,.mdl .h h2{
 ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#8a6f33,#5a4a26);
   border-radius:999px;border:2px solid rgba(0,0,0,.35)}
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#a98a42,#6b552a)}
+
+/* ═══════════════════════════════════════════════════════════
+   PRZEBUDOWA WŁAŚCIWA — SŁOWNIK VICTORII, RYSOWANY OD ZERA
+   Poprzednia warstwa ustawiła wymiary. Ta odtwarza to, z czego ich panele są
+   naprawdę złożone. Nazwy plików z gfx/interface/backgrounds mówią wprost,
+   jakie to warstwy:
+
+     paper_bg, paper_texture        pergamin pod treścią
+     bg_bronze_with_frame           brązowa rama dookoła płyty
+     header_color, header_bg_shading,
+     header_bg_dec, header_borders  nagłówek: barwa, cieniowanie, ornament, obwódki
+     divider_gold, divider_gold_center  kreska ze zdobieniem na środku
+     entry_bg_simple, entry_bg_fancy_dark  własne tła wierszy listy
+     popup_bg_frame                 cięższa rama okna
+
+   Każda z tych warstw jest tu odtworzona gradientami i SVG w treści arkusza.
+   Ani jeden ich plik nie jest użyty — to jest rekonstrukcja, nie kopia.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── pergamin: ziarno pod treścią płyty ── */
+.card,.mdl,.nocplyta,.pickmain,.stol,.nocsz,.wystudio{
+  position:relative;isolation:isolate}
+.card::before,.mdl .bd::before{
+  content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
+  border-radius:inherit;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.62' numOctaves='4'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .45 0 0 0 0 .24 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E")}
+
+/* ── brązowa rama dookoła płyty ── */
+.card,.mdl{
+  border:1px solid #4a3b1c;
+  box-shadow:
+    inset 0 0 0 1px rgba(247,227,170,.10),
+    inset 0 1px 0 rgba(247,227,170,.16),
+    inset 0 -14px 28px -22px #000,
+    0 0 0 1px rgba(0,0,0,.55),
+    0 18px 40px -26px #000}
+/* okucia w rogach płyty — cztery kątowniki, jak na ich ramach */
+.card::after{
+  content:'';position:absolute;inset:5px;pointer-events:none;border-radius:4px;
+  border:1px solid transparent;
+  background:
+    linear-gradient(var(--acc2),var(--acc2)) left top/14px 1px no-repeat,
+    linear-gradient(var(--acc2),var(--acc2)) left top/1px 14px no-repeat,
+    linear-gradient(var(--acc2),var(--acc2)) right top/14px 1px no-repeat,
+    linear-gradient(var(--acc2),var(--acc2)) right top/1px 14px no-repeat,
+    linear-gradient(var(--acc2),var(--acc2)) left bottom/14px 1px no-repeat,
+    linear-gradient(var(--acc2),var(--acc2)) left bottom/1px 14px no-repeat,
+    linear-gradient(var(--acc2),var(--acc2)) right bottom/14px 1px no-repeat,
+    linear-gradient(var(--acc2),var(--acc2)) right bottom/1px 14px no-repeat;
+  opacity:.42;width:auto;height:auto;bottom:5px;right:5px;transition:opacity .2s}
+.card:hover::after{opacity:.85}
+
+/* ── nagłówek warstwowy ── */
+.card>.h{
+  position:relative;overflow:hidden;
+  padding:9px var(--o4);
+  background:
+    linear-gradient(180deg,rgba(247,227,170,.10),rgba(0,0,0,.18) 62%,rgba(0,0,0,.30)),
+    linear-gradient(90deg,color-mix(in srgb,var(--kolor,var(--acc)) 16%,transparent),transparent 62%)}
+/* ornament w tle nagłówka — rytmiczny wzór, wygaszony ku prawej */
+.card>.h::before{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.16;
+  background-image:repeating-linear-gradient(135deg,
+    rgba(247,227,170,.5) 0 1px, transparent 1px 9px);
+  -webkit-mask-image:linear-gradient(90deg,#000,transparent 60%);
+  mask-image:linear-gradient(90deg,#000,transparent 60%)}
+.card>.h h3{position:relative;text-shadow:0 1px 0 rgba(0,0,0,.6)}
+
+/* ── złota kreska ze zdobieniem na środku ── */
+.card>.h::after{
+  height:3px;
+  background:
+    radial-gradient(circle at 50% 50%, #f7e3aa 0 3px, transparent 3.5px),
+    linear-gradient(90deg,transparent,var(--kolor,var(--acc)) 8%,#f7e3aa 50%,var(--kolor,var(--acc)) 92%,transparent)}
+
+/* ── wiersze listy: własne tło, wariant „fancy" dla ważnych ── */
+.lrow,.minrow,.lh,.ekos,.pz,.rcell,.ekocz,.vrow{
+  border:1px solid rgba(74,59,28,.55);
+  background:linear-gradient(180deg,rgba(255,255,255,.030),rgba(0,0,0,.20));
+  box-shadow:inset 0 1px 0 rgba(247,227,170,.06)}
+.lawheld .lh:nth-child(odd),
+.ekolista .ekos:nth-child(odd),
+.przyczyny .pz:nth-child(odd){
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(0,0,0,.16))}
+
+/* ── przyciski: metal z fazą, jak ich guziki ── */
+.btn{
+  border:1px solid #6b552a;
+  background:
+    linear-gradient(180deg,rgba(247,227,170,.22),rgba(0,0,0,.08) 46%,rgba(0,0,0,.30));
+  box-shadow:
+    inset 0 1px 0 rgba(247,227,170,.45),
+    inset 0 -2px 4px rgba(0,0,0,.45),
+    0 2px 5px -2px #000;
+  text-shadow:0 1px 0 rgba(0,0,0,.5)}
+.btn:not(:disabled):hover{
+  background:linear-gradient(180deg,rgba(247,227,170,.34),rgba(0,0,0,.06) 46%,rgba(0,0,0,.26));
+  border-color:var(--acc)}
+.btn:not(:disabled):active{
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.6),inset 0 1px 0 rgba(247,227,170,.15);
+  transform:translateY(1px)}
+.btn.g{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(0,0,0,.30));
+  border-color:#4a3b1c}
+
+/* ── okno: cięższa rama i pergamin w treści ── */
+.mdl{border-width:2px}
+.mdl .h{background:
+  linear-gradient(180deg,rgba(247,227,170,.12),rgba(0,0,0,.22)),
+  linear-gradient(90deg,rgba(217,171,69,.14),transparent 70%)}
+
+/* ═══════════════════════════════════════════════════════════
+   MENU GŁÓWNE — WZORZEC KINOWY
+   Jedyny ekran w grze bez płyt, ram i okuć. Tło idzie na całą szerokość,
+   a treść to sam tekst po lewej: znak, tytuł, cienka złota kreska i pozycje
+   menu jedna pod drugą. Reszta gry zostaje w języku Victorii — ten ekran ma
+   być pusty i ma robić wrażenie.
+
+   Tło bierzemy z gra/obrazki/menu-tlo.jpg, jeśli tam leży. Dopóki go nie ma,
+   rysujemy scenę gradientami: łuna nad horyzontem, ciemne zbocze, mgła.
+   ═══════════════════════════════════════════════════════════ */
+/* Pełne rozlanie na całą szerokość okna. Sam margines ujemny nie wystarczał,
+   bo .wrap ma własne wypełnienie i ograniczoną szerokość — menu ma dotykać
+   krawędzi ekranu, inaczej to nie jest ekran tytułowy tylko kolejna karta. */
+.mg{position:relative;min-height:100vh;overflow:hidden;
+  width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);
+  display:flex;align-items:center}
+/* Obrazek na wierzchu, malowana scena pod nim jako zapas — gdyby pliku
+   zabrakło, ekran tytułowy nadal wygląda jak ekran tytułowy, a nie jak czarne tło. */
+.mgtlo{position:absolute;inset:0;z-index:0;
+  background-image:
+    url("../obrazki/menu-tlo.jpg"),
+    radial-gradient(900px 520px at 68% 22%, rgba(255,214,140,.22), transparent 62%),
+    linear-gradient(180deg,#1b1710 0%,#120f0b 42%,#080706 100%);
+  background-size:cover,auto,auto;
+  background-position:center 28%,center,center;
+  background-repeat:no-repeat}
+/* zaciemnienie od lewej, żeby tekst zawsze był czytelny na dowolnym tle */
+.mgcien{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.94) 0%,rgba(0,0,0,.80) 22%,rgba(0,0,0,.42) 40%,rgba(0,0,0,.08) 58%,transparent 70%),
+    linear-gradient(180deg,rgba(0,0,0,.55),transparent 30%,transparent 66%,rgba(0,0,0,.72))}
+.mgtresc{position:relative;z-index:2;padding:0 clamp(40px,7vw,110px);max-width:640px}
+.mgznak{font-family:var(--m);font-size:11px;letter-spacing:.38em;text-transform:uppercase;
+  color:rgba(217,171,69,.75);margin-bottom:10px}
+.mgtytul{font-family:"EB Garamond","Playfair Display",var(--fd);
+  font-size:clamp(56px,7vw,104px);line-height:.92;margin:0 0 var(--o4);
+  color:#f3ead6;text-shadow:0 6px 34px rgba(0,0,0,.8),0 0 60px rgba(217,171,69,.18)}
+/* cienka kreska nad i pod menu — jedyna ozdoba na tym ekranie */
+.mgkreska{height:1px;width:230px;margin:var(--o4) 0;
+  background:linear-gradient(90deg,var(--acc),rgba(217,171,69,.25) 55%,transparent)}
+.mgkreska.dol{margin-top:var(--o4)}
+.mgmenu{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.mgpoz{
+  background:none;border:none;box-shadow:none;padding:9px 0;
+  font-family:"EB Garamond",var(--fd);font-size:19px;letter-spacing:.16em;
+  text-transform:uppercase;color:rgba(238,242,231,.72);cursor:pointer;
+  position:relative;transition:color .18s,letter-spacing .22s var(--krzywa),padding-left .22s var(--krzywa);
+  min-width:0;min-height:0;text-shadow:0 2px 10px rgba(0,0,0,.9)}
+.mgpoz::before{content:'';position:absolute;left:-18px;top:50%;width:10px;height:1px;
+  background:var(--acc);opacity:0;transform:translateY(-50%) scaleX(0);transform-origin:right;
+  transition:opacity .18s,transform .22s var(--krzywa)}
+.mgpoz:hover,.mgpoz:focus-visible{color:#f7e3aa;letter-spacing:.22em;padding-left:14px;outline:none}
+.mgpoz:hover::before,.mgpoz:focus-visible::before{opacity:1;transform:translateY(-50%) scaleX(1)}
+.mgwersja{position:absolute;left:clamp(40px,7vw,110px);bottom:26px;z-index:2;
+  font-family:var(--m);font-size:10.5px;letter-spacing:.2em;color:rgba(238,242,231,.35)}
+@media (max-width:760px){
+  .mgtresc{padding:0 26px}
+  .mgcien{background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.85))}
+}
+/* 100vw liczy się razem z paskiem przewijania, więc ekran tytułowy wystawał
+   o jego szerokość i robił poziomy pasek. Na tym jednym ekranie nie ma czego
+   przewijać w bok, więc go po prostu przycinamy. */
+body:has(.mg){overflow-x:hidden}
+
+/* ═══════════════════════════════════════════════════════════
+   DOMIESZKA EKRANU TYTUŁOWEGO
+   Ostatnia warstwa: to, co robi wrażenie na menu głównym, wchodzi w mniejszym
+   stężeniu do reszty gry. Szeryfowe nagłówki rozstrzelone wersalikami, cienkie
+   złote kreski jako przerywniki, głębsza czerń pod spodem i to samo zachowanie
+   pod kursorem — litery rozjeżdżają się o włos i zapala się złoto.
+
+   W tle wciąż stoi Victoria: płyty, ramy, kapsuły. Ten ekran dokłada im
+   powietrza, żeby gra nie wyglądała jak sama tabela.
+   ═══════════════════════════════════════════════════════════ */
+
+/* głębsza czerń — jak pod obrazkiem menu */
+:root{--bg:#050706}
+body{background:#050706}
+
+/* nagłówki działów: wersaliki z rozstrzeleniem, jak pozycje menu */
+.dzialnag span,.kick,.card>.h .n,.luke,.ekleg,.nocleg{
+  font-family:var(--m);letter-spacing:.24em;text-transform:uppercase}
+.card>.h h3{
+  font-family:"EB Garamond","Playfair Display",var(--fd);
+  letter-spacing:.045em}
+
+/* cienka złota kreska jako przerywnik — ta sama, co nad i pod menu */
+.dzialnag::after{
+  height:1px;
+  background:linear-gradient(90deg,var(--acc),rgba(217,171,69,.25) 45%,transparent)}
+
+/* zachowanie pod kursorem wzięte z menu: litery się rozsuwają, zapala się złoto */
+.wrap>.nav button,.cats button,.mgpoz{
+  transition:color .18s,letter-spacing .22s var(--krzywa),
+             padding-left .22s var(--krzywa),background .15s}
+.wrap>.nav button:hover,.cats button:hover{letter-spacing:.06em;color:#f7e3aa}
+.wrap>.nav button.on,.cats button.on{color:#f7e3aa}
+
+/* tytuły ekranów pełnoekranowych dostają oddech ekranu tytułowego */
+.nocsz h1,.intro h1,.krehead h1{
+  font-family:"EB Garamond","Playfair Display",var(--fd);
+  text-shadow:0 6px 30px rgba(0,0,0,.75),0 0 50px rgba(217,171,69,.14)}
+
+/* winieta na całej grze, delikatniejsza niż na menu */
+body::before{
+  background:
+    radial-gradient(1400px 620px at 50% -260px, rgba(217,171,69,.11), transparent 68%),
+    radial-gradient(760px 900px at -10% 45%, rgba(84,150,96,.055), transparent 65%),
+    radial-gradient(760px 900px at 110% 55%, rgba(84,150,96,.045), transparent 65%),
+    radial-gradient(130% 100% at 50% 42%, transparent 48%, rgba(0,0,0,.62) 100%)}
+
+/* ═══════════════════════════════════════════════════════════
+   SKALOWANIE POD KAŻDĄ ROZDZIELCZOŚĆ
+   Gra chodzi i na laptopie 1366×768, i na 2560×1440. Zamiast sztywnych
+   pikseli wszystko, co niesie układ, idzie na clamp() — rośnie z oknem,
+   ale ma dno i sufit, więc na małym ekranie nic nie wypada, a na dużym
+   nie robi się z tego plakat.
+   ═══════════════════════════════════════════════════════════ */
+
+/* podstawa typografii płynie z szerokości okna */
+body{font-size:clamp(13.5px,0.95vw,16px)}
+.card>.h h3{font-size:clamp(16px,1.15vw,20px)}
+.mdl .h h2{font-size:clamp(19px,1.5vw,25px)}
+
+/* menu główne: tytuł, pozycje i marginesy skalują się razem */
+.mgtytul{font-size:clamp(44px,6.4vw,110px)}
+.mgpoz{font-size:clamp(15px,1.25vw,21px);padding:clamp(6px,0.75vh,11px) 0}
+.mgkreska{width:clamp(150px,17vw,260px)}
+.mgtresc{max-width:min(640px,52vw)}
+/* na bardzo niskim oknie menu przestaje się rozpychać w pionie */
+@media (max-height:700px){
+  .mgtytul{font-size:clamp(38px,5vw,64px);margin-bottom:var(--o3)}
+  .mgkreska{margin:var(--o3) 0}
+  .mgpoz{padding:5px 0}
+}
+
+/* pasek władzy: kapsuły i przyciski schodzą razem z oknem */
+.hud,.wrap:has(>.nav)>.hud{padding:clamp(3px,.4vh,6px) clamp(8px,1vw,18px)}
+.hud .rgroup .rs .rv b{font-size:clamp(13px,1.05vw,17px)}
+.hud .id .crest{width:clamp(30px,2.4vw,40px);height:clamp(30px,2.4vw,40px)}
+.hud .id h2{font-size:clamp(11.5px,0.95vw,15px)}
+@media (max-width:1280px){
+  .hud .id{max-width:200px}
+  .hud .id .sub{display:none}
+}
+@media (max-width:1000px){ .hudgora{display:none} }   /* przy ciasnocie zostaje sam stan */
+
+/* kolumna menu trybów i panel obok — progi zamiast jednej sztywnej szerokości */
+.startekran .modes.v3{grid-template-columns:clamp(230px,22vw,310px) minmax(0,1fr)}
+.pick.v3{grid-template-columns:minmax(0,1fr) clamp(300px,26vw,420px)}
+@media (max-width:1150px){ .pick.v3{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:1000px){ .startekran .modes.v3{grid-template-columns:minmax(0,1fr)} }
+
+/* siatki kart same dobierają liczbę kolumn */
+.rgrid{grid-template-columns:repeat(auto-fit,minmax(min(210px,100%),1fr))}
+.medsklep{grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr))}
+.startekran .modes:not(.v3){grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr))}
+
+/* nic w grze nie ma prawa wypchnąć strony w bok */
+.wrap{overflow-x:clip}
+img,svg,canvas{max-width:100%}
+
+/* Drobiazgi z przeglądu rozdzielczości: odznaka rangi i nazwa partii w pasku
+   miały za mało miejsca i traciły końcówkę. Nazwa niech się skraca dopiero
+   naprawdę przy ciasnocie, a ranga niech raczej zejdzie z rozmiarem, niż
+   zgubi połowę tytułu. */
+.ranga{font-size:clamp(7.5px,.62vw,9px);letter-spacing:.02em;max-width:none}
+.hud .id{max-width:clamp(180px,20vw,320px)}
+.hud .id h2{font-size:clamp(11px,1vw,15px)}
+/* podpisy na wykresie kondycji nie mają się przycinać do zera */
+.radar text,.kond svg text{font-size:9px}
+/* Przy 1366 panel wybranej partii nie mieścił się obok listy razem z odstępem.
+   Próg podniesiony, więc na laptopowych szerokościach lista i panel układają
+   się jeden pod drugim, zamiast wypychać się poza okno. */
+@media (max-width:1400px){
+  .pick.v3{grid-template-columns:minmax(0,1fr)}
+  .pick.v3 .pickmain{grid-column:1;grid-row:1;position:static}
+  .pick.v3>div:not(.pickmain){grid-row:2}
+}
