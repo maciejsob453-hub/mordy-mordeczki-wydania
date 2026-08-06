@@ -2130,3 +2130,52 @@ body:has(.mg) .wrap{padding:0;max-width:none;overflow:hidden}
 .podnag h2{font-family:"EB Garamond","Playfair Display",var(--fd);
   font-size:clamp(24px,2.4vw,34px);font-weight:600;margin:4px 0 0;
   letter-spacing:.02em}
+
+/* ═══════════════════════════════════════════════════════════
+   UKŁAD ROZGRYWKI: PANELE OBOK SIEBIE, NIE JEDEN STOS
+   Każdy dział był pionowym stosem kart — trzeba było przewijać, żeby
+   zobaczyć drugą połowę tego, co i tak mieści się na ekranie. Victoria
+   układa panele obok siebie i tak samo robimy tutaj: na szerokim oknie
+   treść działu idzie w dwa pasy, a to, co naprawdę potrzebuje szerokości
+   — mapa, sala sejmowa, słupki wyborcze, stół tygodnia — bierze oba.
+
+   Wszystko jest w CSS: żaden ekran nie jest przepisany, więc nie ma jak
+   zepsuć logiki. Przy węższym oknie układ sam wraca do jednego pasa.
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width:1450px){
+  .widok{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:var(--o4);
+    align-items:start;
+    grid-auto-flow:row dense}
+  .widok>*{min-width:0;margin-bottom:0}
+  /* treści, które muszą mieć całą szerokość */
+  .widok>.mapwrap,
+  .widok>.kurier,
+  .widok>.stol,
+  .widok>.layout,
+  .widok>.ekoblok,
+  .widok>H4,.widok>h4,
+  .widok>.note,
+  .widok>.card:has(.seatchart),
+  .widok>.card:has(.hemi),
+  .widok>.card:has(.aktsiatka),
+  .widok>.card:has(.acts),
+  .widok>.card:has(.picklist),
+  .widok>.card:has(.krepartie){grid-column:1/-1}
+}
+/* na bardzo szerokim oknie trzy pasy — inaczej karty robią się plakatami */
+@media (min-width:2100px){
+  .widok{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+/* Karta z tabelą bierze oba pasy — tabela ma swoje kolumny i nie da się jej
+   ścisnąć do połowy bez rozjechania. Gdyby i tak zabrakło miejsca, przewija
+   się w poziomie w środku karty, a nie wypycha całej strony. */
+@media (min-width:1450px){
+  .widok>.card:has(table),
+  .widok>.card:has(.wrow),
+  .widok>.card:has(.histchart){grid-column:1/-1}
+}
+.card table{display:block;overflow-x:auto;max-width:100%;scrollbar-width:thin}
+.card table thead,.card table tbody{display:table;width:100%;table-layout:auto}
