@@ -4263,7 +4263,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.58';
+let WERSJA='1.1.59';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4821,7 +4821,10 @@ function setup(){
     </div>
     <div id="loadErr" style="font-size:12px;color:var(--neg);margin-top:6px"></div>
   </div>
-  <div class="pick">
+  <!-- Układ z ekranu startu Victorii: lista po lewej, panel wybranego po prawej.
+       Ich wiersze mają 560x105, panel boczny 420, odstęp 5 — te proporcje
+       przenosimy tutaj, samą grafikę rysujemy po swojemu. -->
+  <div class="pick v3">
     <div class="pickmain" id="pmain"></div>
     <div>
       <div style="font-family:var(--m);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim2);margin-bottom:10px">${PID.length} ugrupowań · kliknij, żeby obejrzeć</div>

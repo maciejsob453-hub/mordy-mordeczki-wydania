@@ -1676,3 +1676,52 @@ button,.act,.opt,.card,.pill{transition-timing-function:cubic-bezier(.2,.7,.3,1)
   .startekran .modes.v3{grid-template-columns:minmax(0,1fr)}
   .startekran .modes.v3::after{display:none}
 }
+
+/* ═══════════════════════════════════════════════════════════
+   WYBÓR PARTII W UKŁADZIE VICTORII
+   Ich ekran startu: lista po lewej wierszami 560×105, panel wybranego po
+   prawej szerokości 420, odstęp 5. Tu lista jest po lewej, a panel — jako
+   ten, który trzeba widzieć cały czas — trzyma się prawej i nie ucieka
+   przy przewijaniu.
+   ═══════════════════════════════════════════════════════════ */
+.pick.v3{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 420px;
+  gap:var(--o4);
+  align-items:start}
+.pick.v3>div:not(.pickmain){grid-column:1;grid-row:1}
+.pick.v3 .pickmain{grid-column:2;grid-row:1;position:sticky;top:var(--o3)}
+
+/* lista: wiersze zamiast kafli */
+.pick.v3 .picklist{display:flex;flex-direction:column;gap:5px}
+.pick.v3 .pickcell{
+  min-height:105px;
+  display:grid;
+  grid-template-columns:56px minmax(0,1fr) auto;
+  grid-template-rows:auto auto;
+  align-items:center;
+  gap:2px var(--o4);
+  padding:var(--o3) var(--o4);
+  text-align:left;
+  border-radius:var(--r2)}
+.pick.v3 .pickcell:hover{transform:translateX(4px)}
+.pick.v3 .pcimg{grid-row:1/span 2;grid-column:1}
+.pick.v3 .pcimg .crest{width:52px;height:52px}
+.pick.v3 .pickcell>span:first-of-type{
+  grid-column:2;grid-row:1;align-self:end;
+  font-family:var(--m);font-size:11px;letter-spacing:.16em;color:var(--acc)}
+.pick.v3 .pcname{
+  grid-column:2;grid-row:2;align-self:start;
+  font-family:var(--fd);font-size:17px;line-height:1.2;color:var(--tx);
+  white-space:normal;overflow:visible;text-overflow:clip}
+.pick.v3 .pcrow{
+  grid-column:3;grid-row:1/span 2;
+  display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.pick.v3 .pcbar{grid-row:1/span 2;grid-column:1/span 3;
+  position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0}
+
+@media (max-width:1150px){
+  .pick.v3{grid-template-columns:minmax(0,1fr)}
+  .pick.v3 .pickmain{grid-column:1;grid-row:1;position:static}
+  .pick.v3>div:not(.pickmain){grid-row:2}
+}
