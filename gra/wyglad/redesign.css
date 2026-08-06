@@ -2179,3 +2179,140 @@ body:has(.mg) .wrap{padding:0;max-width:none;overflow:hidden}
 }
 .card table{display:block;overflow-x:auto;max-width:100%;scrollbar-width:thin}
 .card table thead,.card table tbody{display:table;width:100%;table-layout:auto}
+/* wiersz scenariusza jest prostszy niż partii — nie ma herbu ani liczb */
+.pick.v3 .scenrow{grid-template-columns:minmax(0,1fr) auto;min-height:64px}
+.pick.v3 .scenrow .pcname{grid-column:1;grid-row:1;align-self:center}
+.pick.v3 .scenrow .pcrow{grid-column:2;grid-row:1;flex-direction:row;align-items:center}
+
+/* ═══════════════════════════════════════════════════════════
+   SZYNA NAWIGACJI I EKRAN DECYZJI
+   Ostatnie dwa miejsca, które jeszcze wyglądały po staremu. Szyna dostaje
+   wygląd paska zakładek: każda pozycja to osadzona płytka z mosiężną krawędzią
+   przy aktywnej, a nie sam napis z kreską. Decyzje układają się w gęstą siatkę
+   kart o równej wysokości, tak jak lista budynków w Victorii.
+   ═══════════════════════════════════════════════════════════ */
+@supports selector(:has(*)){
+  .wrap>.nav{padding-top:var(--o4);gap:3px}
+  .wrap>.nav button{
+    margin-right:var(--o3);padding:9px var(--o4);
+    border:1px solid transparent;border-left:none;
+    border-radius:0 var(--v3-r-mala) var(--v3-r-mala) 0;
+    background:linear-gradient(90deg,rgba(255,255,255,.03),transparent)}
+  .wrap>.nav button:hover{
+    border-color:rgba(107,85,42,.7);
+    background:linear-gradient(90deg,rgba(247,227,170,.07),transparent)}
+  .wrap>.nav button.on{
+    border-color:#6b552a;
+    background:linear-gradient(90deg,rgba(217,171,69,.20),rgba(217,171,69,.03));
+    box-shadow:inset 0 1px 0 rgba(247,227,170,.18),0 0 22px -12px var(--acc)}
+  .wrap>.nav button.on::after{width:3px;box-shadow:0 0 12px -2px var(--acc)}
+}
+
+/* pasek kategorii decyzji: kapsuły zamiast napisów */
+.cats{gap:4px;flex-wrap:wrap}
+.cats button{
+  border:1px solid rgba(107,85,42,.55);
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,.25));
+  padding:6px 14px}
+.cats button.on{
+  border-color:var(--acc);
+  background:linear-gradient(180deg,rgba(217,171,69,.22),rgba(0,0,0,.18));
+  box-shadow:inset 0 1px 0 rgba(247,227,170,.22),0 0 20px -10px var(--acc)}
+
+/* kafle decyzji: równa wysokość i osadzenie jak wiersze listy budynków */
+.acts,.aktsiatka{gap:var(--o2)}
+.act{
+  border:1px solid rgba(74,59,28,.75);
+  border-radius:var(--v3-r-mala);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.035),rgba(0,0,0,.24));
+  box-shadow:inset 0 1px 0 rgba(247,227,170,.07),0 8px 20px -18px #000}
+.act:hover:not([disabled]){
+  border-color:var(--acc2);
+  background:linear-gradient(180deg,rgba(247,227,170,.09),rgba(0,0,0,.20))}
+.act[disabled]{opacity:.42;filter:grayscale(.35)}
+
+/* ═══════════════════════════════════════════════════════════
+   RESZTA INTERFEJSU — TO, CZEGO JESZCZE NIE TKNĄŁEM
+   Formularze, suwaki, mapa okręgów, sala sejmowa, wykresy, pigułki, notki,
+   banery sytuacji, pasek kampanii, okno wydarzenia, samouczek i kreator.
+   Wszystko schodzi na ten sam mosiądz, pergamin i osadzenie, co płyty.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── pola tekstowe i suwaki ── */
+.inp,.ta2,input[type=text],textarea{
+  border:1px solid #4a3b1c;border-radius:var(--v3-r-mala);
+  background:linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.24));
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.55);
+  color:var(--tx);padding:9px 12px;font-family:var(--f)}
+.inp:focus,.ta2:focus,input[type=text]:focus,textarea:focus{
+  outline:none;border-color:var(--acc);
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.55),0 0 0 1px rgba(217,171,69,.35)}
+input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.3));
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,#fbf3dd,var(--acc) 62%,#8a6a1f);
+  border:1px solid #6b552a;box-shadow:0 1px 3px rgba(0,0,0,.6)}
+
+/* ── mapa okręgów ── */
+.mapwrap,.mapa{border-radius:var(--v3-r);border:1px solid #4a3b1c;
+  background:
+    radial-gradient(680px 320px at 50% -60px,rgba(217,171,69,.07),transparent 70%),
+    linear-gradient(180deg,var(--p2),rgba(0,0,0,.4));
+  box-shadow:inset 0 1px 0 rgba(247,227,170,.08),0 16px 38px -28px #000}
+.okr{border-radius:var(--v3-r-mala);border:1px solid rgba(74,59,28,.7);
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,.24))}
+
+/* ── sala sejmowa i słupki ── */
+.seats,.hemi{filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+.stube{border-radius:var(--v3-r-mala) var(--v3-r-mala) 0 0;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 0 0 1px rgba(0,0,0,.4)}
+
+/* ── wykresy ── */
+.histchart,.radar{border-radius:var(--v3-r-mala);
+  background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.12));
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.5)}
+
+/* ── pigułki, notki, znaczniki ── */
+.pill{border:1px solid rgba(107,85,42,.6);border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(0,0,0,.24));
+  box-shadow:inset 0 1px 0 rgba(247,227,170,.10)}
+.note{border-radius:var(--v3-r-mala);border:1px solid rgba(74,59,28,.6);
+  border-left:3px solid var(--acc2);
+  background:linear-gradient(90deg,rgba(217,171,69,.08),rgba(0,0,0,.14) 60%)}
+.badge{border-radius:999px;box-shadow:inset 0 1px 0 rgba(255,255,255,.15)}
+
+/* ── banery: sytuacja, epoka, kampania, samouczek ── */
+.sitban,.eraban,.campbar,.tutbox,.runoff{
+  border-radius:var(--v3-r);border:1px solid #4a3b1c;
+  background:
+    linear-gradient(180deg,rgba(247,227,170,.06),transparent 40%),
+    linear-gradient(180deg,var(--p2),rgba(0,0,0,.38));
+  box-shadow:inset 0 1px 0 rgba(247,227,170,.12),0 14px 32px -26px #000}
+
+/* ── okno wydarzenia i głosowania ── */
+.votebar{border-radius:var(--v3-r-mala);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.65),0 0 0 1px #4a3b1c}
+
+/* ── kreator scenariuszy ── */
+.kreekran .card,.krebox{border-radius:var(--v3-r)}
+.krebox{border:1px solid #4a3b1c;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(0,0,0,.24))}
+.krep{border-radius:var(--v3-r-mala);border:1px solid rgba(74,59,28,.7);
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,.22))}
+.krep.on{border-color:var(--acc);box-shadow:0 0 20px -10px var(--acc)}
+
+/* ── okna: przycisk zamknięcia jak w ich panelach ── */
+.mdlx{border-radius:50%;border:1px solid #6b552a;width:26px;height:26px;
+  background:linear-gradient(180deg,rgba(247,227,170,.14),rgba(0,0,0,.3));
+  box-shadow:inset 0 1px 0 rgba(247,227,170,.2)}
+.mdlx:hover{border-color:var(--acc);background:linear-gradient(180deg,rgba(217,171,69,.3),rgba(0,0,0,.25))}
+/* Nazwy trybów urywały się w połowie, bo znacznik zjadał pół przycisku.
+   Znacznik schodzi pod nazwę, a nazwa dostaje całą szerokość. */
+.startekran .modes.v3 .modecard{
+  flex-direction:column;align-items:flex-start;justify-content:center;
+  gap:2px;padding:var(--o2) var(--o4);min-height:62px}
+.startekran .modes.v3 .modecard h2{white-space:normal;overflow:visible;font-size:18px}
+.startekran .modes.v3 .modecard .mtag{margin-left:0;order:-1;font-size:8.5px;padding:1px 7px}

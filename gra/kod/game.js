@@ -3398,22 +3398,35 @@ const SCEN={
   }},
 };
 function scenScreen(){
+  /* Ten sam układ, co przy wyborze partii: lista po lewej wierszami,
+     panel wybranego po prawej. Jeden wzorzec na oba ekrany startu. */
+  const wybrany=SCEN[SCENSEL]||SCEN[Object.keys(SCEN)[0]];
+  const wybId=SCEN[SCENSEL]?SCENSEL:Object.keys(SCEN)[0];
   app.innerHTML=`
-  <div class="intro" style="padding:52px 0 14px">
-    <div class="kick">Tryb gry · scenariusze</div>
-    <h1>Wybierz świat</h1>
-    <p>Scenariusz zmienia stan serwera w chwili startu: skład partii, mandaty, relacje i zasady.
-       Wszystko inne działa tak samo. Po wybraniu scenariusza wskażesz partię.</p>
+  <div class="podnag">
+    <div class="kick">Nowa gra · scenariusze</div>
+    <h2>Wybierz świat</h2>
   </div>
-  <div class="scengrid">
-    ${Object.keys(SCEN).map(id=>{const x=SCEN[id];
-      return `<button class="scencard ${SCENSEL===id?'on':''}" onclick="pickScen('${id}')">
-        <div class="stag">${x.t}${x.zModa?' · mod':''}</div>
-        <h3>${x.n}</h3>
-        <p>${x.d}</p>
-        <div class="smod">${x.mod}</div>
-        ${x.zModa?`<div class="smod" style="color:var(--acc)">${x.autor?'autor: '+esc(x.autor):'twój scenariusz'}</div>`:''}
-      </button>`}).join('')}
+  <div class="pick v3 scenv3">
+    <div class="pickmain">
+      <div class="pickhd"><h2>${esc(wybrany.n)}</h2>
+        <div class="meta">${esc(wybrany.t)}${wybrany.zModa?' · mod':''}</div></div>
+      <p style="font-size:13.5px;line-height:1.6;color:var(--dim)">${wybrany.d}</p>
+      <div class="note" style="margin:var(--o4) 0">${wybrany.mod}</div>
+      ${wybrany.zModa?`<div class="dim" style="font-size:12px">${wybrany.autor?'autor: '+esc(wybrany.autor):'twój scenariusz'}</div>`:''}
+      <button class="btn" style="width:100%;margin-top:var(--o4)" onclick="pickScen('${wybId}')">
+        Biorę ten świat →</button>
+    </div>
+    <div>
+      <div class="picklist">
+        ${Object.keys(SCEN).map(id=>{const x=SCEN[id];
+          return `<button class="pickcell scenrow ${wybId===id?'on':''}" onclick="podejrzyjScen('${id}')">
+          <i class="pcbar"></i>
+          <span class="pcname">${esc(x.n)}</span>
+          <div class="pcrow"><span class="pcseat">${esc(x.t)}${x.zModa?' · mod':''}</span></div>
+        </button>`}).join('')}
+      </div>
+    </div>
   </div>
   <div class="scennarz">
     <button class="btn g sm" onclick="backToMode()">← Wstecz</button>
@@ -3424,6 +3437,8 @@ function scenScreen(){
       · <button class="conowego" onclick="openMody()">zarządzaj</button></span>`:''}
   </div>`;
 }
+/* Podgląd scenariusza nie zaczyna jeszcze gry — dopiero „Biorę ten świat". */
+function podejrzyjScen(id){SCENSEL=id;SFX.click();render()}
 function pickScen(id){SCENSEL=id;MODE='free';SFX.click();render()}
 
 /* ── scenariusz jako plik ──
@@ -4147,6 +4162,7 @@ let MENU=true;
 function menuIdz(gdzie){
   if(gdzie==='nowa'){MENU=false;render();return}
   if(gdzie==='wczytaj'){openSave();return}
+  if(gdzie==='scenariusze'){MENU=false;MODE='scen';render();return}
   if(gdzie==='kreator'){openKreator();return}
   if(gdzie==='tworcy'){modal('Mordy Mordeczki','Twórcy',creditsBox(),
     [{l:'Zamykam',f:()=>{close();render()}}]);return}
@@ -4157,8 +4173,8 @@ function menuIdz(gdzie){
   }
 }
 function menuGlowne(){
-  const poz=[['nowa','Nowa gra'],['wczytaj','Wczytaj grę'],['kreator','Kreator scenariuszy'],
-             ['tworcy','Twórcy'],['wyjdz','Wyjdź']];
+  const poz=[['nowa','Nowa gra'],['wczytaj','Wczytaj grę'],['scenariusze','Scenariusze'],
+             ['kreator','Kreator scenariuszy'],['tworcy','Twórcy'],['wyjdz','Wyjdź']];
   app.innerHTML=`
   <div class="mg">
     <div class="mgtlo"></div>
@@ -4249,19 +4265,13 @@ function modeScreen(){
       stopka:'ok. 10 minut',akcjaN:'Zaczynam →'})}
     ${karta({i:'free',akcja:"pickMode('free')",tag:'pełna gra',data:'1 sierpnia 2026',kl:'glowna',n:'Dzień dzisiejszy',
       d:'Serwer taki, jaki jest teraz: czternaście partii od największej po jednoosobową, rząd na swoim miejscu i wszystko do wzięcia.',
-      stopka:'wszystkie partie i kreator',akcjaN:'Wybieram partię →'})}
-    ${karta({i:'los',akcja:'slepyLos()',tag:'???',kl:'tajemna',n:'Ślepy los',
-      d:'Nie wybierasz nic. Ani sceny, ani partii. Dowiadujesz się, kim grasz, dopiero kiedy siadasz do stołu.',
-      stopka:'losowa scena i partia',akcjaN:'Rzucam →'})}
-    ${karta({i:'kre',akcja:'openKreator()',tag:'twoje',n:'Kreator scenariuszy',
-      d:'Ustawiasz, jak wygląda serwer w chwili startu: kto ile ma mandatów, jak duże są partie, ile trwa kadencja. Gotowy scenariusz zapiszesz jako plik.',
-      stopka:'pełny edytor',akcjaN:'Buduję →'})}
-    ${karta({i:'plik',akcja:'wczytajScenPlik()',tag:'twoje',n:'Scenariusz z pliku',
-      d:'Ktoś przysłał ci plik <b>.mmscen</b>? Wczytaj go tutaj, a stanie na liście obok wbudowanych i zagrasz nim od razu.',
-      stopka:'plik .mmscen',akcjaN:'Otwieram →'})}
+      stopka:'wszystkie partie i scenariusze',akcjaN:'Wybieram partię →'})}
     ${karta({i:'upad',wyl:1,kl:'wkrotce',tag:'scenariusz',data:'25 kwietnia 2025',n:'Upadek Republikanów',
       d:'Zaczynasz szesnaście miesięcy wcześniej, w tygodniu, w którym niebieski sztandar poszedł w dół, a jego ludzie rozeszli się po całym serwerze.',
       stopka:'w przygotowaniu',akcjaN:'Wkrótce'})}
+    ${karta({i:'los',akcja:'slepyLos()',tag:'???',kl:'tajemna',n:'Losowo',
+      d:'Nie wybierasz nic. Ani sceny, ani partii. Dowiadujesz się, kim grasz, dopiero kiedy siadasz do stołu.',
+      stopka:'losowa scena i partia',akcjaN:'Rzucam →'})}
   </div>
 
   </div>`;
@@ -4279,7 +4289,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.63';
+let WERSJA='1.1.64';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -11327,7 +11337,7 @@ function dead(){
   ${ekstopka('koniec tej rozgrywki','<button class="btn" onclick="newRun()">Od nowa</button>')}`)}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,

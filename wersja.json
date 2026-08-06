@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.63",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/bc7082c68518c6dad0ed3df32b95d5c6745bc60a",
+ "wersja": "1.1.64",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,8 +14,8 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "3ab0107f56713e55f90c83ac7544375428e49dfb19fcfc67ae8e3b9f1cb67f59",
-   "bajtow": 723977
+   "sha": "815ca8226813705f138b569a6e4aad63614e30517dc6d1e512da6b435fa6dfd3",
+   "bajtow": 724325
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -569,8 +569,8 @@
   },
   {
    "sciezka": "gra/wyglad/redesign.css",
-   "sha": "8d38001b6bbccdcab5cdde6be02f0566c40c6efc98ed705f8dfbd15849cfa084",
-   "bajtow": 124762
+   "sha": "5a92d9c6f7c75729ddf12387150adf85f99e2688081ce2705bbd0fac3512632f",
+   "bajtow": 132326
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -595,6 +595,5 @@
   "sha": "57a24009869345debd0b84510d16028cc0eb16ff0cbd35fff64ce882ff11c567",
   "bajtow": 12138309,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.59/Mordy.Mordeczki.Launcher.exe"
- },
- "commit": "bc7082c68518c6dad0ed3df32b95d5c6745bc60a"
+ }
 }
