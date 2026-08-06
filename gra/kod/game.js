@@ -1591,7 +1591,8 @@ function endWeek(){
   histPush();SFX.week();
   G.catUsed={};G.used2={};G.lastCharge=null;podgladCache={};   // ostatnia decyzja przechodzi na kolejny tydzień, żeby kombinacje w ogóle działały
   // nastroje serwera dryfują tydzień po tygodniu, nikt nie wie, dokąd
-  SID.forEach(g=>{G.mood[g]=cl(G.mood[g]+R(-.042,.042)+(1-G.mood[g])*.16,.76,1.26)});
+  /* Nastrój segmentu nie dryfuje już losowo — liczy go grupyTydzien z zadowolenia
+     grupy interesu, więc jest za co odpowiadać zamiast czekać na rzut kostką. */
   if(ch(.13)){const a=pick(SID);let b=pick(SID);while(b===a)b=pick(SID);
     G.mood[a]=cl(G.mood[a]+R(.06,.13),.76,1.28);
     G.mood[b]=cl(G.mood[b]-R(.05,.11),.76,1.28);
@@ -4071,6 +4072,116 @@ function modyfikatory(){
   </div></div>`;
 }
 
+
+/* ══════════ GRUPY INTERESU ══════════
+   Wzięte z panelu grup interesu Victorii. Elita, intelektualiści i serwerowicze
+   byli do tej pory wyłącznie elektoratem — liczyli się przy urnach i nic poza
+   tym. Teraz są siłą polityczną: mają zadowolenie, mają czego chcieć, popierają
+   albo blokują ustawy i mówią to wprost.
+
+   Zadowolenie rusza się od tego, co robisz: podatek progresywny wkurza elitę,
+   równy uderza w serwerowiczów, ustawy o rozrywce cieszą wszystkich, awantura
+   w partii zniechęca intelektualistów. Wchodzi wprost w nastrój segmentu,
+   czyli w to samo miejsce, którym gra liczyła głosy od zawsze. */
+const GRUPY={
+ eli:{n:'Elita',   c:'#e0b23c', chce:'Spokoju, prestiżu i tego, żeby nikt nie ruszał ich pieniędzy.'},
+ int:{n:'Intelektualiści',c:'#5a9be8', chce:'Programów, ustaw i tego, żeby ktoś w ogóle czytał statut.'},
+ ser:{n:'Serwerowicze',c:'#4bbd85', chce:'Rozrywki, luzu i niskich podatków dla zwykłych ludzi.'},
+};
+function grupyInit(){
+  if(!G.grupy)G.grupy={};
+  SID.forEach(g=>{if(G.grupy[g]===undefined)G.grupy[g]=50});
+}
+const zadowolenie=g=>{grupyInit();return G.grupy[g]};
+function zmienZadowolenie(g,d,why){
+  grupyInit();
+  G.grupy[g]=cl(G.grupy[g]+d,0,100);
+  if(why&&Math.abs(d)>=4)
+    say(`<b>${GRUPY[g].n}:</b> ${why} Zadowolenie ${d>0?'+':''}${Math.round(d)} (teraz ${Math.round(G.grupy[g])}).`,
+        d>0?'good':'bad');
+}
+/* Zadowolenie przekłada się na nastrój segmentu, czyli na to, ilu ich przyjdzie
+   zagłosować. Pięćdziesiąt to obojętność, sto to zapał, zero to bojkot. */
+function grupyTydzien(){
+  grupyInit();
+  const p=me(), st=stawkaMajatkowa(), prog=progresjaWlaczona();
+  // podatki
+  if(st>0){
+    if(prog){zmienZadowolenie('eli',-st*.35);zmienZadowolenie('ser',+st*.18)}
+    else {zmienZadowolenie('ser',-st*.30);zmienZadowolenie('eli',+st*.10)}
+  }
+  // awantura zniechęca tych, którzy lubią porządek
+  if(p.ctr>65){zmienZadowolenie('int',-1.1);zmienZadowolenie('eli',-.9)}
+  if(p.ctr<30)zmienZadowolenie('eli',+.4);
+  // aktywność cieszy serwerowiczów, wiarygodność intelektualistów
+  if(p.act>60)zmienZadowolenie('ser',+.6);
+  if(p.cred>60)zmienZadowolenie('int',+.6);
+  // wszystko wraca powoli do obojętności, więc nic nie zostaje na zawsze
+  SID.forEach(g=>{G.grupy[g]=cl(G.grupy[g]+(50-G.grupy[g])*.05,0,100)});
+  // nastrój segmentu jedzie za zadowoleniem
+  SID.forEach(g=>{G.mood[g]=cl(.78+G.grupy[g]/100*.48,.76,1.28)});
+}
+/* Jak grupa patrzy na konkretną ustawę. Zwraca liczbę od −1 do 1. */
+function grupaWobecUstawy(g,id,opcje){
+  const law=lawById(id); if(!law)return 0;
+  let v=0;
+  if(law.kat==='rozrywka')v+= g==='ser'?.7:g==='int'?.2:0;
+  if(law.kat==='ustroj') v+= g==='int'?.5:g==='eli'?.2:-.2;
+  if(id==='podatki'&&opcje){
+    const st=opcje.majatek||0, pr=opcje.progresja>0;
+    if(pr){v+= g==='eli'?-st*.11:g==='ser'?+st*.06:0}
+    else  {v+= g==='ser'?-st*.10:g==='eli'?+st*.04:0}
+  }
+  if(id==='media')v+= g==='int'?.5:g==='ser'?.3:0;
+  if(id==='man') v+= g==='int'?.6:g==='eli'?.3:-.1;
+  // grupa niezadowolona jest generalnie przeciw wszystkiemu, co idzie od rządu
+  v+=(zadowolenie(g)-50)/145;
+  return Math.max(-1,Math.min(1,v));
+}
+function grupyTab(){
+  grupyInit();
+  return `<div class="card"><div class="h"><h3>Grupy interesu</h3>
+    <span class="n">czego chcą i jak im się układa</span></div><div class="b">
+    <div class="grlista">${SID.map(g=>{const z=zadowolenie(g),G_=GRUPY[g];
+      const stan=z>=70?'zadowoleni':z>=55?'spokojni':z>=45?'obojętni':z>=30?'zniechęceni':'wrogo nastawieni';
+      return `<div class="grw" style="--gc:${G_.c}">
+        <div class="grl"><b>${G_.n}</b><span>${G_.chce}</span></div>
+        <div class="grp">
+          <div class="trk"><i style="width:${z}%;background:${G_.c}"></i></div>
+          <div class="grv">${Math.round(z)} · ${stan}</div>
+        </div>
+      </div>`}).join('')}</div>
+    <div class="note" style="margin-top:12px">Zadowolenie przekłada się wprost na to,
+    ilu z nich przyjdzie zagłosować. Podatki, awantury i to, czym się zajmujesz,
+    ruszają nim w obie strony, ale wszystko powoli wraca do obojętności.</div>
+  </div></div>`;
+}
+
+/* ══════════ RADYKAŁOWIE I LOJALIŚCI ══════════
+   U nich ludność dzieli się na radykałów i lojalistów zależnie od tego, jak jej
+   się żyje. U nas tak samo: przy awanturze i rozsypanej partii część składu
+   radykalizuje się i zaczyna szkodzić, przy wiarygodności i zgodzie rośnie
+   twardy trzon, którego nikt ci nie podbierze. */
+function radykalowie(k){
+  const p=G.p[k||G.me]; if(!p)return {rad:0,loj:0};
+  const rad=Math.round(p.mem*cl(p.ctr/100*.55+(60-p.uni)/100*.35,0,.75));
+  const loj=Math.round(p.mem*cl(p.cred/100*.42+p.uni/100*.30-p.ctr/100*.25,0,.7));
+  return {rad:Math.max(0,rad),loj:Math.max(0,loj)};
+}
+function radykalowieTydzien(){
+  const p=me(), r=radykalowie(G.me);
+  if(r.rad>0){
+    // radykałowie sami z siebie podbijają kontrowersję i czasem wychodzą
+    p.ctr=cl(p.ctr+Math.min(3.2,r.rad*.16));
+    if(r.rad>=4&&ch(.18)){
+      const g=giveBackCap(p,1),n=g.eli+g.int+g.ser;
+      if(n)say(`<b>Radykałowie odchodzą.</b> ${r.rad} ${pl(r.rad,'osoba jest','osoby są','osób jest')} `
+        +`nie do utrzymania przy tej kontrowersji — jedna właśnie trzasnęła drzwiami.`,'bad');
+    }
+  }
+  if(r.loj>0)p.uni=cl(p.uni+Math.min(1.6,r.loj*.05));
+}
+
 /* ══════════ SYTUACJE CZASOWE ══════════ */
 const absWeek=()=>((G.term-1)*12+G.week);
 function sitDate(abs){const d=new Date(2026,7,1);d.setDate(d.getDate()+(abs-1)*7);return d}
@@ -4399,7 +4510,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.66';
+let WERSJA='1.1.67';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -5140,7 +5251,7 @@ function game(){
       :G.tab==='cele'?goalTab():G.tab==='lider'?leadTab():G.tab==='krol'?kingTab()
       :G.tab==='premier'?premierTab():G.tab==='prezydent'?prezydentTab()
       :G.tab==='ekonomia'?ekonomiaTab()
-      :G.tab==='media'?mediaTab():sejmTab()+sadTab()}</div>
+      :G.tab==='media'?mediaTab():sejmTab()+grupyTab()+sadTab()}</div>
   </div>`;
   G._we=0;
 }
@@ -5489,6 +5600,8 @@ function pkbTydzien(){
   G.pkbPop=G.pkb||pkbLicz();
   G.pkb=pkbLicz();
   G.pkbTempo=G.pkbPop?(G.pkb-G.pkbPop)/G.pkbPop:0;
+  grupyTydzien();                    // zadowolenie grup interesu i nastroje segmentów
+  radykalowieTydzien();              // radykałowie szkodzą, lojaliści trzymają
   mediaTydzien();                    // wydawnictwa naliczają swoje koszty stałe
   dlugTydzien();                     // kto wszedł pod kreskę, ten zaczyna tonąć
   sprawdzRangi();                    // kto przekroczył próg, ten awansuje i płaci wpisowe
@@ -8616,11 +8729,17 @@ function lawVote(id,opcje,wnioskodawca,mojGlos){
        głosowali za co trzecim projektem i wszystko przechodziło samo — teraz ustawa
        potrzebuje realnego zaplecza w sejmie albo dogadania się z kimś z zewnątrz. */
     const opozycja=!!(G.gov&&!G.gov.parties.includes(k)&&przez!==k);
+    /* Posłowie słuchają swojego zaplecza: partia oparta na elicie zagłosuje
+       inaczej niż ta stojąca na serwerowiczach, bo obie odpowiadają przed kim
+       innym. To jest ten sam podział, który liczy się przy urnach. */
+    const skl=G.p[k].comp, mem=Math.max(1,G.p[k].mem);
+    const glosGrup=SID.reduce((a,g)=>a+(skl[g]/mem)*grupaWobecUstawy(g,id,opcje),0);
     const szansa=cl(BAL.ustawaBaza+rel/165+(wRzadzie?BAL.ustawaKoalicja:0)+(maResort?.12:0)
       -(opozycja?BAL.ustawaOpozycja:0)       // rywalowi nie robi się prezentów
       +(law.kat==='rozrywka'?.18:0)          // przy rozrywce nikt się nie kłóci
       -(law.prog>.6?.18:0)                   // ustrojowych pilnują wszyscy
       -rad*BAL.ustawaOpor*nastrojSejmu()     // im bardziej pod siebie, tym większy opór
+      +glosGrup*.22                          // czego chce zaplecze tej partii
       +(G.p[k].cred>60?-.05:.03),.02,.94);
     if(ch(szansa)){za+=s;by[k]='za'}
     else if(ch(.22)){wstrzym+=s;by[k]='wstrzymał się'}
@@ -11494,7 +11613,7 @@ function dead(){
   ${ekstopka('koniec tej rozgrywki','<button class="btn" onclick="newRun()">Od nowa</button>')}`)}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{iskra,setSoczewka,SOCZEWKI,waznePozycje,waznePasek,modyfikatory,podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{grupyTab,zadowolenie,radykalowie,grupaWobecUstawy,iskra,setSoczewka,SOCZEWKI,waznePozycje,waznePasek,modyfikatory,podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,
