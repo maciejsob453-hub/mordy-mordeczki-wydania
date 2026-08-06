@@ -4157,6 +4157,13 @@ const iko=k=>`<svg class="mico" viewBox="0 0 64 64"><g fill="none" stroke="curre
    Karta bez podpowiedzi: gra sama dobiera scenariusz i partię, a gracz dowiaduje
    się, czym gra, dopiero po starcie. Nie ma tu żadnej nowej mechaniki — to zwykły
    start, tylko wybrany za ciebie. */
+/* Panel obok kolumny menu pokazuje to, na co gracz akurat patrzy. */
+function opisTrybu(el){
+  const box=el&&el.closest('.modes'); if(!box)return;
+  box.setAttribute('data-opis',el.getAttribute('data-opis')||'');
+  box.querySelectorAll('.modecard.patrze').forEach(x=>x.classList.remove('patrze'));
+  el.classList.add('patrze');
+}
 function slepyLos(){
   const scenariusze=Object.keys(SCEN);
   const partie=PID.filter(k=>BASE[k]);
@@ -4173,7 +4180,9 @@ function slepyLos(){
 
 function modeScreen(){
   const karta=(o)=>`
-    <button class="modecard ${o.kl||''}" ${o.wyl?'disabled aria-disabled="true"':`onclick="${o.akcja}"`}>
+    <button class="modecard ${o.kl||''}" ${o.wyl?'disabled aria-disabled="true"':`onclick="${o.akcja}"`}
+      onmouseenter="opisTrybu(this)" onfocus="opisTrybu(this)"
+      data-opis="${esc((o.n||'')+String.fromCharCode(10,10)+String(o.d||'').replace(/<[^>]+>/g,'')+String.fromCharCode(10,10)+(o.stopka||''))}">
       <div class="mramka"></div>
       <div class="mikob">${iko(o.i)}</div>
       ${o.data?`<div class="mdata">${o.data}</div>`:''}
@@ -4209,7 +4218,10 @@ function modeScreen(){
   </div>
 
   <div class="dzialnag"><span>Od czego zaczynasz</span></div>
-  <div class="modes">
+  <!-- Układ menu wzięty z proporcji Victorii: kolumna przycisków 310x55 po lewej,
+       odstęp 5 w grupie i 25 między grupami, a po prawej panel z opisem tego,
+       na co akurat patrzysz. Same kafle zostają — zmienia się tylko to, jak stoją. -->
+  <div class="modes v3">
     ${karta({i:'tut',akcja:"pickMode('tut')",tag:'dla nowych',n:'Samouczek',
       d:'Prowadzę cię krok po kroku przez pierwszą kadencję Stronnictwem Reisei: obecność w kanałach, kolejność decyzji, transfery, cele partyjne i wybory.',
       stopka:'ok. 10 minut',akcjaN:'Zaczynam →'})}
@@ -4237,6 +4249,12 @@ function modeScreen(){
   <div id="loadErr" style="font-size:12px;color:var(--neg);margin-top:6px"></div>
   ${creditsBox()}
   </div>`;
+  /* Panel po prawej startuje od karty głównej. Ustawiamy go po klatce, bo
+     przeglądarka potrafi w międzyczasie sama komuś nadać fokus i podmienić
+     opis na przypadkowy kafel. */
+  setTimeout(()=>{const dom=app.querySelector('.modes.v3 .modecard.glowna')
+    ||app.querySelector('.modes.v3 .modecard');
+    if(dom)opisTrybu(dom)},0);
   // „Co nowego” wyskakuje raz na wersję, przy pierwszym wejściu na ekran startowy
   if(patchDoPokazania())setTimeout(pokazPatch,240);
 }
@@ -4245,7 +4263,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.57';
+let WERSJA='1.1.58';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -11292,7 +11310,7 @@ function dead(){
   ${ekstopka('koniec tej rozgrywki','<button class="btn" onclick="newRun()">Od nowa</button>')}`)}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,
