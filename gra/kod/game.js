@@ -4559,7 +4559,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.73';
+let WERSJA='1.1.74';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4570,6 +4570,13 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.74':{data:'7 sierpnia 2026', zmiany:[
+  'Kondycja partii jest teraz duzym panelem po prawej stronie ekranu, z odczytem cech w dwoch kolumnach zamiast w waskiej liscie.',
+  'Usunieto karte Co na ciebie dziala; Kronika pokazuje tylko najnowsze wpisy bez przycietego przewijania, a Przewodnictwo i Sklad sa krotsze.',
+  'Przyciski akcji dostaly z powrotem czytelne zlote lub zielone tla. Zablokowane przyciski nadal sa zablokowane, ale ich opis jest widoczny.',
+  'Mapa ma stale grubosci lukow oraz przerywana linie i podpis drugiej partii w kazdym okregu.',
+  'Sejm zwija poboczne listy wyborcze do jednej karty, zostawiajac na wierzchu tylko najwazniejsze uklady.',
+ ]},
  '1.1.73':{data:'7 sierpnia 2026', zmiany:[
    'WYBOR TRYBU JEST TERAZ TABLICA CZTERECH KART. Dzien dzisiejszy, samouczek, los i przyszle archiwum maja wlasne pelne pola, a data jest tabliczka sezonu.',
    'GORNY PASEK JEST KROTSZY: nie ma wykresow ostatnich odczytow ani kapitalu prywatnego. Energia znow miesci sie obok akcji, kapitalu, sondazu i mandatow.',
@@ -6434,7 +6441,6 @@ function sidebar(p,q){
       border-left:2px solid var(--acc2);padding:8px 10px;border-radius:0 5px 5px 0;line-height:1.45">
       Partia niemal wyłącznie serwerowicka, jedność leci w dół, kontrowersja w górę.</div>`:''}
   </div></div>
-  ${modyfikatory()}
   <div class="card kond"><div class="h"><h3>Kondycja partii</h3><span class="n">mapa</span></div><div class="b">
     ${radar(p)}
     <div id="paskiCech">
@@ -6628,24 +6634,32 @@ function mapTab(q,AL){
         <rect x="0" y="0" width="800" height="620" fill="url(#grid)" rx="12"/>
         <rect x="0" y="0" width="800" height="620" fill="url(#vig)" rx="12"/>
         ${REG.map(x=>{
-          const Lk=alive().reduce((a,k2)=>G.p[k2].pres[x.id]>G.p[a].pres[x.id]?k2:a,G.me);
+          /* Trzy łuki są zawsze tej samej grubości: zewnętrzny to lider,
+             przerywany pod nim to druga partia, a najbliższy środkowi to ty.
+             Wcześniej szerokość rosła razem z obecnością i mapa wyglądała,
+             jakby część granic przypadkiem była pogrubiona. */
+          const rank=alive().slice().sort((a,b)=>G.p[b].pres[x.id]-G.p[a].pres[x.id]);
+          const Lk=rank[0],drugi=rank[1]||null;
           const c=G.p[Lk].c,pr=p.pres[x.id],on=x.id===G.sel,crestSrc=(G.p[Lk].logo&&LOGOS[G.p[Lk].logo])||LOGOS[Lk]||'';
-          const R0=102, arc=presArc(x.x,x.y,R0+7,cl(pr,0,100)/100);
-          const dom=Lk, dp=G.p[dom].pres[x.id], darc=presArc(x.x,x.y,R0+15,cl(dp,0,100)/100);
+          const R0=102, arc=presArc(x.x,x.y,R0+2,cl(pr,0,100)/100);
+          const dom=Lk, dp=G.p[dom].pres[x.id], darc=presArc(x.x,x.y,R0+16,cl(dp,0,100)/100);
+          const dp2=drugi?G.p[drugi].pres[x.id]:0,darc2=drugi?presArc(x.x,x.y,R0+9,cl(dp2,0,100)/100):'';
           const glosy=ld[x.id];
           return `<g class="hex" onclick="setSel('${x.id}')">
             <polygon class="hglow" points="${hexPts(x.x,x.y,R0)}" fill="${c}" filter="url(#soft)"/>
             <polygon class="hf" points="${hexPts(x.x,x.y,R0)}" fill="${c}" fill-opacity="${(.17+dp/155).toFixed(3)}"
               stroke="${on?'var(--acc)':c}" stroke-width="${on?3.6:1.6}" stroke-opacity="${on?1:.72}"/>
-            <path d="${darc}" fill="none" stroke="${G.p[dom].c}" stroke-width="${(3+dp/22).toFixed(1)}" stroke-linecap="round" stroke-opacity=".85"/>
-            ${dom===G.me?'':`<path d="${arc}" fill="none" stroke="${p.c}" stroke-width="3" stroke-linecap="round" stroke-opacity="${(.35+pr/190).toFixed(2)}"/>`}
+            <path d="${darc}" fill="none" stroke="${G.p[dom].c}" stroke-width="4" stroke-linecap="round" stroke-opacity=".92"/>
+            ${drugi?`<path d="${darc2}" fill="none" stroke="${G.p[drugi].c}" stroke-width="2" stroke-linecap="round" stroke-dasharray="7 6" stroke-opacity=".95"/>`:''}
+            ${dom===G.me?'':`<path d="${arc}" fill="none" stroke="${p.c}" stroke-width="2" stroke-linecap="round" stroke-opacity=".88"/>`}
             <rect x="${x.x-19}" y="${x.y-72}" width="38" height="38" rx="7" fill="#f4f1ea" fill-opacity=".93"/>
             <image class="hcrest" href="${crestSrc}" x="${x.x-17}" y="${x.y-70}" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>
             <text x="${x.x}" y="${x.y-12}" text-anchor="middle" fill="var(--tx)" font-size="17.5" font-weight="660">${x.n}</text>
             <text x="${x.x}" y="${x.y+9}" text-anchor="middle" fill="${c}" font-size="13" font-weight="650" letter-spacing=".04em">${G.p[Lk].ab} dominuje</text>
-            ${Array.from({length:x.seats}).map((_,i)=>`<rect x="${x.x-(x.seats*11-3)/2+i*11}" y="${x.y+20}" width="8" height="8" rx="4"
+            ${drugi?`<text x="${x.x}" y="${x.y+27}" text-anchor="middle" fill="${G.p[drugi].c}" font-size="10.5" font-weight="650" letter-spacing=".05em">2. ${G.p[drugi].ab} · ${Math.round(dp2)}</text>`:''}
+            ${Array.from({length:x.seats}).map((_,i)=>`<rect x="${x.x-(x.seats*11-3)/2+i*11}" y="${x.y+38}" width="8" height="8" rx="4"
               fill="var(--acc)" fill-opacity=".95" stroke="rgba(0,0,0,.5)" stroke-width=".6"/>`).join('')}
-            <text x="${x.x}" y="${x.y+50}" text-anchor="middle" fill="var(--dim)" font-size="12" font-family="ui-monospace,monospace">${G.p[glosy].ab} bierze głosy · ty ${Math.round(pr)}/100</text>
+            <text x="${x.x}" y="${x.y+65}" text-anchor="middle" fill="var(--dim)" font-size="12" font-family="ui-monospace,monospace">${G.p[glosy].ab} bierze głosy · ty ${Math.round(pr)}/100</text>
           </g>`}).join('')}
       </svg></div>
       <div class="legend">${alive().sort((a,b)=>q.res[b].tot-q.res[a].tot).slice(0,7)
@@ -9997,14 +10011,26 @@ function sejmTab(){
           sp.wice.length?`wicemarszałkowie: ${sp.wice.map(k=>G.p[k].lead+' ('+G.p[k].ab+')').join(', ')}`:'brak wicemarszałków',
           '#5a8bb0', isMar()?'mine':''):''}
         ${opoCard()}
-        ${allBlocs().filter(b=>b.parties.some(k=>G.p[k].seats>0)&&!(b===G.opoBloc&&!inGov()&&me().seats)).map(b=>`
+        ${(()=>{
+          /* Sejm nie może być ścianą niemal identycznych kart. Zostają układy,
+             które rządzą, stoją naprzeciw albo dotyczą gracza; reszta jest skrótem. */
+          const aktywne=allBlocs().filter(b=>b.parties.some(k=>G.p[k].seats>0)&&!(b===G.opoBloc&&!inGov()&&me().seats));
+          const pierwsze=aktywne.filter(b=>b===G.bloc||b===G.opoBloc||b.parties.includes(G.me));
+          const reszta=aktywne.filter(b=>!pierwsze.includes(b));
+          const karta=b=>`
           <div class="wcard" style="--wc:${b.color}">
             <div class="wlab">${b===G.bloc?'Blok rządowy':b===G.opoBloc?'Blok opozycyjny':'Lista wyborcza'} · ${b.short}</div>
             <div class="wbody"><div style="flex:1;min-width:0">
               <b>${b.name}</b>
               <span>${b.parties.map(k=>G.p[k].ab).join(' · ')}, ${b.parties.reduce((a,k)=>a+G.p[k].seats,0)} mandatów</span></div>
               ${b.parties.includes(G.me)&&b.parties.length>1?`<button class="btn g sm" onclick="renameBloc('${b===G.opoBloc?'opo':b===G.bloc?'gov':b.short}')">Nazwij</button>`:''}
-            </div></div>`).join('')}
+            </div></div>`;
+          return pierwsze.map(karta).join('')+(reszta.length?`<div class="wcard wcard-zbiorczy">
+            <div class="wlab">Pozostałe listy · ${reszta.length}</div>
+            <div class="wbody"><div><b>${reszta.map(b=>b.short).join(' · ')}</b>
+              <span>${reszta.reduce((s,b)=>s+b.parties.reduce((a,k)=>a+G.p[k].seats,0),0)} mandatów poza głównymi układami</span></div></div>
+          </div>`:'');
+        })()}
       `})()}
     </div>
     <div class="sejmgrid">
@@ -10036,10 +10062,14 @@ function sejmTab(){
     </tbody></table></div></div>`;
 }
 function feed(n){
+  /* Kronika ma dawać ostatni puls kadencji, a nie drugi, ciasny ekran z własnym
+     paskiem przewijania. Pełna historia dalej jest w zakładce Kronika. */
+  const ile=n||5;
   return `<div class="card kronika"><div class="h"><h3>Kronika</h3><span class="n">K${G.term}·T${G.week}</span></div>
-  <div class="b log" style="max-height:${n?520:300}px;padding-top:4px">${G.log.slice(0,n||14).map(l=>
+  <div class="b log">${G.log.slice(0,ile).map(l=>
     `<div class="e ${l.c}" style="font-size:12.5px;padding:8px 0"><span class="w">${l.w}</span>${l.t}</div>`).join('')
-    ||'<span class="dim">Cisza. Zrób coś, a serwer zacznie gadać.</span>'}</div></div>`;
+    ||'<span class="dim">Cisza. Zrób coś, a serwer zacznie gadać.</span>'}
+    ${!n&&G.log.length>ile?`<div class="kronika-stopka">Starsze wpisy są w zakładce Kronika.</div>`:''}</div></div>`;
 }
 
 function leadTab(){

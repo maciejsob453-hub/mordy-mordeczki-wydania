@@ -387,3 +387,68 @@ body:not(:has(.mg)) .sidebar .mods .modw{border-bottom-color:rgba(214,170,88,.12
   body:not(:has(.mg)) .modepick .modehead h2{font-size:29px}
   body:not(:has(.mg)) .hud .datechip{display:none}
 }
+
+/* 1.1.74: prawa kolumna jest pulpitem dowodzenia. Najważniejszy stan partii
+   ma być widoczny od razu, a nie ginąć w lewym, wąskim stosie pomocniczych kart. */
+body:not(:has(.mg)) .layout{grid-template-columns:minmax(0,1fr) 372px;gap:22px}
+body:not(:has(.mg)) .layout>.widok{grid-column:1;grid-row:1}
+body:not(:has(.mg)) .layout>.sidebar{grid-column:2;grid-row:1;min-width:0}
+body:not(:has(.mg)) .sidebar>.kond{order:-100!important;border-color:rgba(143,195,109,.6);box-shadow:inset 0 1px rgba(255,255,255,.06),0 12px 28px rgba(0,0,0,.22)}
+body:not(:has(.mg)) .sidebar .kond>.h{min-height:48px;background:linear-gradient(90deg,rgba(143,195,109,.2),rgba(214,170,88,.05))}
+body:not(:has(.mg)) .sidebar .kond>.h .n{display:none}
+body:not(:has(.mg)) .sidebar .kond>.b{padding:12px}
+/* Radar przestaje być czarnym pudełkiem: jest tylko spokojnym odczytem sześciu cech. */
+body:not(:has(.mg)) .sidebar .kond .radar{width:100%;max-width:292px;margin:0 auto 10px;padding:0;border:0;background:transparent;filter:drop-shadow(0 5px 11px rgba(0,0,0,.2))}
+body:not(:has(.mg)) .sidebar .kond #paskiCech{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+body:not(:has(.mg)) .sidebar .kond .st{min-width:0;margin:0;padding:7px 8px;border-color:rgba(214,170,88,.15);background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(0,0,0,.13))}
+body:not(:has(.mg)) .sidebar .kond .st .l{gap:3px;font-size:11px}
+body:not(:has(.mg)) .sidebar .kond .st .l b{font-size:15px}
+body:not(:has(.mg)) .sidebar .kond .ctrwarn{grid-column:1/-1}
+body:not(:has(.mg)) .sidebar .kond>.b>.st{margin-top:7px}
+
+/* Kronika nie ma własnego, przyciętego scrolka. Pięć wpisów wystarcza w pulpicie. */
+body:not(:has(.mg)) .sidebar .kronika .log{max-height:none!important;overflow:visible!important;padding:0!important}
+body:not(:has(.mg)) .sidebar .kronika .e{padding:8px 0!important;font-size:12px!important;line-height:1.42}
+body:not(:has(.mg)) .kronika-stopka{margin-top:7px;padding-top:7px;border-top:1px solid rgba(214,170,88,.16);color:#a99d83;font-family:var(--m);font-size:9px;letter-spacing:.06em}
+
+/* Przewodnictwo i skład są krótszymi kartami informacji, nie kolumną drobnego druku. */
+body:not(:has(.mg)) .sidebar .lead>.b,body:not(:has(.mg)) .sidebar .skl>.b{padding:12px}
+body:not(:has(.mg)) .sidebar .leadbox{padding:10px;margin-bottom:9px;background:linear-gradient(145deg,rgba(214,170,88,.08),rgba(0,0,0,.13))}
+body:not(:has(.mg)) .sidebar .lstat{gap:5px;margin-top:9px}
+body:not(:has(.mg)) .sidebar .lstat div{padding:7px 2px 6px;background:rgba(0,0,0,.12)}
+body:not(:has(.mg)) .sidebar .lstat b{font-size:16px}
+body:not(:has(.mg)) .sidebar .hint{margin-top:9px;padding:8px 9px;border-left:2px solid rgba(214,170,88,.7);background:rgba(0,0,0,.16);font-size:11.5px;line-height:1.4}
+body:not(:has(.mg)) .sidebar .skl .b{font-size:12px;line-height:1.35}
+
+/* Wcześniej ogólny styl przycisków kasował wypełnienie i robił czarne plamy.
+   Każda akcja ma teraz jasną hierarchię; niedostępna akcja nadal jest czytelna. */
+body:not(:has(.mg)) .btn:not(.g):not(.red):not(:disabled),
+body:not(:has(.mg)) button.opt:not(:disabled){
+  background:linear-gradient(180deg,#f4d477,#ba822b)!important;color:#211806!important;
+  -webkit-text-fill-color:#211806!important;border-color:#ffe19a!important;
+  text-shadow:none!important;box-shadow:inset 0 1px rgba(255,255,255,.68),0 2px 7px rgba(0,0,0,.28)!important;
+}
+body:not(:has(.mg)) .btn.g:not(:disabled){
+  background:linear-gradient(180deg,#315140,#142b21)!important;color:#f1e6c8!important;
+  -webkit-text-fill-color:#f1e6c8!important;border-color:#6d9a75!important;text-shadow:0 1px #07120c!important;
+}
+body:not(:has(.mg)) .btn.red:not(:disabled){-webkit-text-fill-color:#ffe2dc!important}
+body:not(:has(.mg)) .btn:disabled,body:not(:has(.mg)) button.opt:disabled{
+  opacity:1!important;background:linear-gradient(180deg,#28231d,#151311)!important;color:#9b907e!important;
+  -webkit-text-fill-color:#9b907e!important;border-color:#594a36!important;text-shadow:none!important;box-shadow:inset 0 1px rgba(255,255,255,.04)!important;
+}
+body:not(:has(.mg)) .btn:disabled *,body:not(:has(.mg)) button.opt:disabled *{color:inherit!important;-webkit-text-fill-color:currentColor!important}
+
+/* Jedna karta zbiorcza mówi, że pozostałe listy istnieją, bez robienia śmietnika w Sejmie. */
+body:not(:has(.mg)) .wcard-zbiorczy{--wc:#75695b;grid-column:span 2;background:linear-gradient(135deg,rgba(38,36,35,.92),rgba(23,21,21,.98))}
+body:not(:has(.mg)) .wcard-zbiorczy .wbody b{font-size:13px;letter-spacing:.03em}
+
+@media (max-width:1080px){
+  body:not(:has(.mg)) .layout{grid-template-columns:1fr}
+  body:not(:has(.mg)) .layout>.widok,body:not(:has(.mg)) .layout>.sidebar{grid-column:auto;grid-row:auto}
+  body:not(:has(.mg)) .sidebar .kond #paskiCech{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:620px){
+  body:not(:has(.mg)) .sidebar .kond #paskiCech{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body:not(:has(.mg)) .wcard-zbiorczy{grid-column:auto}
+}
