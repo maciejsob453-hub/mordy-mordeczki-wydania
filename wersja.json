@@ -1,11 +1,11 @@
 {
- "wersja": "1.1.69",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/7e0ef4b058b543f27fb9b2344c2cdae6d69dd629",
+ "wersja": "1.1.70",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "2ea59fc7de929e931dc273225342b04186b767d3a53a5d7b61e12902f84aeed9",
-   "bajtow": 541
+   "sha": "c5bc331b23160acd20fff52468c1eff1cdd7b5292661f7c296779e3890e3326a",
+   "bajtow": 591
   },
   {
    "sciezka": "gra/kod/desktop.js",
@@ -14,8 +14,8 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "dc866b51b609957ac05c234647e33a4762674ae566528f450ea67b025d72857c",
-   "bajtow": 739864
+   "sha": "4089ac90e974eb9c2854ce61930fcbd07c18d25fb6f2524a2eb3da2a2664d951",
+   "bajtow": 740443
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -563,6 +563,11 @@
    "bajtow": 34587
   },
   {
+   "sciezka": "gra/obrazki/sejm-atlas-tlo-v4.png",
+   "sha": "5a83d903f82e6c7306a72d2a89e2ef0eb3bd37b4fcf0521191ce192083a01792",
+   "bajtow": 2182786
+  },
+  {
    "sciezka": "gra/wyglad/desktop.css",
    "sha": "632b7a7e6d20a052090827742ed5454257faf635ccdc79d1efac52583ee51d9b",
    "bajtow": 10678
@@ -571,6 +576,11 @@
    "sciezka": "gra/wyglad/redesign.css",
    "sha": "73f4e6a33a8cab638a506faa1205c040d271d3e278dec19e73d2bec0c3777d0c",
    "bajtow": 149650
+  },
+  {
+   "sciezka": "gra/wyglad/sejm-v4.css",
+   "sha": "eb03681926410ac3159a25d568e1fdf257868e73d6832f16a885d797f9bcb1ac",
+   "bajtow": 12971
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -595,6 +605,5 @@
   "sha": "57a24009869345debd0b84510d16028cc0eb16ff0cbd35fff64ce882ff11c567",
   "bajtow": 12138309,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.59/Mordy.Mordeczki.Launcher.exe"
- },
- "commit": "7e0ef4b058b543f27fb9b2344c2cdae6d69dd629"
+ }
 }

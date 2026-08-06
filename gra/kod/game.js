@@ -4510,7 +4510,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.69';
+let WERSJA='1.1.70';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4521,6 +4521,12 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.70':{data:'7 sierpnia 2026', zmiany:[
+   'NOWY WYGLAD CALEJ GRY POZA MENU GLOWNYM. Zasoby sa teraz ciezka belka urzedowa, zakladki tworza boczny grzbiet ksiegi, a karty, ustawy i okna maja jeden jezyk ciemnego archiwum z mosiadznymi detalami.',
+   'WYBOR PARTII, MAPA, SEJM I NOC WYBORCZA DOSTALY WLASNA HIERARCHIE. Najwazniejsza tresc bierze miejsce, lista jest narzedziem, a nie sciana takich samych kafli.',
+   'NOWA AUTORSKA FAKTURA TLA. Ciemny atlas z delikatna siatka i ornamentem stoi tylko za gra, wiec filmowe menu glowne zostaje dokladnie takie jak bylo.',
+ ]},
+
  '1.1.56':{data:'6 sierpnia 2026', zmiany:[
    'PORZUCONA DECYZJA NIE ZOSTAJE NA STOLE TYGODNIA. Wpis szedl na stol w chwili odpalenia decyzji, takze tej z wlasnym oknem — a ta w tym momencie jeszcze niczego nie zrobila. Zamkniecie okna bez wyboru zostawialo kafel bez skutkow, czasem z liczbami z powietrza. Teraz decyzja okienkowa czeka i wchodzi na stol dopiero po kliknieciu tego ostatniego punktu, a rezygnacja zdejmuje ja calkiem.',
    'JEDNOSC NADAJA JUZ TYLKO TRZY DECYZJE: Spot wyborczy, Czystka w partii i Zjazd partii. Reszta gry przestala ja dosypywac po cichu.',

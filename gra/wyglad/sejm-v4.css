@@ -1,0 +1,215 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   SEJM V4 — „Archiwum władzy”
+
+   Menu główne ma własną, filmową scenę i celowo nie dotykamy go ani pikselem.
+   Sama gra dostaje natomiast jeden czytelny świat: ciemne archiwum, mosiężne
+   regały, karty jak oficjalne teczki. Ważne jest zawsze na jasnym papierze,
+   akcja jest zawsze zielono-złota, zagrożenie zawsze czerwone.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+body:not(:has(.mg)){
+  --v4-bg:#09100e;
+  --v4-paper:#15211d;
+  --v4-paper-2:#1a2a25;
+  --v4-ink:#edf0df;
+  --v4-muted:#9aab9d;
+  --v4-brass:#d6aa58;
+  --v4-brass-dim:#806331;
+  --v4-line:rgba(214,170,88,.27);
+  --v4-green:#8fc36d;
+  --v4-red:#dc756c;
+  background:#09100e url("../obrazki/sejm-atlas-tlo-v4.png") center top / cover fixed;
+  color:var(--v4-ink);
+}
+body:not(:has(.mg))::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(2,7,5,.9),transparent 23%,transparent 77%,rgba(2,7,5,.9)),
+             linear-gradient(180deg,rgba(3,9,7,.55),rgba(3,9,7,.25) 36%,rgba(3,9,7,.76));
+}
+body:not(:has(.mg)) .wrap{
+  max-width:1840px;padding:18px 28px 54px 176px;
+}
+
+/* Pasek władzy: nie kolejny panel, tylko ciężka belka urzędowa. */
+body:not(:has(.mg)) .hud,
+body:not(:has(.mg)) .wrap:has(>.nav)>.hud{
+  min-height:72px;padding:9px 12px 9px 9px;gap:14px;
+  border:1px solid var(--v4-line);border-radius:3px;
+  background:linear-gradient(100deg,rgba(23,38,32,.98),rgba(12,23,19,.97));
+  box-shadow:inset 0 1px rgba(255,255,255,.06),0 12px 32px rgba(0,0,0,.25);
+  position:sticky;top:12px;z-index:50;
+}
+body:not(:has(.mg)) .hud::before{
+  content:"";align-self:stretch;width:3px;flex:none;background:var(--acc,var(--v4-brass));
+  box-shadow:0 0 14px color-mix(in srgb,var(--acc,var(--v4-brass)) 60%,transparent);
+}
+body:not(:has(.mg)) .hud .id{padding-left:2px}
+body:not(:has(.mg)) .hud .id h2{font-family:var(--fd);font-size:18px;letter-spacing:.025em}
+body:not(:has(.mg)) .hud .id .sub,
+body:not(:has(.mg)) .hud .rs .rn{font-family:var(--m);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--v4-muted)}
+body:not(:has(.mg)) .hud .rs{border-left:1px solid rgba(214,170,88,.15);padding-left:12px}
+body:not(:has(.mg)) .hud .rs .rv b{font-size:17px;color:var(--v4-ink)}
+body:not(:has(.mg)) .hud .btn.tura{
+  min-width:184px;min-height:47px;border-radius:2px;border:1px solid #f0d58b;
+  background:linear-gradient(180deg,#e6c26b,#b7802e);color:#1c170a;
+  box-shadow:inset 0 1px rgba(255,255,255,.65),0 0 0 3px rgba(214,170,88,.12);
+  font-family:var(--m);font-size:11px;letter-spacing:.11em;text-transform:uppercase;
+}
+
+/* Nawigacja jest stałym grzbietem tomu, nie pasem odrywającym treść. */
+body:not(:has(.mg)) .wrap>.nav{
+  position:fixed;left:0;top:0;bottom:0;width:148px;margin:0;padding:102px 10px 18px;
+  display:flex;flex-direction:column;gap:3px;overflow:auto;z-index:42;
+  border:0;border-right:1px solid var(--v4-line);border-radius:0;
+  background:linear-gradient(180deg,rgba(11,23,19,.97),rgba(8,16,13,.98));
+  box-shadow:12px 0 28px rgba(0,0,0,.18);
+}
+body:not(:has(.mg)) .wrap>.nav::before{
+  content:"SEJM";position:absolute;top:26px;left:17px;color:var(--v4-brass);
+  font-family:var(--fd);font-size:25px;letter-spacing:.15em;
+}
+body:not(:has(.mg)) .wrap>.nav::after{
+  content:"KSIĘGA SPRAW";position:absolute;top:59px;left:18px;color:var(--v4-muted);
+  font-family:var(--m);font-size:8px;letter-spacing:.16em;
+}
+body:not(:has(.mg)) .wrap>.nav button{
+  min-height:38px;padding:7px 8px 7px 12px;border:1px solid transparent;border-radius:2px;
+  color:#b5c0b1;font-family:var(--m);font-size:10px;letter-spacing:.075em;text-align:left;text-transform:uppercase;
+}
+body:not(:has(.mg)) .wrap>.nav button:hover{padding-left:15px;background:rgba(214,170,88,.07);color:#fff}
+body:not(:has(.mg)) .wrap>.nav button.on{
+  color:#f8e3ac;background:linear-gradient(90deg,rgba(214,170,88,.19),rgba(214,170,88,.035));
+  border-color:rgba(214,170,88,.28);
+}
+body:not(:has(.mg)) .wrap>.nav button.on::after{left:0;top:7px;bottom:7px;width:3px;height:auto;background:var(--v4-brass);box-shadow:0 0 12px rgba(214,170,88,.7)}
+
+/* Jedna hierarchia: tytuł widoku, potem karty o tej samej wadze. */
+body:not(:has(.mg)) .widok{margin-top:18px}
+body:not(:has(.mg)) .dzialnag,
+body:not(:has(.mg)) .podnag{
+  margin:0 0 16px;padding:13px 0 15px;border-bottom:1px solid var(--v4-line);
+  background:linear-gradient(90deg,rgba(20,36,30,.76),transparent 74%);
+}
+body:not(:has(.mg)) .dzialnag h2,
+body:not(:has(.mg)) .podnag h2{font-family:var(--fd);font-size:30px;letter-spacing:.015em;color:#f2edda}
+body:not(:has(.mg)) .dzialnag span,
+body:not(:has(.mg)) .kick{font-family:var(--m);font-size:10px;letter-spacing:.16em;color:var(--v4-brass);text-transform:uppercase}
+body:not(:has(.mg)) .card,
+body:not(:has(.mg)) .pickmain,
+body:not(:has(.mg)) .stol,
+body:not(:has(.mg)) .nocsz,
+body:not(:has(.mg)) .nocplyta{
+  border:1px solid var(--v4-line);border-radius:3px;
+  background:linear-gradient(145deg,rgba(27,43,36,.96),rgba(16,29,24,.98));
+  box-shadow:inset 0 1px rgba(255,255,255,.045),0 10px 25px rgba(0,0,0,.2);
+}
+body:not(:has(.mg)) .card::before{width:auto;height:2px;top:0;left:16px;right:16px;border:0;border-radius:0;background:linear-gradient(90deg,transparent,var(--v4-brass),transparent);opacity:.7}
+body:not(:has(.mg)) .card::after{display:none}
+body:not(:has(.mg)) .card>.h{min-height:50px;padding:12px 18px 10px;border-bottom:1px solid rgba(214,170,88,.15);background:rgba(3,12,9,.18)}
+body:not(:has(.mg)) .card>.h h3{font-family:var(--fd);font-size:20px;letter-spacing:.02em;text-transform:none;color:#f3eedc}
+body:not(:has(.mg)) .card>.h .n{font-family:var(--m);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--v4-muted)}
+body:not(:has(.mg)) .card>.b{padding:17px 18px 19px}
+body:not(:has(.mg)) .card:hover{transform:none;border-color:rgba(214,170,88,.46);box-shadow:inset 0 1px rgba(255,255,255,.06),0 12px 28px rgba(0,0,0,.27)}
+
+/* Decyzje, ustawy i resorty wyglądają jak konkretne sprawy do załatwienia. */
+body:not(:has(.mg)) .act,
+body:not(:has(.mg)) .law,
+body:not(:has(.mg)) .resort,
+body:not(:has(.mg)) .agent{
+  min-height:116px;border:1px solid rgba(214,170,88,.2);border-radius:2px;
+  background:linear-gradient(135deg,rgba(31,52,43,.94),rgba(15,29,24,.98));
+  box-shadow:inset 3px 0 var(--acc,var(--v4-brass));
+}
+body:not(:has(.mg)) .act:hover:not(.used),
+body:not(:has(.mg)) .law:hover,
+body:not(:has(.mg)) .resort:hover{transform:translateY(-2px);border-color:rgba(214,170,88,.65);background:linear-gradient(135deg,rgba(40,66,54,.98),rgba(16,32,25,1))}
+body:not(:has(.mg)) .act.used,
+body:not(:has(.mg)) .act:disabled{opacity:.42;filter:saturate(.35)}
+body:not(:has(.mg)) .act h3,
+body:not(:has(.mg)) .law h3,
+body:not(:has(.mg)) .resort h3{font-family:var(--fd);font-size:18px;color:#f0ecdc}
+body:not(:has(.mg)) .cats{gap:5px;padding:8px 0 13px;border-bottom:1px solid rgba(214,170,88,.14)}
+body:not(:has(.mg)) .cats button,
+body:not(:has(.mg)) .fx,
+body:not(:has(.mg)) .socz{
+  border:1px solid rgba(214,170,88,.22);border-radius:2px;background:rgba(5,15,11,.45);
+  font-family:var(--m);font-size:9px;letter-spacing:.095em;text-transform:uppercase;color:var(--v4-muted);
+}
+body:not(:has(.mg)) .cats button.on,
+body:not(:has(.mg)) .fx.on,
+body:not(:has(.mg)) .socz.on{background:rgba(214,170,88,.17);border-color:var(--v4-brass);color:#ffe8ad}
+
+/* Kontrolki nie udają plastiku: proste, czytelne, z jednym kolorem decyzji. */
+body:not(:has(.mg)) .btn,
+body:not(:has(.mg)) .opt{
+  border-radius:2px;border:1px solid rgba(214,170,88,.38);background:rgba(17,35,28,.96);color:#f1e7c8;
+  font-family:var(--m);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+}
+body:not(:has(.mg)) .btn:hover:not([disabled]),
+body:not(:has(.mg)) .opt:hover:not([disabled]){border-color:#f0d587;background:rgba(214,170,88,.16);color:#fff;box-shadow:0 0 0 2px rgba(214,170,88,.08)}
+body:not(:has(.mg)) .btn.g{color:#b4c0b4;border-color:rgba(180,192,180,.25);background:rgba(8,20,15,.55)}
+body:not(:has(.mg)) .btn.red{border-color:rgba(220,117,108,.52);color:#ffd6d0}
+body:not(:has(.mg)) .opt{min-height:58px;text-align:left}
+body:not(:has(.mg)) .opt b{font-family:var(--fd);font-size:17px;letter-spacing:.015em;text-transform:none}
+body:not(:has(.mg)) input,
+body:not(:has(.mg)) textarea,
+body:not(:has(.mg)) select{border-radius:2px;border-color:rgba(214,170,88,.3);background:#0d1a15;color:#f0eedf}
+body:not(:has(.mg)) input:focus,
+body:not(:has(.mg)) textarea:focus,
+body:not(:has(.mg)) select:focus{outline:2px solid rgba(214,170,88,.55);outline-offset:1px}
+
+/* Wybór partii jest stołem negocjacyjnym: lista ma być narzędziem, nie ścianą kart. */
+body:not(:has(.mg)) .pick.v3{grid-template-columns:360px minmax(0,1fr);gap:18px}
+body:not(:has(.mg)) .pick.v3 .picklist{padding:8px;border:1px solid var(--v4-line);border-radius:3px;background:rgba(8,20,15,.74)}
+body:not(:has(.mg)) .pick.v3 .pickcell{min-height:62px;border:1px solid transparent;border-radius:2px;background:transparent}
+body:not(:has(.mg)) .pick.v3 .pickcell:hover{background:rgba(214,170,88,.08);border-color:rgba(214,170,88,.19)}
+body:not(:has(.mg)) .pick.v3 .pickcell.on{background:linear-gradient(90deg,rgba(214,170,88,.2),rgba(214,170,88,.03));border-color:rgba(214,170,88,.44)}
+body:not(:has(.mg)) .pickmain{min-height:650px}
+body:not(:has(.mg)) .pickhd{border-bottom:1px solid var(--v4-line);padding-bottom:18px}
+
+/* Mapa i parlament mają dostać przestrzeń i mrok, nie białą tabelę. */
+body:not(:has(.mg)) .mapwrap{grid-template-columns:minmax(0,1fr) 360px;gap:18px}
+body:not(:has(.mg)) .mapwrap>.card.okr{border-color:rgba(214,170,88,.38);background:linear-gradient(160deg,rgba(26,45,37,.98),rgba(12,25,20,.98))}
+body:not(:has(.mg)) .hexsvg{background:radial-gradient(circle at 50% 42%,rgba(77,109,88,.2),transparent 58%);border-radius:2px}
+body:not(:has(.mg)) .hemi{filter:drop-shadow(0 14px 20px rgba(0,0,0,.28))}
+body:not(:has(.mg)) .seat{stroke:#07100c;stroke-width:1.4}
+body:not(:has(.mg)) table th{background:rgba(214,170,88,.1);color:#f5dc9a;font-family:var(--m);font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+body:not(:has(.mg)) table td{border-color:rgba(214,170,88,.12)}
+body:not(:has(.mg)) tr:hover td{background:rgba(214,170,88,.055)}
+
+/* Noc wyborcza, urząd premiera i prezydent mają poczucie ceremonii. */
+body:not(:has(.mg)) .nocsz,
+body:not(:has(.mg)) .runoff,
+body:not(:has(.mg)) .glospieczec{border-color:rgba(214,170,88,.52);background:linear-gradient(150deg,rgba(27,46,38,.98),rgba(7,18,13,.99))}
+body:not(:has(.mg)) .nocsz h1,
+body:not(:has(.mg)) .runoff h2{font-family:var(--fd);font-size:34px;color:#f4ebcf}
+body:not(:has(.mg)) .nrow{border-bottom-color:rgba(214,170,88,.15)}
+body:not(:has(.mg)) .nrow.mine{background:rgba(214,170,88,.1)}
+
+/* Modale są pojedynczą teczką na stole. Tło odcina grę, ale nie oślepia. */
+body:not(:has(.mg)) .veil{background:rgba(2,8,5,.76);backdrop-filter:blur(9px) saturate(.7)}
+body:not(:has(.mg)) .mdl{border:1px solid rgba(214,170,88,.6);border-radius:3px;background:linear-gradient(150deg,#1d3028,#0f2019);box-shadow:0 30px 90px rgba(0,0,0,.65),inset 0 1px rgba(255,255,255,.09)}
+body:not(:has(.mg)) .mdl .h{border-bottom:1px solid rgba(214,170,88,.22);background:rgba(4,14,10,.32)}
+body:not(:has(.mg)) .mdl .h h2{font-family:var(--fd);font-size:25px;color:#f6ebca}
+body:not(:has(.mg)) .mdl .op{border-top:1px solid rgba(214,170,88,.2);background:rgba(4,13,10,.28)}
+
+@media (max-width:1120px){
+  body:not(:has(.mg)) .wrap{padding:14px 18px 42px}
+  body:not(:has(.mg)) .wrap>.nav{position:sticky;top:0;width:auto;height:auto;min-height:48px;padding:5px 8px;flex-direction:row;align-items:center;overflow-x:auto;border:1px solid var(--v4-line);border-radius:3px;margin-bottom:12px}
+  body:not(:has(.mg)) .wrap>.nav::before,
+  body:not(:has(.mg)) .wrap>.nav::after{display:none}
+  body:not(:has(.mg)) .wrap>.nav button{flex:none;min-height:32px;padding:5px 9px}
+  body:not(:has(.mg)) .pick.v3,.mapwrap{grid-template-columns:minmax(0,1fr)}
+  body:not(:has(.mg)) .mapwrap>.card.okr{grid-column:1;position:static}
+}
+@media (max-width:720px){
+  body:not(:has(.mg)) .wrap{padding:8px 10px 28px}
+  body:not(:has(.mg)) .hud{top:6px;min-height:58px;gap:8px}
+  body:not(:has(.mg)) .hud .rgroup{display:none}
+  body:not(:has(.mg)) .hud .btn.tura{min-width:108px;font-size:9px}
+  body:not(:has(.mg)) .dzialnag h2,body:not(:has(.mg)) .podnag h2{font-size:24px}
+  body:not(:has(.mg)) .card>.b{padding:14px}
+}
+@media (prefers-reduced-motion:reduce){
+  body:not(:has(.mg)) *{scroll-behavior:auto!important}
+}
