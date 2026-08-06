@@ -4559,7 +4559,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.74';
+let WERSJA='1.1.75';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4570,6 +4570,11 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.75':{data:'7 sierpnia 2026', zmiany:[
+  'Kondycja partii nie ma juz wykresu radarowego. Zamiast niego jest ocena kondycji, trend tygodnia, mocna strona i rzecz do naprawy.',
+  'Przyciski dostaly druga warstwe czytelnosci bez zaleznosci od wygladu ekranu: dotyczy to mediow, transferow, list i modali.',
+  'Zablokowane przyciski sa ciemne, ale maja jasny napis zamiast czarnej plamy.',
+ ]},
  '1.1.74':{data:'7 sierpnia 2026', zmiany:[
   'Kondycja partii jest teraz duzym panelem po prawej stronie ekranu, z odczytem cech w dwoch kolumnach zamiast w waskiej liscie.',
   'Usunieto karte Co na ciebie dziala; Kronika pokazuje tylko najnowsze wpisy bez przycietego przewijania, a Przewodnictwo i Sklad sa krotsze.',
@@ -5307,24 +5312,30 @@ function game(){
   G._we=0;
 }
 function radar(p){
-  const AX=[['Sława',p.fame,'var(--acc)'],['Wiarygodność',p.cred,'var(--info)'],['Jedność',p.uni,'var(--pos)'],
-    ['Aktywność',p.act,'#9b7fd4'],['Spokój',100-p.ctr,'var(--neg)'],['Przystępność',100-p.pret,'#d98b4a']];
-  const cx=110,cy=98,R=72,N=AX.length;
-  const pt=(i,r)=>{const a=-Math.PI/2+i*2*Math.PI/N;return [cx+r*Math.cos(a),cy+r*Math.sin(a)]};
-  const poly=(f)=>AX.map((x,i)=>pt(i,R*cl(f===null?x[1]:f,0,100)/100).map(v=>v.toFixed(1)).join(',')).join(' ');
-  const prev=G.prev?[G.prev.fame,G.prev.cred,G.prev.uni,G.prev.act,100-G.prev.ctr,100-G.prev.pret]:null;
-  const prevPoly=prev?prev.map((v,i)=>pt(i,R*cl(v,0,100)/100).map(x=>x.toFixed(1)).join(',')).join(' '):null;
-  return `<svg viewBox="0 0 220 200" class="radar">
-    ${[25,50,75,100].map(r=>`<polygon points="${poly(r)}" fill="none" stroke="var(--line)" stroke-width="1" ${r===100?'stroke-opacity=".9"':'stroke-opacity=".45"'}/>`).join('')}
-    ${AX.map((x,i)=>{const [ex,ey]=pt(i,R);return `<line x1="${cx}" y1="${cy}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="var(--line)" stroke-width="1" stroke-opacity=".5"/>`}).join('')}
-    ${prevPoly?`<polygon points="${prevPoly}" fill="none" stroke="var(--dim2)" stroke-width="1.2" stroke-dasharray="3 3" opacity=".7"/>`:''}
-    <polygon points="${poly(null)}" fill="${p.c}" fill-opacity=".26" stroke="${p.c}" stroke-width="2" stroke-linejoin="round"/>
-    ${AX.map((x,i)=>{const [px,py]=pt(i,R*cl(x[1],0,100)/100);
-      return `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3" fill="${x[2]}"/>`}).join('')}
-    ${AX.map((x,i)=>{const [lx,ly]=pt(i,R+17);
-      return `<text x="${lx.toFixed(1)}" y="${(ly+3).toFixed(1)}" text-anchor="${i===0||i===3?'middle':(lx>cx?'start':'end')}"
-        font-size="9.5" font-family="ui-monospace,monospace" fill="var(--dim2)" letter-spacing=".04em">${x[0].toUpperCase()}</text>`}).join('')}
-  </svg>`;
+  /* Wykres sześciokątny wyglądał jak ozdoba, a nie informacja do decyzji.
+     Ten skrót mówi od razu: jak zdrowa jest partia, co ją ciągnie i co ją zjada. */
+  const AX=[
+    {n:'Sława',v:p.fame,c:'var(--acc)'},{n:'Wiarygodność',v:p.cred,c:'var(--info)'},
+    {n:'Jedność',v:p.uni,c:'var(--pos)'},{n:'Aktywność',v:p.act,c:'#9b7fd4'},
+    {n:'Spokój',v:100-p.ctr,c:'var(--neg)'},{n:'Przystępność',v:100-p.pret,c:'#d98b4a'},
+  ];
+  const wynik=Math.round(AX.reduce((s,x)=>s+cl(x.v),0)/AX.length);
+  const poprzedni=G.prev?Math.round(([G.prev.fame,G.prev.cred,G.prev.uni,G.prev.act,100-G.prev.ctr,100-G.prev.pret]
+    .reduce((s,x)=>s+cl(x),0))/6):null;
+  const roznica=poprzedni===null?0:wynik-poprzedni;
+  const najlepsza=AX.slice().sort((a,b)=>b.v-a.v)[0],najsłabsza=AX.slice().sort((a,b)=>a.v-b.v)[0];
+  const stan=wynik>=72?'mocna':wynik>=55?'stabilna':wynik>=38?'chwiejna':'w kryzysie';
+  return `<div class="party-health" style="--party:${p.c};--wynik:${wynik}%">
+    <div class="ph-main">
+      <span>Ocena kondycji</span><div><b>${wynik}</b><em>${stan}</em></div>
+      <small>${roznica?`${roznica>0?'+':''}${roznica} od poprzedniego tygodnia`:'bez zmiany od poprzedniego tygodnia'}</small>
+    </div>
+    <div class="ph-meter"><i></i><u></u></div>
+    <div class="ph-flagi">
+      <div><span>Mocna strona</span><b style="color:${najlepsza.c}">${najlepsza.n} ${Math.round(najlepsza.v)}</b></div>
+      <div><span>Do naprawy</span><b style="color:${najsłabsza.c}">${najsłabsza.n} ${Math.round(najsłabsza.v)}</b></div>
+    </div>
+  </div>`;
 }
 /* ---- zakładka „Partie” ----
    Jedno pytanie i jedna odpowiedź: kto siedzi w cudzych partiach. Własnej tu nie ma,
