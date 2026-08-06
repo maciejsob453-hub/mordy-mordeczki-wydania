@@ -1725,3 +1725,100 @@ button,.act,.opt,.card,.pill{transition-timing-function:cubic-bezier(.2,.7,.3,1)
   .pick.v3 .pickmain{grid-column:1;grid-row:1;position:static}
   .pick.v3>div:not(.pickmain){grid-row:2}
 }
+
+/* ═══════════════════════════════════════════════════════════
+   PRZEBUDOWA CAŁEGO INTERFEJSU NA MODŁĘ VICTORII
+   Wszystkie liczby niżej są odczytane z jej plików interfejsu, nie zgadnięte:
+
+     gui/shared/defaults.gui    tekst EBGaramond 17, podpowiedzi OpenSans 15,
+                                nagłówki PlayfairDisplay 26, skala 10/12/14/20/22/26/30
+     gui/shared/backgrounds.gui płyta zaokrąglona 14, jasne tło 6, przyciemnienie 0.2
+     gui/shared/dividers.gui    złota kreska pod nagłówkiem, wysokość 3
+     gui/*.gui                  przyciski 240×40 i 80×30, wiersze list 40 i 45
+
+   Sama grafika jest rysowana od zera w CSS — z Victorii wzięte są wyłącznie
+   proporcje, rytm i układ. Żaden ich plik nie trafia do gry.
+   ═══════════════════════════════════════════════════════════ */
+
+:root{
+  --v3-r:14px;          /* płyta, spriteborder 14 */
+  --v3-r-mala:6px;      /* jasne tło, spriteborder 6 */
+  --v3-wiersz:40px;     /* najczęstszy wiersz listy */
+  --v3-wiersz-duzy:45px;
+  --v3-btn-w:240px; --v3-btn-h:40px;
+  --v3-btn-mala-h:30px;
+}
+
+/* ─── typografia ─── */
+body{font-size:15px;line-height:1.6}
+h1,h2,h3,h4,.card>.h h3,.mdl .h h2{
+  font-family:"EB Garamond","Playfair Display",var(--fd)}
+.card>.h h3{font-size:19px;font-weight:600;letter-spacing:.005em}
+.mdl .h h2{font-size:24px;font-weight:600}
+
+/* ─── płyta: karta, okno, panel ─── */
+.card,.mdl,.nocplyta,.medkafel,.pickmain,.stol{border-radius:var(--v3-r)}
+.card{
+  border:1px solid var(--line2);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.02),transparent 120px),
+    linear-gradient(180deg,var(--p2),var(--p1));
+  box-shadow:
+    inset 0 1px 0 rgba(247,227,170,.09),
+    0 0 0 1px rgba(0,0,0,.45),
+    0 16px 38px -28px #000}
+/* nagłówek płyty: pasek, a pod nim złota kreska na całą szerokość */
+.card>.h{
+  min-height:38px;align-items:center;
+  background:linear-gradient(180deg,rgba(247,227,170,.06),transparent);
+  border-bottom:none}
+.card>.h::after{
+  height:3px;left:0;right:0;opacity:1;
+  background:linear-gradient(90deg,
+    transparent,var(--kolor,var(--acc)) 8%,#f7e3aa 50%,var(--kolor,var(--acc)) 92%,transparent);
+  box-shadow:0 1px 4px -1px rgba(0,0,0,.7)}
+.card>.h .n{font-family:"OpenSans",var(--f);font-size:12px;opacity:.85}
+
+/* ─── przyciski ─── */
+.btn{
+  min-height:var(--v3-btn-h);
+  border-radius:var(--v3-r-mala);
+  font-size:15px;letter-spacing:.01em;
+  justify-content:center}
+/* Pełne 240 szerokości dostają tylko przyciski samodzielne — te, które w Victorii
+   stoją w kolumnie albo w stopce. W ciasnym rzędzie flex i tak by je ścisnął,
+   a wymuszanie szerokości rozwalałoby wiersze. */
+.btn.tura,.ekstopka .btn,.pickmain .btn,.kreakcje .btn,.startekran .loadbar .btn{
+  min-width:var(--v3-btn-w)}
+.btn.sm,.btn.g.sm,.btn.r.sm{
+  min-width:80px;min-height:var(--v3-btn-mala-h);
+  padding:5px 14px;font-size:12.5px}
+.mdl .op .opt{border-radius:var(--v3-r-mala)}
+
+/* ─── wiersze list: jeden rytm w całej grze ─── */
+.lrow,.minrow,.vrow,.lh,.ekos,.bench .bperson,.pz,.rcell,.ekocz{
+  min-height:var(--v3-wiersz);
+  border-radius:var(--v3-r-mala)}
+/* naprzemienne pasy, tak jak w ich tabelach */
+.lawheld .lh:nth-child(odd),
+.ekolista .ekos:nth-child(odd),
+.przyczyny .pz:nth-child(odd){background:rgba(255,255,255,.022)}
+.vrow{min-height:var(--v3-wiersz)}
+
+/* ─── nawigacja jako pasek zakładek ─── */
+.wrap>.nav button{border-radius:0 var(--v3-r-mala) var(--v3-r-mala) 0;min-height:36px}
+.cats button{min-height:var(--v3-btn-mala-h);border-radius:var(--v3-r-mala);font-size:13px}
+
+/* ─── podpowiedzi ─── */
+.tipbox{font-family:"OpenSans",var(--f);font-size:13px;border-radius:var(--v3-r-mala)}
+
+/* ─── paski postępu ─── */
+.trk,.rbar,.wbar,.ntrk,.ltrack{border-radius:var(--v3-r-mala)}
+
+/* ─── suwak przewijania w ich stylu ─── */
+*{scrollbar-width:thin;scrollbar-color:#6b552a rgba(0,0,0,.35)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,.35);border-radius:999px}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#8a6f33,#5a4a26);
+  border-radius:999px;border:2px solid rgba(0,0,0,.35)}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#a98a42,#6b552a)}
