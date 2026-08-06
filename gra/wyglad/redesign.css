@@ -2520,3 +2520,22 @@ button[disabled],.act[disabled],.opt[disabled]{
 .grp{flex:none;width:clamp(150px,18vw,230px)}
 .grp .trk{height:8px}
 .grv{font-family:var(--m);font-size:11px;color:var(--dim2);margin-top:4px;text-align:right}
+
+/* ═══════════════════════════════════════════════════════════
+   KONIEC PŁYNNEJ TYPOGRAFII
+   Tekst jechał na clamp od 13,5 do 16 pikseli, a nagłówki od 16 do 20 —
+   przez to ta sama gra wyglądała inaczej na każdej szerokości okna i działy
+   „dziwnie się skalowały". Rozmiary są teraz stałe: interfejs ma wyglądać
+   tak samo na laptopie i na dużym monitorze, a od szerokości zależy wyłącznie
+   to, ile paneli mieści się obok siebie.
+   ═══════════════════════════════════════════════════════════ */
+body{font-size:15px}
+.card>.h h3{font-size:18px}
+.mdl .h h2{font-size:23px}
+.hud .rgroup .rs .rv b{font-size:16px}
+.hud .id h2{font-size:14px}
+.hud .id .crest{width:38px;height:38px}
+.ranga{font-size:8.5px}
+.podnag h2{font-size:30px}
+.mgtytul{font-size:clamp(52px,6vw,96px)}   /* sam ekran tytułowy może oddychać */
+.mgpoz{font-size:19px}
