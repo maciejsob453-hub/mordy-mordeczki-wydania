@@ -6,7 +6,7 @@
    ═══════════════════════════════════════════════════════════ */
 (function(){
 "use strict";
-const LOGOS = {"PKR": "obrazki/2d4de0deb7c1.webp", "WP": "obrazki/10efbd4fb21b.webp", "LSD": "obrazki/62ff16ae5515.webp", "KAN": "obrazki/28efd8279222.svg", "HAND": "obrazki/f3c9da594c00.svg", "POST": "obrazki/adb43c8743c7.webp", "LIB": "obrazki/5609cc4b3929.webp", "ALT": "obrazki/1fb954d6dd7c.webp", "ADS": "obrazki/a5665e494ecf.webp", "HMO": "obrazki/3da3c7510fc8.webp", "SS": "obrazki/5ed581dc6fb1.webp", "REP": "obrazki/a56a5574593a.webp", "PD": "obrazki/505b87671205.webp", "PPP": "obrazki/9a313b752b8b.webp", "ZHM": "obrazki/07520c9d52a7.webp", "NP": "obrazki/686628e32c75.webp", "ROM": "obrazki/f72e203052b7.webp", "NBR": "obrazki/20c8f32ecec2.webp", "FD": "obrazki/1f63df863e7f.webp", "KK": "obrazki/40064ea5d3ff.webp", "PKD": "obrazki/174141e9bca2.webp", "PLR": "obrazki/2f9ecd9fa8cf.webp", "ChPC": "obrazki/4c15d82ceb7d.webp", "DPD": "obrazki/04774de77d36.webp", "POJ": "obrazki/31bfab4a1110.webp", "PP": "obrazki/720fb5e0b9e2.webp", "P1612": "obrazki/logo-p1612.png", "CEN": "obrazki/logo-centrum.webp", "HEG": "obrazki/logo-hegemon.webp", "SWIA": "obrazki/logo-swiadek.svg", "KAZIK": "obrazki/ava-kaziu-prime.webp"};
+const LOGOS = {"PKR": "obrazki/2d4de0deb7c1.webp", "WP": "obrazki/10efbd4fb21b.webp", "LSD": "obrazki/62ff16ae5515.webp", "KAN": "obrazki/28efd8279222.svg", "HAND": "obrazki/f3c9da594c00.svg", "POST": "obrazki/adb43c8743c7.webp", "LIB": "obrazki/5609cc4b3929.webp", "ALT": "obrazki/1fb954d6dd7c.webp", "ADS": "obrazki/a5665e494ecf.webp", "HMO": "obrazki/3da3c7510fc8.webp", "SS": "obrazki/5ed581dc6fb1.webp", "REP": "obrazki/a56a5574593a.webp", "PD": "obrazki/505b87671205.webp", "PPP": "obrazki/9a313b752b8b.webp", "ZHM": "obrazki/07520c9d52a7.webp", "NP": "obrazki/686628e32c75.webp", "ROM": "obrazki/f72e203052b7.webp", "NBR": "obrazki/20c8f32ecec2.webp", "FD": "obrazki/1f63df863e7f.webp", "KK": "obrazki/40064ea5d3ff.webp", "PKD": "obrazki/174141e9bca2.webp", "PLR": "obrazki/logo-concordia.png", "ChPC": "obrazki/4c15d82ceb7d.webp", "DPD": "obrazki/04774de77d36.webp", "POJ": "obrazki/31bfab4a1110.webp", "PP": "obrazki/720fb5e0b9e2.webp", "P1612": "obrazki/logo-p1612.png", "CEN": "obrazki/logo-centrum.webp", "HEG": "obrazki/logo-hegemon.webp", "SWIA": "obrazki/logo-swiadek.svg", "KAZIK": "obrazki/ava-kaziu-prime.webp"};
 
 /* ══════════ POKRĘTŁA TRUDNOŚCI ══════════
    Wszystko, czym realnie stroi się grę, siedzi tutaj. Wcześniej te liczby były
@@ -117,6 +117,8 @@ function leadWybrany(){
 function setLeadSel(n){G.leadSel=n;render()}
 /* wrodzone, przypisane do osoby, nie do partii; wracają razem z nią */
 const INNATE={
+ 'Maciek':{n:'Tłuszczolt',c:'#b8683a',
+   d:'Kontrowersja +2,8 i pretensjonalność +2,2 tygodniowo — Maciek nie umie przejść obok żadnej awantury. Za to Król Mordeczka trzyma z nim jak równy z równym: przychylność dworu +14.'},
  'Lager':{n:'Odpisze jutro',c:'#c98a3a',
    d:'Aktywność partii spada o 2,4 tygodniowo, cokolwiek zrobisz. Dopóki Lager przewodzi, PPP się nie rusza.'},
  'loof':{n:'Zawsze ma rację i zawsze to powie',c:'#5a8bb0',
@@ -350,7 +352,7 @@ const BASE={
    aff:{eli:6,int:9,ser:2}, comp0:[1,6,19],
    blurb:'Najbardziej profesjonalna partia w grze. I wszyscy jej to wypominają.',
    flaw:'Pretensjonalność 74. Memiarze i nowicjusze, czyli 9 mandatów, cię odrzucają.'},
- PLR :{n:'Partia Liberalno-Republikańska',ab:'PLR',c:'#7b2fbe',founded:'10.10.2025',pull:1.500,
+ PLR :{n:'Concordia',ab:'PLR',c:'#a92fd0',founded:'10.10.2025',pull:1.500,
    fame:62,cred:55,uni:58,act:55,ctr:30,pret:34,mem:24,pot:88,diff:3,
    aff:{eli:4,int:7,ser:5}, comp0:[0,5,19],
    blurb:'Dawni „Postępowcy”. Sufit potencjału 88, najwyższy w grze. Nikt go jeszcze nie dotknął.',
@@ -465,6 +467,10 @@ function kingFactors(k){
     {n:'Aktywność',        v:Math.round(p.act),  w:(p.act-45)*.34,  d:'Martwa partia nie utrzyma rządu.'},
     {n:'Kontrowersja',     v:Math.round(p.ctr),  w:-p.ctr*.26,      d:'Skandale przeszkadzają, ale Król widział już gorsze rzeczy.'},
     {n:'Stosunki z dworem',v:me2?Math.round(G.king.rel):50, w:me2?(G.king.rel-50)*.34:0, d:'To, co ustaliliście na osobności, przez ustawy, daninę i przysługi.'},
+    /* Tłuszczolt. Mordeczka i Maciek trzymają się razem z powodów, o których
+       obaj mówią niechętnie i zawsze tak samo: „wagowo się sprzyjamy". */
+    {n:'Tłuszczolt', v:isLead(p,'Maciek')?'tak':'—', w:isLead(p,'Maciek')?14:0,
+     d:'Król trzyma z Maćkiem jak równy z równym. Reszcie sejmu trudno to skomentować.'},
     {n:'Danina',           v:me2?G.king.paid:0,  w:me2?G.king.paid/(G.krolTryb?8:DANINA_ZA_PUNKT):0, d:'Kapitałem da się go przekonać, ale bardzo drogo.'},
   ];
   if(isLead(p,'Mnem'))out.push({n:'Młoda krew',v:'Mnem',w:10,d:'„Jam jest młody i młodością was zabije.” Tupet i świeżość imponują dworowi niezależnie od reszty.'});
@@ -934,7 +940,7 @@ const A=[
  d:'Emitowany wyłącznie w #kanał_eventowy, tam trafia zawsze i mocno. Do pozostałych okręgów przenika tylko czasem i słabiej. Wymaga wiarygodności, inaczej wyjdzie cringe.',
  f:(p,f)=>{if(ch(cl(.55-p.cred/160,.06,.5))){p.fame=cl(p.fame+2);p.ctr=cl(p.ctr+9);p.cred=cl(p.cred-4);
    return `Spot uznano za <b>cringe</b>. Krąży, ale jako mem.`}
-  const g=R(8,14)*f;M(p,9);p.fame=cl(p.fame+g);p.cred=cl(p.cred+2);
+  const g=R(8,14)*f;M(p,9);p.fame=cl(p.fame+g);p.cred=cl(p.cred+2);p.uni=cl(p.uni+4);
   p.pres.event=cl(p.pres.event+34*f);
   let ile=0;
   REG.filter(r=>r.id!=='event').forEach(r=>{if(ch(.45)){p.pres[r.id]=cl(p.pres[r.id]+R(5,11)*f);ile++}});
@@ -992,11 +998,12 @@ const A=[
 {id:'czyst',cat:'org',n:'Czystka w partii',ap:2,kp:0,en:16,
  d:'Jedność mocno w górę kosztem 10–22% składu. Pamiętaj, że liczba osób przekłada się wprost na głosy, to najdroższa jedność w grze.',
  f:(p,f)=>{const q=giveBackCap(p,Math.max(1,Math.round(p.mem*R(.10,.22))));const l=q.eli+q.int+q.ser;
-  p.ctr=cl(p.ctr+10);p.cred=cl(p.cred-5);p.act=cl(p.act+R(4,8));
+  p.ctr=cl(p.ctr+10);p.cred=cl(p.cred-5);p.act=cl(p.act+R(4,8));p.uni=cl(p.uni+R(12,19)*f);
   return `Wylatuje <b>${l} ${pl(l,'osoba','osoby','osób')}</b>, reszta trzyma szyk.`}},
 {id:'zjazd',cat:'org',n:'Zjazd partii',ap:2,kp:105,en:26,term1:1,
  d:'Najdroższa decyzja w grze i tylko raz na kadencję. Poza sławą, jednością i obecnością wszędzie daje trwałą przewagę wyborczą +9% do wyborów.',
  f:(p,f)=>{M(p,22);p.fame=cl(p.fame+R(12,19)*f);p.act=cl(p.act+18*f);p.cred=cl(p.cred+8);
+  p.uni=cl(p.uni+R(9,15)*f);
   REG.forEach(r=>p.pres[r.id]=cl(p.pres[r.id]+20));
   p.rally=Math.min(2,(p.rally||0)+1);
   return `<b>Zjazd</b> przeszedł do serwerowej legendy. Przewaga wyborcza +${p.rally*9}% do końca kadencji.`}},
@@ -1611,6 +1618,8 @@ function endWeek(){
 }
 function leaderTraitDrift(p,name){
   switch(name){
+    // Tłuszczolt: Maciek nie przechodzi obok żadnej awantury, ale dwór go lubi
+    case 'Maciek':    p.ctr=cl(p.ctr+2.8);p.pret=cl(p.pret+2.2); break;
     case 'Lager':     p.act=cl(p.act-2.4); break;
     case 'loof':      if(!goalDone('demokraci')){p.cred=cl(p.cred+1.5);p.uni=cl(p.uni+1.2);p.ctr=cl(p.ctr+2.6)} break;
     case 'Peterdeus': p.act=cl(p.act-1.9);p.uni=cl(p.uni-1.4); break;
@@ -4236,7 +4245,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.55';
+let WERSJA='1.1.56';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4247,6 +4256,15 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.56':{data:'6 sierpnia 2026', zmiany:[
+   'PORZUCONA DECYZJA NIE ZOSTAJE NA STOLE TYGODNIA. Wpis szedl na stol w chwili odpalenia decyzji, takze tej z wlasnym oknem — a ta w tym momencie jeszcze niczego nie zrobila. Zamkniecie okna bez wyboru zostawialo kafel bez skutkow, czasem z liczbami z powietrza. Teraz decyzja okienkowa czeka i wchodzi na stol dopiero po kliknieciu tego ostatniego punktu, a rezygnacja zdejmuje ja calkiem.',
+   'JEDNOSC NADAJA JUZ TYLKO TRZY DECYZJE: Spot wyborczy, Czystka w partii i Zjazd partii. Reszta gry przestala ja dosypywac po cichu.',
+   'PASEK WLADZY W DUCHU VICTORII 3: sztandar partii po lewej jak flaga, obok jeden zaokraglony pancerz z mosiezna obwodka, a odczyty stoja w nim jako osobne kapsuly oddzielone pionowymi kreskami. Ikona przed liczba, podpis pod nia, przyrost tygodniowy zielony tuz przy wartosci.',
+   'TLUSZCZOLT — nowa cecha wrodzona Macka. Kontrowersja +2,8 i pretensjonalnosc +2,2 tygodniowo, bo Maciek nie przechodzi obok zadnej awantury. Za to Krol Mordeczka trzyma z nim jak rowny z rownym: przychylnosc dworu +14, osobnym wierszem na liscie u Krola.',
+   'PARTIA LIBERALNO-REPUBLIKANSKA NAZYWA SIE TERAZ CONCORDIA i ma nowe logo. Barwa poszla w mocniejszy fiolet.',
+   'LICZNIK ODPALEN W LAUNCHERZE: ile razy gra zostala uruchomiona i na ilu komputerach. Nie wychodzi stamtad nic o graczu — zaden nick, adres ani nazwa komputera. Instalacja dostaje losowy numer, ktory nigdzie nie jest wysylany i sluzy tylko temu, zeby drugie odpalenie na tej samej maszynie nie doliczylo kolejnej osoby. Brak internetu oznacza tylko tyle, ze launcher pokaze ostatnia znana liczbe.',
+ ]},
+
  '1.1.55':{data:'6 sierpnia 2026', zmiany:[
    'DZIAL PROGRAM USUNIETY. Trzy decyzje przestawiajace elektorat poszly razem z nim, ale wyciszenie sporu i zejscie na ziemie zostaja — bez nich z wysokiej kontrowersji i pretensjonalnosci nie dalo by sie zejsc w ogole, a paraliz przy 90 bylby slepa uliczka. Siedza teraz w Organizacji. Kategorii jest szesc zamiast siedmiu.',
    'ZADNA DECYZJA NIE NADAJE JUZ JEDNOSCI. Manifest, luzny stream, regeneracja lidera i kurs dla zaplecza po cichu ja dosypywaly — teraz zgoda w partii bierze sie wylacznie z tego, co dzieje sie wokol niej, a nie z klikania decyzji.',
@@ -5472,6 +5490,7 @@ function zrzutkaWez(n){
   p.bench=p.bench.filter(x=>x!==n); p.main=p.main.filter(x=>x!==n);
   M(p,-3);
   G.lastCharge=null;                                        // zrzutka doszła do skutku
+  stolZatwierdz();
   say(`<b>${n} wyłożył własne pieniądze.</b> Partia dostaje ${k.kp} kapitału, `
      +`ale ${n} odchodzi, a jedność leci o ${k.uni} w dół.`,'bad');
   close();
@@ -6938,10 +6957,15 @@ function fire(a,t,r,s,tm){
      a nie powtarza ogólny opis z listy. */
   const stolKlucz=G.term+'-'+G.week;
   if(!G.stol||G.stolTyg!==stolKlucz){G.stol=[];G.stolTyg=stolKlucz}
-  const stolPo=snap(), stolZm={};
-  ['fame','cred','uni','act','mem'].forEach(k=>{
-    const d=Math.round(stolPo[k]-stolPrzed[k]); if(d)stolZm[k]=d});
-  G.stol.push({id:a.id,n:a.n,kat:a.cat,ap:a.ap,zm:stolZm});
+  /* Na stół trafia wyłącznie decyzja, która NAPRAWDĘ się odbyła.
+
+     Wcześniej wpis szedł tu zawsze, także dla decyzji z własnym oknem — a te
+     w tym momencie jeszcze niczego nie zrobiły. Zamknięcie okna bez wyboru
+     zostawiało na stole kafel bez skutków, czasem z liczbami z powietrza.
+     Teraz decyzja okienkowa czeka w G.stolPend i wchodzi na stół dopiero
+     wtedy, gdy gracz kliknie ten ostatni punkt. Rezygnacja ją stamtąd zdejmuje. */
+  if(msg)stolWpis(a,stolPrzed);
+  else G.stolPend={id:a.id,n:a.n,kat:a.cat,ap:a.ap,przed:stolPrzed};
   checkDeath();
   // uwaga: decyzje z własnym oknem (nabór, rekonstrukcja, ustawa, rebranding) otwierają je w a.f,
   // więc fire nie może tu zamykać niczego, bo skasowałby okno w tej samej klatce
@@ -6949,7 +6973,23 @@ function fire(a,t,r,s,tm){
 }
 /* Oddanie opłaty za decyzję, która nie doszła do skutku. Wydzielone z actBack,
    bo to samo musi się dziać, gdy okno zniknie bez kliknięcia „wstecz”. */
+/* Dopisanie decyzji do stołu tygodnia razem z tym, co realnie zmieniła. */
+function stolWpis(a,przed){
+  const klucz=G.term+'-'+G.week;
+  if(!G.stol||G.stolTyg!==klucz){G.stol=[];G.stolTyg=klucz}
+  const po=snap(), zm={};
+  ['fame','cred','uni','act','mem'].forEach(k=>{
+    const d=Math.round(po[k]-(przed?przed[k]:po[k])); if(d)zm[k]=d});
+  G.stol.push({id:a.id,n:a.n,kat:a.cat,ap:a.ap,zm});
+}
+/* Decyzja okienkowa doszła do skutku — dopiero teraz ląduje na stole. */
+function stolZatwierdz(){
+  const w=G&&G.stolPend; if(!w)return;
+  G.stolPend=null;
+  stolWpis({id:w.id,n:w.n,cat:w.kat,ap:w.ap},w.przed);
+}
 function oddajOplate(){
+  if(G)G.stolPend=null;          // rezygnacja zdejmuje decyzję ze stołu
   const c=G&&G.lastCharge; if(!c)return;
   G.ap+=c.ap;G.kp+=c.kp;G.en=cl(G.en+c.en);
   if(G.used[c.id])G.used[c.id]--;
@@ -7414,6 +7454,7 @@ function wywiadKoniec(){
     :'Skakałeś między trzema rejestrami i widać to na nagraniu.';
   WYW=null;
   G.lastCharge=null;      // wywiad się odbył, nie ma czego zwracać
+  stolZatwierdz();
   close();
   const podsum=`<div class="wypodsum">
       <div><b>${traf}/${ile}</b><span>trafione rejestry</span></div>
@@ -7556,7 +7597,7 @@ function naborPublikuj(){
       <p style="margin-top:14px;font-size:16px;color:${g?'var(--pos)':'var(--neg)'}">
         <b>${g?`Dołącza ${opis}.`:'Pula serwerowiczów jest pusta.'}</b><br><span style="font-size:13.5px;color:var(--dim)">Partia liczy teraz <b style="color:var(--tx)">${p.mem}</b> ${pl(p.mem,'osobę','osoby','osób')}, skład: ${p.comp.eli} elity, ${p.comp.int} intelektualistów, ${p.comp.ser} serwerowiczów.</span></p>`;
     v.querySelector('.op').innerHTML=`<button class="opt" id="rok"><b>Zamykam</b><span></span></button>`;
-    v.querySelector('#rok').onclick=()=>{NABOR=null;pend=null;G.lastCharge=null;close();render()};
+    v.querySelector('#rok').onclick=()=>{NABOR=null;pend=null;G.lastCharge=null;stolZatwierdz();close();render()};
 }
 function danina(v){
   if(!G||G.kp<v)return;
@@ -7590,7 +7631,7 @@ function openTrainFor(kto){
         f:()=>{if(!G.lup[kto])G.lup[kto]=[0,0,0,0];
           G.lup[kto][i]+=gain;
           say(`<b>${kto}</b> podciąga ${n} do ${L(kto)[id]}.`);
-          G.lastCharge=null;close();render()}}})   // szkolenie się odbyło
+          G.lastCharge=null;stolZatwierdz();close();render()}}})   // szkolenie się odbyło
       .concat([{l:'Rezygnuję',s:'Nie tracisz akcji ani kapitału',f:actBack}]),actBack)
 }
 
@@ -7674,6 +7715,7 @@ function steryOk(){
   stare.forEach(n=>{if(!nowe.includes(n)&&!p.main.includes(n)&&!p.bench.includes(n))p.bench.push(n)});
   p.uni=cl(p.uni+k.uni);p.ctr=cl(p.ctr+k.ctr);
   STER=null;pend=null;G.lastCharge=null;close();   // stery przestawione, nie ma czego zwracać
+  stolZatwierdz();
   say(`<b>Nowy układ sterów.</b> ${p.ab} prowadzi ${nowe.length===1?'samodzielnie':'wspólnie'}: ${nowe.join(', ')}.`,'roy');
   XP(12);render();
 }
@@ -7842,6 +7884,7 @@ function obsadz(id,nick,zPartii){
   const res=RESORTY.find(r=>r.id===id);
   if(!res)return;                       // resort mógł zniknąć razem z zapisem ze starszej wersji
   if(G)G.lastCharge=null;               // resort obsadzony — decyzja doszła do skutku
+  stolZatwierdz();
   const stary=G.rada[id];
   if(stary&&stary!==nick){
     /* Każda roszada w radzie ma swoją cenę: partia odwołanego zapamiętuje,
@@ -8027,7 +8070,7 @@ function openDym(){
     cand.map(k=>{const rs=ministrowieZ(k).map(r=>r.n).join(', ');
       return {l:`Odwołuję ${G.p[k].lead} (${G.p[k].ab})`,
       s:`${rs} · relacje ${Math.round(G.rel[G.me][k])} → −55 · koalicja traci ${G.p[k].seats} ${pl(G.p[k].seats,'mandat','mandaty','mandatów')}`,
-      f:()=>{close();G.lastCharge=null;   // minister odwołany, decyzja doszła do skutku
+      f:()=>{close();G.lastCharge=null;   // minister odwołany, decyzja doszła do skutkustolZatwierdz();
         RESORTY.forEach(r=>{const n=radaKto(r.id);
           if(n&&partiaOsoby(n)===k){delete G.rada[r.id];delete G.radaOd[r.id]}});
         G.rel[G.me][k]=-55;G.rel[k][G.me]=-55;
@@ -11250,7 +11293,7 @@ Object.assign(window,{mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,med
   ekonomiaTab,kapitalTab,kapPryw,kapPrywRazem,podzialMajatku,kasa,kasaSkrot,
   rolaOsoby,pkbTydzien,pkbLicz,pkbMnoznik,pkbCzynniki,stawkaMajatkowa,
   wszyscyZaplecze,alive,openZrzutka,zrzutkaWez,zrzutkaDaje,aiZrzutka,
-  zarobekLidera,zarobekTydzien,pkbWykres,openWariant,wariantyUstawy,wariantPo,
+  stolWpis,stolZatwierdz,zarobekLidera,zarobekTydzien,pkbWykres,openWariant,wariantyUstawy,wariantPo,
   majatekSzefa,panelGlosowania,nextCandidate,pkbZapiszOdczyt,
   RANGI,ranga,rangaNr,nastepnaRanga,mnoznikRangi,rangiStart,sprawdzRangi,absolutorium,
   rangaKoszt,rangaWymog,oknoAbsolutorium,sadTab,sadSklad,nagranieStart,liveLap,DANINA_ZA_PUNKT,NAGR_TRYBY,

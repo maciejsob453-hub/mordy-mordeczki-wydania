@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.55",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/b71f45725b04e32e277fd68f843fccffbf884940",
+ "wersja": "1.1.56",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,8 +14,8 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "735ec58c343d6c35018f39fcc5d4fbffccc505014442524c7920992aabe51f06",
-   "bajtow": 717597
+   "sha": "f67d123b12689dadd1c3e892ebd7d55425f369eff4456840190819a79c709cc8",
+   "bajtow": 721240
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -533,6 +533,11 @@
    "bajtow": 53866
   },
   {
+   "sciezka": "gra/obrazki/logo-concordia.png",
+   "sha": "47385c9c122b0ae92109e737f2205667999bb6b3e734c5f61496e66137f68404",
+   "bajtow": 70417
+  },
+  {
    "sciezka": "gra/obrazki/logo-hegemon.webp",
    "sha": "6077c899641b2cced760f3dbbe234756ad42fc2685966eba8bd822150f5844df",
    "bajtow": 134454
@@ -559,8 +564,8 @@
   },
   {
    "sciezka": "gra/wyglad/redesign.css",
-   "sha": "95da97090a68544f5a3e68f877e6fba18c371f2634daa9bef6721f4dead4eb8c",
-   "bajtow": 89844
+   "sha": "435faa49c0ab7c6be491a2649bc43c0670358f1944df2d47cdd7953efd49e00a",
+   "bajtow": 93319
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -582,9 +587,8 @@
  },
  "launcher": {
   "nazwa": "Mordy Mordeczki Launcher.exe",
-  "sha": "e0f582f398e571c686dc8a20c8d660400ce0e437636f84ad738bd86af0a91212",
-  "bajtow": 12136320,
-  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.36/Mordy.Mordeczki.Launcher.exe"
- },
- "commit": "b71f45725b04e32e277fd68f843fccffbf884940"
+  "sha": "931ba25ce52786edcd2603c1461fadab8b7c32e4983293d9d1c10dddada24ba3",
+  "bajtow": 12138277,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.56/Mordy.Mordeczki.Launcher.exe"
+ }
 }
