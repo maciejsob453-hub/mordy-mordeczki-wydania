@@ -301,7 +301,20 @@ body::after{
   background:rgba(217,171,69,.07);opacity:0;transition:opacity .16s;pointer-events:none}
 .rs.tip:hover::after{opacity:1}
 .hud .tura{position:relative}
-.tipbox{border-radius:var(--r3);box-shadow:var(--sh3);border-color:var(--line2)}
+/* Podpowiedź musi się mieścić w swojej ramce. Nazwy wydawnictw i długie zdania
+   wychodziły poza prostokąt, bo nic nie łamało wyrazów, a wiersz z liczbą
+   rozpychał box szerzej, niż on sam pozwalał. */
+.tipbox{border-radius:var(--r3);box-shadow:var(--sh3);border-color:var(--line2);
+  box-sizing:border-box;max-width:min(320px,calc(100vw - 32px));overflow-wrap:anywhere;
+  word-break:normal;hyphens:auto}
+.tipbox .l{gap:var(--o3);align-items:baseline}
+.tipbox .l span{min-width:0;overflow-wrap:anywhere}
+.tipbox .l b{flex:none;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.tipbox .tot{display:flex;justify-content:space-between;align-items:baseline;gap:var(--o3)}
+.tipbox .tot b{flex:none;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+/* przy prawej krawędzi okna podpowiedź odsuwa się do środka zamiast wystawać */
+.rgroup .rs:last-child .tipbox{left:auto;right:0;transform:none}
+.rgroup .rs:last-child .tipbox::before{left:auto;right:38px}
 
 /* ═══════════════════════════════════════════════════════════
    POWŁOKA APLIKACJI — szyna nawigacji po lewej

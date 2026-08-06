@@ -965,7 +965,7 @@ const A=[
  d:'Wybierasz oś programową. Trwale przesuwa partię w stronę wybranej grupy.',
  f:(p,f,_,__,___,t)=>{const tm=TEM.find(x=>x.id===t)||TEM[0];
   SID.forEach(s=>{if(tm.w[s])p.aff[s]=Math.max(.1,p.aff[s]+tm.w[s]*.26*f)});
-  p.cred=cl(p.cred+R(8,12)*f);p.fame=cl(p.fame+4*f);p.pret=cl(p.pret+6);p.uni=cl(p.uni+5);M(p,6);
+  p.cred=cl(p.cred+R(8,12)*f);p.fame=cl(p.fame+4*f);p.pret=cl(p.pret+6);M(p,6);
   return `Manifest: „${tm.n}”. Program przesunięty, wiarygodność w górę.`}},
 /* --- organizacja --- */
 {id:'rekr',cat:'org',n:'Nabór do partii',ap:1,kp:18,en:11,reg:1,
@@ -1042,12 +1042,12 @@ const A=[
  d:'Zamiast jednej osoby przepuszczasz przez szkołę kadr trzech naraz. Drożej, ale za jedną akcję.',
  f:(p)=>{let n=0;for(let i=0;i<3&&p.comp.ser>0;i++){p.comp.ser--;p.comp.int++;n++}
   if(!n)return 'Nie ma kogo szkolić.';
-  p.cred=cl(p.cred+4);p.pret=cl(p.pret+4);p.uni=cl(p.uni+3);p.aff.int+=.4;
+  p.cred=cl(p.cred+4);p.pret=cl(p.pret+4);p.aff.int+=.4;
   return `<b>${n} ${pl(n,'osoba przechodzi','osoby przechodzą','osób przechodzi')}</b> z serwerowiczów na intelektualistów.`}},
 {id:'luz',cat:'kam',n:'Luźny stream z liderem',ap:1,kp:8,en:9,
  d:'Dwie godziny gadania o niczym na kanale głosowym. Zbija pretensjonalność najmocniej w grze, przy okazji dorzuca trochę sławy.',
  f:(p,f)=>{const d=R(11,17)*f;p.pret=cl(p.pret-d);p.fame=cl(p.fame+R(3,6)*f);p.aff.ser+=.35;
-  p.uni=cl(p.uni+3);p.cred=cl(p.cred-2);
+  p.cred=cl(p.cred-2);
   return `Serwer usłyszał normalnego człowieka. <b>Pretensjonalność −${Math.round(d)}</b>.`}},
 {id:'konsult',cat:'org',n:'Otwarte konsultacje z serwerem',ap:1,kp:10,en:8,
  d:'Otwierasz kanał, w którym każdy może wejść i powiedzieć, co jest nie tak z partią. Pretensjonalność i kontrowersja w dół, aktywność w górę.',
@@ -1088,24 +1088,16 @@ const A=[
   alive().forEach(k=>{if(k===G.me||k===t)return;G.rel[k][G.me]=cl(G.rel[k][G.me]-12,-100,100)});
   return `<b>Administracja odrzuciła zgłoszenie</b>, ale wyciekło, kto je złożył. Kontrowersja +34, wszyscy patrzą krzywo.`}},
 /* --- program --- */
-{id:'zwrot',cat:'pro',n:'Zwrot programowy',ap:2,kp:11,en:13,seg:1,
- d:'Przestawiasz partię na inny elektorat. Nazwą to koniunkturalizmem.',
- f:(p,f,_,__,s)=>{p.aff[s]+=R(1.6,2.4);SID.forEach(x=>{if(x!==s)p.aff[x]=Math.max(.1,p.aff[x]-.28)});
-  p.cred=cl(p.cred-6);p.uni=cl(p.uni-4);return `Zwrot ku grupie <b>${sn(s)}</b>.`}},
-{id:'nisza',cat:'pro',n:'Umocnienie niszy',ap:1,kp:7,en:6,
- d:'Idziesz w to, co masz. Bezpieczne, ale zamyka drogę na zewnątrz.',
- f:(p,f)=>{const t=topSeg(p);p.aff[t]+=1.3*f;SID.forEach(x=>{if(x!==t)p.aff[x]=Math.max(.1,p.aff[x]-.13)});
-  p.uni=cl(p.uni+5);p.cred=cl(p.cred+2);return `Rdzeń (<b>${sn(t)}</b>) zabetonowany.`}},
-{id:'otw',cat:'pro',n:'Otwarcie na nowych',ap:1,kp:7,en:6,
- d:'#ogłoszenia_youtube i #czat_gamingowy to razem 5 mandatów przy najniższej frekwencji w grze.',
- f:(p,f)=>{p.aff.ser+=1.35*f;p.pres.brama=cl(p.pres.brama+14);p.pres.gaming=cl(p.pres.gaming+10);
-  p.act=cl(p.act+3);return `Program dla nowych ruszył.`}},
-{id:'chlodzenie',cat:'pro',n:'Wyciszenie sporu',ap:1,kp:12,en:9,
+/* Dział „Program" wypadł z gry. Trzy decyzje przestawiające elektorat poszły
+   razem z nim, ale wyciszenie sporu i zejście na ziemię zostają — bez nich
+   z wysokiej kontrowersji i pretensjonalności nie dałoby się zejść w ogóle,
+   a paraliż przy 90 byłby ślepą uliczką. Siedzą teraz w Organizacji. */
+{id:'chlodzenie',cat:'org',n:'Wyciszenie sporu',ap:1,kp:12,en:9,
  d:'Wycofujesz się z awantur, kasujesz najgorsze posty, przepraszasz za ton. Kontrowersja spada o 8–13, powoli, ale to jedyny sposób, żeby zejść z linii ognia. Kosztuje trochę sławy.',
  f:(p,f)=>{const d=R(8,13)*Math.max(.55,f);
-  p.ctr=cl(p.ctr-d);p.fame=cl(p.fame-R(1.5,3));p.cred=cl(p.cred+2);p.uni=cl(p.uni+2);
+  p.ctr=cl(p.ctr-d);p.fame=cl(p.fame-R(1.5,3));p.cred=cl(p.cred+2);
   return `Spór wyciszony. <b>Kontrowersja −${Math.round(d)}</b> (teraz ${Math.round(p.ctr)}).`}},
-{id:'depret',cat:'pro',n:'Zejście na ziemię',ap:1,kp:6,en:7,
+{id:'depret',cat:'org',n:'Zejście na ziemię',ap:1,kp:6,en:7,
  d:'Mniej manifestów, więcej normalnej gadki. Zbija pretensjonalność.',
  f:(p,f)=>{const d=R(9,15)*f;p.pret=cl(p.pret-d);p.cred=cl(p.cred-1.5);p.aff.ser+=.3;p.aff.ser+=.25;
   return `Ton złagodzony. <b>Pretensjonalność −${Math.round(d)}</b>.`}},
@@ -1200,7 +1192,7 @@ const A=[
   return `<b>Sabotaż udany.</b> ${o.ab} traci sławę, aktywność i jedną trzecią obecności we wszystkich okręgach. Nikt nie wie, że to ty (ryzyko było ${Math.round(risk*100)}%).`}},
 {id:'odp',cat:'spe',n:'Regeneracja lidera',ap:1,kp:0,en:-36,tydz2:1,
  d:'Lider znika na chwilę i wraca z energią. Nic nie kosztuje, ale dwa razy w tygodniu to maksimum — po trzecim zniknięciu nikt by go już nie szukał.',
- f:(p)=>{p.act=cl(p.act-3);p.uni=cl(p.uni+2);return `${p.lead} odpoczął. <b>Energia +36</b>.`}},
+ f:(p)=>{p.act=cl(p.act-3);return `${p.lead} odpoczął. <b>Energia +36</b>.`}},
 {id:'stery',cat:'spe',n:'Układ sterów',ap:1,kp:26,en:12,term1:1,
  d:'Ustalasz, ilu ludzi prowadzi partię: jeden, dwóch albo trzech, i kto to jest. Statystyki oraz cechy wrodzone liczą się wtedy jako średnia całego składu sterów. Raz na kadencję.',
  f:()=>{openStery();return null}},
@@ -1219,7 +1211,7 @@ const COMBO=[
 ];
 /* Premier i prezydent mają własne działy w nawigacji, więc nie ma ich tutaj. */
 const CATS=[['kam','Kampania'],['org','Organizacja'],['dyp','Dyplomacja'],['bru','Brudne'],
-            ['pro','Program'],['prm','Przemiana'],['wla','Rząd'],
+            ['prm','Przemiana'],['wla','Rząd'],
             ['opo','Opozycja'],['spe','Specjalne']];
 
 /* ══════════ WYDARZENIA ══════════ */
@@ -4244,7 +4236,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.54';
+let WERSJA='1.1.55';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4255,6 +4247,18 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.55':{data:'6 sierpnia 2026', zmiany:[
+   'DZIAL PROGRAM USUNIETY. Trzy decyzje przestawiajace elektorat poszly razem z nim, ale wyciszenie sporu i zejscie na ziemie zostaja — bez nich z wysokiej kontrowersji i pretensjonalnosci nie dalo by sie zejsc w ogole, a paraliz przy 90 bylby slepa uliczka. Siedza teraz w Organizacji. Kategorii jest szesc zamiast siedmiu.',
+   'ZADNA DECYZJA NIE NADAJE JUZ JEDNOSCI. Manifest, luzny stream, regeneracja lidera i kurs dla zaplecza po cichu ja dosypywaly — teraz zgoda w partii bierze sie wylacznie z tego, co dzieje sie wokol niej, a nie z klikania decyzji.',
+   'Ostrzezenie o kontrowersji zniknelo ze skladu partii i zostalo w jednym miejscu, przy kondycji partii. Wczesniej ta sama czerwona ramka stala w dwoch dzialach naraz.',
+   'NAZWY WYDAWNICTW DAJA SIE ZMIENIAC. Okno nazwy bylo od blokow wyborczych i wymagalo listy partii, wiec przy wydawnictwie wywracalo sie na pierwszym odwolaniu i nic sie nie otwieralo.',
+   'Gazeta nie ma juz serduszek zanim wyda pierwszy numer — swiezy szyld nie ma czego lajkowac.',
+   'Lista wydawnictw ustawia sie po bilansie: najbardziej dochodowe na wierzchu, deficytowe na dole. Ujemny bilans pokazuje sie wreszcie z minusem, a nie jak zysk.',
+   'JEDNA REDAKCJA KAZDEGO RODZAJU: jedna gazeta, jedna telewizja, jedno kino. Trzy szyldy tego samego naraz to juz nie byl wybor, tylko lista zakupow. W sklepie widac wprost, co juz masz.',
+   'Boty siegaja po media wyraznie czesciej i przy mniejszym zapasie w kieszeni.',
+   'Podpowiedz kapitalu prywatnego miesci sie w swojej ramce — dlugie nazwy i zdania wychodzily poza prostokat. Przy prawej krawedzi okna odsuwa sie do srodka, a kwoty w niej maja mordedolara.',
+ ]},
+
  '1.1.54':{data:'6 sierpnia 2026', zmiany:[
    'GOSPODARKA WESZLA DO POLITYKI. Media byly zamknieta petla obok gry: kupowales je za prywatne pieniadze, zarabialy prywatne pieniadze i nic z tego nie wracalo do rdzenia. Teraz zasieg wydawnictw wchodzi WPROST DO SONDAZU — kto ma gazete, antene i ekran, ten dociera do ludzi takze wtedy, gdy nie zrobil w tygodniu nic innego. Zasieg liczy sie tylko z wydawnictw, ktore realnie cos wydaja, i wygasa sam, wiec media trzeba karmic, a nie kupic raz i zapomniec.',
    'DA SIE PRZEGRAC PRZEZ GOSPODARKE. Kieszen przewodniczacego moze zejsc pod kreske, a wtedy dlug rosnie sam o dziewiec procent tygodniowo, co tydzien zabiera wiarygodnosc i jednosc oraz podbija kontrowersje. Po trzech tygodniach pod kreska komornik zabiera wydawnictwa, jedno po drugim, zaczynajac od najdrozszego — z licytacji wraca niecala polowa. Do tego kazdy szyld ma koszty stale, wiec media, z ktorych nic nie wychodzi, po prostu topia pieniadze.',
@@ -4885,12 +4889,13 @@ function game(){
       <div class="tipbox">
         <div style="font-family:var(--m);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px">Kieszenie zaplecza</div>
         ${roster(p).sort((a,b)=>kapPryw(b)-kapPryw(a)).slice(0,5).map(n=>
-          `<div class="l"><span>${n}${isLead(p,n)?' · przewodnictwo':''}</span><b>${kasaSkrot(kapPryw(n))}</b></div>`).join('')}
+          `<div class="l"><span>${n}${isLead(p,n)?' · przewodnictwo':''}</span>
+            <b>${mordedolar(11)} ${kasaSkrot(kapPryw(n))}</b></div>`).join('')}
         ${z?`<div class="l" style="border-top:1px solid var(--line);padding-top:6px;margin-top:6px">
           <span>Zarobek przewodniczącego w tygodniu</span><b style="color:var(--pos)">+${kasaSkrot(z)}</b></div>`:''}
-        <div class="tot"><span>Razem</span><b class="m" style="color:var(--acc)">${kasaSkrot(kp)}</b></div>
+        <div class="tot"><span>Razem</span><b class="m" style="color:var(--acc)">${mordedolar(13)} ${kasaSkrot(kp)}</b></div>
         <div style="color:var(--dim2);font-size:11.5px;margin-top:6px">Milion prywatnego majątku zamienisz
-        na ${KAP_ZA_MLN} kapitału decyzją <b>Zrzutka z prywatnych kieszeni</b>, ale kto wyłoży, ten odchodzi.</div>
+        na ${KAP_ZA_MLN} kapitału <b>Zrzutką z prywatnych kieszeni</b> — ale kto wyłoży, ten odchodzi.</div>
       </div></div>`})()}
     </div>
     ${streakBox()}
@@ -5489,9 +5494,9 @@ function aiMedia(k){
   const p=G.p[k]; if(!p||p.dead)return;
   const szef=p.lead, maj=kapPryw(szef), moje=G.aiMedia[k];
   // zakup: rzadko i tylko wtedy, gdy zostaje wyraźny zapas
-  if(moje.length<3&&ch(.16)){
+  if(moje.length<3&&ch(.42)){
     const chce=Object.keys(MEDIA_TYP)
-      .filter(t=>maj>MEDIA_TYP[t].koszt*2.2&&!moje.some(m=>m.typ===t))
+      .filter(t=>maj>MEDIA_TYP[t].koszt*1.5&&!moje.some(m=>m.typ===t))
       .sort((a,b)=>MEDIA_TYP[b].koszt-MEDIA_TYP[a].koszt)[0];
     if(chce){
       G.kapPryw[szef]=Math.round(maj-MEDIA_TYP[chce].koszt);
@@ -5597,6 +5602,13 @@ const mediaBilans=()=>mediaMoje().reduce((a,m)=>a+m.bilans,0);
    cztery systemy jechały na samej sławie i optymalna gra sprowadzała się
    do podbijania jednego suwaka. */
 function serduszka(m){
+  // świeży szyld nie ma jeszcze czego lajkować — serduszka liczą się od numerów
+  if(!m.numery)return 0;
+  const p=me(), ld=L(m.szef)||{komp:50};
+  return Math.max(0,Math.round(p.cred*.46+ld.komp*.22+(m.staz||0)*.5+p.fame*.08-14));
+}
+/* Ile serduszek zbierze NASTĘPNY numer — to jest prognoza, a nie stan konta. */
+function serduszkaProg(m){
   const p=me(), ld=L(m.szef)||{komp:50};
   return Math.max(0,Math.round(p.cred*.46+ld.komp*.22+(m.staz||0)*.5+p.fame*.08-14));
 }
@@ -5663,17 +5675,34 @@ function mediaKup(typ){
   const t=MEDIA_TYP[typ]; if(!t)return;
   mediaInit();
   const p=me(), szef=p.lead;
+  // jedna redakcja każdego rodzaju — trzy szyldy naraz to już nie wybór, tylko lista zakupów
+  if(G.media.some(m=>m.typ===typ))return;
   if(kapPryw(szef)<t.koszt)return;
   kieszenSzefa(-t.koszt);
-  const nr=G.media.filter(m=>m.typ===typ).length+1;
-  G.media.push({typ,nazwa:`${t.n.split(' ')[1]||'Wydawnictwo'} ${nr}`,szef,bilans:0,staz:0,serca:0,ostatnio:0});
+  G.media.push({typ,nazwa:`${t.n.split(' ')[1]||'Wydawnictwo'} ${p.ab}`,szef,
+                bilans:0,staz:0,serca:0,ostatnio:0,numery:0});
   say(`<b>${t.n}</b> ruszyło. ${szef} wyłożył ${kasaSkrot(t.koszt)}.`,'good');
   close();render();
 }
 function mediaNazwij(i){
   const m=mediaMoje()[i]; if(!m)return;
-  modalName(null,(nazwa)=>{if(nazwa)m.nazwa=nazwa.slice(0,40);close();render()},
-    'Nazwa wydawnictwa','Jak ma się nazywać?');
+  /* Własne okno, bo modalName jest od bloków wyborczych i wymaga listy partii —
+     podanie mu null wywracało się na pierwszym odwołaniu i nazwy nie dało się
+     zmienić w ogóle. */
+  close();
+  const v=document.createElement('div');v.className='veil';v.id='veil';
+  v.innerHTML=`<div class="mdl"><button class="mdlx" type="button" aria-label="Zamknij">×</button>
+    <div class="h"><div class="k">${MEDIA_TYP[m.typ].n}</div><h2>Jak ma się nazywać?</h2></div>
+    <div class="bd"><p>Pod tą nazwą wydawnictwo występuje na liście i w kronice.</p>
+      <input class="inp" id="mn" maxlength="40" value="${esc(m.nazwa)}"></div>
+    <div class="op"><button class="opt" id="mok"><b>Zatwierdzam</b><span>Nazwa wchodzi od zaraz</span></button></div></div>`;
+  document.body.appendChild(v);
+  const zapisz=()=>{const w=v.querySelector('#mn').value.trim();
+    if(w)m.nazwa=w.slice(0,40); close(); render()};
+  v.querySelector('#mok').onclick=zapisz;
+  v.querySelector('#mn').onkeydown=e=>{if(e.key==='Enter')zapisz()};
+  v.querySelector('.mdlx').onclick=()=>{close();render()};
+  setTimeout(()=>{const inp=v.querySelector('#mn');if(inp){inp.focus();inp.select()}},30);
 }
 function mediaSzef(i){
   const m=mediaMoje()[i]; if(!m)return;
@@ -5691,7 +5720,7 @@ function mediaSzef(i){
 function mediaNumer(i){
   const m=mediaMoje()[i]; if(!m||m.typ!=='gazeta'||!mediaGotowe(m))return;
   const p=me();
-  const s=serduszka(m)+RI(-3,3);
+  const s=serduszkaProg(m)+RI(-3,3);
   const serca=Math.max(0,s);
   const zysk=Math.round((serca-10)*18000);
   m.bilans+=zysk; m.serca=serca; m.ostatnio=zysk;
@@ -5811,7 +5840,10 @@ function mediaTab(){
         <div><b>${kasaSkrot(mediaBilans())}</b><span>bilans łączny</span></div>
         <div><b>${kasaSkrot(maj)}</b><span>kieszeń ${esc(szef)}</span></div>
       </div>
-      ${lista.length?`<div class="ekolista">${lista.map((m,i)=>{const t=MEDIA_TYP[m.typ];
+      ${lista.length?`<div class="ekolista">${lista
+        .map((m,i)=>({m,i}))
+        .sort((a,b)=>b.m.bilans-a.m.bilans)      // najbardziej dochodowe na wierzchu, deficytowe na dole
+        .map(({m,i})=>{const t=MEDIA_TYP[m.typ];
         const gotowe=mediaGotowe(m), za=mediaZa(m);
         const akcja={gazeta:['mediaNumer','Wydaj numer'],tv:['mediaOdcinek','Nagraj odcinek'],
                      kino:['mediaFilm','Nakręć film']}[m.typ];
@@ -5820,9 +5852,12 @@ function mediaTab(){
           <span class="ekon">${esc(m.nazwa)}<em class="ekotag">${t.n} · ${esc(m.szef)}${
             m.numery?` · ${m.numery} ${m.typ==='gazeta'?pl(m.numery,'numer','numery','numerów')
               :pl(m.numery,'wydanie','wydania','wydań')}`:' · nic jeszcze nie wyszło'}</em></span>
-          ${m.typ==='gazeta'?`<span class="medserca ${serduszka(m)>=10?'ok':'no'}">♥ ${serduszka(m)}</span>`
+          ${m.typ==='gazeta'
+            ?`<span class="medserca ${m.numery?(m.serca>=10?'ok':'no'):''}">${
+                m.numery?`♥ ${m.serca}`:'brak numerów'}</span>`
             :`<span class="medserca">${m.widz?m.widz+' widzów':'brak wydań'}</span>`}
-          <b class="ekow ${m.bilans>=0?'plus':'minus'}">${mordedolar(12)} ${m.bilans>=0?'+':''}${kasaSkrot(m.bilans)}</b>
+          <b class="ekow ${m.bilans>=0?'plus':'minus'}">${mordedolar(12)} ${
+            m.bilans<0?'−':'+'}${kasaSkrot(Math.abs(m.bilans))}</b>
           <span class="medakcje">
             <button class="btn ${gotowe?'':'g'} sm" ${gotowe?'':'disabled'}
               onclick="${akcja[0]}(${i})">${gotowe?akcja[1]:`za ${za} ${pl(za,'tydzień','tygodnie','tygodni')}`}</button>
@@ -5836,13 +5871,14 @@ function mediaTab(){
     <div class="card"><div class="h"><h3>Załóż wydawnictwo</h3>
       <span class="n">płaci ${esc(szef)} z własnej kieszeni</span></div><div class="b">
       <div class="medsklep">${Object.keys(MEDIA_TYP).map(k=>{const t=MEDIA_TYP[k],stac=maj>=t.koszt;
-        return `<div class="medkafel ${stac?'':'brak'}">
+        const mam=lista.some(m=>m.typ===k);
+        return `<div class="medkafel ${mam?'mam':stac?'':'brak'}">
           <div class="mede duzy">${t.e}</div>
           <b>${t.n}</b>
           <div class="medcena">${mordedolar(13)} ${kasaSkrot(t.koszt)}</div>
           <p>${t.d}</p>
-          <button class="btn ${stac?'':'g'}" ${stac?'':'disabled'} onclick="mediaKup('${k}')">
-            ${stac?'Zakładam':'Brakuje '+kasaSkrot(t.koszt-maj)}</button>
+          <button class="btn ${mam||!stac?'g':''}" ${mam||!stac?'disabled':''} onclick="mediaKup('${k}')">
+            ${mam?'Już to masz':stac?'Zakładam':'Brakuje '+kasaSkrot(t.koszt-maj)}</button>
         </div>`}).join('')}</div>
     </div></div>
   </div>`;
@@ -6031,10 +6067,6 @@ function sidebar(p,q){
       <i style="width:9px;height:9px;border-radius:2px;background:${s.c};flex:none"></i>
       <span style="flex:1">${s.n}</span><b class="m">${p.comp[s.id]}</b>
       <span class="dim m" style="width:38px;text-align:right">${p.mem?Math.round(p.comp[s.id]/p.mem*100):0}%</span></div>`).join('')}
-    ${p.ctr>=82?`<div style="margin-top:10px;font-size:12.5px;color:#f0a0a0;background:rgba(192,74,62,.18);
-      border-left:2px solid var(--neg);padding:9px 11px;border-radius:0 5px 5px 0;line-height:1.45">
-      <b>Kontrowersja ${Math.round(p.ctr)}/100.</b> Przy 90 partia wpada w paraliż: sondaż liczony na pół, kapitał wycieka,
-      co tydzień ktoś odchodzi. Schłodź ją: zejście na ziemię, szkolenie kadr, mniej brudnych zagrywek.</div>`:''}
     ${p.fame<=9&&p.act<=9?`<div style="margin-top:10px;font-size:12.5px;color:#f0a0a0;background:rgba(192,74,62,.18);
       border-left:2px solid var(--neg);padding:9px 11px;border-radius:0 5px 5px 0;line-height:1.45">
       <b>Sława ${Math.round(p.fame)}, aktywność ${Math.round(p.act)}.</b> Przy zerze obu naraz ${p.lead}
@@ -6042,7 +6074,7 @@ function sidebar(p,q){
     ${eliteRisk(p)>0?`<div style="margin-top:10px;font-size:12.5px;color:#e8a4ad;background:rgba(226,96,111,.1);
       border-left:2px solid var(--neg);padding:8px 10px;border-radius:0 5px 5px 0;line-height:1.45">
       <b>Za dużo elity.</b> ${Math.round(ratio(p,'eli')*100)}% składu przy bezpiecznym progu 30%.
-      Kontrowersja rośnie o ${(eliteRisk(p)*6).toFixed(1)} tygodniowo. Przy 90 partia wpada w paraliż.</div>`:''}
+      Kontrowersja rośnie o ${(eliteRisk(p)*6).toFixed(1)} tygodniowo.</div>`:''}
     ${p.mem>4&&ratio(p,'ser')>.72?`<div style="margin-top:10px;font-size:12.5px;color:var(--dim);background:#0b0e13;
       border-left:2px solid var(--acc2);padding:8px 10px;border-radius:0 5px 5px 0;line-height:1.45">
       Partia niemal wyłącznie serwerowicka, jedność leci w dół, kontrowersja w górę.</div>`:''}
