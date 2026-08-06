@@ -4516,26 +4516,27 @@ function modeScreen(){
     </button>`;
 
   app.innerHTML=`
-  <div class="startekran">
+  <div class="startekran modepick">
   <button class="btn g sm" style="margin-bottom:14px" onclick="backToMenu()">← Wstecz</button>
   <!-- Ekran trybów jest podstroną, a nie drugim ekranem głównym. Wielki tytuł,
        godło i wizytówka serwera zostały w menu — tutaj jest tylko nagłówek
        mówiący, gdzie jesteś, i sama lista. -->
-  <div class="podnag">
-    <div class="kick">Nowa gra</div>
-    <h2>Od czego zaczynasz</h2>
+  <div class="podnag modehead">
+    <div class="kick">Nowa rozgrywka</div>
+    <h2>Wybierz stół, przy którym siadasz</h2>
+    <p>Każdy tryb prowadzi do tej samej politycznej gry. Różni się tylko punktem startu.</p>
   </div>
   <!-- Układ menu wzięty z proporcji Victorii: kolumna przycisków 310x55 po lewej,
        odstęp 5 w grupie i 25 między grupami, a po prawej panel z opisem tego,
        na co akurat patrzysz. Same kafle zostają — zmienia się tylko to, jak stoją. -->
-  <div class="modes">
+  <div class="modes fifamodes">
     ${karta({i:'tut',akcja:"pickMode('tut')",tag:'dla nowych',n:'Samouczek',
       d:'Prowadzę cię krok po kroku przez pierwszą kadencję Stronnictwem Reisei: obecność w kanałach, kolejność decyzji, transfery, cele partyjne i wybory.',
       stopka:'ok. 10 minut',akcjaN:'Zaczynam →'})}
-    ${karta({i:'free',akcja:"pickMode('free')",tag:'pełna gra',data:'1 sierpnia 2026',kl:'glowna',n:'Dzień dzisiejszy',
+    ${karta({i:'free',akcja:"pickMode('free')",tag:'pełna gra',data:'STAN SERWERA · 1 SIERPNIA 2026',kl:'glowna',n:'Dzień dzisiejszy',
       d:'Serwer taki, jaki jest teraz: czternaście partii od największej po jednoosobową, rząd na swoim miejscu i wszystko do wzięcia.',
       stopka:'wszystkie partie i scenariusze',akcjaN:'Wybieram partię →'})}
-    ${karta({i:'upad',wyl:1,kl:'wkrotce',tag:'scenariusz',data:'25 kwietnia 2025',n:'Upadek Republikanów',
+    ${karta({i:'upad',wyl:1,kl:'wkrotce',tag:'scenariusz',data:'ARCHIWUM · 25 KWIETNIA 2025',n:'Upadek Republikanów',
       d:'Zaczynasz szesnaście miesięcy wcześniej, w tygodniu, w którym niebieski sztandar poszedł w dół, a jego ludzie rozeszli się po całym serwerze.',
       stopka:'w przygotowaniu',akcjaN:'Wkrótce'})}
     ${karta({i:'los',akcja:'slepyLos()',tag:'???',kl:'tajemna',n:'Losowo',
@@ -4558,7 +4559,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.72';
+let WERSJA='1.1.73';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4569,6 +4570,12 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.73':{data:'7 sierpnia 2026', zmiany:[
+   'WYBOR TRYBU JEST TERAZ TABLICA CZTERECH KART. Dzien dzisiejszy, samouczek, los i przyszle archiwum maja wlasne pelne pola, a data jest tabliczka sezonu.',
+   'GORNY PASEK JEST KROTSZY: nie ma wykresow ostatnich odczytow ani kapitalu prywatnego. Energia znow miesci sie obok akcji, kapitalu, sondazu i mandatow.',
+   'MAPA WROCILA DO ZWYKLYCH SZESCIOBOCZNYCH OKREGOW. Zniknal pasek Czeka na ciebie, a wazne dzialy dostaja wykrzyknik na swojej zakladce.',
+   'KONDYCJA PARTII JEST PIERWSZA W BOCZNYM PANELU. Wykres wychodzi do obu krawedzi karty, a zlote tla w Mediach i przy wyborze partii sa z powrotem widoczne.',
+ ]},
  '1.1.72':{data:'7 sierpnia 2026', zmiany:[
    'WYBOR PARTII I SCENARIUSZA DOSTAL NOWY UKLAD. Najpierw widzisz pelny profil wybranej opcji, a potem krotka tablice szyldow zamiast absurdalnej listy obok panelu.',
    'PULPIT I BOCZNY PANEL SA CZYTELNIEJSZE: zasoby maja rowne kasetony, kondycja partii stoi na gorze, a wykres wypelnia cala szerokosc karty.',
@@ -5218,9 +5225,6 @@ function game(){
     </div>
     <div class="rgroup">
     <div class="rs tip">${ikona('sondaz')}<div class="rv"><b>${fmt(shown(G.me,sh))}%<span class="plus" style="color:var(--info);-webkit-text-fill-color:var(--info)">?</span></b><span>sondaż</span></div>
-      ${(()=>{const h=(G.polls||[]).map(r=>r.s&&r.s[G.me]).filter(x=>isFinite(x));
-        return h.length>1?`<div class="iskrabox">${iskra(h,'var(--acc)')}
-          <span>ostatnie ${h.length} ${pl(h.length,'odczyt','odczyty','odczytów')}</span></div>`:''})()}
       <div class="tipbox" style="width:330px">
         <div style="font-family:var(--m);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px">Co realnie rusza sondażem</div>
         <div class="l"><span><b>Liczba i skład partii</b>, decyduje najmocniej</span></div>
@@ -5239,22 +5243,6 @@ function game(){
     <!-- mandaty zdobyte w ostatnich wyborach, nie prognoza z bieżącego przeliczenia:
          liczba ma się zgadzać z tym, co pokazuje sejm, i zmieniać dopiero po urnach -->
     <div class="rs" title="Mandaty zdobyte w ostatnich wyborach. Zmienią się dopiero po następnych."><i class="ic ic-mandat" aria-hidden="true"></i><div class="rv"><b>${p.seats}</b><span>mandaty</span></div></div>
-    ${(()=>{const kp=roster(p).reduce((a,n)=>a+kapPryw(n),0), z=G.zarobekOstatnio||0;
-      return `<div class="rs tip">${mordedolar(19)}<div class="rv"><b>${kasaSkrot(kp)}</b><span>kapitał prywatny</span></div>
-      ${(()=>{const h=(G.pkbHist||[]).map(x=>x.k).filter(x=>isFinite(x));
-        return h.length>1?`<div class="iskrabox">${iskra(h,'var(--acc)')}
-          <span>majątek zaplecza przez ${h.length} ${pl(h.length,'tydzień','tygodnie','tygodni')}</span></div>`:''})()}
-      <div class="tipbox">
-        <div style="font-family:var(--m);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px">Kieszenie zaplecza</div>
-        ${roster(p).sort((a,b)=>kapPryw(b)-kapPryw(a)).slice(0,5).map(n=>
-          `<div class="l"><span>${n}${isLead(p,n)?' · przewodnictwo':''}</span>
-            <b>${mordedolar(11)} ${kasaSkrot(kapPryw(n))}</b></div>`).join('')}
-        ${z?`<div class="l" style="border-top:1px solid var(--line);padding-top:6px;margin-top:6px">
-          <span>Zarobek przewodniczącego w tygodniu</span><b style="color:var(--pos)">+${kasaSkrot(z)}</b></div>`:''}
-        <div class="tot"><span>Razem</span><b class="m" style="color:var(--acc)">${mordedolar(13)} ${kasaSkrot(kp)}</b></div>
-        <div style="color:var(--dim2);font-size:11.5px;margin-top:6px">Milion prywatnego majątku zamienisz
-        na ${KAP_ZA_MLN} kapitału <b>Zrzutką z prywatnych kieszeni</b> — ale kto wyłoży, ten odchodzi.</div>
-      </div></div>`})()}
     </div>
     ${streakBox()}
     <div class="hudend">
@@ -5282,15 +5270,16 @@ function game(){
         : '<span class="dim" style="margin-left:auto;font-size:12.5px">Nie ma cię w dogrywce.</span>'}
     </div></div>`:''}
   ${lukKadencji()}
-  ${waznePasek()}
   <div class="nav">
-    ${(()=>{const nv=[['mapa','Mapa okręgów'],['akcje','Decyzje'+(G.ap?`<span class="badge">${G.ap}</span>`:'')],
+    ${(()=>{const wazne=new Set(waznePozycje().map(x=>x.t));
+      const nazwa=(k,n)=>n+(wazne.has(k)?'<span class="badge">!</span>':'');
+      const nv=[['mapa',nazwa('mapa','Mapa okręgów')],['akcje',nazwa('akcje','Decyzje')+(G.ap?`<span class="badge">${G.ap}</span>`:'')],
        ['lider','Lider'+(leads(G.p[G.me]).some(n=>xpOs(n)>=35)?'<span class="badge">!</span>':'')],['krol','Król'+(kingFav(G.me)<0?'<span class="badge">!</span>':'')],['partie','Partie'],['sondaz','Sondaż']];
       const mg=myGoals();
-      if(mg.length)nv.push(['cele',(mg.length>1?'Cele partyjne':'Cel partyjny')+(goalReady()?'<span class="badge">!</span>':'')]);
+      if(mg.length)nv.push(['cele',nazwa('cele',mg.length>1?'Cele partyjne':'Cel partyjny')]);
       // urzędy mają własne działy zamiast kategorii schowanych w decyzjach
-      if(isPM())nv.push(['premier','Premier'+(lawsPending()?'<span class="badge">!</span>':'')]);
-      if(hasPrez())nv.push(['prezydent','Prezydent'+(lawsToSign().length?`<span class="badge">${lawsToSign().length}</span>`:'')]);
+      if(isPM())nv.push(['premier',nazwa('premier','Premier')]);
+      if(hasPrez())nv.push(['prezydent',nazwa('prezydent','Prezydent')]);
       nv.push(['sejm','Sejm i władza']);
       nv.push(['ekonomia','Ekonomia']);
       // Media stoją nad Sądem i widać je zawsze — bez ustawy po prostu nie da
@@ -6619,24 +6608,6 @@ function presArc(cx,cy,r,frac){
   return `M ${(cx+r*Math.cos(a0)).toFixed(2)} ${(cy+r*Math.sin(a0)).toFixed(2)} `
     +`A ${r} ${r} 0 ${frac>.5?1:0} 1 ${(cx+r*Math.cos(a1)).toFixed(2)} ${(cy+r*Math.sin(a1)).toFixed(2)}`;
 }
-/* Kanały są różnymi miejscami, nie kaflami z jednej planszy. Stałe, lekko
-   nieregularne obrysy dają każdemu własny kształt, ale mieszczą się w dawnym
-   promieniu heksa, więc nie nachodzą na siebie ani na podpisy. */
-const OKREG_KSZTALTY=[
-  [[0,-1], [.72,-.72], [1,-.08], [.78,.66], [.18,.97], [-.68,.78], [-.96,.18], [-.83,-.55], [-.3,-.94]],
-  [[-.2,-1], [.62,-.78], [1,-.26], [.92,.48], [.37,.94], [-.46,.92], [-.94,.36], [-.9,-.44], [-.48,-.9]],
-  [[0,-1], [.78,-.64], [.95,.13], [.58,.88], [-.05,.98], [-.78,.66], [-1,.03], [-.67,-.76]],
-  [[-.46,-.9], [.35,-1], [.92,-.48], [1,.26], [.45,.92], [-.38,.96], [-.94,.45], [-.86,-.38]],
-  [[0,-1], [.68,-.8], [1,-.15], [.86,.54], [.34,.98], [-.44,.9], [-.96,.4], [-.9,-.33], [-.46,-.86]],
-  [[-.15,-1], [.68,-.73], [1,-.02], [.68,.72], [.02,1], [-.74,.7], [-.98,.02], [-.72,-.7]],
-  [[0,-1], [.82,-.52], [.96,.24], [.54,.9], [-.22,.98], [-.9,.56], [-1,-.16], [-.55,-.88]],
-  [[-.32,-.95], [.5,-.9], [.98,-.34], [.88,.46], [.28,.98], [-.58,.82], [-1,.22], [-.8,-.58]],
-  [[.08,-1], [.78,-.62], [1,.1], [.66,.8], [-.1,.98], [-.8,.64], [-.96,-.18], [-.56,-.86]],
-];
-function okregPts(cx,cy,r,i){
-  return OKREG_KSZTALTY[i%OKREG_KSZTALTY.length]
-    .map(([x,y])=>`${(cx+x*r).toFixed(1)},${(cy+y*r).toFixed(1)}`).join(' ')
-}
 function mapTab(q,AL){
   const p=me(),r=REG.find(x=>x.id===G.sel);
   const ld=Object.fromEntries(REG.map(x=>[x.id,leader(x.id,q.res)]));
@@ -6656,15 +6627,15 @@ function mapTab(q,AL){
         </defs>
         <rect x="0" y="0" width="800" height="620" fill="url(#grid)" rx="12"/>
         <rect x="0" y="0" width="800" height="620" fill="url(#vig)" rx="12"/>
-        ${REG.map((x,i)=>{
+        ${REG.map(x=>{
           const Lk=alive().reduce((a,k2)=>G.p[k2].pres[x.id]>G.p[a].pres[x.id]?k2:a,G.me);
           const c=G.p[Lk].c,pr=p.pres[x.id],on=x.id===G.sel,crestSrc=(G.p[Lk].logo&&LOGOS[G.p[Lk].logo])||LOGOS[Lk]||'';
-          const R0=94, shape=okregPts(x.x,x.y,R0,i), arc=presArc(x.x,x.y,R0+7,cl(pr,0,100)/100);
+          const R0=102, arc=presArc(x.x,x.y,R0+7,cl(pr,0,100)/100);
           const dom=Lk, dp=G.p[dom].pres[x.id], darc=presArc(x.x,x.y,R0+15,cl(dp,0,100)/100);
           const glosy=ld[x.id];
           return `<g class="hex" onclick="setSel('${x.id}')">
-            <polygon class="hglow" points="${shape}" fill="${c}" filter="url(#soft)"/>
-            <polygon class="hf" points="${shape}" fill="${c}" fill-opacity="${(.17+dp/155).toFixed(3)}"
+            <polygon class="hglow" points="${hexPts(x.x,x.y,R0)}" fill="${c}" filter="url(#soft)"/>
+            <polygon class="hf" points="${hexPts(x.x,x.y,R0)}" fill="${c}" fill-opacity="${(.17+dp/155).toFixed(3)}"
               stroke="${on?'var(--acc)':c}" stroke-width="${on?3.6:1.6}" stroke-opacity="${on?1:.72}"/>
             <path d="${darc}" fill="none" stroke="${G.p[dom].c}" stroke-width="${(3+dp/22).toFixed(1)}" stroke-linecap="round" stroke-opacity=".85"/>
             ${dom===G.me?'':`<path d="${arc}" fill="none" stroke="${p.c}" stroke-width="3" stroke-linecap="round" stroke-opacity="${(.35+pr/190).toFixed(2)}"/>`}
