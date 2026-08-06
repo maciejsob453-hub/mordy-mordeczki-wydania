@@ -4245,7 +4245,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.56';
+let WERSJA='1.1.57';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4259,7 +4259,7 @@ const PATCHNOTE={
  '1.1.56':{data:'6 sierpnia 2026', zmiany:[
    'PORZUCONA DECYZJA NIE ZOSTAJE NA STOLE TYGODNIA. Wpis szedl na stol w chwili odpalenia decyzji, takze tej z wlasnym oknem — a ta w tym momencie jeszcze niczego nie zrobila. Zamkniecie okna bez wyboru zostawialo kafel bez skutkow, czasem z liczbami z powietrza. Teraz decyzja okienkowa czeka i wchodzi na stol dopiero po kliknieciu tego ostatniego punktu, a rezygnacja zdejmuje ja calkiem.',
    'JEDNOSC NADAJA JUZ TYLKO TRZY DECYZJE: Spot wyborczy, Czystka w partii i Zjazd partii. Reszta gry przestala ja dosypywac po cichu.',
-   'PASEK WLADZY W DUCHU VICTORII 3: sztandar partii po lewej jak flaga, obok jeden zaokraglony pancerz z mosiezna obwodka, a odczyty stoja w nim jako osobne kapsuly oddzielone pionowymi kreskami. Ikona przed liczba, podpis pod nia, przyrost tygodniowy zielony tuz przy wartosci.',
+   'PASEK WLADZY NA DWA POZIOMY, jak w Victorii: gorny rzad to przyrosty tygodniowe na zielono — kapital, energia, zarobek przewodniczacego i momentum — a dolny to stan zasobow. Oba siedza w jednym zaokraglonym pancerzu z mosiezna obwodka, sztandar partii stoi po lewej jak flaga. Podpisy zeszly pod liczbami do podpowiedzi, wiec pasek zszedl ze 143 na 106 pikseli i nie zawija sie juz na trzy pietra.',
    'TLUSZCZOLT — nowa cecha wrodzona Macka. Kontrowersja +2,8 i pretensjonalnosc +2,2 tygodniowo, bo Maciek nie przechodzi obok zadnej awantury. Za to Krol Mordeczka trzyma z nim jak rowny z rownym: przychylnosc dworu +14, osobnym wierszem na liscie u Krola.',
    'PARTIA LIBERALNO-REPUBLIKANSKA NAZYWA SIE TERAZ CONCORDIA i ma nowe logo. Barwa poszla w mocniejszy fiolet.',
    'LICZNIK ODPALEN W LAUNCHERZE: ile razy gra zostala uruchomiona i na ilu komputerach. Nie wychodzi stamtad nic o graczu — zaden nick, adres ani nazwa komputera. Instalacja dostaje losowy numer, ktory nigdzie nie jest wysylany i sluzy tylko temu, zeby drugie odpalenie na tej samej maszynie nie doliczylo kolejnej osoby. Brak internetu oznacza tylko tyle, ze launcher pokaze ostatnia znana liczbe.',
@@ -4851,6 +4851,18 @@ function game(){
   <div class="hud" style="--partia:${p.c}">
     <div class="id">${crest(G.me,'m')}<div style="min-width:0"><h2>${p.n}</h2>
       <div class="sub">${p.lead} · <span class="rola ${role.toLowerCase()}">${role}</span>${hasPrez()?' · <span class="rola prezydent">PREZYDENT</span>':''}</div></div></div>
+    <div class="hudtabl">
+    <!-- Górny poziom paska: co PRZYBĘDZIE w tym tygodniu, na zielono.
+         Dolny: stan na teraz. Dokładnie ten układ, co w pasku Victorii —
+         najpierw przyrosty, pod nimi zasoby, wszystko w jednym pancerzu. -->
+    ${(()=>{const i=income(),eg=enGain(),z=zarobekLidera(G.me),mom=Math.round(p.mom||0);
+      const wiersz=[[ikona('kapital'),'+'+i.total,'kapitał tygodniowo'],
+                    [ikona('energia'),'+'+eg,'regeneracja energii'],
+                    [mordedolar(14),'+'+kasaSkrot(z),'zarobek przewodniczącego'],
+                    [ikona('sondaz'),(mom>0?'+':'')+mom,'momentum']];
+      return `<div class="hudgora">${wiersz.map(([ic,v,t])=>
+        `<span class="hudpr ${String(v).startsWith('-')?'dol':''}" title="${t}">${ic}<b>${v}</b></span>`
+      ).join('')}</div>`})()}
     <div class="rgroup">
     <div class="rs">${ikona('akcje')}<div class="rv"><b>${G.ap}<span class="of">/${G.apMax}</span></b><span>akcje</span></div></div>
     ${(()=>{const i=income();return `<div class="rs tip">${ikona('kapital')}<div class="rv"><b class="${G.kp<0?'ujem':''}">${Math.round(G.kp)}<span class="plus">+${i.total}</span></b><span>kapitał</span></div>
@@ -4915,6 +4927,7 @@ function game(){
         <div style="color:var(--dim2);font-size:11.5px;margin-top:6px">Milion prywatnego majątku zamienisz
         na ${KAP_ZA_MLN} kapitału <b>Zrzutką z prywatnych kieszeni</b> — ale kto wyłoży, ten odchodzi.</div>
       </div></div>`})()}
+    </div>
     </div>
     ${streakBox()}
     <div class="hudend">
