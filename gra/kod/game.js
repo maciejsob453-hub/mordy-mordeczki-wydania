@@ -3106,8 +3106,9 @@ function initTips(){
     d.style.top=(r.top-h-10<8?r.bottom+10:r.top-h-10)+'px';
   };
   const ukryj=()=>{const d=document.getElementById('qfloat');if(d)d.style.display='none'};
-  document.addEventListener('mouseover',e=>{const t=e.target.closest&&e.target.closest('.qtip');if(t)pokaz(t)});
-  document.addEventListener('mouseout',e=>{const t=e.target.closest&&e.target.closest('.qtip');if(t)ukryj()});
+  const cel=e=>e.target.closest&&e.target.closest('.qtip,.act[data-tip]');
+  document.addEventListener('mouseover',e=>{const t=cel(e);if(t&&!t.contains(e.relatedTarget))pokaz(t)});
+  document.addEventListener('mouseout',e=>{const t=cel(e);if(t&&!t.contains(e.relatedTarget))ukryj()});
   document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('.qtip');
     if(t){e.stopPropagation();const d=document.getElementById('qfloat');
       if(d&&d.style.display==='block')ukryj();else pokaz(t)}else ukryj()});
@@ -4480,7 +4481,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.77';
+let WERSJA='1.1.78';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4491,6 +4492,14 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.78':{data:'7 sierpnia 2026', zmiany:[
+  'Kondycja partii ma tylko osobne wskazniki. Usunieto ostatnie pozostalosci zbiorczej oceny.',
+  'Kazdy panel prawego pulpitu mozna zwinac, a wybor nie resetuje sie przy przerysowaniu ekranu.',
+  'Sala Sejmu jest wyzsza i wieksza. Mandaty, wiekszosc oraz sila rzadu dostaly czytelna hierarchie.',
+  'Zloto zostalo tylko przy najwazniejszych potwierdzeniach. Negocjacje koalicyjne maja kolory zalezne od relacji i zgody.',
+  'Podpowiedzi akcji, kapitalu, energii i sondazu znow sa widoczne. Pokazuja aktywne czynniki i sposob poprawy wyniku.',
+  'Gorny pasek i srodkowe widoki maja wiecej miejsca oraz rowniejsze proporcje.',
+ ]},
  '1.1.77':{data:'7 sierpnia 2026', zmiany:[
   'Kondycja partii pokazuje juz tylko konkretne wskazniki. Zniknela zbiorcza ocena, trend i podsumowanie mocnej oraz slabej strony.',
   'Srodek gry jest szerszy: mapa, decyzje, lider, Krol i pozostale dzialy dostaly miejsce zabrane z bocznego pulpitu i nawigacji.',
@@ -4511,7 +4520,7 @@ const PATCHNOTE={
   'Transfery sa w trzech czytelnych kolumnach, a Sejm pokazuje najwazniejsze uklady bez sciany kart list wyborczych.',
  ]},
  '1.1.75':{data:'7 sierpnia 2026', zmiany:[
-  'Kondycja partii nie ma juz wykresu radarowego. Zamiast niego jest ocena kondycji, trend tygodnia, mocna strona i rzecz do naprawy.',
+  'Kondycja partii nie ma juz wykresu radarowego. Zamiast niego pokazuje osobne wskazniki stanu partii.',
   'Przyciski dostaly druga warstwe czytelnosci bez zaleznosci od wygladu ekranu: dotyczy to mediow, transferow, list i modali.',
   'Zablokowane przyciski sa ciemne, ale maja jasny napis zamiast czarnej plamy.',
  ]},
@@ -5149,10 +5158,21 @@ function game(){
          najpierw przyrosty, pod nimi zasoby, wszystko w jednym pancerzu. -->
     <div class="hudcenter">
     <div class="rgroup zasoby">
-    <div class="rs">${ikona('akcje')}<div class="rv"><b>${G.ap}<span class="of">/${G.apMax}</span></b><span>akcje</span></div></div>
+    ${(()=>{const skl=[];
+      if(isPM())skl.push('premier +1');if(hasPrez())skl.push('prezydent +1');
+      if(hasAds(G.me))skl.push('Państwo Partyjne +2');if(hasHeg(G.me))skl.push('Hegemon +1');
+      if(hasHor(G.me))skl.push('Horda −1');
+      return `<div class="rs tip">${ikona('akcje')}<div class="rv"><b>${G.ap}<span class="of">/${G.apMax}</span></b><span>akcje</span></div>
+      <div class="tipbox">
+        <div class="tiptyt">Pula działań w tygodniu</div>
+        <div class="l"><span>Podstawa</span><b>3</b></div>
+        ${skl.map(x=>`<div class="l"><span>${x}</span></div>`).join('')}
+        <div class="tot"><span>Dostępne teraz</span><b class="m">${G.ap} z ${G.apMax}</b></div>
+        <div class="tiprada">Pula odnawia się przy kolejnym tygodniu. Więcej akcji dają najważniejsze urzędy i wybrane przemiany partii. Koszt konkretnej decyzji pokazują kropki na jej karcie.</div>
+      </div></div>`})()}
     ${(()=>{const i=income();return `<div class="rs tip">${ikona('kapital')}<div class="rv"><b class="${G.kp<0?'ujem':''}">${Math.round(G.kp)}<span class="plus">+${i.total}</span></b><span>kapitał</span></div>
       <div class="tipbox">
-        <div style="font-family:var(--m);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px">Wpływy tygodniowe</div>
+        <div class="tiptyt">Wpływy tygodniowe</div>
         ${SEG.map(s=>{const per={eli:2.6,int:.95,ser:.18}[s.id];
           return `<div class="l"><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${s.c};margin-right:6px"></i>${s.n} ${p.comp[s.id]}×${per.toFixed(2)}</span><b>${(p.comp[s.id]*per).toFixed(1)}</b></div>`}).join('')}
         <div class="l" style="border-top:1px solid var(--line);padding-top:6px;margin-top:6px">
@@ -5165,24 +5185,25 @@ function game(){
           <b style="color:var(--neg)">decyzje +${inflacjaProc()}%</b></div>
           <div style="color:var(--dim2);font-size:11.5px;margin-top:6px">Im większy zapas leży w kasie,
           tym drożej wychodzi każda decyzja. Wydawaj, zamiast zbierać.</div>`:''}
-        <div style="color:var(--dim2);font-size:11.5px;margin-top:7px">Elita płaci czternaście razy tyle co serwerowicz, ale przy martwej partii nie płaci nikt.</div>
+        <div class="tiprada">Kapitał zwiększasz przez liczniejszy skład, większy udział elity, aktywność, urzędy i wydawnictwa. Elita płaci wielokrotnie więcej od serwerowicza, ale przy martwej partii nie płaci nikt.</div>
       </div></div>`})()}
     ${(()=>{const eg=enGain(),ld=lead(G.me);return `<div class="rs tip">${ikona('energia')}
       <div class="rv"><b class="${G.en<25?'ujem':''}">${Math.round(G.en)}<span class="plus" style="color:${eg<8?'var(--neg)':eg<18?'var(--acc)':'var(--pos)'};-webkit-text-fill-color:${eg<8?'var(--neg)':eg<18?'var(--acc)':'var(--pos)'}">+${eg}</span></b><span>energia</span></div>
       <div class="tipbox">
-        <div style="font-family:var(--m);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px">Regeneracja tygodniowa</div>
-        <div class="l"><span>Podstawa</span><b>2,0</b></div>
-        <div class="l"><span>Wytrzymałość ${p.lead} (${ld.wytrz})</span><b>+${(ld.wytrz/3.4).toFixed(1)}</b></div>
-        <div class="l"><span>Jedność ${Math.round(p.uni)} <span style="color:var(--dim2)">(próg 48)</span></span>
-          <b style="color:${p.uni>=48?'var(--pos)':'var(--neg)'}">${p.uni>=48?'+':''}${((p.uni-48)/4.5).toFixed(1)}</b></div>
+        <div class="tiptyt">Regeneracja tygodniowa</div>
+        <div class="l"><span>Podstawa</span><b>${BAL.energiaBaza.toFixed(1)}</b></div>
+        <div class="l"><span>Wytrzymałość ${p.lead} (${ld.wytrz})</span><b>+${(ld.wytrz/3.1).toFixed(1)}</b></div>
+        <div class="l"><span>Jedność ${Math.round(p.uni)} <span style="color:var(--dim2)">(punkt odniesienia 42)</span></span>
+          <b style="color:${p.uni>=42?'var(--pos)':'var(--neg)'}">${p.uni>=42?'+':''}${((p.uni-42)/4.4).toFixed(1)}</b></div>
+        ${G.law&&G.law.zagadki?'<div class="l"><span>Cotygodniowe zagadki</span><b style="color:var(--pos)">+4,0</b></div>':''}
         <div class="tot"><span>Razem</span><b class="m" style="color:${eg<8?'var(--neg)':'var(--acc)'}">+${eg}</b></div>
-        <div style="color:var(--dim2);font-size:11.5px;margin-top:7px">Przy jedności poniżej dwudziestu lider praktycznie nie regeneruje sił, nikt nie ma weny do prowadzenia partii, w której jest sam.</div>
+        <div class="tiprada">Energię zwiększasz przede wszystkim wytrzymałością przewodniczącego i jednością. Przy bardzo niskiej jedności lider praktycznie nie regeneruje sił.</div>
       </div></div>`})()}
     </div>
     <div class="rgroup polityka">
     <div class="rs tip">${ikona('sondaz')}<div class="rv"><b>${fmt(shown(G.me,sh))}%<span class="plus" style="color:var(--info);-webkit-text-fill-color:var(--info)">?</span></b><span>sondaż</span></div>
       <div class="tipbox" style="width:330px">
-        <div style="font-family:var(--m);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px">Co realnie rusza sondażem</div>
+        <div class="tiptyt">Co realnie rusza sondażem</div>
         <div class="l"><span><b>Liczba i skład partii</b>, decyduje najmocniej</span></div>
         <div style="font-size:11.5px;color:var(--dim2);margin:-2px 0 7px">Dwie trzecie wyniku to twoi ludzie. Elita waży 1,75 głosu, intelektualista 1,10, serwerowicz 0,66.</div>
         <div class="l"><span><b>Obecność w okręgach</b></span><b>×0,45–2,1</b></div>
@@ -5192,7 +5213,7 @@ function game(){
         <div class="l"><span><b>Urzędy</b></span><b>premier +26%, pałac +13%</b></div>
         <div class="l"><span><b>Momentum</b></span><b>±30%</b></div>
         <div style="font-size:11.5px;color:var(--dim2);margin:-2px 0 7px">Rośnie od wygranych debat, udanych afer i owacyjnych wieców; wygasa o 17% tygodniowo.</div>
-        <div style="border-top:1px solid var(--line);padding-top:7px;margin-top:4px;color:var(--dim2);font-size:11.5px">
+        <div class="tiprada">
           Sam sondaż to <b style="color:var(--tx)">badanie</b>, nie wynik, pojedynczy odczyt bywa przestrzelony nawet o siedem punktów.
           Prawdziwe poparcie widać dopiero przy urnach.</div>
       </div></div>
@@ -6317,6 +6338,21 @@ function najlepszyRywal(k){
     return a;
   },null);
 }
+
+/* Zwiniecie panelu jest wyborem gracza, wiec zwykle przerysowanie ekranu nie
+   moze go kasowac. Stan siedzi w rozgrywce i przechodzi razem z zapisem. */
+const SIDE_DOMYSLNIE={lead:1,kond:1,kronika:1,skl:1,zaplecze:0,serwer:0,rel:0};
+function sideOtwarte(id){
+  if(!G.sideOpen)G.sideOpen={...SIDE_DOMYSLNIE};
+  return G.sideOpen[id]===undefined?!!SIDE_DOMYSLNIE[id]:!!G.sideOpen[id];
+}
+function sideToggle(el,id){
+  if(!G||!el)return;
+  if(!G.sideOpen)G.sideOpen={...SIDE_DOMYSLNIE};
+  G.sideOpen[id]=el.open?1:0;
+}
+const sideAttr=id=>`${sideOtwarte(id)?'open ':''}ontoggle="sideToggle(this,'${id}')"`;
+
 function sidebar(p,q){
   const b=(l,v,c,k)=>{const d=G.prev?v-G.prev[k]:0;
     /* Kreska rywala. Sama liczba „62" nigdy nic nie znaczyła — dopiero widok,
@@ -6336,8 +6372,8 @@ function sidebar(p,q){
   const ld=lead(G.me),used=PID.reduce((a,k)=>a+G.p[k].mem,0);
   const benchAll=roster(p),swapCands=benchAll.filter(x=>!isLead(p,x));
   return `
-  <div class="card lead"><div class="h"><h3>Przewodnictwo</h3>
-    <span class="n">${leads(p).length===1?'jednoosobowe':leads(p).length===2?'dwuosobowe':'trzyosobowe'}</span></div><div class="b">
+  <details class="card lead sidefold" ${sideAttr('lead')}><summary><h3>Przewodnictwo</h3>
+    <span class="n">${leads(p).length===1?'jednoosobowe':leads(p).length===2?'dwuosobowe':'trzyosobowe'}</span></summary><div class="b">
     <div class="leadbox">${leadAva(G.me,44)}<div style="min-width:0">
       <b style="font-size:15px">${leads(p).join(' / ')}</b>
       <div class="dim" style="font-size:12px">${leads(p).length>1?'współprzewodniczący':'przewodniczący'} ${p.ab}${hasPrez()?' · <span style="color:var(--roy)">prezydent</span>':''}${isPM()?' · <span style="color:var(--acc)">premier</span>':''}</div>
@@ -6349,9 +6385,9 @@ function sidebar(p,q){
       <div><b>${ld.autor}</b><span>autorytet</span></div></div>
     <div class="hint">${leads(p).length>1?'Statystyki to średnia całego składu sterów. ':''}Kto prowadzi partię, ustawiasz
       w <b>Decyzjach → Specjalne → Układ sterów</b>${G.useTerm.stery?' <span class="bad">(zużyte w tej kadencji)</span>':''}.</div>
-  </div></div>
+  </div></details>
   ${feed()}
-  <div class="card skl"><div class="h"><h3>Skład partii</h3><span class="n">${p.mem} ${pl(p.mem,'osoba','osoby','osób')}</span></div><div class="b">
+  <details class="card skl sidefold" ${sideAttr('skl')}><summary><h3>Skład partii</h3><span class="n">${p.mem} ${pl(p.mem,'osoba','osoby','osób')}</span></summary><div class="b">
     <div style="display:flex;height:11px;border-radius:4px;overflow:hidden;margin-bottom:10px">
       ${SEG.map(s=>`<i style="display:block;height:100%;width:${p.mem?p.comp[s.id]/p.mem*100:0}%;background:${s.c}"></i>`).join('')}</div>
     ${SEG.map(s=>`<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;margin-bottom:5px">
@@ -6369,8 +6405,8 @@ function sidebar(p,q){
     ${p.mem>4&&ratio(p,'ser')>.72?`<div style="margin-top:10px;font-size:12.5px;color:var(--dim);background:#0b0e13;
       border-left:2px solid var(--acc2);padding:8px 10px;border-radius:0 5px 5px 0;line-height:1.45">
       <b>${Math.round(ratio(p,'ser')*100)}% serwerowiczów.</b> Jedność spada, kontrowersja rośnie.</div>`:''}
-  </div></div>
-  <div class="card kond"><div class="h"><h3>Kondycja partii</h3><span class="n">mapa</span></div><div class="b">
+  </div></details>
+  <details class="card kond sidefold" ${sideAttr('kond')}><summary><h3>Kondycja partii</h3><span class="n">wskaźniki</span></summary><div class="b">
     <div id="paskiCech">
     ${b('Sława',p.fame,'var(--acc)','fame')}
     ${b('Wiarygodność',p.cred,'var(--info)','cred')}
@@ -6400,11 +6436,11 @@ function sidebar(p,q){
       <span>sufit <b style="color:var(--tx)">${Math.round(p.pot)}</b></span>
       <span>prestiż <b style="color:var(--tx)">${G.prest}</b></span></div>
     ${p.marg?`<div style="margin-top:10px"><span class="pill neg">marginalizacja −25%</span></div>`:''}
-  </div></div>
+  </div></details>
     ${(()=>{
       // Prawdziwy stan serwera, a nie stała z początku gry: ludzie przychodzą i odchodzą
       const ludzie=used+freeTot(), zmiana=ludzie-SERVER;
-      return `<details class="card sidefold serwerfold"><summary><h3>Serwer</h3>
+      return `<details class="card sidefold serwerfold" ${sideAttr('serwer')}><summary><h3>Serwer</h3>
       <span class="n">${ludzie} ${zmiana?`<span style="color:${zmiana>0?'var(--pos)':'var(--neg)'}">${zmiana>0?'+':''}${zmiana}</span>`:''}</span></summary><div class="b">
     <div class="st"><div class="l"><span>W partiach</span><b class="m">${used}</b></div>
       <div class="trk"><i style="width:${cl(used/Math.max(1,ludzie)*100)}%;background:var(--acc)"></i></div></div>
@@ -6413,7 +6449,7 @@ function sidebar(p,q){
     <div style="display:flex;gap:10px;margin-top:9px;font-family:var(--m);font-size:11px;color:var(--dim)">
       ${SEG.map(s=>`<span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${s.c};margin-right:4px"></i>${G.free[s.id]}</span>`).join('')}</div>
   </div></details>
-  <details class="card sidefold zaplecze"><summary><h3>Zaplecze</h3><span class="n">${benchAll.length} ${pl(benchAll.length,'osoba','osoby','osób')}</span></summary><div class="b">
+  <details class="card sidefold zaplecze" ${sideAttr('zaplecze')}><summary><h3>Zaplecze</h3><span class="n">${benchAll.length} ${pl(benchAll.length,'osoba','osoby','osób')}</span></summary><div class="b">
     <div class="benchgrid">
       ${benchAll.map(n=>`<div class="bperson ${isLead(p,n)?'lead':''}" title="${n} — kapitał prywatny ${kasa(kapPryw(n))}${ranga(n)?' · '+ranga(n).n:''}">
         ${ava(n,p.c,34)}<span>${n}</span>
@@ -6421,7 +6457,7 @@ function sidebar(p,q){
         ${rangaOdznaka(n)}</div>`).join('')||'<span class="dim">Nikogo poza przewodniczącym.</span>'}
     </div>
   </div></details>
-  <details class="card sidefold rel"><summary><h3>Relacje</h3><span class="n">${alive().length-1} partii</span></summary><div class="b">
+  <details class="card sidefold rel" ${sideAttr('rel')}><summary><h3>Relacje</h3><span class="n">${alive().length-1} partii</span></summary><div class="b">
     ${alive().filter(k=>k!==G.me).sort((a,b2)=>G.rel[b2][G.me]-G.rel[a][G.me]).map(k=>{
       const v=Math.round(G.rel[G.me][k]);
       return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12.5px">
@@ -6438,8 +6474,11 @@ function hemi(order,w,mode){
   const n=order.length;if(!n)return '';
   const W=w||600, cx=W/2;
   const rows=n>48?6:n>34?5:n>18?4:3;
-  const rad=Math.max(4.5,Math.min(10,W/n*0.52));
+  const rad=Math.max(5.5,Math.min(13,W/n*0.72));
   const Rmax=W/2-rad-10, Rmin=Rmax*0.42;
+  /* W widoku Sejmu półkole jest celowo wyższe od geometrycznego. Zwykły łuk 2:1
+     wyglądał jak spłaszczony wykres i ściskał pięć rzędów mandatów. */
+  const yScale=mode?1.20:1;
   const radii=rows===1?[Rmax]:[...Array(rows)].map((_,i)=>Rmin+i*(Rmax-Rmin)/(rows-1));
   const tw=radii.reduce((a,b)=>a+b,0);
   let cnt=radii.map(r=>Math.max(1,Math.floor(n*r/tw)));
@@ -6453,7 +6492,7 @@ function hemi(order,w,mode){
   pts.sort((a,b)=>a.t-b.t||a.ri-b.ri);
 
   // Podpisy przeniosły się pod wykres, więc samo SVG nie potrzebuje już zapasu na dole.
-  const H=Math.round(Rmax+rad+18), cy=Math.round(Rmax+rad+12);
+  const H=Math.round(Rmax*yScale+rad+26), cy=Math.round(Rmax*yScale+rad+18);
   const colOf=k=>{if(mode==='bloc'){const b=blocOf(k);if(b)return b.color}return G.p[k].c};
   const uid='h'+Math.random().toString(36).slice(2,7);
 
@@ -6473,21 +6512,21 @@ function hemi(order,w,mode){
     return b?(a.t+b.t)/2:Math.min(Math.PI,a.t+(a.t-(pts[ile-2]?pts[ile-2].t:0))/2);
   };
   const luk=(R,od,do_,kolor,gr,op)=>{
-    const x1=cx-R*Math.cos(od), y1=cy-R*Math.sin(od);
-    const x2=cx-R*Math.cos(do_), y2=cy-R*Math.sin(do_);
+    const x1=cx-R*Math.cos(od), y1=cy-R*Math.sin(od)*yScale;
+    const x2=cx-R*Math.cos(do_), y2=cy-R*Math.sin(do_)*yScale;
     const duzy=Math.abs(do_-od)>Math.PI?1:0;
-    return `<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${R} ${R} 0 ${duzy} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}"
+    return `<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${R} ${(R*yScale).toFixed(1)} 0 ${duzy} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}"
       fill="none" stroke="${kolor}" stroke-width="${gr}" stroke-linecap="round" opacity="${op}"/>`;
   };
 
   const miejsca=pts.map((p,i)=>{const k=order[i];if(!k)return '';
-    const x=cx-p.r*Math.cos(p.t), y=cy-p.r*Math.sin(p.t);
+    const x=cx-p.r*Math.cos(p.t), y=cy-p.r*Math.sin(p.t)*yScale;
     const mine=k===G.me, b=blocOf(k), wRzadzie=rzad.includes(k);
     return `<g class="seat ${mine?'mine':''}" data-p="${k}" style="--sd:${Math.min(i*6,240)}ms">
       <circle cx="${x.toFixed(1)}" cy="${(y+1.2).toFixed(1)}" r="${rad}" fill="rgba(0,0,0,.55)"/>
       <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rad}" fill="${colOf(k)}"
-        stroke="${mine?'#f0d489':wRzadzie?'rgba(255,255,255,.42)':'rgba(0,0,0,.5)'}"
-        stroke-width="${mine?2.4:wRzadzie?1.3:1}"/>
+        stroke="${mine?'#f0d489':wRzadzie?'rgba(255,255,255,.58)':'rgba(255,255,255,.34)'}"
+        stroke-width="${mine?3:wRzadzie?1.8:1.5}"/>
       <circle cx="${(x-rad*.3).toFixed(1)}" cy="${(y-rad*.34).toFixed(1)}" r="${(rad*.34).toFixed(1)}"
         fill="#fff" opacity=".26"/>
       <title>${G.p[k].n}${b?' · '+b.name:''} — ${G.p[k].seats} ${pl(G.p[k].seats,'mandat','mandaty','mandatów')}${wRzadzie?' · w rządzie':''}</title>
@@ -6509,18 +6548,18 @@ function hemi(order,w,mode){
     <!-- Próg większości. Kreska biegnie wyłącznie nad ławami, bo poprowadzona
          przez środek przecinała fotele i wyglądała jak rysa na wykresie. -->
     ${luk(Rzew+7,0,kątProgu,`url(#${uid}maj)`,mRzad>0?1.5:3,mRzad>0?.5:.8)}
-    <line x1="${(cx-(Rzew+10)*Math.cos(kątProgu)).toFixed(1)}" y1="${(cy-(Rzew+10)*Math.sin(kątProgu)).toFixed(1)}"
-          x2="${(cx-(Rzew+21)*Math.cos(kątProgu)).toFixed(1)}" y2="${(cy-(Rzew+21)*Math.sin(kątProgu)).toFixed(1)}"
+    <line x1="${(cx-(Rzew+10)*Math.cos(kątProgu)).toFixed(1)}" y1="${(cy-(Rzew+10)*Math.sin(kątProgu)*yScale).toFixed(1)}"
+          x2="${(cx-(Rzew+21)*Math.cos(kątProgu)).toFixed(1)}" y2="${(cy-(Rzew+21)*Math.sin(kątProgu)*yScale).toFixed(1)}"
           stroke="var(--acc)" stroke-width="1.7" stroke-dasharray="4 3" opacity=".95"/>
-    <text x="${(cx-(Rzew+29)*Math.cos(kątProgu)).toFixed(1)}" y="${(cy-(Rzew+29)*Math.sin(kątProgu)+3.5).toFixed(1)}"
+    <text x="${(cx-(Rzew+29)*Math.cos(kątProgu)).toFixed(1)}" y="${(cy-(Rzew+29)*Math.sin(kątProgu)*yScale+3.5).toFixed(1)}"
       text-anchor="middle" fill="var(--acc)" font-size="10.5" font-family="ui-monospace,monospace"
       letter-spacing=".08em">${MAJ}</text>
 
     ${miejsca}
 
-    <text x="${cx}" y="${cy-30}" text-anchor="middle" fill="${moje?G.p[G.me].c:'var(--dim2)'}"
-      font-size="27" font-weight="700" font-family="ui-monospace,monospace">${moje}</text>
-    <text x="${cx}" y="${cy-15}" text-anchor="middle" fill="var(--dim2)" font-size="10"
+    <text x="${cx}" y="${cy-(mode?51:30)}" text-anchor="middle" fill="${moje?G.p[G.me].c:'var(--dim2)'}"
+      font-size="${mode?48:27}" font-weight="700" font-family="ui-monospace,monospace">${moje}</text>
+    <text x="${cx}" y="${cy-(mode?24:15)}" text-anchor="middle" fill="var(--dim2)" font-size="${mode?13:10}"
       font-family="ui-monospace,monospace" letter-spacing=".14em">TWOICH MANDATÓW</text>
   </svg>
   <!-- Podpisy wyszły z SVG do zwykłego paska: wewnątrz wykresu nie mieściły się
@@ -6714,6 +6753,23 @@ function inflacja(){
 }
 const inflacjaProc=()=>Math.round((inflacja()-1)*100);
 
+function actPomoc(a,kpC,f,cb){
+  const sf=sizeF(me()), kat=(CATS.find(x=>x[0]===a.cat)||['','Decyzja'])[1];
+  const koszt=`${a.ap} ${pl(a.ap,'akcja','akcje','akcji')}${a.kp?' · '+kpC+' kapitału':''}${a.en>0?' · '+Math.round(a.en*.82*sf.en)+' energii':a.en<0?' · energia +'+(-a.en):''}`;
+  const sila=[];
+  if(f<1)sila.push(`powtarzanie tej decyzji: ×${f.toFixed(2)}`);else sila.push('brak kary za powtarzanie');
+  if(sf.lab)sila.push(`${sf.lab}: koszt kapitału ×${sf.kp.toFixed(2)}, sława ×${sf.fame.toFixed(2)}`);
+  if(cb)sila.push(`${cb.n}: ×${cb.m.toFixed(2)}`);
+  if((G.streak||0)>=3)sila.push(`seria aktywnych tygodni: ×${streakMul().toFixed(2)} do sławy`);
+  const jak=a.cat==='kam'?'Obecność w okręgu, trafiony temat i charyzma lidera podnoszą wynik kampanii.'
+    :a.cat==='wew'?'Jedność, aktywność i kompetencja przewodnictwa ułatwiają pracę wewnątrz partii.'
+    :a.cat==='med'?'Zasięg mediów, charyzma prowadzącego i regularne publikacje zwiększają zwrot.'
+    :a.cat==='dypl'?'Relacje, ideologiczny dystans oraz cechy negocjacyjne lidera decydują o skuteczności.'
+    :'Najlepszy efekt daje świeża decyzja, pełna energia i świadome łączenie jej z poprzednią akcją.';
+  const html=`<b>${a.n}</b><i>${a.d}</i><u><strong>Koszt:</strong> ${koszt}</u><u><strong>Co działa teraz:</strong> ${sila.join(' · ')}</u><u><strong>Jak poprawić:</strong> ${jak}</u><u>Kategoria: ${kat}. Zużycie kategorii i wszystkie blokady są wypisane na karcie.</u>`;
+  return html.replace(/"/g,'&quot;');
+}
+
 function actCards(list,fx){
   return list.map(a=>{
     const f=fat(a.id),done=a.once&&G.once[a.id];
@@ -6734,7 +6790,7 @@ function actCards(list,fx){
       :noShame?'dostępne tylko tuż po wpadce':(a.id==='rekr'&&G.recCd>0)?`nabór wraca za ${G.recCd} ${pl(G.recCd,'tydzień','tygodnie','tygodni')}`
       :G.ap<a.ap?'za mało akcji':G.kp<kpC?'za mało kapitału':(a.en>0&&G.en<a.en)?'za mało energii':'';
     const wym=[a.reg?'okręg':'',a.tem?'temat':'',a.tgt?'cel':'',a.seg?'grupa':''].filter(Boolean);
-    return `<button class="act" ${ok?'':'disabled'} style="--ac:${col}" onclick="doAct('${a.id}')"
+    return `<button class="act" ${ok?'':'disabled'} style="--ac:${col}" data-tip="${actPomoc(a,kpC,f,cb)}" onclick="doAct('${a.id}')"
       onmouseenter="podglad('${a.id}')" onmouseleave="podglad('')">
       <div class="ahd">
         <div style="min-width:0"><h4>${a.n}</h4>
@@ -9911,7 +9967,7 @@ function sejmTab(){
       return `<div class="sejm-sala">${true?`<div class="hemi-filtry">
         <button class="hfil ${m==='party'?'on':''}" onclick="setHemi('party')">Podział partyjny</button>
         <button class="hfil ${m==='bloc'?'on':''}" onclick="setHemi('bloc')">Podział koalicyjny</button></div>`:''}
-      <div class="hemi-scena">${hemi(arrS,520,m)}</div>
+      <div class="hemi-scena">${hemi(arrS,720,m)}</div>
       <div class="sejmleg">
         ${grupy.map(g2=>{
           const wRzadzie=g2.k&&G.gov&&G.gov.parties.includes(g2.k);
@@ -9993,11 +10049,11 @@ function feed(n){
   /* Kronika ma dawać ostatni puls kadencji, a nie drugi, ciasny ekran z własnym
      paskiem przewijania. Pełna historia dalej jest w zakładce Kronika. */
   const ile=n||5;
-  return `<div class="card kronika"><div class="h"><h3>Kronika</h3><span class="n">K${G.term}·T${G.week}</span></div>
+  return `<details class="card kronika sidefold" ${sideAttr('kronika')}><summary><h3>Kronika</h3><span class="n">K${G.term}·T${G.week}</span></summary>
   <div class="b log">${G.log.slice(0,ile).map(l=>
     `<div class="e ${l.c}" style="font-size:12.5px;padding:8px 0"><span class="w">${l.w}</span>${l.t}</div>`).join('')
     ||'<span class="dim">Cisza. Zrób coś, a serwer zacznie gadać.</span>'}
-    ${!n&&G.log.length>ile?`<div class="kronika-stopka">Starsze wpisy są w zakładce Kronika.</div>`:''}</div></div>`;
+    ${!n&&G.log.length>ile?`<div class="kronika-stopka">Starsze wpisy są w zakładce Kronika.</div>`:''}</div></details>`;
 }
 
 function leadTab(){
@@ -10706,10 +10762,11 @@ function drawGov(){
   const sum=me().seats+govSel.reduce((a,k)=>a+G.p[k].seats,0);
   box.innerHTML=partnersList().map(k=>{const on=govSel.includes(k),acc=accepts(k,govPay*2);
     const zBloku=bylWBloku(k);
-    return `<button class="opt ${zBloku?'zbloku':''}" style="margin-bottom:8px;${on?'border-color:var(--acc)':''}" onclick="tg('${k}')">
+    const rel=G.rel[k][G.me], stan=rel<0?'rel-bad':acc||zBloku?'rel-good':'rel-mid';
+    return `<button class="opt coal-option ${stan} ${on?'on':''} ${zBloku?'zbloku':''}" style="--rel:${rel}" onclick="tg('${k}')">
       <b>${on?'✓ ':''}${G.p[k].ab}, ${G.p[k].lead} <span class="m dim">${G.p[k].seats} mand.</span>${
         zBloku?'<span class="tagblok">byliście w bloku</span>':''}</b>
-      <span>relacja <b style="color:${G.rel[k][G.me]>=30?'var(--pos)':G.rel[k][G.me]<0?'var(--neg)':'var(--acc)'}">${Math.round(G.rel[k][G.me])}</b>
+      <span>relacja <b style="color:${rel>=30?'var(--pos)':rel<0?'var(--neg)':'#b8a67d'}">${Math.round(rel)}</b>
       · dystans ${ideo(k,G.me).toFixed(1)} ·
       <span class="${acc?'ok':'bad'}">${zBloku?'wchodzą bez targowania':acc?'zgodzą się':G.rel[k][G.me]<0?'wykluczone, ujemna relacja':'za mało, dopłać albo popraw relacje'}</span></span></button>`}).join('')
    +`<div style="display:flex;align-items:center;gap:10px;margin:12px 0 4px">
@@ -11617,7 +11674,7 @@ function dead(){
 Object.assign(window,{radykalowie,iskra,waznePozycje,waznePasek,modyfikatory,podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
-  pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,
+  pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,sideToggle,
   openResort,startLaw,signLaw,premierTab,prezydentTab,
   closeFinalCamp,runFinalCamp,openEdycja,edytSet,edytOk,
   /* _we to jednorazowa flaga animacji wejścia. Ekran przerysowuje się po każdej

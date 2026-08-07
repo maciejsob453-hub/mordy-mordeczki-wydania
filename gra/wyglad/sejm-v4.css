@@ -455,24 +455,9 @@ body:not(:has(.mg)) .wcard-zbiorczy .wbody b{font-size:13px;letter-spacing:.03em
 
 /* 1.1.75: kondycja ma być odczytem dowódcy, nie ozdobnym wykresem. */
 body:not(:has(.mg)) .sidebar>.kond{position:sticky;top:94px}
-body:not(:has(.mg)) .sidebar .party-health{
-  display:grid;grid-template-columns:112px minmax(0,1fr);gap:11px 14px;align-items:end;
-  margin:0 0 13px;padding:13px;border:1px solid color-mix(in srgb,var(--party) 50%,rgba(214,170,88,.22));
-  background:linear-gradient(135deg,color-mix(in srgb,var(--party) 16%,rgba(12,26,20,.96)),rgba(5,14,11,.78));
-  box-shadow:inset 0 1px rgba(255,255,255,.055),0 7px 15px rgba(0,0,0,.17);
-}
-body:not(:has(.mg)) .ph-main>span,body:not(:has(.mg)) .ph-flagi span{display:block;color:#aeb8aa;font-family:var(--m);font-size:8px;letter-spacing:.12em;text-transform:uppercase}
-body:not(:has(.mg)) .ph-main>div{display:flex;align-items:baseline;gap:6px;margin-top:2px}
-body:not(:has(.mg)) .ph-main b{font-family:var(--m);font-size:37px;line-height:.95;color:#f4e7c4}
-body:not(:has(.mg)) .ph-main em{color:#d9ba70;font-family:var(--fd);font-size:15px;font-style:normal;line-height:1}
-body:not(:has(.mg)) .ph-main small{display:block;margin-top:6px;color:#91a093;font-size:10px;line-height:1.28}
-body:not(:has(.mg)) .ph-meter{position:relative;height:13px;margin-bottom:5px;overflow:hidden;border:1px solid rgba(214,170,88,.22);background:#07100c}
-body:not(:has(.mg)) .ph-meter::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(25% - 1px),rgba(255,255,255,.14) calc(25% - 1px),rgba(255,255,255,.14) 25%)}
-body:not(:has(.mg)) .ph-meter i{display:block;position:relative;z-index:1;width:var(--wynik);height:100%;background:linear-gradient(90deg,#b85048,var(--party));box-shadow:0 0 12px color-mix(in srgb,var(--party) 78%,transparent)}
-body:not(:has(.mg)) .ph-meter u{display:none}
-body:not(:has(.mg)) .ph-flagi{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px;border-top:1px solid rgba(214,170,88,.16);padding-top:9px}
-body:not(:has(.mg)) .ph-flagi>div{min-width:0}
-body:not(:has(.mg)) .ph-flagi b{display:block;margin-top:3px;font-size:12px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Stary blok zbiorczej oceny nie ma prawa wrócić nawet w ekranie zszytym z DOM-u
+   poprzedniej wersji. Zostają wyłącznie osobne wskaźniki kondycji. */
+body:not(:has(.mg)) .sidebar .party-health{display:none!important}
 
 /* Nie opieramy czytelności akcji o to, czy silnik przeglądarki rozpozna :has().
    Ten selektor łapie bezpośrednio realne przyciski gry: media, transfery, listy i modale. */
@@ -653,6 +638,10 @@ body:not(:has(.mg)) .mdl .opt:not(:disabled){
 /* Więcej miejsca dostaje właściwa gra. Prawy pulpit nadal jest czytelny, ale
    nie zabiera jednej trzeciej okna mapie, decyzjom, liderowi i królowi. */
 body:not(:has(.mg)) .wrap{padding-left:156px}
+/* Nawigacja jest już fixed, więc stara pierwsza kolumna siatki nie może dalej
+   rezerwować 212 px pustki. To ona ściskała każdy środkowy ekran na laptopie. */
+body:not(:has(.mg)) .wrap:has(>.nav){grid-template-columns:minmax(0,1fr)!important;column-gap:0!important}
+body:not(:has(.mg)) .wrap:has(>.nav)>*{grid-column:1}
 body:not(:has(.mg)) .wrap>.nav{width:136px;padding-left:8px;padding-right:8px}
 body:not(:has(.mg)) .wrap>.nav::before{left:15px}
 body:not(:has(.mg)) .wrap>.nav::after{left:16px}
@@ -724,4 +713,93 @@ body:not(:has(.mg)) .sejm-sala .sejmleg{justify-content:center;margin-top:10px}
   body:not(:has(.mg)) .wrap{padding-left:18px}
   body:not(:has(.mg)) .hud,body:not(:has(.mg)) .wrap:has(>.nav)>.hud{display:flex}
   body:not(:has(.mg)) .hudcenter{flex:1}
+}
+
+/* 1.1.78: wszystkie karty pulpitu mają ten sam mechanizm zwijania. */
+body:not(:has(.mg)) .sidebar>.sidefold{position:static!important;top:auto!important;z-index:auto!important;transform:none!important}
+body:not(:has(.mg)) .sidebar>.sidefold>summary{
+  min-height:52px;padding:12px 15px;border-bottom:0;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--game-accent) 10%,transparent),rgba(0,0,0,.13));
+}
+body:not(:has(.mg)) .sidebar>.sidefold[open]>summary{border-bottom:1px solid color-mix(in srgb,var(--game-accent) 24%,rgba(214,170,88,.12))}
+body:not(:has(.mg)) .sidebar>.sidefold>summary::before{
+  border-color:color-mix(in srgb,var(--game-accent) 58%,rgba(214,170,88,.25));
+  color:color-mix(in srgb,var(--game-accent) 45%,#f3e5bf 55%);
+}
+body:not(:has(.mg)) .sidebar>.sidefold>summary h3{font-size:19px;line-height:1.08}
+body:not(:has(.mg)) .sidebar>.sidefold:not([open]){min-height:52px}
+body:not(:has(.mg)) .sidebar>.sidefold:not([open])::before{opacity:.42}
+body:not(:has(.mg)) .sidebar .kond>summary{background:linear-gradient(90deg,color-mix(in srgb,var(--game-accent) 20%,transparent),rgba(0,0,0,.08))}
+
+/* Globalny selektor z poprzedniej wersji malował niemal każdy przycisk na złoto.
+   Zwykła akcja jest teraz ciemna i partyjna; złoto zostaje dla końca tury,
+   zakupu medium i rozpoczęcia gry. */
+#app .btn:not(.red):not(:disabled),
+#app .opt:not(:disabled){
+  background:linear-gradient(180deg,color-mix(in srgb,var(--game-accent,#50775f) 20%,#283a31 80%),#14231c)!important;
+  color:#eee7d8!important;-webkit-text-fill-color:#eee7d8!important;
+  border-color:color-mix(in srgb,var(--game-accent,#66846e) 42%,#53665b 58%)!important;
+  text-shadow:0 1px rgba(0,0,0,.7)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.065),0 2px 7px rgba(0,0,0,.22)!important;
+}
+#app .btn:not(.red):not(:disabled):hover,
+#app .opt:not(:disabled):hover{
+  background:linear-gradient(180deg,color-mix(in srgb,var(--game-accent,#62886e) 28%,#32483b 72%),#1a2e24)!important;
+  border-color:color-mix(in srgb,var(--game-accent,#7b9a82) 68%,#bdc9bd 32%)!important;
+}
+#app .hud .btn.tura:not(:disabled),
+#app .medkafel:not(.brak) .btn:not(.g):not(:disabled),
+#app .partyselect .pickstart:not(:disabled){
+  background:linear-gradient(180deg,#f2d37e,#b9822d)!important;color:#211806!important;
+  -webkit-text-fill-color:#211806!important;border-color:#ffe19a!important;
+  text-shadow:none!important;box-shadow:inset 0 1px rgba(255,255,255,.67),0 2px 8px rgba(0,0,0,.3)!important;
+}
+
+/* Negocjacje mają semantyczne barwy: zielony to realna zgoda, czerwony odmowa,
+   a przygaszony piaskowy oznacza, że brakuje relacji lub dopłaty. */
+#app .coal-option{position:relative;margin:0 0 8px;padding-left:15px!important;border-left-width:4px!important}
+#app .coal-option.rel-good{--coal:#69a875;background:linear-gradient(90deg,rgba(79,139,91,.24),rgba(13,30,21,.94))!important;border-color:#4f815c!important}
+#app .coal-option.rel-mid{--coal:#aa9870;background:linear-gradient(90deg,rgba(150,132,91,.16),rgba(24,28,24,.95))!important;border-color:#6f674f!important}
+#app .coal-option.rel-bad{--coal:#bd5d55;background:linear-gradient(90deg,rgba(171,67,60,.22),rgba(31,21,20,.96))!important;border-color:#8d4742!important}
+#app .coal-option.on{box-shadow:inset 5px 0 var(--coal),inset 0 0 0 1px color-mix(in srgb,var(--coal) 55%,transparent)!important}
+#app .coal-option.on::after{content:"WYBRANA";position:absolute;right:12px;top:10px;color:var(--coal);font-family:var(--m);font-size:8px;letter-spacing:.14em}
+
+/* HUD nie może ucinać podpowiedzi. Na szerokim ekranie odczyty dostają też
+   większe pola i liczby, zamiast pięciu drobnych kapsuł ściśniętych pośrodku. */
+body:not(:has(.mg)) .hud,body:not(:has(.mg)) .hudcenter{overflow:visible!important}
+body:not(:has(.mg)) .hud .tipbox{width:330px;z-index:240}
+body:not(:has(.mg)) .tiptyt{margin-bottom:9px;color:color-mix(in srgb,var(--game-accent) 55%,#f0d48c 45%);font-family:var(--m);font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+body:not(:has(.mg)) .tiprada{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);color:var(--dim2);font-size:11.5px;line-height:1.48}
+.qfloat strong{color:#f0ddaa;font-weight:700}
+
+@media (min-width:1501px){
+  body:not(:has(.mg)) .hud,body:not(:has(.mg)) .wrap:has(>.nav)>.hud{min-height:82px;grid-template-columns:280px minmax(590px,1fr) auto}
+  body:not(:has(.mg)) .hud .rgroup .rs{min-width:105px;padding:9px 11px}
+  body:not(:has(.mg)) .hud .rgroup .rs .rv b{font-size:21px}
+  body:not(:has(.mg)) .hudcenter{gap:8px}
+  body:not(:has(.mg)) .widok>.card>.b{padding:20px}
+}
+
+/* Sala Sejmu jest głównym obiektem zakładki, nie małym wykresem w pustej karcie. */
+body:not(:has(.mg)) .sejm-sala{max-width:1080px;margin:2px auto 22px;padding:18px 22px 17px}
+body:not(:has(.mg)) .hemi-filtry{gap:8px;margin-bottom:12px}
+body:not(:has(.mg)) .hemi-filtry .hfil{min-width:168px;min-height:38px;padding:8px 17px;font-size:13px}
+body:not(:has(.mg)) .hemi-filtry .hfil.on{
+  background:linear-gradient(180deg,color-mix(in srgb,var(--game-accent) 30%,#33483c 70%),#172a20);
+  border-color:color-mix(in srgb,var(--game-accent) 70%,#92a999 30%);color:#f3ecdd;text-shadow:0 1px #000;
+  box-shadow:inset 3px 0 var(--game-accent),0 0 12px color-mix(in srgb,var(--game-accent) 18%,transparent);
+}
+body:not(:has(.mg)) .hemi-scena{max-width:720px;margin:0 auto 13px}
+body:not(:has(.mg)) .hemi-scena .hemi{filter:drop-shadow(0 14px 20px rgba(0,0,0,.36))}
+body:not(:has(.mg)) .sejm-sala .hemipod{max-width:720px;margin:7px auto 0;gap:0;border-color:rgba(214,170,88,.2)}
+body:not(:has(.mg)) .sejm-sala .hemipod>span{min-height:48px;padding:9px 12px;font-size:13px;color:#b8c2b8}
+body:not(:has(.mg)) .sejm-sala .hemipod>span b{font-family:var(--m);font-size:19px;color:#f2ead8}
+body:not(:has(.mg)) .sejm-sala .hemistan{min-height:42px!important;font-family:var(--m);font-size:13px!important;letter-spacing:.05em}
+body:not(:has(.mg)) .sejm-sala .sejmleg{max-width:920px;gap:7px 9px;margin:14px auto 0}
+body:not(:has(.mg)) .sejm-sala .sejmleg .sl{min-height:34px;padding:6px 10px;font-size:12px}
+
+@media (max-width:1500px){
+  body:not(:has(.mg)) .hudcenter{overflow:visible!important}
+  body:not(:has(.mg)) .sejm-sala{max-width:900px;padding:15px 17px}
+  body:not(:has(.mg)) .hemi-scena{max-width:650px}
 }
