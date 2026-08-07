@@ -338,10 +338,10 @@ const thrFor=n=>n<=1?THR.base:n<=2?THR.base+3:THR.base+8;
 /* ══════════ PARTIE ══════════ */
 const BASE={
  PPP :{n:'Partia Polskich Patriotów',ab:'PPP',c:'#237a3a',founded:'25.04.2025',pull:15.115,
-   fame:78,cred:50,uni:40,act:35,ctr:35,pret:30,mem:41,pot:74,diff:1,
-   aff:{eli:5,int:4,ser:7}, comp0:[1,7,33],
-   blurb:'Największa partia serwera. 41 osób, sześć mandatów i lider, który nie odpisuje na DM.',
-   flaw:'Lager ma wytrzymałość 30 i kompetencję 36, energia ledwo się odnawia, wiarygodność wycieka. Na ławce czekają kenzo i bluetes33.'},
+   fame:78,cred:50,uni:40,act:35,ctr:35,pret:30,mem:39,pot:74,diff:1,
+   aff:{eli:1,int:4,ser:31}, comp0:[1,7,31],
+   blurb:'Największa partia serwera. 39 osób, cztery mandaty i lider, który nie odpisuje na DM.',
+   flaw:'Lager ma wytrzymałość 30 i kompetencję 36, energia ledwo się odnawia, wiarygodność wycieka. Kenzo został jako ostatni mocny człowiek zaplecza.'},
  KK  :{n:'Kongres Koronny',ab:'KK',c:'#a01c2c',founded:'16.02.2024',pull:12.592,
    fame:72,cred:64,uni:35,act:30,ctr:20,pret:38,mem:34,pot:62,diff:2,
    aff:{eli:8,int:6,ser:3}, comp0:[1,6,27],
@@ -358,10 +358,10 @@ const BASE={
    blurb:'Dawni „Postępowcy”. Sufit potencjału 88, najwyższy w grze. Nikt go jeszcze nie dotknął.',
    flaw:'Niewykorzystany potencjał: 26 punktów poniżej własnego sufitu. Dwóch liderów, zero zaplecza.'},
  NP  :{n:'Nowa Perspektywa',ab:'NP',c:'#c8952b',founded:'01.02.2026',pull:1.668,
-   fame:58,cred:66,uni:70,act:68,ctr:22,pret:36,mem:21,pot:84,diff:1,
-   aff:{eli:4,int:6,ser:6}, comp0:[0,4,17],
-   blurb:'Siedem mandatów i fotel premiera na starcie. kisielek48 zbiera wokół siebie wszystkich, którzy nie chcą monarchistów.',
-   flaw:'Brak wyrazistości: nie dominujesz żadnego segmentu, wszędzie jesteś druga. Rząd z ośmiu koalicjantów pęka od jednego złego tygodnia.'},
+   fame:58,cred:66,uni:70,act:68,ctr:22,pret:36,mem:23,pot:84,diff:1,
+   aff:{eli:4,int:6,ser:19}, comp0:[0,4,19],
+   blurb:'Dziesięć mandatów i fotel premiera na starcie. kisielek48 zbiera wokół siebie wszystkich, którzy nie chcą monarchistów.',
+   flaw:'Bluetes i Pablo przeszli do NP razem z mandatami. Masz siłę, ale rząd z ośmiu koalicjantów nadal pęka od jednego złego tygodnia.'},
  PKD :{n:'Partia Królestwa Dawidowego',ab:'PKD',c:'#b9a24b',founded:'09.11.2025',pull:1.199,
    fame:52,cred:30,uni:55,act:50,ctr:55,pret:22,mem:16,pot:60,diff:4,
    aff:{eli:3,int:2,ser:8}, comp0:[0,2,14],
@@ -604,7 +604,7 @@ function newGame(id){
   // rząd przecina listy wyborcze, więc nie jest blokiem: HM, FS i HPI zostają na swoim miejscu
   G.bloc=null; G.opoBloc=null;
   PID.forEach(k=>G.p[k].coal=coalOf(k));
-  say('<b>Rząd zastany:</b> kisielek48 premierem, dziewięć partii, '+st+' z '+TOTAL_SEATS+' mandatów. Monarchiści po raz pierwszy poza gabinetem.','roy');
+  say('<b>Rząd zastany:</b> kisielek48 premierem, '+st+' z '+TOTAL_SEATS+' mandatów. Monarchiści po raz pierwszy poza gabinetem.','roy');
 }
 // mandat po rozwiązanej ChPC przeszedł razem z jej posłem do Nowej Perspektywy
 /* Z PPP i z Kongresu Koronnego ludzie odeszli. Mandaty nie wyparowały: zabrał je
@@ -614,7 +614,7 @@ function newGame(id){
    stanu zastanego, a nie bonus znikąd: PPP oddaje dwa miejsca, NP je przejmuje. */
 const START_SEATS={PPP:4,KK:3,ROM:2,FD:7,NP:10,PLR:3,PKD:2,PP:1,POJ:1,NBR:1,ZHM:1,DPD:4,SS:1};
 function seedSeats(){
-  // sejm zastany: rząd kisielka48 ma 26 z 40, monarchiści idą w opozycję
+  // sejm zastany: rząd kisielka48 ma większość po transferze Bluetes i Pablo, monarchiści idą w opozycję
   const s=Object.assign({},START_SEATS);
   const cs=(CUSTOM&&CUSTOM.seats)||0;
   if(cs&&CUSTOM){s[CUSTOM.id]=cs;let left=cs;
