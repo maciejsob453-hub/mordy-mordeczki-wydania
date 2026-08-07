@@ -518,6 +518,19 @@ body:not(:has(.mg)) .pick.v3.scenv3{display:grid;grid-template-columns:minmax(43
 body:not(:has(.mg)) .pick.v3.scenv3>.pickmain{grid-column:1;grid-row:1;position:sticky;top:18px;min-height:420px;padding:26px 27px}
 body:not(:has(.mg)) .pick.v3.scenv3>div:not(.pickmain){grid-column:2;grid-row:1;min-width:0}
 body:not(:has(.mg)) .scenv3 .picklist{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px}
+
+/* Karuzela partii jest wyjątkiem od starego układu dwóch kolumn. Ten override
+   musi być tutaj, bo sejm-v4 ładuje się po redesign.css i ma bardziej szczegółowe
+   reguły dla dawnego rosteru. */
+body:not(:has(.mg)) .pick.v3.partyselect.fifa{display:grid;grid-template-columns:74px minmax(0,1fr) 74px;grid-template-rows:auto auto auto;gap:14px;max-width:1180px;align-items:center}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.pickmain{grid-column:2;grid-row:1;position:relative;top:auto;min-height:520px;width:100%;padding:27px 28px;display:flex;flex-direction:column}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partyroster{display:none}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partyarrow{grid-row:1;position:relative;top:auto;min-height:0;padding:0;display:block}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partyarrow.left{grid-column:1}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partyarrow.right{grid-column:3}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partycarouselmeta{grid-column:1 / -1;grid-row:2}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partycreatorlink{grid-column:1 / -1;grid-row:3}
+@media(max-width:760px){body:not(:has(.mg)) .pick.v3.partyselect.fifa{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}body:not(:has(.mg)) .pick.v3.partyselect.fifa>.pickmain{grid-column:2;min-height:470px;padding:18px}.partyselect.fifa .partyarrow{width:40px;height:76px;font-size:40px}}
 body:not(:has(.mg)) .pick.v3.scenv3 .scenrow{min-height:128px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr auto;align-content:start;text-align:left}
 body:not(:has(.mg)) .scenv3 .scenrow .pcname{grid-column:1;grid-row:1;font-family:var(--fd);font-size:19px;color:#f0ead8}
 body:not(:has(.mg)) .scenv3 .scenrow .scenopis{grid-column:1/-1;grid-row:2;margin-top:8px;color:#aeb9ae;font-size:11.5px;line-height:1.42;font-family:var(--f);letter-spacing:0;font-weight:400}
@@ -865,3 +878,14 @@ body:has(.kreekran)::before{
 .sadzamkniety .sadhero{margin-bottom:14px;min-height:130px;display:flex;flex-direction:column;justify-content:center}
 @media(max-width:1280px){.sadkolumny{grid-template-columns:1fr}.sadparam{position:static;margin-top:14px}.sadhero h2{margin-right:80px}.sadhero p{max-width:680px}}
 @media(max-width:820px){.sadkand,.sadoskarzeni{grid-template-columns:1fr}.sadhist>div{grid-template-columns:64px 1fr}.sadhist em{grid-column:2}.sadglosy{grid-template-columns:1fr}.sadhero{padding:18px}.sadhero:after{right:12px}.sadhero h2{font-size:23px}}
+
+/* Ostateczny override karuzeli: ten arkusz jest ładowany jako ostatni. */
+body:not(:has(.mg)) .pick.v3.partyselect.fifa{display:grid;grid-template-columns:74px minmax(0,1fr) 74px;grid-template-rows:auto auto auto;gap:14px;max-width:1180px;align-items:center}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.pickmain{grid-column:2;grid-row:1;position:relative;top:auto;min-height:520px;width:100%;padding:27px 28px;display:flex;flex-direction:column}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partyroster{display:none}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partyarrow{grid-row:1;position:relative;top:auto;min-height:0;padding:0;display:block}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partyarrow.left{grid-column:1}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partyarrow.right{grid-column:3}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partycarouselmeta{grid-column:1 / -1;grid-row:2}
+body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partycreatorlink{grid-column:1 / -1;grid-row:3}
+@media(max-width:760px){body:not(:has(.mg)) .pick.v3.partyselect.fifa{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}body:not(:has(.mg)) .pick.v3.partyselect.fifa>.pickmain{grid-column:2;min-height:470px;padding:18px}.partyselect.fifa .partyarrow{width:40px;height:76px;font-size:40px}}
