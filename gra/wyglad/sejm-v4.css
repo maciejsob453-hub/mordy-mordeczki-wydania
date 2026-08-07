@@ -614,3 +614,114 @@ body:not(:has(.mg)) .mdl>.mdlx{position:absolute!important;top:12px!important;ri
   body:not(:has(.mg)) .partyselect .picklist,body:not(:has(.mg)) .scenv3 .picklist,body:not(:has(.mg)) .agrid{grid-template-columns:1fr}
   body:not(:has(.mg)) .partyselect .partyfacts{grid-template-columns:1fr}
 }
+
+/* 1.1.77: barwa prowadzonej partii spina całą grę. Mosiądz nadal oznacza
+   najważniejszy krok, ale aktywny dział, nagłówki i decyzje należą do gracza. */
+body:not(:has(.mg)) .wrap{--game-accent:var(--party-theme,#d6aa58)}
+body:not(:has(.mg)) .hud::before{background:var(--game-accent);box-shadow:0 0 15px color-mix(in srgb,var(--game-accent) 72%,transparent)}
+body:not(:has(.mg)) .wrap>.nav button.on{
+  color:color-mix(in srgb,var(--game-accent) 34%,#fff 66%);
+  background:linear-gradient(90deg,color-mix(in srgb,var(--game-accent) 24%,transparent),color-mix(in srgb,var(--game-accent) 5%,transparent));
+  border-color:color-mix(in srgb,var(--game-accent) 55%,transparent);
+}
+body:not(:has(.mg)) .wrap>.nav button.on::after{background:var(--game-accent);box-shadow:0 0 12px color-mix(in srgb,var(--game-accent) 75%,transparent)}
+body:not(:has(.mg)) .card::before{background:linear-gradient(90deg,transparent,var(--game-accent),transparent)}
+body:not(:has(.mg)) .card:hover{border-color:color-mix(in srgb,var(--game-accent) 55%,rgba(214,170,88,.24))}
+body:not(:has(.mg)) .dzialnag span,body:not(:has(.mg)) .podnag span,body:not(:has(.mg)) .kick{color:color-mix(in srgb,var(--game-accent) 72%,#f0d587 28%)}
+body:not(:has(.mg)) .cats button.on,
+body:not(:has(.mg)) .fx.on,
+body:not(:has(.mg)) .socz.on{
+  color:color-mix(in srgb,var(--game-accent) 30%,#fff 70%);
+  background:color-mix(in srgb,var(--game-accent) 20%,#0b1913 80%);
+  border-color:color-mix(in srgb,var(--game-accent) 72%,#d6aa58 28%);
+  box-shadow:0 0 16px color-mix(in srgb,var(--game-accent) 25%,transparent);
+}
+body:not(:has(.mg)) .act:not(.used){box-shadow:inset 3px 0 var(--game-accent)}
+body:not(:has(.mg)) .act:not(.used)::before{background:var(--game-accent);box-shadow:0 0 14px -2px var(--game-accent)}
+body:not(:has(.mg)) .act:not(.used) h4{color:color-mix(in srgb,var(--game-accent) 42%,#fff 58%)}
+body:not(:has(.mg)) .act:hover:not(.used){border-color:color-mix(in srgb,var(--game-accent) 68%,#d6aa58 32%)}
+body:not(:has(.mg)) .widok .btn:not(.g):not(.red):not(:disabled){
+  background:linear-gradient(180deg,color-mix(in srgb,var(--game-accent) 62%,#244134 38%),color-mix(in srgb,var(--game-accent) 36%,#10251b 64%))!important;
+  color:#fff3dc!important;-webkit-text-fill-color:#fff3dc!important;
+  border-color:color-mix(in srgb,var(--game-accent) 65%,#d6aa58 35%)!important;
+}
+body:not(:has(.mg)) .mdl .opt:not(:disabled){
+  border-color:color-mix(in srgb,var(--party-theme,#5f8069) 54%,#5f8069 46%)!important;
+  box-shadow:inset 3px 0 color-mix(in srgb,var(--party-theme,#5f8069) 70%,transparent),0 2px 6px rgba(0,0,0,.22)!important;
+}
+
+/* Więcej miejsca dostaje właściwa gra. Prawy pulpit nadal jest czytelny, ale
+   nie zabiera jednej trzeciej okna mapie, decyzjom, liderowi i królowi. */
+body:not(:has(.mg)) .wrap{padding-left:156px}
+body:not(:has(.mg)) .wrap>.nav{width:136px;padding-left:8px;padding-right:8px}
+body:not(:has(.mg)) .wrap>.nav::before{left:15px}
+body:not(:has(.mg)) .wrap>.nav::after{left:16px}
+body:not(:has(.mg)) .layout{grid-template-columns:minmax(0,1fr) 330px;gap:16px}
+body:not(:has(.mg)) .layout>.widok{width:100%;min-width:0}
+body:not(:has(.mg)) .actgrid{grid-template-columns:repeat(auto-fit,minmax(min(520px,100%),1fr));gap:9px}
+
+/* HUD ma trzy równe strefy: tożsamość, liczby i sterowanie. Wcześniej dwie
+   niezależne grupy zasobów rozpychały belkę losowo zależnie od nazwy partii. */
+body:not(:has(.mg)) .hud,
+body:not(:has(.mg)) .wrap:has(>.nav)>.hud{
+  display:grid;grid-template-columns:270px minmax(430px,1fr) auto;align-items:center;column-gap:10px;
+}
+body:not(:has(.mg)) .hud::before{position:absolute;left:8px;top:9px;bottom:9px;width:3px}
+body:not(:has(.mg)) .hud .id{width:100%;max-width:none!important;padding-left:12px}
+body:not(:has(.mg)) .hudcenter{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0}
+body:not(:has(.mg)) .hudcenter>.rgroup{flex:none}
+body:not(:has(.mg)) .hudcenter>.streakchip{flex:none;display:flex;align-items:center;gap:5px;padding:6px 8px}
+body:not(:has(.mg)) .hudend{margin-left:0;justify-self:end}
+
+/* Kolejność pulpitu jest częścią interfejsu, nie przypadkiem wynikającym z DOM-u.
+   CSS ustawia ją bez przekładania węzłów, więc zszywanie nie pomyli kart. */
+body:not(:has(.mg)) .sidebar>.lead{order:-100!important}
+body:not(:has(.mg)) .sidebar>.kond{order:-90!important}
+body:not(:has(.mg)) .sidebar>.kronika{order:-80!important}
+body:not(:has(.mg)) .sidebar>.skl{order:-70!important}
+body:not(:has(.mg)) .sidebar>.zaplecze{order:-60!important}
+body:not(:has(.mg)) .sidebar>.serwerfold{order:-50!important}
+body:not(:has(.mg)) .sidebar>.rel{order:-40!important}
+
+/* Kondycja to same wskaźniki. Nie jest przyklejana ani transformowana, dzięki
+   czemu podczas przewijania nie wchodzi pod portrety z kolejnych kart. */
+body:not(:has(.mg)) .sidebar>.kond{
+  position:static!important;top:auto!important;z-index:auto!important;transform:none!important;
+  overflow:hidden;isolation:isolate;background:linear-gradient(155deg,color-mix(in srgb,var(--game-accent) 10%,#1a3127 90%),#0d1d15);
+}
+body:not(:has(.mg)) .sidebar .kond>.h{background:linear-gradient(90deg,color-mix(in srgb,var(--game-accent) 18%,transparent),transparent)}
+body:not(:has(.mg)) .sidebar .kond #paskiCech{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+
+/* Sala ma własną, zwartą scenę. Liczby większości siedzą pod ławami, zamiast
+   rozciągać nagłówek całej karty na szerokość ekranu. */
+body:not(:has(.mg)) .sejm-sala{
+  max-width:760px;margin:0 auto 18px;padding:14px 16px 13px;border:1px solid color-mix(in srgb,var(--game-accent) 35%,rgba(214,170,88,.22));
+  background:radial-gradient(ellipse at 50% 92%,color-mix(in srgb,var(--game-accent) 12%,transparent),transparent 58%),linear-gradient(180deg,rgba(4,14,10,.5),rgba(0,0,0,.2));
+  box-shadow:inset 0 1px rgba(255,255,255,.04),0 9px 24px rgba(0,0,0,.2);
+}
+body:not(:has(.mg)) .hemi-filtry{display:flex;justify-content:center;gap:5px;margin:0 0 5px}
+body:not(:has(.mg)) .hemi-filtry .hfil.on{background:color-mix(in srgb,var(--game-accent) 72%,#f4e5b0 28%);border-color:color-mix(in srgb,var(--game-accent) 64%,#fff 36%);color:#10140f;text-shadow:none}
+body:not(:has(.mg)) .hemi-scena{max-width:520px;margin:0 auto 9px}
+body:not(:has(.mg)) .hemi-scena .hemi{filter:drop-shadow(0 11px 16px rgba(0,0,0,.32))}
+body:not(:has(.mg)) .sejm-sala .hemipod{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-top:3px;border:1px solid rgba(214,170,88,.15);background:rgba(0,0,0,.18)}
+body:not(:has(.mg)) .sejm-sala .hemipod>span{min-height:36px;display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 8px;border-right:1px solid rgba(214,170,88,.12);text-align:center}
+body:not(:has(.mg)) .sejm-sala .hemipod>span:last-child{border-right:0}
+body:not(:has(.mg)) .sejm-sala .hemistan{grid-column:1/-1!important;border-top:1px solid rgba(214,170,88,.12);border-right:0!important}
+body:not(:has(.mg)) .sejm-sala .sejmleg{justify-content:center;margin-top:10px}
+
+@media (max-width:1500px){
+  body:not(:has(.mg)) .hud,body:not(:has(.mg)) .wrap:has(>.nav)>.hud{grid-template-columns:104px minmax(350px,1fr) auto;padding-right:8px}
+  body:not(:has(.mg)) .hudcenter{justify-content:flex-start;overflow:hidden}
+  body:not(:has(.mg)) .hudcenter>.rgroup{gap:0}
+  body:not(:has(.mg)) .hud .rgroup .rs{min-width:72px;padding:4px 6px}
+  body:not(:has(.mg)) .hud .datechip{min-width:124px;padding-left:8px;padding-right:8px}
+  body:not(:has(.mg)) .hud .datechip b{font-size:15px!important}
+  body:not(:has(.mg)) .hud .btn.tura{min-width:136px;padding-left:8px;padding-right:8px}
+  body:not(:has(.mg)) .hudend{gap:3px}
+  body:not(:has(.mg)) .hudend>.btn.sm{min-width:62px;padding-left:7px;padding-right:7px}
+}
+@media (max-width:1180px){
+  body:not(:has(.mg)) .wrap{padding-left:18px}
+  body:not(:has(.mg)) .hud,body:not(:has(.mg)) .wrap:has(>.nav)>.hud{display:flex}
+  body:not(:has(.mg)) .hudcenter{flex:1}
+}

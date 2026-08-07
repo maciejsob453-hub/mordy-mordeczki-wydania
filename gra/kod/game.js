@@ -578,7 +578,10 @@ function newGame(id){
      sztab:5,sztabMax:5,log:[],used:{},once:{},tab:'mapa',cat:'kam',sel:'ogolny',
      gov:null,pmOk:false,pmProc:null,queue:[],phase:'camp',prest:0,hist:[],prev:null,
      turnout:.85,lup:{},recCd:0,xp:0,xpOs:{},traits:[],ptraits:{},tut:null,tutSeen:{},streak:0,noise:{},useTerm:{},catUsed:{},lastAct:null,
-     king:{rel:52,paid:0}, sejmPrez:null, mar:null, goals:{}, agents:{}, agentWeek:null, sits:[], polls:[], scen:null, mute:false, night:null,
+     king:{rel:52,paid:0}, sejmPrez:null, mar:null, goals:{}, agents:{}, agentWeek:null, sits:[], polls:[], scen:null,
+     /* Parametr jest wyłącznie dla automatycznego podglądu. Normalna gra startuje
+        z dźwiękiem, a test nie budzi człowieka przy komputerze. */
+     mute:typeof location!=='undefined'&&new URLSearchParams(location.search).has('mute'), night:null,
      prez:{party:'KK',lead:'Śledzik',until:2}, prezHist:[]};
   const used=PID.reduce((a,k)=>a+p[k].mem,0), fr=SERVER-used;
   G.free={eli:13,int:Math.round(fr*.24),ser:0};       // elita jest rzadkim towarem
@@ -1590,9 +1593,9 @@ function endWeek(){
   aiOpozycja();            // opozycja rozlicza rząd bez czekania na gracza
   histPush();SFX.week();
   G.catUsed={};G.used2={};G.lastCharge=null;podgladCache={};   // ostatnia decyzja przechodzi na kolejny tydzień, żeby kombinacje w ogóle działały
-  // nastroje serwera dryfują tydzień po tygodniu, nikt nie wie, dokąd
-  /* Nastrój segmentu nie dryfuje już losowo — liczy go grupyTydzien z zadowolenia
-     grupy interesu, więc jest za co odpowiadać zamiast czekać na rzut kostką. */
+  /* Nastroje trzech części serwera pozostają lekkim, losowym pulsem elektoratu.
+     Nie ma już osobnego systemu zadowolenia grup interesu, który nadpisywał
+     ten ruch i drugi raz liczył ten sam podział ludzi. */
   if(ch(.13)){const a=pick(SID);let b=pick(SID);while(b===a)b=pick(SID);
     G.mood[a]=cl(G.mood[a]+R(.06,.13),.76,1.28);
     G.mood[b]=cl(G.mood[b]-R(.05,.11),.76,1.28);
@@ -3131,7 +3134,8 @@ const streakMul=()=>1+Math.min(.40,Math.max(0,((G.streak||0)-2)*.08));
 
 /* ══════════ 1.6 TEST: DŹWIĘK, CZĄSTKI, HISTORIA, SCENARIUSZE ══════════ */
 let AC=null;
-const sndOn=()=>!(G&&G.mute);
+const CICHO_TEST=typeof location!=='undefined'&&new URLSearchParams(location.search).has('mute');
+const sndOn=()=>!CICHO_TEST&&!(G&&G.mute);
 function ac(){try{if(!AC&&typeof window!=='undefined'&&(window.AudioContext||window.webkitAudioContext))
   AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}return AC}
 function beep(f,d,type,vol,slide){
@@ -4122,90 +4126,6 @@ function modyfikatory(){
 }
 
 
-/* ══════════ GRUPY INTERESU ══════════
-   Wzięte z panelu grup interesu Victorii. Elita, intelektualiści i serwerowicze
-   byli do tej pory wyłącznie elektoratem — liczyli się przy urnach i nic poza
-   tym. Teraz są siłą polityczną: mają zadowolenie, mają czego chcieć, popierają
-   albo blokują ustawy i mówią to wprost.
-
-   Zadowolenie rusza się od tego, co robisz: podatek progresywny wkurza elitę,
-   równy uderza w serwerowiczów, ustawy o rozrywce cieszą wszystkich, awantura
-   w partii zniechęca intelektualistów. Wchodzi wprost w nastrój segmentu,
-   czyli w to samo miejsce, którym gra liczyła głosy od zawsze. */
-const GRUPY={
- eli:{n:'Elita',   c:'#e0b23c', chce:'Spokoju, prestiżu i tego, żeby nikt nie ruszał ich pieniędzy.'},
- int:{n:'Intelektualiści',c:'#5a9be8', chce:'Programów, ustaw i tego, żeby ktoś w ogóle czytał statut.'},
- ser:{n:'Serwerowicze',c:'#4bbd85', chce:'Rozrywki, luzu i niskich podatków dla zwykłych ludzi.'},
-};
-function grupyInit(){
-  if(!G.grupy)G.grupy={};
-  SID.forEach(g=>{if(G.grupy[g]===undefined)G.grupy[g]=50});
-}
-const zadowolenie=g=>{grupyInit();return G.grupy[g]};
-function zmienZadowolenie(g,d,why){
-  grupyInit();
-  G.grupy[g]=cl(G.grupy[g]+d,0,100);
-  if(why&&Math.abs(d)>=4)
-    say(`<b>${GRUPY[g].n}:</b> ${why} Zadowolenie ${d>0?'+':''}${Math.round(d)} (teraz ${Math.round(G.grupy[g])}).`,
-        d>0?'good':'bad');
-}
-/* Zadowolenie przekłada się na nastrój segmentu, czyli na to, ilu ich przyjdzie
-   zagłosować. Pięćdziesiąt to obojętność, sto to zapał, zero to bojkot. */
-function grupyTydzien(){
-  grupyInit();
-  const p=me(), st=stawkaMajatkowa(), prog=progresjaWlaczona();
-  // podatki
-  if(st>0){
-    if(prog){zmienZadowolenie('eli',-st*.35);zmienZadowolenie('ser',+st*.18)}
-    else {zmienZadowolenie('ser',-st*.30);zmienZadowolenie('eli',+st*.10)}
-  }
-  // awantura zniechęca tych, którzy lubią porządek
-  if(p.ctr>65){zmienZadowolenie('int',-1.1);zmienZadowolenie('eli',-.9)}
-  if(p.ctr<30)zmienZadowolenie('eli',+.4);
-  // aktywność cieszy serwerowiczów, wiarygodność intelektualistów
-  if(p.act>60)zmienZadowolenie('ser',+.6);
-  if(p.cred>60)zmienZadowolenie('int',+.6);
-  // wszystko wraca powoli do obojętności, więc nic nie zostaje na zawsze
-  SID.forEach(g=>{G.grupy[g]=cl(G.grupy[g]+(50-G.grupy[g])*.05,0,100)});
-  // nastrój segmentu jedzie za zadowoleniem
-  SID.forEach(g=>{G.mood[g]=cl(.78+G.grupy[g]/100*.48,.76,1.28)});
-}
-/* Jak grupa patrzy na konkretną ustawę. Zwraca liczbę od −1 do 1. */
-function grupaWobecUstawy(g,id,opcje){
-  const law=lawById(id); if(!law)return 0;
-  let v=0;
-  if(law.kat==='rozrywka')v+= g==='ser'?.7:g==='int'?.2:0;
-  if(law.kat==='ustroj') v+= g==='int'?.5:g==='eli'?.2:-.2;
-  if(id==='podatki'&&opcje){
-    const st=opcje.majatek||0, pr=opcje.progresja>0;
-    if(pr){v+= g==='eli'?-st*.11:g==='ser'?+st*.06:0}
-    else  {v+= g==='ser'?-st*.10:g==='eli'?+st*.04:0}
-  }
-  if(id==='media')v+= g==='int'?.5:g==='ser'?.3:0;
-  if(id==='man') v+= g==='int'?.6:g==='eli'?.3:-.1;
-  // grupa niezadowolona jest generalnie przeciw wszystkiemu, co idzie od rządu
-  v+=(zadowolenie(g)-50)/145;
-  return Math.max(-1,Math.min(1,v));
-}
-function grupyTab(){
-  grupyInit();
-  return `<div class="card"><div class="h"><h3>Grupy interesu</h3>
-    <span class="n">czego chcą i jak im się układa</span></div><div class="b">
-    <div class="grlista">${SID.map(g=>{const z=zadowolenie(g),G_=GRUPY[g];
-      const stan=z>=70?'zadowoleni':z>=55?'spokojni':z>=45?'obojętni':z>=30?'zniechęceni':'wrogo nastawieni';
-      return `<div class="grw" style="--gc:${G_.c}">
-        <div class="grl"><b>${G_.n}</b><span>${G_.chce}</span></div>
-        <div class="grp">
-          <div class="trk"><i style="width:${z}%;background:${G_.c}"></i></div>
-          <div class="grv">${Math.round(z)} · ${stan}</div>
-        </div>
-      </div>`}).join('')}</div>
-    <div class="note" style="margin-top:12px">Zadowolenie przekłada się wprost na to,
-    ilu z nich przyjdzie zagłosować. Podatki, awantury i to, czym się zajmujesz,
-    ruszają nim w obie strony, ale wszystko powoli wraca do obojętności.</div>
-  </div></div>`;
-}
-
 /* ══════════ RADYKAŁOWIE I LOJALIŚCI ══════════
    U nich ludność dzieli się na radykałów i lojalistów zależnie od tego, jak jej
    się żyje. U nas tak samo: przy awanturze i rozsypanej partii część składu
@@ -4560,7 +4480,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.76';
+let WERSJA='1.1.77';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4571,6 +4491,15 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.77':{data:'7 sierpnia 2026', zmiany:[
+  'Kondycja partii pokazuje juz tylko konkretne wskazniki. Zniknela zbiorcza ocena, trend i podsumowanie mocnej oraz slabej strony.',
+  'Srodek gry jest szerszy: mapa, decyzje, lider, Krol i pozostale dzialy dostaly miejsce zabrane z bocznego pulpitu i nawigacji.',
+  'Prawy pulpit ma nowa kolejnosc: Przewodnictwo, Kondycja, Kronika, Sklad, Zaplecze, Serwer i Relacje. Kondycja nie naklada sie podczas przewijania.',
+  'Barwa prowadzonej partii przechodzi przez cala gre. Concordia daje fiolet, PPP i FD zielen, a kolor widac w nawigacji, kartach i decyzjach.',
+  'Gorny pasek ma trzy rowne strefy i nie wypada poza ekran przy mniejszym oknie.',
+  'Sala Sejmu jest zwarta i wycentrowana. Wiekszosc, liczba mandatow i sila rzadu maja wlasny pas pod lawami zamiast dlugiego napisu w naglowku.',
+  'System grup interesu zostal usuniety: nie ma panelu zadowolenia, cotygodniowego naliczania ani dodatkowego wplywu grup na glosowania ustaw.',
+ ]},
  '1.1.76':{data:'7 sierpnia 2026', zmiany:[
   'Wybor partii dziala jak selektor druzyny: pelny profil zostaje po lewej, a cala stawka miesci sie po prawej bez przewijania przez sciane kart.',
   'Scenariusze dostaly ten sam uklad i od razu pokazuja opis kazdego swiata, zamiast samych nazw i poziomu trudnosci.',
@@ -4871,8 +4800,8 @@ const PATCHNOTE={
    'Filtry decyzji zgadzają się z tym, co decyzja naprawdę robi — zniknęła jedność tam, gdzie jej już nie ma.',
    'Wykres kondycji partii mniejszy, podpisy osi przestały na siebie zachodzić.',
  ]},
- 
- '1.1.23':{data:'5 sierpnia 2026', zmiany:[
+
+'1.1.23':{data:'5 sierpnia 2026', zmiany:[
    'Inflacja: im większy zapas kapitału trzymasz w kasie, tym drożej wychodzi każda decyzja. Przy grubym worku starczy na jedną akcję w tygodniu — kapitał ma pracować, nie leżeć.',
    'Jedności nie kupisz już żadną decyzją. Zostają debaty, a te niosą ze sobą kontrowersję.',
    'Nabór do partii raz na sześć tygodni zamiast co trzy.',
@@ -5205,6 +5134,9 @@ function tryLoadFromSetup(){
 function game(){
   applyGoals();
   const p=me(),q=tally(),AL=allocate(q.res,q.total);
+  /* Barwa partii jest własnością całej rozgrywki, nie tylko herbu w HUD-zie.
+     CSS bierze ją stąd do aktywnej zakładki, nagłówków i kart decyzji. */
+  document.documentElement.style.setProperty('--party-theme',p.c);
   const sh=q.res[G.me].tot/q.total*100;
   G.lastPoll=sh;
   const role=isPM()?'PREMIER':inGov()?'KOALICJA':'OPOZYCJA';
@@ -5215,7 +5147,8 @@ function game(){
     <!-- Górny poziom paska: co PRZYBĘDZIE w tym tygodniu, na zielono.
          Dolny: stan na teraz. Dokładnie ten układ, co w pasku Victorii —
          najpierw przyrosty, pod nimi zasoby, wszystko w jednym pancerzu. -->
-    <div class="rgroup">
+    <div class="hudcenter">
+    <div class="rgroup zasoby">
     <div class="rs">${ikona('akcje')}<div class="rv"><b>${G.ap}<span class="of">/${G.apMax}</span></b><span>akcje</span></div></div>
     ${(()=>{const i=income();return `<div class="rs tip">${ikona('kapital')}<div class="rv"><b class="${G.kp<0?'ujem':''}">${Math.round(G.kp)}<span class="plus">+${i.total}</span></b><span>kapitał</span></div>
       <div class="tipbox">
@@ -5246,7 +5179,7 @@ function game(){
         <div style="color:var(--dim2);font-size:11.5px;margin-top:7px">Przy jedności poniżej dwudziestu lider praktycznie nie regeneruje sił, nikt nie ma weny do prowadzenia partii, w której jest sam.</div>
       </div></div>`})()}
     </div>
-    <div class="rgroup">
+    <div class="rgroup polityka">
     <div class="rs tip">${ikona('sondaz')}<div class="rv"><b>${fmt(shown(G.me,sh))}%<span class="plus" style="color:var(--info);-webkit-text-fill-color:var(--info)">?</span></b><span>sondaż</span></div>
       <div class="tipbox" style="width:330px">
         <div style="font-family:var(--m);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px">Co realnie rusza sondażem</div>
@@ -5268,6 +5201,7 @@ function game(){
     <div class="rs" title="Mandaty zdobyte w ostatnich wyborach. Zmienią się dopiero po następnych."><i class="ic ic-mandat" aria-hidden="true"></i><div class="rv"><b>${p.seats}</b><span>mandaty</span></div></div>
     </div>
     ${streakBox()}
+    </div>
     <div class="hudend">
       <button class="sndbtn" onclick="toggleMute()" title="${G.mute?'Włącz dźwięk':'Wycisz'}">${G.mute?'♪̸':'♪'}</button>
       <div class="datechip" key="${G.term}-${G.week}"><b>${dateStr(gameDate())}</b><span>K${G.term} · tydzień ${G.week} z ${G.weeks}</span></div>
@@ -5318,35 +5252,9 @@ function game(){
       :G.tab==='cele'?goalTab():G.tab==='lider'?leadTab():G.tab==='krol'?kingTab()
       :G.tab==='premier'?premierTab():G.tab==='prezydent'?prezydentTab()
       :G.tab==='ekonomia'?ekonomiaTab()
-      :G.tab==='media'?mediaTab():sejmTab()+grupyTab()+sadTab()}</div>
+      :G.tab==='media'?mediaTab():sejmTab()+sadTab()}</div>
   </div>`;
   G._we=0;
-}
-function radar(p){
-  /* Wykres sześciokątny wyglądał jak ozdoba, a nie informacja do decyzji.
-     Ten skrót mówi od razu: jak zdrowa jest partia, co ją ciągnie i co ją zjada. */
-  const AX=[
-    {n:'Sława',v:p.fame,c:'var(--acc)'},{n:'Wiarygodność',v:p.cred,c:'var(--info)'},
-    {n:'Jedność',v:p.uni,c:'var(--pos)'},{n:'Aktywność',v:p.act,c:'#9b7fd4'},
-    {n:'Spokój',v:100-p.ctr,c:'var(--neg)'},{n:'Przystępność',v:100-p.pret,c:'#d98b4a'},
-  ];
-  const wynik=Math.round(AX.reduce((s,x)=>s+cl(x.v),0)/AX.length);
-  const poprzedni=G.prev?Math.round(([G.prev.fame,G.prev.cred,G.prev.uni,G.prev.act,100-G.prev.ctr,100-G.prev.pret]
-    .reduce((s,x)=>s+cl(x),0))/6):null;
-  const roznica=poprzedni===null?0:wynik-poprzedni;
-  const najlepsza=AX.slice().sort((a,b)=>b.v-a.v)[0],najsłabsza=AX.slice().sort((a,b)=>a.v-b.v)[0];
-  const stan=wynik>=72?'mocna':wynik>=55?'stabilna':wynik>=38?'chwiejna':'w kryzysie';
-  return `<div class="party-health" style="--party:${p.c};--wynik:${wynik}%">
-    <div class="ph-main">
-      <span>Ocena kondycji</span><div><b>${wynik}</b><em>${stan}</em></div>
-      <small>${roznica?`${roznica>0?'+':''}${roznica} od poprzedniego tygodnia`:'bez zmiany od poprzedniego tygodnia'}</small>
-    </div>
-    <div class="ph-meter"><i></i><u></u></div>
-    <div class="ph-flagi">
-      <div><span>Mocna strona</span><b style="color:${najlepsza.c}">${najlepsza.n} ${Math.round(najlepsza.v)}</b></div>
-      <div><span>Do naprawy</span><b style="color:${najsłabsza.c}">${najsłabsza.n} ${Math.round(najsłabsza.v)}</b></div>
-    </div>
-  </div>`;
 }
 /* ---- zakładka „Partie” ----
    Jedno pytanie i jedna odpowiedź: kto siedzi w cudzych partiach. Własnej tu nie ma,
@@ -5673,7 +5581,6 @@ function pkbTydzien(){
   G.pkbPop=G.pkb||pkbLicz();
   G.pkb=pkbLicz();
   G.pkbTempo=G.pkbPop?(G.pkb-G.pkbPop)/G.pkbPop:0;
-  grupyTydzien();                    // zadowolenie grup interesu i nastroje segmentów
   radykalowieTydzien();              // radykałowie szkodzą, lojaliści trzymają
   mediaTydzien();                    // wydawnictwa naliczają swoje koszty stałe
   dlugTydzien();                     // kto wszedł pod kreskę, ten zaczyna tonąć
@@ -6464,7 +6371,6 @@ function sidebar(p,q){
       <b>${Math.round(ratio(p,'ser')*100)}% serwerowiczów.</b> Jedność spada, kontrowersja rośnie.</div>`:''}
   </div></div>
   <div class="card kond"><div class="h"><h3>Kondycja partii</h3><span class="n">mapa</span></div><div class="b">
-    ${radar(p)}
     <div id="paskiCech">
     ${b('Sława',p.fame,'var(--acc)','fame')}
     ${b('Wiarygodność',p.cred,'var(--info)','cred')}
@@ -8807,17 +8713,11 @@ function lawVote(id,opcje,wnioskodawca,mojGlos){
        głosowali za co trzecim projektem i wszystko przechodziło samo — teraz ustawa
        potrzebuje realnego zaplecza w sejmie albo dogadania się z kimś z zewnątrz. */
     const opozycja=!!(G.gov&&!G.gov.parties.includes(k)&&przez!==k);
-    /* Posłowie słuchają swojego zaplecza: partia oparta na elicie zagłosuje
-       inaczej niż ta stojąca na serwerowiczach, bo obie odpowiadają przed kim
-       innym. To jest ten sam podział, który liczy się przy urnach. */
-    const skl=G.p[k].comp, mem=Math.max(1,G.p[k].mem);
-    const glosGrup=SID.reduce((a,g)=>a+(skl[g]/mem)*grupaWobecUstawy(g,id,opcje),0);
     const szansa=cl(BAL.ustawaBaza+rel/165+(wRzadzie?BAL.ustawaKoalicja:0)+(maResort?.12:0)
       -(opozycja?BAL.ustawaOpozycja:0)       // rywalowi nie robi się prezentów
       +(law.kat==='rozrywka'?.18:0)          // przy rozrywce nikt się nie kłóci
       -(law.prog>.6?.18:0)                   // ustrojowych pilnują wszyscy
       -rad*BAL.ustawaOpor*nastrojSejmu()     // im bardziej pod siebie, tym większy opór
-      +glosGrup*.22                          // czego chce zaplecze tej partii
       +(G.p[k].cred>60?-.05:.03),.02,.94);
     if(ch(szansa)){za+=s;by[k]='za'}
     else if(ch(.22)){wstrzym+=s;by[k]='wstrzymał się'}
@@ -9994,7 +9894,7 @@ function sejmTab(){
   const arr=[];alive().sort((a,b)=>G.p[b].seats-G.p[a].seats).forEach(k=>{for(let i=0;i<G.p[k].seats;i++)arr.push(k)});
   const g=G.gov;
   return `<div class="card"><div class="h"><h3>Sejm, kadencja ${G.term}</h3>
-    <span class="n">${TOTAL_SEATS} mandatów · większość ${MAJ}</span></div><div class="b">
+    <span class="n">${alive().filter(k=>G.p[k].seats>0).length} klubów parlamentarnych</span></div><div class="b">
     ${(()=>{const m=G.hemiMode||'party';
       const ord=allBlocs().map(b=>b.short);
       const arrS=m==='bloc'?arr.slice().sort((a,b)=>{
@@ -10008,17 +9908,17 @@ function sejmTab(){
             return rest.length?[{n:'Niezrzeszeni',c:'#75695b',s:rest.reduce((x,k)=>x+G.p[k].seats,0)}]:[]})())
         : alive().filter(k=>G.p[k].seats>0).sort((a,b)=>G.p[b].seats-G.p[a].seats)
             .map(k=>({n:G.p[k].ab,c:G.p[k].c,s:G.p[k].seats,me:k===G.me,k}));
-      return `${true?`<div style="display:flex;gap:4px;justify-content:center;margin:2px 0 6px">
+      return `<div class="sejm-sala">${true?`<div class="hemi-filtry">
         <button class="hfil ${m==='party'?'on':''}" onclick="setHemi('party')">Podział partyjny</button>
         <button class="hfil ${m==='bloc'?'on':''}" onclick="setHemi('bloc')">Podział koalicyjny</button></div>`:''}
-      <div style="max-width:470px;margin:2px auto 10px">${hemi(arrS,470,m)}</div>
+      <div class="hemi-scena">${hemi(arrS,520,m)}</div>
       <div class="sejmleg">
         ${grupy.map(g2=>{
           const wRzadzie=g2.k&&G.gov&&G.gov.parties.includes(g2.k);
           return `<span class="sl ${g2.me?'ja':''} ${wRzadzie?'rzad':''}" style="--pc:${g2.c}">
             ${g2.k?crest(g2.k,'xs'):`<i style="background:${g2.c}"></i>`}
             <b>${g2.n}</b><em>${g2.s}</em></span>`}).join('')}
-      </div>`})()}
+      </div></div>`})()}
     <div class="wladza">
       ${(()=>{const g2=G.gov,sp=G.sejmPrez;
         const card=(lab,who,party,extra,col,cls)=>`<div class="wcard ${cls||''}" style="--wc:${col}">
@@ -11714,7 +11614,7 @@ function dead(){
   ${ekstopka('koniec tej rozgrywki','<button class="btn" onclick="newRun()">Od nowa</button>')}`)}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{grupyTab,zadowolenie,radykalowie,grupaWobecUstawy,iskra,waznePozycje,waznePasek,modyfikatory,podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{radykalowie,iskra,waznePozycje,waznePasek,modyfikatory,podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,
@@ -11751,7 +11651,7 @@ window.__game={przewidz,podglad,get PROBA(){return PROBA},
   localScore,openRecruit,openTrain,collapseGov,makeBlocs,prezPool,drawFrom,giveBack,purge,eliteRisk,ratio,syncCoal,prezDone,makeNoise,XP,
   giveBackCap,prezRound1,prezRound2,runRunoff,memberFlow,prezWait,prezPush,openPush,crownPrez,hemi,pmBlocked,rotateBench,AVA,TEM,INNATE,conflictOf,buyTrait,buyStat,inflacja,inflacjaProc,INFLACJA_PROG,traitsOf,xpOs,xpPula,COMBO,ostatniWynik,hasCen,hasHeg,LOGOS,applyGoals,checkDeath,isPMperson,isPrezPerson,income,EV,wotumChance,prezGo,A,fire,me,topSeg,sejmVote,setGov,PID,REG,SEG,SID,BASE,COAL,LP,LEAD,THR,
   TOPUP,DIST_SEATS,TOTAL_SEATS,MAJ,accepts,thrFor,
-  radar,feed,runDateAnim,gameDate,dateStr,mapTab,actTab,pollTab,partieTab,sejmTab,leadTab,kingTab,sidebar,setup,pmScreen,prezScreen,marScreen,startMar,marContinue,marDeclare,isMar,isWice,isMarPerson,ownPool,bestRep,runRace,raceScore,results,TRAITS,sizeF,shown,enGain,pickMain,kingScore,kingFactors,kingFav,allBlocs,rebalanceSeats,isLead,lead,L,innAll,GOALS,openStery,sterySet,steryTog,steryOk,creditsBox,AUTORZY,WERSJA,
+  feed,runDateAnim,gameDate,dateStr,mapTab,actTab,pollTab,partieTab,sejmTab,leadTab,kingTab,sidebar,setup,pmScreen,prezScreen,marScreen,startMar,marContinue,marDeclare,isMar,isWice,isMarPerson,ownPool,bestRep,runRace,raceScore,results,TRAITS,sizeF,shown,enGain,pickMain,kingScore,kingFactors,kingFav,allBlocs,rebalanceSeats,isLead,lead,L,innAll,GOALS,openStery,sterySet,steryTog,steryOk,creditsBox,AUTORZY,WERSJA,
   LAWS,lawVote,proposeLaw,signLaw,odrzucenieWeta,PROG_WETO,applyLaw,lawDone,lawIntake,lawsPending,lawsToSign,startLaw,
   LAWPAR,lawEdytowalna,lawParams,radykalnosc,aiProposeLaw,openEdycja,rozstrzygnijUstawe,
   nastrojSejmu,bylWBloku,doLobby,rysujOkno,
