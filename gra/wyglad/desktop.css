@@ -107,12 +107,17 @@ body.licze .hemi .seat, body.licze .runoff, body.licze .campbar { animation: non
   padding: 4px; border-radius: 9px;
   background: rgba(22, 33, 23, .82); border: 1px solid var(--line, #27392a);
   box-shadow: 0 8px 22px -12px rgba(0, 0, 0, .8);
-  backdrop-filter: blur(7px); opacity: .35; transition: opacity .18s;
+  backdrop-filter: blur(7px); opacity: .72; transition: opacity .18s;
 }
 #dtBar:hover { opacity: 1; }
 #dtBar button {
   padding: 5px 10px; border-radius: 6px; font-size: 12px; line-height: 1.1;
   color: var(--dim, #a3b49e); background: transparent; border: 1px solid transparent;
+}
+#dtBar button.zoomvalue {
+  min-width: 48px; padding-inline: 7px; color: var(--tx, #eef2e7);
+  background: rgba(0, 0, 0, .24); border-color: var(--line, #27392a);
+  font-family: var(--m, monospace); font-size: 10.5px; font-weight: 700;
 }
 #dtBar button:hover { color: var(--tx, #eef2e7); background: rgba(217, 171, 69, .13); border-color: var(--line2, #3e5a42); }
 #dtBar .sep { width: 1px; height: 16px; margin: 0 3px; background: var(--line2, #3e5a42); }

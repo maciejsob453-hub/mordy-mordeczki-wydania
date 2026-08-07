@@ -2692,3 +2692,27 @@ body{font-size:15px}
 @media(max-width:1260px){.kreseatgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.krediff{grid-template-columns:repeat(3,1fr)}.krepresets{grid-template-columns:repeat(2,1fr)}.kresuwaki,.krestatgrid{grid-template-columns:1fr}}
 @media(max-width:1080px){.krebody{grid-template-columns:1fr}.kreprawa{position:static;grid-row:1}.kreside{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:7px 16px}.kresideprog{grid-column:1/-1}.kresideeyebrow,.kreside h3,.kreside-desc,.kresidemeta,.kreside>.kreseatbar{grid-column:1}.kresidewarn,.kresidenav,.kreodrzuc{grid-column:2}.kresidewarn{grid-row:2/5}.kresidenav{grid-row:5/8}.kreodrzuc{grid-row:8}.kresteps{grid-template-columns:repeat(5,1fr)}.krestep small{display:none}}
 @media(max-width:720px){.kreekran{max-width:calc(100vw - 24px)}.krehead h1{font-size:28px}.krehead p{display:none}.kresteps{display:flex;overflow-x:auto}.krestep{min-width:112px}.krebody{gap:10px}.krepanel,.kreside{padding:12px}.kreside{display:block}.kresideprog{margin:-12px -12px 12px}.kreform,.krefinalgrid{grid-template-columns:1fr}.kreform label.wide{grid-column:auto}.krediff,.krepresets,.krechoices.trzy,.krechoices.cztery{grid-template-columns:1fr 1fr}.kreseatgrid{grid-template-columns:1fr}.kresuwak{grid-template-columns:1fr 35px}.kresuwak input{grid-column:1/-1;grid-row:2}.krestat{grid-template-columns:110px 1fr 34px}.krefinalseats{grid-template-columns:repeat(3,1fr)}}
+
+/* Wygenerowany stół jest właściwą scenografią kreatora, nie ozdobą schowaną
+   pod czarnym prostokątem. Gradient tylko pilnuje czytelności środka. */
+body:has(.kreekran){
+  background-color:#050a08;
+  background-image:
+    linear-gradient(90deg,rgba(1,6,4,.34),rgba(2,9,6,.08) 28%,rgba(2,9,6,.16) 70%,rgba(1,6,4,.42)),
+    linear-gradient(180deg,rgba(0,4,2,.12),rgba(0,5,3,.28)),
+    url("../obrazki/kreator-stol-v1.webp");
+  background-size:cover;background-position:center top;background-attachment:fixed}
+body:has(.kreekran) .appbg{opacity:.16}
+.kreekran .krepanel,.kreekran .kreside{
+  background:
+    linear-gradient(135deg,rgba(218,176,72,.055),transparent 34%),
+    linear-gradient(180deg,rgba(13,29,23,.88),rgba(3,12,8,.91));
+  border-color:rgba(142,126,77,.62);
+  -webkit-backdrop-filter:blur(9px) saturate(.86);backdrop-filter:blur(9px) saturate(.86);
+  box-shadow:inset 0 1px rgba(255,244,205,.06),0 24px 60px -35px #000}
+.kreekran .krestep{background:linear-gradient(180deg,rgba(16,34,27,.83),rgba(3,12,8,.9));
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.kreekran .krestep.on{background:linear-gradient(180deg,rgba(88,70,27,.62),rgba(6,18,12,.9))}
+.kreekran .kreform input,.kreekran .kreform textarea,.kreekran .kreselect select,
+.kreekran .kreseat,.kreekran .kresuwak,.kreekran .krestat,.kreekran .krefinalgrid>section,
+.kreekran .krefinalblock{background-color:rgba(3,13,9,.77);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}

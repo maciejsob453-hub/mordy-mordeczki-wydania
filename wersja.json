@@ -1,21 +1,21 @@
 {
- "wersja": "1.1.79",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/4855fd7650e7e4f59a4b9d4cabe1458df2dc098d",
+ "wersja": "1.1.80",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "c5bc331b23160acd20fff52468c1eff1cdd7b5292661f7c296779e3890e3326a",
-   "bajtow": 591
+   "sha": "c35df45b4febc3c0cff244c2f7818496e92a9a1d9f4bcbf7351e5d6d2fa2dbe0",
+   "bajtow": 645
   },
   {
    "sciezka": "gra/kod/desktop.js",
-   "sha": "9cbee1f081167b7feb63ee7cb7cd349f183db944f75c634e420280b1423f1bea",
-   "bajtow": 11995
+   "sha": "cd5f71dd3790dc38352312a927f695e80dada9761e6d6ec6f9af3dda05acf44c",
+   "bajtow": 12919
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "582e7afb2497736002da71d599eeefe56965adcef4ca426337ebc384ef35fde2",
-   "bajtow": 774915
+   "sha": "06e9c88f862a8fb9c1d7a013152e5c39dc3f5742934a7f57f0e0452ae677a498",
+   "bajtow": 786203
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -528,6 +528,11 @@
    "bajtow": 18317
   },
   {
+   "sciezka": "gra/obrazki/kreator-stol-v1.webp",
+   "sha": "df0a2065b25fc4b894caf2a57e0f386383876f3049dbfb403404e9419479ac3c",
+   "bajtow": 135586
+  },
+  {
    "sciezka": "gra/obrazki/logo-centrum.webp",
    "sha": "cc4647ea6666fa5bde82c8fed009c66a7abec144db1f45feeebd2b31eca6b932",
    "bajtow": 53866
@@ -569,18 +574,18 @@
   },
   {
    "sciezka": "gra/wyglad/desktop.css",
-   "sha": "632b7a7e6d20a052090827742ed5454257faf635ccdc79d1efac52583ee51d9b",
-   "bajtow": 10678
+   "sha": "7bb14200a6a7675a73d2f77e6275ed8dd59c5d4c34ee9fdffb78270f03a1b234",
+   "bajtow": 10916
   },
   {
    "sciezka": "gra/wyglad/redesign.css",
-   "sha": "4429d12f0b349e5d4078501595d03421bef151e6bc8a8887f0b25e5e58c69db1",
-   "bajtow": 163545
+   "sha": "9dba8e985c4864b3435f6a7097d886b6f36f71e381dadd53ed31248a89c3b0d3",
+   "bajtow": 165031
   },
   {
    "sciezka": "gra/wyglad/sejm-v4.css",
-   "sha": "e66deebaa5f193554d9b92c0e30777339784cdc2caaf3646446964bea8fa4b8b",
-   "bajtow": 58014
+   "sha": "7e5fa10c6f4b14a0cf089cdb09cca66d478c3dfbf8526e0a0834d684ff62d852",
+   "bajtow": 64826
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -590,21 +595,20 @@
  ],
  "exe": {
   "nazwa": "Mordy Mordeczki.exe",
-  "sha": "00299251cda910117f8639a13311b7a399139a5a8e21b062570ffdd36eefe4c3",
-  "bajtow": 6080543,
-  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.36/Mordy.Mordeczki.exe"
+  "sha": "1bc721769d3a095236ef8058390db03c2dcee03093f48ed973c1169f5bb9006f",
+  "bajtow": 6080550,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.80/Mordy.Mordeczki.exe"
  },
  "runtime": {
-  "sha": "9dcf03d8e3c4185a75b117af406577d64efd9559c8310be50fed14af66be9872",
-  "bajtow": 13704327,
-  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.37/biblioteki-1.1.37.zip",
-  "znacznik": "2eb28efdbe5659b1f83c47d54c4f8fa5a02b26f47c26c5901791237f4186e0d4"
+  "sha": "c66999d9cac04310db8c6ccbc9c7b99b543f458cb4acf18f715ae9f86c112a7e",
+  "bajtow": 13703747,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.80/biblioteki-1.1.80.zip",
+  "znacznik": "342e6c7231daf3b9c292979015346d27872b1e69359b658105dbbfab6aa950fe"
  },
  "launcher": {
   "nazwa": "Mordy Mordeczki Launcher.exe",
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "4855fd7650e7e4f59a4b9d4cabe1458df2dc098d"
+ }
 }

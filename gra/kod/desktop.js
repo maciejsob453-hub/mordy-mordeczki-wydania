@@ -26,6 +26,7 @@ bar.innerHTML =
   '<button data-a="load" title="Wczytaj z pliku (Ctrl+O)">Z pliku</button>' +
   '<span class="sep"></span>' +
   '<button data-a="zoomout" title="Pomniejsz (Ctrl+-)">−</button>' +
+  '<button data-a="zoomreset" class="zoomvalue" title="Automatyczne dopasowanie / reset (Ctrl+0)">100%</button>' +
   '<button data-a="zoomin" title="Powiększ (Ctrl++)">+</button>' +
   '<button data-a="full" title="Pełny ekran (F11)">⛶</button>';
 document.body.appendChild(bar);
@@ -281,11 +282,20 @@ async function offerResume() {
 /* ---------- zoom ---------- */
 
 let zoom = 1;
-function setZoom(z) {
-  zoom = Math.max(0.6, Math.min(1.8, z));
+const zoomLabel = () => bar.querySelector('.zoomvalue');
+function autoZoom() {
+  /* Gra jest składana ze stałych wymiarów, więc małe ekrany dostają rozsądny
+     punkt startowy zamiast osobnego, połamanego układu. Gracz nadal może go
+     zmienić co 5%, a duży monitor zostaje przy pełnej skali. */
+  const w = window.innerWidth || 1920;
+  return w < 1180 ? .72 : w < 1380 ? .80 : w < 1580 ? .88 : w < 1780 ? .94 : 1;
+}
+function setZoom(z, zapisz) {
+  zoom = Math.round(Math.max(0.7, Math.min(1.3, z)) * 20) / 20;
   document.body.style.zoom = zoom;
+  const l=zoomLabel();if(l)l.textContent=Math.round(zoom*100)+'%';
   const a = api();
-  if (a) a.remember_zoom(zoom);
+  if (a && zapisz !== false) a.remember_zoom(zoom);
 }
 
 /* ---------- wejścia ---------- */
@@ -297,8 +307,9 @@ bar.addEventListener("click", (e) => {
   if (act === "sloty") otworzSloty();
   else if (act === "save") saveToFile();
   else if (act === "load") loadFromFile();
-  else if (act === "zoomin") setZoom(zoom + 0.1);
-  else if (act === "zoomout") setZoom(zoom - 0.1);
+  else if (act === "zoomin") setZoom(zoom + 0.05);
+  else if (act === "zoomout") setZoom(zoom - 0.05);
+  else if (act === "zoomreset") setZoom(autoZoom());
   else if (act === "full" && api()) api().toggle_fullscreen();
 });
 
@@ -315,9 +326,9 @@ window.addEventListener("keydown", (e) => {
   if (k === "s") { e.preventDefault(); saveToFile(); }
   else if (k === "o") { e.preventDefault(); loadFromFile(); }
   else if (k === "z") { e.preventDefault(); otworzSloty(); }
-  else if (k === "+" || k === "=") { e.preventDefault(); setZoom(zoom + 0.1); }
-  else if (k === "-") { e.preventDefault(); setZoom(zoom - 0.1); }
-  else if (k === "0") { e.preventDefault(); setZoom(1); }
+  else if (k === "+" || k === "=") { e.preventDefault(); setZoom(zoom + 0.05); }
+  else if (k === "-") { e.preventDefault(); setZoom(zoom - 0.05); }
+  else if (k === "0") { e.preventDefault(); setZoom(autoZoom()); }
 }, true);
 
 /* pywebview zgłasza gotowość mostu do Pythona osobnym zdarzeniem */
@@ -325,7 +336,7 @@ window.addEventListener("pywebviewready", async () => {
   const a = api();
   if (a) {
     const z = await a.remembered_zoom();
-    if (z && z !== 1) setZoom(z);
+    setZoom(z || autoZoom(), false);
     // przy grze ze źródeł kod ma numer z ostatniego wydania — bierzemy prawdziwy
     try {
       const v = await a.wersja();
@@ -334,5 +345,9 @@ window.addEventListener("pywebviewready", async () => {
   }
   offerResume();
 });
+
+/* W zwykłej przeglądarce nie ma zdarzenia pywebviewready. Pasek nadal pokazuje
+   prawdziwą skalę, co pozwala testować widok bez aplikacji. */
+if (!api()) setZoom(autoZoom(), false);
 
 })();

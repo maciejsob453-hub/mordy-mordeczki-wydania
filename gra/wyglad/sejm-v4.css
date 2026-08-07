@@ -803,3 +803,65 @@ body:not(:has(.mg)) .sejm-sala .sejmleg .sl{min-height:34px;padding:6px 10px;fon
   body:not(:has(.mg)) .sejm-sala{max-width:900px;padding:15px 17px}
   body:not(:has(.mg)) .hemi-scena{max-width:650px}
 }
+/* Kreator ma własną, wygenerowaną scenografię stołu politycznego. Ten arkusz
+   ładuje się ostatni, więc wybór tła musi mieszkać właśnie tutaj. */
+body:has(.kreekran){
+  background-color:#050a08;
+  background-image:
+    linear-gradient(90deg,rgba(1,6,4,.22),rgba(2,9,6,.02) 28%,rgba(2,9,6,.08) 70%,rgba(1,6,4,.3)),
+    linear-gradient(180deg,rgba(0,4,2,.03),rgba(0,5,3,.18)),
+    url("../obrazki/kreator-stol-v1.webp");
+  background-size:cover;background-position:center top;background-attachment:fixed}
+body:has(.kreekran)::before{
+  background:
+    radial-gradient(ellipse at center,transparent 25%,rgba(1,6,4,.18) 82%),
+    linear-gradient(180deg,rgba(0,5,3,.05),rgba(0,5,3,.16))}
+/* ══════════════════════════════════════════════════════════════
+   SĄD — osobna, chłodniejsza gałąź władzy
+   Złoto zostaje tylko na pieczęci i krawędziach. Reszta używa grafitu, zieleni
+   i atramentu, żeby dział nie wyglądał jak kolejna karta Sejmu.
+   ══════════════════════════════════════════════════════════════ */
+.sadekran{display:grid;gap:14px}
+.sadhero{
+  position:relative;overflow:hidden;padding:22px 26px;border:1px solid color-mix(in srgb,var(--party-theme,#84a85d) 36%,#3b4440);
+  border-radius:14px;background:
+    linear-gradient(105deg,rgba(7,12,11,.94),rgba(19,27,25,.88)),
+    repeating-linear-gradient(90deg,transparent 0 74px,rgba(255,255,255,.025) 75px 76px);
+  box-shadow:inset 0 1px rgba(255,255,255,.04),0 15px 36px -30px #000;
+}
+.sadhero:after{content:"§";position:absolute;right:28px;top:50%;transform:translateY(-53%);font:700 92px/1 Georgia,serif;color:color-mix(in srgb,var(--party-theme,#84a85d) 24%,transparent)}
+.sadhero>span{display:block;font:700 10px/1.2 var(--m,monospace);letter-spacing:.22em;color:var(--party-theme,#9fbd72);margin-bottom:7px}
+.sadhero h2{position:relative;z-index:1;margin:0 120px 5px 0;font:600 28px/1.08 var(--ser,Georgia,serif);color:var(--tx,#eee)}
+.sadhero p{position:relative;z-index:1;max-width:760px;margin:0;color:var(--dim,#aaa);font-size:13.5px}
+.sadparam{position:absolute;right:118px;top:20px;display:flex;gap:7px;z-index:2}
+.sadparam b{min-width:74px;padding:8px 10px;border:1px solid rgba(255,255,255,.09);border-radius:8px;background:rgba(0,0,0,.28);font:700 17px/1 var(--m,monospace);text-align:center;color:var(--tx,#eee)}
+.sadparam em{display:block;margin-top:5px;font:500 8px/1 var(--m,monospace);letter-spacing:.12em;text-transform:uppercase;color:var(--dim2,#777)}
+.sadkolumny{display:grid;grid-template-columns:minmax(440px,.92fr) minmax(520px,1.08fr);gap:14px;align-items:start}
+.sadlawka{display:grid;gap:7px}
+.sadsedzia{display:grid;grid-template-columns:24px 38px minmax(0,1fr);gap:10px;align-items:center;padding:9px 11px;border:1px solid var(--line,#3a343b);border-radius:9px;background:linear-gradient(90deg,rgba(255,255,255,.045),rgba(0,0,0,.12))}
+.sadsedzia .sadnr{font:700 10px var(--m,monospace);color:var(--dim2,#777);text-align:center}
+.sadsedzia span:last-child{min-width:0}.sadsedzia b,.sadsedzia em{display:block}.sadsedzia b{font-size:13.5px;color:var(--tx,#eee)}
+.sadsedzia em{margin-top:2px;font:500 9.5px var(--m,monospace);color:var(--dim2,#777);font-style:normal;text-transform:uppercase;letter-spacing:.08em}
+.sadwak{display:flex;gap:9px;align-items:baseline;margin:12px 0 7px;padding-top:11px;border-top:1px solid var(--line,#3a343b)}
+.sadwak b{color:var(--acc,#d7ab45)}.sadwak span{font-size:12px;color:var(--dim,#aaa)}
+.sadkand{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.sadkand button,.sadoskarzeni button{display:flex;align-items:center;gap:8px;min-width:0;padding:8px 10px;border:1px solid var(--line,#3a343b);border-radius:8px;background:rgba(0,0,0,.18);color:var(--tx,#eee);text-align:left;cursor:pointer}
+.sadkand button:hover,.sadoskarzeni button:hover:not(:disabled){border-color:color-mix(in srgb,var(--party-theme,#84a85d) 58%,#555);background:color-mix(in srgb,var(--party-theme,#84a85d) 10%,rgba(0,0,0,.2))}
+.sadkand span,.sadoskarzeni span{min-width:0}.sadkand span>*,.sadoskarzeni span>*{display:block}.sadkand span{font-size:12px;font-weight:700}
+.sadkand em,.sadoskarzeni em{margin-top:2px;font:500 9px var(--m,monospace);font-style:normal;color:var(--dim2,#777);text-transform:uppercase;letter-spacing:.06em}
+.sadoskarzeni{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:330px;overflow:auto;padding-right:3px}
+.sadoskarzeni button>i{margin-left:auto;color:var(--party-theme,#9fbd72);font:22px/1 Georgia,serif}
+.sadoskarzeni button:disabled{opacity:.42;cursor:not-allowed}
+.sadhist{display:flex;flex-direction:column-reverse;gap:6px}
+.sadhist>div{display:grid;grid-template-columns:78px minmax(220px,.55fr) 1fr;gap:12px;align-items:center;padding:9px 12px;border-left:3px solid var(--line2,#555);border-radius:6px;background:rgba(0,0,0,.16)}
+.sadhist>div.skazany{border-left-color:var(--neg,#d35b55)}.sadhist>div.wybrany{border-left-color:var(--pos,#78ad68)}
+.sadhist span{font:700 9px var(--m,monospace);letter-spacing:.13em;text-transform:uppercase;color:var(--dim2,#777)}
+.sadhist b{font-size:12.5px;color:var(--tx,#eee)}.sadhist em{font-size:11.5px;font-style:normal;color:var(--dim,#aaa)}
+.sadwyrok{padding:15px 17px;margin-bottom:12px;border:1px solid var(--line2,#555);border-left:4px solid var(--acc,#d7ab45);border-radius:9px;background:rgba(0,0,0,.2)}
+.sadwyrok span{font:700 9px var(--m,monospace);letter-spacing:.15em;text-transform:uppercase;color:var(--dim2,#777)}
+.sadwyrok h3{margin:4px 0 6px;font:600 21px var(--ser,Georgia,serif)}.sadwyrok p{margin:0;color:var(--dim,#aaa)}
+.sadglosy{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.sadglosy>div{display:flex;gap:8px;align-items:center;padding:8px;border:1px solid var(--line,#444);border-radius:8px}
+.sadglosy>div.za{border-color:color-mix(in srgb,var(--neg,#d35b55) 45%,var(--line,#444))}.sadglosy span>*{display:block}.sadglosy b{font-size:12px}.sadglosy em{font-size:10px;font-style:normal;color:var(--dim2,#777);text-transform:uppercase}
+.sadzamkniety .sadhero{margin-bottom:14px;min-height:130px;display:flex;flex-direction:column;justify-content:center}
+@media(max-width:1280px){.sadkolumny{grid-template-columns:1fr}.sadparam{position:static;margin-top:14px}.sadhero h2{margin-right:80px}.sadhero p{max-width:680px}}
+@media(max-width:820px){.sadkand,.sadoskarzeni{grid-template-columns:1fr}.sadhist>div{grid-template-columns:64px 1fr}.sadhist em{grid-column:2}.sadglosy{grid-template-columns:1fr}.sadhero{padding:18px}.sadhero:after{right:12px}.sadhero h2{font-size:23px}}

@@ -1503,6 +1503,7 @@ function endWeek(){
   ustawPlany();
   ai();drift();aiGoals();aiAgents();aiTransfery();sitTick();
   sprzatnijRade();   // po transferach i odejściach rada musi zgadzać się ze składami partii
+  sadTydzien();      // sąd sprząta skład i wygasza stare materiały dowodowe
   zwlokaPrezydenta();   // ustawa nie może leżeć na biurku bez końca
   if(isEraNiestab()&&!G.eraNiestab){G.eraNiestab=1;
     say('<b>Era niestabilności.</b> Grudniowo-styczniowy chaos na serwerze ułatwia podbieranie ludzi z innych partii, i tobie, i botom. Potrwa do końca stycznia.','roy');}
@@ -2687,7 +2688,6 @@ Object.defineProperty(app,'innerHTML',{
   configurable:true,
   get(){return OPIS_INNER.get.call(app)},
   set(html){
-    const przewijanie=window.scrollY;
     /* Skoro odczyty przeżywają rysowanie, da się wreszcie zobaczyć, że się
        zmieniły. Zapamiętujemy je przed zszyciem i mrugamy tymi, które poszły
        w górę albo w dół — wcześniej liczba po prostu była inna.
@@ -2705,7 +2705,9 @@ Object.defineProperty(app,'innerHTML',{
        zszywanie — trzeba ją przerwać i puścić od nowa. */
     const w=app.querySelector('.widok.wejscie');
     if(w){w.classList.remove('wejscie');void w.offsetWidth;w.classList.add('wejscie')}
-    if(window.scrollY!==przewijanie)window.scrollTo(0,przewijanie);
+    /* Zszywanie zachowuje ten sam korzeń dokumentu, więc przeglądarka sama trzyma
+       pozycję. Ręczne window.scrollTo odpalane przy każdym renderze ścigało się
+       z kółkiem myszy i na dłuższych ekranach wprawiało całą grę w drganie. */
   }
 });
 const crest=(k,s='m')=>{const src=(G&&G.p&&G.p[k]&&G.p[k].logo&&LOGOS[G.p[k].logo])||LOGOS[k]||'';
@@ -4742,7 +4744,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.79';
+let WERSJA='1.1.80';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4753,6 +4755,14 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.80':{data:'7 sierpnia 2026', zmiany:[
+  'Sad jest osobnym dzialem. Sejm wybiera sedziow, a partie wnosza sprawy o naduzycie urzedu, korupcje i naruszenie procedury.',
+  'Wyroki zapadaja imiennymi glosami sedziow i koncza sie upomnieniem, grzywna, usunieciem z urzedu albo uniewinnieniem.',
+  'Ustawa o sadach ma trzy nastawy: liczbe sedziow, niezaleznosc od partii i surowosc wyrokow. Brudne decyzje zostawiaja dowody.',
+  'Przewijanie nie trzesie juz ekranem. Gra przestala cofac pozycje strony przy kazdym przerysowaniu.',
+  'Skale interfejsu mozna zmieniac co 5 procent, a pierwsze uruchomienie dobiera rozmiar do szerokosci ekranu.',
+  'Partie sterowane przez komputer zakladaja nazwane gazety, telewizje i kina, placa utrzymanie, publikuja i zdobywaja zasieg.',
+ ]},
  '1.1.79':{data:'7 sierpnia 2026', zmiany:[
   'Kreator scenariuszy zostal zbudowany od nowa jako piec krokow: opowiesc, Sejm, partie, wladza i finalna kontrola.',
   'Podzial mandatow zawsze pilnuje dokladnie 40 miejsc. Mandat najpierw trafia do puli, a dopiero potem do innej partii.',
@@ -5529,11 +5539,10 @@ function game(){
       if(hasPrez())nv.push(['prezydent',nazwa('prezydent','Prezydent')]);
       nv.push(['sejm','Sejm i władza']);
       nv.push(['ekonomia','Ekonomia']);
-      // Media stoją nad Sądem i widać je zawsze — bez ustawy po prostu nie da
-      // się w nich niczego otworzyć, zamiast znikać z nawigacji bez słowa.
-      // Sąd zszedł pod Sejm jako karta. Trzynaście działów na trzy akcje w tygodniu
-      // to było za dużo: nowe systemy konkurowały nie o uwagę, tylko o te same ruchy.
+      // Media i Sąd są osobnymi systemami. Bez odpowiedniej ustawy widać je jako
+      // zamknięte, żeby gracz od razu wiedział, co może odblokować w Sejmie.
       nv.push(['media','Media'+(mediaJest()?'':'<span class="badge wip">zamk.</span>')]);
+      nv.push(['sad','Sąd'+(lawDone('sady')?'':'<span class="badge wip">zamk.</span>')]);
       return nv.map(([k,n])=>`<button class="${G.tab===k?'on':''}" onclick="setTab('${k}')">${n}</button>`).join('')})()}
   </div>
   <div class="layout">
@@ -5542,7 +5551,7 @@ function game(){
       :G.tab==='cele'?goalTab():G.tab==='lider'?leadTab():G.tab==='krol'?kingTab()
       :G.tab==='premier'?premierTab():G.tab==='prezydent'?prezydentTab()
       :G.tab==='ekonomia'?ekonomiaTab()
-      :G.tab==='media'?mediaTab():sejmTab()+sadTab()}</div>
+      :G.tab==='media'?mediaTab():G.tab==='sad'?sadTab():sejmTab()}</div>
   </div>`;
   G._we=0;
 }
@@ -6064,33 +6073,59 @@ function zrzutkaWez(n){
    bo nikt inny nawet nie próbował. Teraz partie prowadzone przez komputer robią
    to samo co ty — kupują wydawnictwa, kiedy je na to stać, i regularnie z nich
    wydają, więc ich zasięg też wchodzi do sondażu. */
+const AI_MEDIA_NAZWY={
+  gazeta:['Kurier','Dziennik','Trybuna','Głos'],
+  tv:['Telewizja','Studio','Kanał','Wizja'],
+  kino:['Kino','Film','Ekran','Wytwórnia'],
+};
+function aiNazwaMedia(k,typ,nr){
+  const p=G.p[k], pula=AI_MEDIA_NAZWY[typ]||['Media'];
+  const rdzen=pula[(PID.indexOf(k)+(nr||0))%pula.length];
+  return `${rdzen} ${p.ab}`;
+}
 function aiMedia(k){
   if(!mediaJest())return;
   if(!G.aiMedia)G.aiMedia={};
+  if(!G.aiMediaPlan)G.aiMediaPlan={};
   if(!G.aiMedia[k])G.aiMedia[k]=[];
   const p=G.p[k]; if(!p||p.dead)return;
-  const szef=p.lead, maj=kapPryw(szef), moje=G.aiMedia[k];
-  // zakup: rzadko i tylko wtedy, gdy zostaje wyraźny zapas
-  if(moje.length<3&&ch(.42)){
-    const chce=Object.keys(MEDIA_TYP)
-      .filter(t=>maj>MEDIA_TYP[t].koszt*1.5&&!moje.some(m=>m.typ===t))
-      .sort((a,b)=>MEDIA_TYP[b].koszt-MEDIA_TYP[a].koszt)[0];
+  const szef=p.lead, moje=G.aiMedia[k], teraz=absWeek();
+  moje.forEach((m,i)=>{if(!m.nazwa||/[📰📺🎬]$/.test(m.nazwa))m.nazwa=aiNazwaMedia(k,m.typ,i)});
+  if(G.aiMediaPlan[k]===undefined)G.aiMediaPlan[k]=teraz+RI(0,2);
+
+  /* Bot zawsze zaczyna od gazety, a droższe formaty dokłada dopiero później.
+     Losowa szansa zakupu sprawiała, że część partii przez całe kadencje nie robiła
+     nic; plan tygodniowy jest widoczny, przewidywalny i nadal zależy od pieniędzy. */
+  if(moje.length<3&&teraz>=G.aiMediaPlan[k]){
+    const maj=kapPryw(szef);
+    const kolejnosc=['gazeta','tv','kino'];
+    const chce=kolejnosc.find(t=>!moje.some(m=>m.typ===t)&&maj>=MEDIA_TYP[t].koszt*1.18);
     if(chce){
-      G.kapPryw[szef]=Math.round(maj-MEDIA_TYP[chce].koszt);
-      moje.push({typ:chce,nazwa:`${p.ab} ${MEDIA_TYP[chce].e}`,szef,bilans:0,staz:0,ostatnieWyd:absWeek()});
-      say(`<b>${p.ab} zakłada ${MEDIA_TYP[chce].n.toLowerCase()}.</b> ${szef} wyłożył ${kasaSkrot(MEDIA_TYP[chce].koszt)}.`,'');
-    }
+      const koszt=MEDIA_TYP[chce].koszt;
+      G.kapPryw[szef]=Math.round(maj-koszt);
+      const nazwa=aiNazwaMedia(k,chce,moje.length);
+      moje.push({typ:chce,nazwa,szef,bilans:0,staz:0,serca:0,numery:0,
+                 ostatnio:0,ostatnieWyd:-99});
+      G.aiMediaPlan[k]=teraz+RI(4,7);
+      say(`<b>${p.ab} zakłada ${nazwa}.</b> ${szef} wyłożył ${kasaSkrot(koszt)}.`,'');
+    }else G.aiMediaPlan[k]=teraz+2;
   }
-  // wydawanie: bot pilnuje swoich terminów tak samo jak gracz
+
+  // Każdy szyld płaci koszty i publikuje, gdy kończy mu się przerwa.
   moje.forEach(m=>{
     m.staz=(m.staz||0)+1;
-    if(absWeek()-(m.ostatnieWyd||-99)<MEDIA_PRZERWA[m.typ])return;
-    if(!ch(.7))return;
+    const utrz=MEDIA_UTRZYMANIE[m.typ]||0;
+    m.bilans=(m.bilans||0)-utrz;
+    G.kapPryw[m.szef]=Math.round((G.kapPryw[m.szef]!==undefined?G.kapPryw[m.szef]:kapPryw(m.szef))-utrz);
+    if(teraz-(m.ostatnieWyd!==undefined?m.ostatnieWyd:-99)<MEDIA_PRZERWA[m.typ])return;
     const ld=L(m.szef)||{komp:50,char:50};
     const skala={gazeta:.9,tv:1.6,kino:1.9}[m.typ]||1;
-    const zysk=Math.round((p.cred*.5+p.act*.4+ld.komp*.3-18)*skala*22000*R(.7,1.3));
-    m.bilans+=zysk; m.ostatnieWyd=absWeek();
-    G.kapPryw[m.szef]=Math.round((G.kapPryw[m.szef]!==undefined?G.kapPryw[m.szef]:kapPryw(m.szef))+zysk);
+    const zysk=Math.max(12000,Math.round((p.cred*.5+p.act*.4+ld.komp*.3-18)*skala*22000*R(.7,1.3)));
+    m.bilans+=zysk;m.ostatnio=zysk;m.ostatnieWyd=teraz;m.numery=(m.numery||0)+1;
+    m.serca=m.typ==='gazeta'?Math.max(1,Math.round((p.cred+ld.komp+m.staz)/14)):m.serca;
+    m.widz=m.typ==='gazeta'?0:Math.max(3,Math.round((p.act+p.fame+ld.char)/9*skala));
+    G.kapPryw[m.szef]=Math.round(G.kapPryw[m.szef]+zysk);
+    p.fame=cl(p.fame+Math.min(2.5,(m.widz||m.serca||1)/16));
   });
 }
 
@@ -6412,6 +6447,8 @@ function mediaTab(){
       <b>Kultury i Rozrywki</b>. Dopiero po niej ten dział się otwiera.</div>
     </div></div>`;
   const lista=mediaMoje();
+  const rynek=alive().filter(k=>k!==G.me).flatMap(k=>((G.aiMedia&&G.aiMedia[k])||[]).map(m=>({k,m})))
+    .sort((a,b)=>zasiegMediow(b.k)-zasiegMediow(a.k));
   return `
   <div class="ekoblok">
     <div class="card"><div class="h"><h3>Twoje wydawnictwa</h3>
@@ -6462,76 +6499,198 @@ function mediaTab(){
             ${mam?'Już to masz':stac?'Zakładam':'Brakuje '+kasaSkrot(t.koszt-maj)}</button>
         </div>`}).join('')}</div>
     </div></div>
+
+    <div class="card"><div class="h"><h3>Rynek mediów</h3>
+      <span class="n">${rynek.length} cudzych ${pl(rynek.length,'szyld','szyldy','szyldów')}</span></div><div class="b">
+      ${rynek.length?`<div class="ekolista medrynek">${rynek.map(({k,m})=>`<div class="ekos medw">
+        <span class="mede">${MEDIA_TYP[m.typ].e}</span>
+        <span class="ekon">${esc(m.nazwa)}<em class="ekotag">${G.p[k].ab} · ${esc(m.szef)} · ${m.numery||0} ${pl(m.numery||0,'wydanie','wydania','wydań')}</em></span>
+        <span class="medserca">zasięg ${zasiegMediow(k).toFixed(1).replace('.',',')}%</span>
+        <b class="ekow ${m.bilans>=0?'plus':'minus'}">${m.bilans<0?'−':'+'}${kasaSkrot(Math.abs(m.bilans||0))}</b>
+      </div>`).join('')}</div>`:'<p class="dim" style="margin:0">Ustawa dopiero ruszyła. Partie potrzebują najwyżej kilku tygodni, żeby otworzyć pierwsze redakcje.</p>'}
+    </div></div>
   </div>`;
 }
 
 /* ── SĄD ──
-   Dział na razie tylko pokazuje. Skład sądu bierze się wprost z ustawy
-   o sądach administracyjnych: dopóki sejm jej nie uchwali, żadnego sądu nie ma
-   i nie ma kto rozpatrywać odwołań. Sędziów wyznacza resort Sprawiedliwości,
-   więc kto go trzyma, ten obsadza ławę.
-
-   Co jest gotowe: skład, źródło jego powołania i podgląd, kto ma wpływ.
-   Czego nie ma: samych spraw, odwołań od decyzji administracji, wyroków
-   i tego, żeby sąd cokolwiek realnie blokował. Dlatego dział stoi z etykietą
-   „wip” — żeby było jasne, że liczby są prawdziwe, a mechaniki jeszcze nie ma. */
-function sadSklad(){
-  if(!G||!lawDone('sady'))return [];
-  /* Ława to trzy osoby: minister Sprawiedliwości z urzędu, a do tego dwoje
-     o najwyższej kompetencji spośród tych, którzy nie prowadzą własnej partii —
-     sędzia z fotelem przewodniczącego byłby sędzią we własnej sprawie. */
-  const res=RESORTY.find(r=>r.id==='spraw');
-  const min=res?radaKto(res.id):null;
-  const wolni=wszyscyZaplecze()
-    .filter(n=>n!==min&&!alive().some(k=>isLead(G.p[k],n)))
-    .sort((a,b)=>L(b).komp-L(a).komp).slice(0,2);
-  const ludzie=[];
-  if(min)ludzie.push({n:min,rola:'Przewodniczący składu',skad:'z urzędu, resort Sprawiedliwości'});
-  wolni.forEach(n=>ludzie.push({n,rola:'Sędzia',skad:'powołany za kompetencję'}));
-  return ludzie;
+   To osobna gałąź władzy, a nie dekoracja pod Sejmem. Ustawa określa wielkość
+   składu, niezależność od partii i surowość. Każde nazwisko przechodzi przez
+   głosowanie izby, a każda sprawa kończy się imiennym głosem sędziów i karą. */
+const SAD_ZARZUTY={
+  urzad:{n:'Nadużycie urzędu',d:'Wykorzystanie stanowiska lub administracji do walki partyjnej.'},
+  korupcja:{n:'Korupcja polityczna',d:'Prywatne pieniądze i wpływy użyte do załatwienia decyzji.'},
+  procedura:{n:'Naruszenie procedury',d:'Obejście regulaminu, terminów albo wyniku głosowania.'},
+};
+function sadInit(){
+  if(!G.sad)G.sad={sedziowie:[],historia:[],odrzuceni:{},tropy:{},nr:0};
+  const s=G.sad;
+  s.sedziowie=Array.isArray(s.sedziowie)?s.sedziowie:[];
+  s.historia=Array.isArray(s.historia)?s.historia:[];
+  s.odrzuceni=s.odrzuceni||{};s.tropy=s.tropy||{};s.nr=s.nr||0;
+  /* Człowiek, który odszedł z polityki, nie może wisieć na ławie jako duch. */
+  s.sedziowie=s.sedziowie.filter(x=>x&&x.n&&partiaOsoby(x.n));
+  return s;
+}
+const sadNastawy=()=>lawDone('sady')?lawParams('sady'):{sklad:3,niezaleznosc:60,surowosc:50};
+function sadKandydaci(){
+  const s=sadInit(), zajeci=new Set(s.sedziowie.map(x=>x.n));
+  return wszyscyZaplecze().filter(n=>partiaOsoby(n)&&!zajeci.has(n)
+      &&!alive().some(k=>isLead(G.p[k],n))&&!s.odrzuceni[n+'|'+G.term])
+    .sort((a,b)=>(L(b).komp+L(b).autor*.45)-(L(a).komp+L(a).autor*.45));
+}
+function sadGlosyKandydata(nick,mojGlos){
+  const pk=partiaOsoby(nick), min=radaKto('spraw'), mk=min?partiaOsoby(min):null;
+  const ld=L(nick), by={};let za=0,przeciw=0,wstrzym=0;
+  alive().forEach(k=>{
+    const mand=G.p[k].seats;if(!mand)return;
+    let v;
+    if(k===G.me&&mojGlos!==undefined)v=mojGlos;
+    else{
+      const rel=pk&&G.rel[k]&&G.rel[k][pk]!==undefined?G.rel[k][pk]:0;
+      let x=(ld.komp-50)*.7+(ld.autor-50)*.25+rel*.38+R(-18,18);
+      if(k===pk)x+=55;
+      if(k===mk)x+=28;
+      if(G.gov&&G.gov.parties.includes(k)&&mk&&G.gov.parties.includes(mk))x+=12;
+      v=x>8?'za':x<-13?'przeciw':'wstrzym';
+    }
+    by[k]=v;
+    if(v==='za')za+=mand;else if(v==='przeciw')przeciw+=mand;else wstrzym+=mand;
+  });
+  return {za,przeciw,wstrzym,by,potrzeba:MAJ,ok:za>=MAJ};
+}
+function sadZglos(nick){
+  if(!lawDone('sady')||!me().seats)return;
+  const s=sadInit(), n=sadNastawy();
+  if(s.sedziowie.length>=n.sklad||!sadKandydaci().includes(nick))return;
+  const pk=partiaOsoby(nick), l=L(nick);
+  modal('Sąd','Wybór sędziego',
+    `<p>Zgłaszasz <b>${esc(nick)}</b> (${pk?G.p[pk].ab:'bezpartyjny'}). Kandydat ma
+     kompetencję <b>${l.komp}</b> i autorytet <b>${l.autor}</b>.</p>
+     <p class="dim" style="margin-top:10px">Sędzia potrzebuje ${MAJ} głosów całej izby.
+     Minister Sprawiedliwości ma wpływ na nominację, ale nie może ominąć głosowania.</p>`,
+    [{l:'Głosuję za',f:()=>{close();sadWybierz(nick,'za')}},
+     {l:'Wstrzymuję się',f:()=>{close();sadWybierz(nick,'wstrzym')}},
+     {l:'Głosuję przeciw',f:()=>{close();sadWybierz(nick,'przeciw')}},
+     {l:'Wycofuję kandydaturę',f:close}],close);
+}
+function sadWybierz(nick,mojGlos,cicho){
+  const s=sadInit(), w=sadGlosyKandydata(nick,mojGlos), pk=partiaOsoby(nick);
+  if(w.ok)s.sedziowie.push({n:nick,partia:pk,od:absWeek()});
+  else s.odrzuceni[nick+'|'+G.term]=1;
+  s.historia.push({typ:'wybor',tyd:absWeek(),n:nick,partia:pk,ok:w.ok,za:w.za,przeciw:w.przeciw});
+  s.historia=s.historia.slice(-16);
+  if(cicho)return w.ok;
+  SFX.vote();
+  modal('Sejm',w.ok?'Sędzia wybrany':'Kandydatura odrzucona',
+    `<p><b>${esc(nick)}</b> ${w.ok?'wchodzi do składu sądu':'nie zebrał większości'}.</p>${panelGlosowania(w)}`,
+    [{l:'Rozumiem',f:()=>{close();render()}}]);
+  render();return w.ok;
+}
+function sadZapewnijSklad(){
+  if(!lawDone('sady'))return;
+  const s=sadInit(), cel=sadNastawy().sklad;
+  if(s.sedziowie.length>cel)s.sedziowie=s.sedziowie.slice(0,cel);
+  /* Pierwszy skład musi powstać od razu po ustawie. Symulujemy te same głosowania,
+     które później gracz widzi przy wakacie; inaczej nowy system byłby martwy przez
+     kilka tygodni tylko dlatego, że nikt jeszcze nie otworzył jego zakładki. */
+  if(!s.sedziowie.length){
+    for(const n of sadKandydaci().slice(0,12)){
+      sadWybierz(n,undefined,true);
+      if(s.sedziowie.length>=cel)break;
+    }
+  }
+}
+function sadSklad(){sadInit();return lawDone('sady')?G.sad.sedziowie.slice():[]}
+function sadDowody(nick,typ){
+  const k=partiaOsoby(nick), p=k?G.p[k]:null;if(!p)return 0;
+  const trop=(G.sad&&G.sad.tropy&&G.sad.tropy[k])||0;
+  if(typ==='urzad')return Math.round(cl(18+p.ctr*.42+(G.gov&&G.gov.parties.includes(k)?13:0)+trop,5,95));
+  if(typ==='korupcja')return Math.round(cl(12+p.ctr*.32+Math.log10(Math.max(10,kapPryw(nick)))*5+trop*.7,5,95));
+  return Math.round(cl(20+p.pret*.35+(100-p.cred)*.28+trop*.85,5,95));
+}
+function sadOpenSprawa(nick){
+  if(!lawDone('sady')||sadSklad().length<2)return;
+  const k=partiaOsoby(nick);if(!k||k===G.me)return;
+  modal('Sąd',`Sprawa przeciw ${esc(nick)}`,
+    `<p>Wybierz zarzut. Wniesienie sprawy kosztuje <b>1 akcję i 8 kapitału</b>.
+     Jeśli oskarżenie upadnie, twoja wiarygodność spadnie.</p>`,
+    Object.keys(SAD_ZARZUTY).map(id=>{const z=SAD_ZARZUTY[id],d=sadDowody(nick,id);
+      return {l:z.n,s:`${z.d} · materiał dowodowy ${d}/100`,dis:G.ap<1||G.kp<8,
+        f:()=>{close();sadWnies(nick,id)}}}).concat([{l:'Rezygnuję',f:close}]),close);
+}
+function sadWnies(nick,typ,cicho){
+  const k=partiaOsoby(nick), z=SAD_ZARZUTY[typ], sklad=sadSklad();
+  if(!k||!z||sklad.length<2||(!cicho&&(G.ap<1||G.kp<8)))return;
+  if(!cicho){G.ap--;G.kp-=8;G.actedWeek=G.term+'-'+G.week}
+  const n=sadNastawy(), dow=sadDowody(nick,typ), glosy=[];
+  sklad.forEach(s=>{
+    const ld=L(s.n), taSama=s.partia===k, moja=s.partia===G.me;
+    const partyjnosc=(100-n.niezaleznosc)/100;
+    const wynik=dow+(n.surowosc-50)*.34+(ld.komp-50)*.18
+      +(moja?7*partyjnosc:0)-(taSama?22*partyjnosc:0)+R(-15,15);
+    glosy.push({n:s.n,partia:s.partia,za:wynik>=50});
+  });
+  const za=glosy.filter(x=>x.za).length, win=za>sklad.length/2, p=G.p[k];
+  let wyrok='uniewinnienie',kara='Sąd oddala zarzuty.';
+  if(win){
+    if(dow>=76){wyrok='zakaz pełnienia urzędu';p.cred=cl(p.cred-8);p.ctr=cl(p.ctr+10);p.fame=cl(p.fame-5);
+      Object.keys(G.rada||{}).forEach(r=>{if(G.rada[r]===nick){delete G.rada[r];delete G.radaOd[r]}});
+      kara='Usunięcie z urzędu, wiarygodność −8, sława −5, kontrowersja +10.';
+    }else if(dow>=54){wyrok='grzywna';const gr=Math.round(Math.max(50e3,kapPryw(nick)*.06));
+      G.kapPryw[nick]=Math.max(0,kapPryw(nick)-gr);G.skarb=(G.skarb||0)+gr;p.cred=cl(p.cred-5);p.ctr=cl(p.ctr+6);
+      kara=`Grzywna ${kasaSkrot(gr)}, wiarygodność −5, kontrowersja +6.`;
+    }else{wyrok='upomnienie';p.cred=cl(p.cred-3);p.ctr=cl(p.ctr+3);kara='Wiarygodność −3, kontrowersja +3.'}
+  }else if(!cicho){me().cred=cl(me().cred-3);me().ctr=cl(me().ctr+2);kara+=' Za bezpodstawny wniosek tracisz 3 wiarygodności.'}
+  const s=sadInit();s.nr++;s.tropy[k]=Math.max(0,(s.tropy[k]||0)-20);
+  s.historia.push({typ:'wyrok',tyd:absWeek(),nr:s.nr,n:nick,partia:k,zarzut:z.n,dow,wyrok,za,ilu:sklad.length});
+  s.historia=s.historia.slice(-16);
+  if(cicho)return {win,wyrok};
+  SFX.seal();
+  modal('Sąd',win?'Wyrok skazujący':'Uniewinnienie',
+    `<div class="sadwyrok"><span>Sprawa ${s.nr}</span><h3>${esc(nick)} — ${wyrok}</h3><p>${kara}</p></div>
+     <div class="sadglosy">${glosy.map(x=>`<div class="${x.za?'za':'przeciw'}">${ava(x.n,G.p[x.partia]?G.p[x.partia].c:'#777',28)}<span><b>${esc(x.n)}</b><em>${x.za?'winny':'niewinny'}</em></span></div>`).join('')}</div>`,
+    [{l:'Przyjmuję wyrok',f:()=>{close();render()}}]);
+  render();
+}
+function sadTydzien(){
+  if(!lawDone('sady'))return;
+  const s=sadInit();
+  Object.keys(s.tropy).forEach(k=>s.tropy[k]=Math.max(0,s.tropy[k]-3));
+  sadZapewnijSklad();
 }
 function sadTab(){
-  const jest=lawDone('sady');
-  const sklad=sadSklad();
-  const res=RESORTY.find(r=>r.id==='spraw');
-  const kto=res?radaKto(res.id):null;
-  const mojResort=!!(res&&mojeResorty().includes('spraw'));
-  return `
-  <div class="ekoblok">
-    <div class="ekotasma">NIEDOKOŃCZONE! Skład jest prawdziwy, spraw i wyroków jeszcze nie ma.</div>
-
-    <div class="card"><div class="h"><h3>Sąd administracyjny</h3>
-      <span class="n">${jest?'powołany':'nie istnieje'}</span></div><div class="b">
-      ${jest?`
-        <div class="tabliczki" style="margin:0 0 14px">
-          <div><b>${sklad.length}</b><span>${pl(sklad.length,'sędzia','sędziów','sędziów')}</span></div>
-          <div><b>${kto?G.p[partiaOsoby(kto)]?G.p[partiaOsoby(kto)].ab:'—':'wakat'}</b><span>obsadza ławę</span></div>
-          <div><b>${sklad.length?Math.round(sklad.reduce((a,x)=>a+L(x.n).komp,0)/sklad.length):0}</b><span>średnia kompetencja</span></div>
-        </div>
-        <div class="ekolista">${sklad.map((x,i)=>`<div class="ekos">
-          <span class="ekopoz">${i+1}</span>${ava(x.n,me().c,26)}
-          <span class="ekon">${x.n}<em class="ekotag">${x.rola}</em></span>
-          <b class="ekow">kompetencja ${L(x.n).komp}</b>
-          <span class="ekodaje">${x.skad}</span>
-        </div>`).join('')||'<div class="dim">Nie ma kogo powołać.</div>'}</div>`
-       :`<p style="margin-top:0">Sądu nie ma, bo sejm nie uchwalił <b>ustawy o sądach
-         administracyjnych</b>. Dopóki jej nie ma, decyzje administracji są ostateczne
-         i nie ma od nich odwołania.</p>
-         <div class="note" style="margin:12px 0 0">Ustawę zgłasza premier albo
-         <b>minister Sprawiedliwości</b>${kto?` — teraz jest nim <b>${kto}</b>`:', a resort stoi pusty'}.
-         ${mojResort?'Resort trzymasz ty, więc możesz ją wnieść.':''}</div>`}
-    </div></div>
-
-    <div class="card"><div class="h"><h3>Czego tu jeszcze nie ma</h3>
-      <span class="n">plan działu</span></div><div class="b">
-      <ul class="krelista">
-        <li><b>Sprawy i odwołania</b> — od banów, od decyzji administracji, od wyników głosowań.</li>
-        <li><b>Wyroki</b> — sąd utrzymuje albo uchyla, a uchylenie realnie cofa skutek.</li>
-        <li><b>Skład jako stawka polityczna</b> — kto obsadzi ławę, ten wygrywa spory zanim się zaczną.</li>
-        <li><b>Koszt procesu</b> — odwołanie ma kosztować kapitał i czas, żeby nie było darmowe.</li>
-      </ul>
-      <div class="dim" style="font-size:12px;margin-top:11px">Skład powyżej liczy się naprawdę
-      i zmienia się razem z obsadą resortu — reszta dopiero powstaje.</div>
+  const jest=lawDone('sady'), res=RESORTY.find(r=>r.id==='spraw'), min=res?radaKto(res.id):null;
+  if(!jest)return `<div class="card sadzamkniety"><div class="h"><h3>Sąd</h3><span class="n">nie istnieje</span></div><div class="b">
+    <div class="sadhero"><span>WŁADZA SĄDOWNICZA</span><h2>Najpierw potrzebna jest ustawa</h2>
+      <p>Bez sądu decyzje administracji są ostateczne. Ustawę może zgłosić premier albo minister Sprawiedliwości${min?` — teraz jest nim <b>${esc(min)}</b>`:''}.</p></div>
+    <button class="btn" onclick="setTab('sejm')">Idę do Sejmu i ustaw</button></div></div>`;
+  sadZapewnijSklad();
+  const s=sadInit(), sklad=sadSklad(), nast=sadNastawy(), wakat=Math.max(0,nast.sklad-sklad.length);
+  const oskarzeni=alive().filter(k=>k!==G.me).map(k=>G.p[k].lead).filter(Boolean)
+    .sort((a,b)=>sadDowody(b,'procedura')-sadDowody(a,'procedura'));
+  return `<div class="ekoblok sadekran">
+    <div class="sadhero"><span>SĄD ADMINISTRACYJNY</span><h2>Wyrok zapada głosami, nie przyciskiem ministra</h2>
+      <p>Sejm wybiera skład. Sędziowie oceniają dowody według ustawy, własnej kompetencji i partyjnych nacisków.</p>
+      <div class="sadparam"><b>${nast.sklad}<em>miejsc</em></b><b>${nast.niezaleznosc}<em>niezależność</em></b><b>${nast.surowosc}<em>surowość</em></b></div>
+    </div>
+    <div class="sadkolumny">
+      <div class="card"><div class="h"><h3>Skład sądu</h3><span class="n">${sklad.length}/${nast.sklad}</span></div><div class="b">
+        <div class="sadlawka">${sklad.map((x,i)=>{const pk=partiaOsoby(x.n)||x.partia;return `<div class="sadsedzia">
+          <span class="sadnr">${i+1}</span>${ava(x.n,G.p[pk]?G.p[pk].c:'#777',38)}
+          <span><b>${esc(x.n)}</b><em>${pk&&G.p[pk]?G.p[pk].ab:'—'} · kompetencja ${L(x.n).komp}</em></span></div>`}).join('')}</div>
+        ${wakat?`<div class="sadwak"><b>${wakat} ${pl(wakat,'wakat','wakaty','wakatów')}</b><span>Wskaż kandydata; o powołaniu zdecyduje cały Sejm.</span></div>
+          <div class="sadkand">${sadKandydaci().slice(0,6).map(n=>{const pk=partiaOsoby(n);return `<button onclick='sadZglos(${JSON.stringify(n)})'>${ava(n,G.p[pk].c,25)}<span>${esc(n)}<em>${G.p[pk].ab} · komp. ${L(n).komp}</em></span></button>`}).join('')}</div>`:''}
+      </div></div>
+      <div class="card"><div class="h"><h3>Wnieś sprawę</h3><span class="n">1 akcja · 8 kapitału</span></div><div class="b">
+        <p class="dim" style="margin-top:0">Wybierz oskarżonego. W następnym kroku wskażesz zarzut i zobaczysz siłę materiału.</p>
+        <div class="sadoskarzeni">${oskarzeni.map(n=>{const k=partiaOsoby(n),d=Math.max(...Object.keys(SAD_ZARZUTY).map(t=>sadDowody(n,t)));
+          return `<button ${sklad.length<2||G.ap<1||G.kp<8?'disabled':''} onclick='sadOpenSprawa(${JSON.stringify(n)})'>${ava(n,G.p[k].c,30)}<span><b>${esc(n)}</b><em>${G.p[k].ab} · materiał do ${d}/100</em></span><i>›</i></button>`}).join('')}</div>
+      </div></div>
+    </div>
+    <div class="card"><div class="h"><h3>Wokanda i wybory</h3><span class="n">ostatnie ${Math.min(8,s.historia.length)}</span></div><div class="b">
+      <div class="sadhist">${s.historia.slice(-8).map(x=>x.typ==='wyrok'
+        ?`<div class="${x.wyrok==='uniewinnienie'?'oddalona':'skazany'}"><span>sprawa ${x.nr}</span><b>${esc(x.n)} — ${x.wyrok}</b><em>${esc(x.zarzut)} · dowody ${x.dow}/100 · ${x.za}/${x.ilu} sędziów za winą</em></div>`
+        :`<div class="${x.ok?'wybrany':'oddalona'}"><span>wybór</span><b>${esc(x.n)} ${x.ok?'wchodzi do składu':'odrzucony'}</b><em>Sejm ${x.za}:${x.przeciw}</em></div>`).join('')||'<p class="dim" style="margin:0">Wokanda jest czysta.</p>'}</div>
     </div></div>
   </div>`;
 }
@@ -7523,13 +7682,11 @@ function fire(a,t,r,s,tm){
     p.fame=f0+(p.fame-f0)*mul}
   if(p.mem>m0){const raw=p.mem,d2=Math.max(.3,1-Math.pow(cl(m0/110,0,1),1.5));
     p.mem=raw}
-  /* Ustawa o sądach administracyjnych: kto ją przepchnął, ten ma procedurę po swojej
-     stronie i brudne zagrywki kosztują go o połowę mniej wizerunku. */
+  /* Sąd nie daje autorowi ustawy immunitetu. Brudna zagrywka zostawia za to
+     materiał procesowy, który przez kilka tygodni podbija szansę skazania. */
   if(a.cat==='bru'&&lawDone('sady')){
-    const autor=G.lawBy&&G.lawBy.sady===G.me;
-    const ulga=autor?.5:.85;
-    if(p.ctr>c0)p.ctr=c0+(p.ctr-c0)*ulga;
-    if(p.pret>pr0)p.pret=pr0+(p.pret-pr0)*ulga;
+    const s=sadInit();
+    s.tropy[G.me]=cl((s.tropy[G.me]||0)+12+Math.max(0,p.ctr-c0)*.7+Math.max(0,p.pret-pr0)*.5,0,60);
   }
   // kolejność ma znaczenie: powiązane decyzje wzmacniają się, sprzeczne kasują
   if(cb){
@@ -8850,8 +9007,8 @@ const LAWS=[
   d:'Serwerowa encyklopedia: kto, kiedy, co i dlaczego, z przypisami i sporami o przypisy.',
   skutek:'Sława +10 od razu dla tego, kto ją przepchnął, a co kadencję dochodzi intelektualista.'},
  {id:'sady',n:'Ustawa o sądach administracyjnych',kat:'ustrój',prog:.5,resort:'spraw',
-  d:'Instancja odwoławcza od decyzji administracji: terminy, procedura i papier na wszystko.',
-  skutek:'Brudne zagrywki kosztują wnioskodawcę o połowę mniej kontrowersji i pretensjonalności.'},
+  d:'Powołuje osobną władzę sądowniczą. Sejm wybiera sędziów, a partie mogą wnosić sprawy o nadużycie urzędu, korupcję i naruszenie procedury.',
+  skutek:'Ustalasz liczbę sędziów, niezależność od partii i surowość wyroków. Brudne decyzje zostawiają materiał dowodowy.'},
  {id:'man',n:'Ustawa o MAN',kat:'ustrój',prog:.5,resort:'edu',
   d:'Mordeczkowa Akademia Nauk: stopnie, tytuły i ścieżka awansu dla tych, którzy piszą dłużej niż zdanie. Przy okazji ustalasz, co Akademia organizuje na otwarcie — i płacisz za to z własnej kieszeni.',
   skutek:'Raz na kadencję wnioskodawca przekuwa dwóch intelektualistów w elitę. Reszcie dochodzi jeden po latach. Do tego skutek wybranego przedsięwzięcia.',
@@ -8926,6 +9083,12 @@ const LAWPAR={
   zakres:{majatek:[0,12],progresja:[0,1]},
   krok:{majatek:1,progresja:1},
   opis:{majatek:'Podatek od prywatnego majątku (%)',progresja:'Progresja (0 równo, 1 progresywnie)'},
+  jedn:''},
+ sady:{
+  baza:{sklad:3,niezaleznosc:60,surowosc:50},
+  zakres:{sklad:[3,5],niezaleznosc:[20,100],surowosc:[20,100]},
+  krok:{sklad:2,niezaleznosc:10,surowosc:10},
+  opis:{sklad:'Liczba sędziów',niezaleznosc:'Niezależność od partii',surowosc:'Surowość wyroków'},
   jedn:''},
 };
 const lawEdytowalna=id=>!!LAWPAR[id];
@@ -9359,6 +9522,7 @@ function applyLaw(id,opcje){
      co liczy się od stałej wielkości izby — większość, progi list, rozliczenie
      kadencji — przestawało się zgadzać z tym, co gracz miał przed oczami. */
   if(id==='ordyn'&&opcje)THR.base=cl(opcje.prog,0,8);
+  if(id==='sady')sadZapewnijSklad();
 }
 const TOTAL_SEATS_LIVE=()=>REG.reduce((a,r)=>a+r.seats,0)+TOPUP;
 
@@ -11957,7 +12121,8 @@ Object.assign(window,{radykalowie,iskra,waznePozycje,waznePasek,modyfikatory,pod
   stolWpis,stolZatwierdz,zarobekLidera,zarobekTydzien,pkbWykres,openWariant,wariantyUstawy,wariantPo,
   majatekSzefa,panelGlosowania,nextCandidate,pkbZapiszOdczyt,
   RANGI,ranga,rangaNr,nastepnaRanga,mnoznikRangi,rangiStart,sprawdzRangi,absolutorium,
-  rangaKoszt,rangaWymog,oknoAbsolutorium,sadTab,sadSklad,nagranieStart,liveLap,DANINA_ZA_PUNKT,NAGR_TRYBY,
+  rangaKoszt,rangaWymog,oknoAbsolutorium,sadTab,sadSklad,sadInit,sadZglos,sadWybierz,
+  sadOpenSprawa,sadWnies,sadDowody,sadTydzien,nagranieStart,liveLap,DANINA_ZA_PUNKT,NAGR_TRYBY,
   mediaTab,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,mediaTydzien,mediaBilans,
   zasiegMediow,aiMedia,dlugTydzien,kieszenSzefa,MEDIA_ZASIEG,MEDIA_UTRZYMANIE,absWeek,tally,
   mediaOdcinekGraj,mediaFilmGraj,serduszka,MEDIA_TYP,nagranieMAN,mediaNumer,mediaGotowe,mediaZa,mediaJest,
