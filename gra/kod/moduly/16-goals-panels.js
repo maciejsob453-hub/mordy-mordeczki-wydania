@@ -629,12 +629,13 @@ function radaPodglad(){
   return `<div class="card rel"><div class="h"><h3>Rada ministrów</h3>
     <span class="n">${obsadzone} z ${RESORTY.length}${mojeResorty?` · ${mojeResorty} twoich`:''}</span></div><div class="b">
     <div class="minlist">${RESORTY.map(r=>{
-      const kto=radaKto(r.id), kPart=kto?partiaOsoby(kto):null, moj=kPart===G.me;
-      return `<div class="minrow2 ${moj?'moj':''}">
+    const kto=radaKto(r.id), kPart=kto?partiaOsoby(kto):null, moj=kPart===G.me;
+      const canAsk=!isPM()&&G.gov.parties.includes(G.me)&&!kto;
+      return `<div class="minrow2 ${moj?'moj':''} ${canAsk?'resortrequest':''}" ${canAsk?`onclick="openResort('${r.id}')" title="Porozmawiaj z premierem o tym resorcie"`:''}>
         <span class="mres">${r.n}</span>
         ${kto?`<span class="mkto">${ava(kto,kPart?G.p[kPart].c:'#666',22)}<b>${kto}</b>
             <span class="dim">${kPart?G.p[kPart].ab:'bezpartyjny'}</span></span>`
-          :'<span class="mkto dim">wakat</span>'}
+          :`<span class="mkto dim">wakat${canAsk?'<small>porozmawiaj z premierem ›</small>':''}</span>`}
       </div>`}).join('')}</div>
     <div class="note" style="margin:12px 0 0">Minister pracuje na konto swojej partii: co tydzień dokłada jej
     sławy i aktywności, a przy ustawach ze swojego resortu liczy się tak jak premier.

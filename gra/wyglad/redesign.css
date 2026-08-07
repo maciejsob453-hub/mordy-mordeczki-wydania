@@ -533,6 +533,7 @@ body::after{
   margin:14px 0;padding:12px;border:1px solid var(--line);border-radius:8px;background:rgba(0,0,0,.22);
   color:var(--dim2);font:11px var(--m)}
 .talkmeter b{color:var(--acc);font-size:18px}.talkmeter span:last-child{text-align:right}
+.resortrequest{cursor:pointer;transition:border-color .16s,background .16s,transform .16s}.resortrequest:hover{border-color:var(--acc)!important;background:rgba(217,171,69,.08);transform:translateX(2px)}.resortrequest small{display:block;color:var(--acc);font:9px var(--m);letter-spacing:.05em;margin-top:3px}
 .pollhero,.royalhero{display:flex;justify-content:space-between;align-items:center;gap:22px;padding:22px 26px;
   border:1px solid var(--line2);border-radius:14px;background:radial-gradient(520px 180px at 0 0,rgba(90,155,232,.13),transparent 70%),linear-gradient(160deg,var(--p2),rgba(0,0,0,.35));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),var(--sh1)}
 .pollhero h2,.royalhero h2{margin:5px 0 4px;font:600 28px var(--fd);color:var(--tx)}
