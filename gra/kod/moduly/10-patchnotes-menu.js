@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.87':{data:'7 sierpnia 2026', zmiany:[
+  'KREATOR MA SYMULATOR TYGODNI. Sprawdzisz warunki, lancuchy i skutki wydarzen bez ruszania prawdziwej gry.',
+  'WALIDATOR WYKRYWA PETLE, NIEOSIAGALNE WYDARZENIA, SPRZECZNE WARUNKI I BRAK PUNKTU STARTOWEGO.',
+  'SYMULATOR MA TRYB PIERWSZEJ ODPOWIEDZI ORAZ PROSTY TRYB AI Z LOGIEM KAZDEGO WYDARZENIA.',
+ ]},
  '1.1.86':{data:'7 sierpnia 2026', zmiany:[
   'KREATOR MA ZAPIS ROBOCZY, PODGLAD, DUPLIKOWANIE ORAZ IMPORT I EKSPORT JSON.',
   'WYDARZENIA MOZNA TWORZYC Z GOTOWYCH SZABLONOW AFERA, KRYZYS I MEDIA.',

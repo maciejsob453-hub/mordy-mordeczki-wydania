@@ -2742,3 +2742,8 @@ body:has(.kreekran) .appbg{opacity:.16}
 .kretools .btn,.krewydtemplates .btn{font-size:11px;white-space:nowrap}
 .krechain{margin:12px 0 16px;padding:12px;border:1px solid rgba(198,155,56,.3);border-radius:8px;background:rgba(30,20,30,.42)}
 .krechain .sterlab{margin-bottom:8px}
+.kretestscores{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:12px 0}
+.kretestscores span{padding:8px 10px;border:1px solid rgba(198,155,56,.25);border-radius:6px;background:rgba(3,13,9,.55);font-size:11px;color:var(--muted,#aaa)}
+.kretestscores b{float:right;color:var(--gold,#d9ab45);font-size:13px}
+.kretestlog{max-height:260px;overflow:auto;margin-top:12px}
+@media(max-width:760px){.kretestscores{grid-template-columns:repeat(2,minmax(0,1fr))}}

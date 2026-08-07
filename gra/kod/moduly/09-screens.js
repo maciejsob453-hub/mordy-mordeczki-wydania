@@ -190,6 +190,31 @@ function kre2MaZmiany(){
     KRE2_POLA.concat(KRE2_OGOLNE).some(([k,,,,d])=>KRE.ef[k]!==d)||
     Object.keys(KRE.partie).some(k=>kreIleZmian(k));
 }
+function kre2WalidacjaWydarzen(){
+  const out=[],ev=Array.isArray(KRE?.wydarzenia)?KRE.wydarzenia:[],byId=new Map(),dupy=new Set(),cykle=new Set(),nierealne=new Set();
+  const dodaj=(blok,t)=>out.push({blok,krok:5,t});
+  ev.forEach((e,i)=>{const id=String(e.id||'').trim();if(!id)dodaj(1,`Wydarzenie „${e.nazwa||'bez nazwy'}” nie ma identyfikatora.`);else if(byId.has(id)){dupy.add(id);dodaj(1,`Identyfikator wydarzenia „${id}” powtarza się.`)}else byId.set(id,e)});
+  ev.forEach(e=>{
+    const n=e.nazwa||'bez nazwy',w=e.war||{},minM=+w.minMandaty||0,maxM=+w.maxMandaty||0;
+    if(minM&&maxM&&minM>maxM){nierealne.add(e.id);dodaj(1,`Wydarzenie „${n}” wymaga jednocześnie minimum mandatów większego od maksimum.`)}
+    if(minM>TOTAL_SEATS){nierealne.add(e.id);dodaj(1,`Wydarzenie „${n}” wymaga więcej mandatów, niż istnieje w Sejmie.`)}
+    if(+w.minSlawa>100){nierealne.add(e.id);dodaj(1,`Wydarzenie „${n}” wymaga sławy powyżej 100 i nigdy się nie uruchomi.`)}
+    if(+w.maxKontrowersja<0){nierealne.add(e.id);dodaj(1,`Wydarzenie „${n}” ma ujemny maksymalny poziom kontrowersji.`)}
+    if(+w.coIle<0||+w.przerwa<0||+w.poTygodniach<0)dodaj(1,`Wydarzenie „${n}” ma ujemny odstęp czasowy.`);
+    if(KRE.ef.tygodni&&+w.week>+KRE.ef.tygodni){nierealne.add(e.id);dodaj(1,`Wydarzenie „${n}” wypada po końcu kadencji.`)}
+    const popr=w.poWydarzeniu||w.wymagaWydarzenia;
+    if(popr){
+      if(popr===e.id||!byId.has(popr))dodaj(1,`Wydarzenie „${n}” ma nieprawidłowego poprzednika.`);
+      const p=byId.get(popr),opc=String(w.poOpcji||'');
+      if(p&&opc&&!((p.opcje||[]).some(o=>String(o.id||o.nazwa||'')===opc)))dodaj(1,`Wydarzenie „${n}” wymaga odpowiedzi, której poprzednik nie posiada.`);
+    }else if(w.poOpcji)dodaj(1,`Wydarzenie „${n}” ma wybraną odpowiedź poprzednika bez poprzednika.`);
+  });
+  let zmiana=true;while(zmiana){zmiana=false;ev.forEach(e=>{const p=e.war&&(e.war.poWydarzeniu||e.war.wymagaWydarzenia);if(p&&nierealne.has(p)&&!nierealne.has(e.id)){nierealne.add(e.id);dodaj(1,`Wydarzenie „${e.nazwa||'bez nazwy'}” jest nieosiągalne, bo czeka na wydarzenie, które nigdy się nie uruchomi.`);zmiana=true}})}
+  const przejdz=(id,sciezka)=>{if(!id||!byId.has(id))return;const idx=sciezka.indexOf(id);if(idx>=0){const kl=sciezka.slice(idx).concat(id).join('>');if(!cykle.has(kl)){cykle.add(kl);dodaj(1,`Łańcuch wydarzeń tworzy pętlę: ${sciezka.slice(idx).concat(id).join(' → ')}.`)}return}const e=byId.get(id),p=e&&e.war&&(e.war.poWydarzeniu||e.war.wymagaWydarzenia);if(p)przejdz(p,sciezka.concat(id))};
+  ev.forEach(e=>przejdz(e.id,[]));
+  if(ev.length>1&&!ev.some(e=>!(e.war&&(e.war.poWydarzeniu||e.war.wymagaWydarzenia))))dodaj(1,'Każde wydarzenie czeka na inne wydarzenie. Łańcuch nie ma punktu startowego.');
+  return out;
+}
 function kre2Walidacja(){
   const w=[];
   if(!KRE.nazwa.trim())w.push({blok:1,krok:0,t:'Nadaj scenariuszowi nazwę.'});
@@ -217,8 +242,7 @@ function kre2Walidacja(){
     if(!krePartieLista().includes(c.party))w.push({blok:1,krok:6,t:`Cel „${c.nazwa||'bez nazwy'}” nie ma istniejącej partii.`});
   });
   KRE.wydarzenia.forEach(e=>{if(!String(e.nazwa||'').trim())w.push({blok:1,krok:5,t:'Wydarzenie nie ma nazwy.'});if(!String(e.opis||'').trim())w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” nie ma opisu.`});if(!['gracz','losowa'].includes(e.party)&&!krePartieLista().includes(e.party))w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” wskazuje nieistniejącą partię.`});if(!e.opcje||!e.opcje.length)w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” nie ma odpowiedzi.`});else e.opcje.forEach(o=>{if(!String(o.nazwa||'').trim())w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” ma pustą odpowiedź.`})})});
-  const eventIds=new Set(KRE.wydarzenia.map(e=>e.id));
-  KRE.wydarzenia.forEach(e=>{const war=e.war||{};if(war.poWydarzeniu&&(war.poWydarzeniu===e.id||!eventIds.has(war.poWydarzeniu)))w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” ma nieprawidłowego poprzednika.`});if(war.poTygodniach<0)w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” ma ujemne opóźnienie.`})});
+  w.push(...kre2WalidacjaWydarzen());
   if(KRE.rzadTryb==='wlasny'){
     if(!KRE.rzadPartie.length)w.push({blok:1,krok:7,t:'Własny rząd nie ma żadnej partii.'});
     if(KRE.rzadPartie.some(k=>!KRE.mandaty[k]))w.push({blok:1,krok:7,t:'Partia bez mandatu nie może wejść do startowego rządu.'});
@@ -365,12 +389,12 @@ function kre2EkranFinal(){
 function kre2Sidebar(){
   const wal=kre2Walidacja(),blok=wal.filter(x=>x.blok),zm=KRE2_POLA.concat(KRE2_OGOLNE).filter(([k,,,,d])=>KRE.ef[k]!==d).length+
     Object.keys(KRE.partie).reduce((a,k)=>a+kreIleZmian(k),0)+KRE.nowe.length+KRE.cele.length+KRE.wydarzenia.length+Object.keys(KRE.edycje).length+Object.keys(KRE.ai).length+Object.keys(KRE.swiat.relacje).length+(KRE.mandatyZm?1:0)+(KRE.rzadTryb!=='zastany'?1:0)+(KRE.prezTryb!=='zastany'?1:0)+(KRE.relacje!=='zastane'?1:0);
-  return `<aside class="kreprawa"><div class="kreside"><div class="kresideprog"><i style="width:${(KRE.krok+1)/KRE2_KROKI.length*100}%"></i></div><span class="kresideeyebrow">Krok ${KRE.krok+1} z ${KRE2_KROKI.length}</span><h3 class="kreside-name">${esc(KRE.nazwa)||'Nowy scenariusz'}</h3><p class="kreside-desc">${esc(KRE.opis)||KRE2_KROKI[KRE.krok][1]}</p><div class="kresidemeta"><span>${esc(KRE.trudnosc)}</span><span>${kre2SumaMandatow()}/${TOTAL_SEATS} mandatów</span><span>${zm} zmian</span></div>${kre2SeatBar()}${wal.length?`<div class="kresidewarn ${blok.length?'bad':''}"><b>${blok.length?blok.length+' błędy blokujące':wal.length+' uwagi'}</b><span>${esc((blok[0]||wal[0]).t)}</span></div>`:`<div class="kresidewarn good"><b>Wszystko się zgadza</b><span>Scenariusz przechodzi kontrolę.</span></div>`}<div class="kresidenav">${KRE.krok>0?`<button class="btn g" onclick="kreDalej(-1)">← Wstecz</button>`:''}${KRE.krok<KRE2_KROKI.length-1?`<button class="btn" onclick="kreDalej(1)">Dalej: ${KRE2_KROKI[KRE.krok+1][0]} →</button>`:`<button class="btn" onclick="kreatorProbuj()" ${blok.length?'disabled':''}>Zagraj próbnie</button><button class="btn g" onclick="kreatorZapisz()" ${blok.length?'disabled':''}>Zapisz na listę</button><button class="btn g" onclick="kreatorDoPliku()" ${blok.length?'disabled':''}>Zapisz plik .mmscen</button>`}</div><button class="kreodrzuc" onclick="kreWyjdz()">Odrzuć projekt</button></div></aside>`;
+  return `<aside class="kreprawa"><div class="kreside"><div class="kresideprog"><i style="width:${(KRE.krok+1)/KRE2_KROKI.length*100}%"></i></div><span class="kresideeyebrow">Krok ${KRE.krok+1} z ${KRE2_KROKI.length}</span><h3 class="kreside-name">${esc(KRE.nazwa)||'Nowy scenariusz'}</h3><p class="kreside-desc">${esc(KRE.opis)||KRE2_KROKI[KRE.krok][1]}</p><div class="kresidemeta"><span>${esc(KRE.trudnosc)}</span><span>${kre2SumaMandatow()}/${TOTAL_SEATS} mandatów</span><span>${zm} zmian</span></div>${kre2SeatBar()}${wal.length?`<div class="kresidewarn ${blok.length?'bad':''}"><b>${blok.length?blok.length+' błędy blokujące':wal.length+' uwagi'}</b><span>${esc((blok[0]||wal[0]).t)}</span></div>`:`<div class="kresidewarn good"><b>Wszystko się zgadza</b><span>Scenariusz przechodzi kontrolę.</span></div>`}<div class="kresidenav">${KRE.krok>0?`<button class="btn g" onclick="kreDalej(-1)">← Wstecz</button>`:''}${KRE.krok<KRE2_KROKI.length-1?`<button class="btn" onclick="kreDalej(1)">Dalej: ${KRE2_KROKI[KRE.krok+1][0]} →</button>`:`<button class="btn" onclick="kreatorProbuj()" ${blok.length?'disabled':''}>Zagraj próbnie</button><button class="btn g" onclick="kreatorSymulator()" ${blok.length?'disabled':''}>Symulator tygodni</button><button class="btn g" onclick="kreatorZapisz()" ${blok.length?'disabled':''}>Zapisz na listę</button><button class="btn g" onclick="kreatorDoPliku()" ${blok.length?'disabled':''}>Zapisz plik .mmscen</button>`}</div><button class="kreodrzuc" onclick="kreWyjdz()">Odrzuć projekt</button></div></aside>`;
 }
 
 function kreatorEkran(){
   const ekran=[kre2EkranOpis,kre3EkranPartie,kre3EkranSejm,kre4EkranRelacje,kre4EkranAI,kre4EkranWydarzenia,kre3EkranCele,kre3EkranWladza,kre3EkranFinal][KRE.krok]();
-  app.innerHTML=`<div class="kreekran"><header class="krehead"><div><div class="kick">Kreator kampanii</div><h1>Reżyseria żywego świata</h1><p>Dziewięć etapów: partie, liderzy, Sejm, relacje, AI, wydarzenia, cele, gospodarka i władza.</p><div class="kretools"><button class="btn g sm" onclick="kreatorPodglad()">Podgląd</button><button class="btn g sm" onclick="kreatorDraftZapisz()">Zapisz szkic</button><button class="btn g sm" onclick="kreatorDraftWczytaj()">Wczytaj szkic</button><button class="btn g sm" onclick="kreatorEksportJSON()">Eksport JSON</button><button class="btn g sm" onclick="kreatorImportJSON()">Import JSON</button></div></div><button class="btn g sm" onclick="kreWyjdz()">← Lista scenariuszy</button></header>${kre2Stepper()}<div class="krebody"><main class="krelewa">${ekran}</main>${kre2Sidebar()}</div></div>`;
+  app.innerHTML=`<div class="kreekran"><header class="krehead"><div><div class="kick">Kreator kampanii</div><h1>Reżyseria żywego świata</h1><p>Dziewięć etapów: partie, liderzy, Sejm, relacje, AI, wydarzenia, cele, gospodarka i władza.</p><div class="kretools"><button class="btn g sm" onclick="kreatorPodglad()">Podgląd</button><button class="btn g sm" onclick="kreatorSymulator()">Symulator</button><button class="btn g sm" onclick="kreatorDraftZapisz()">Zapisz szkic</button><button class="btn g sm" onclick="kreatorDraftWczytaj()">Wczytaj szkic</button><button class="btn g sm" onclick="kreatorEksportJSON()">Eksport JSON</button><button class="btn g sm" onclick="kreatorImportJSON()">Import JSON</button></div></div><button class="btn g sm" onclick="kreWyjdz()">← Lista scenariuszy</button></header>${kre2Stepper()}<div class="krebody"><main class="krelewa">${ekran}</main>${kre2Sidebar()}</div></div>`;
   ['#kn','#ka','#ko'].forEach(s=>{const e=document.querySelector(s);if(e)e.oninput=()=>{kreCzytaj();kreOdswiezPodglad()}});
 }
 function kreCzytaj(){
@@ -444,6 +468,44 @@ function kreatorPodglad(){
   if(!KRE)return;const d=kreatorDane(),ev=d.wydarzenia||[],chains=ev.filter(e=>e.war&&e.war.poWydarzeniu).map(e=>`${esc(e.nazwa)} ← ${esc(e.war.poWydarzeniu)}${e.war.poOpcji?' / '+esc(e.war.poOpcji):''}`).join('<br>');
   modal('Podgląd scenariusza',esc(d.nazwa||'Bez nazwy'),`<p>${esc(d.opis||'')}</p><div class="krefinalstats"><div><b>${d.partieNowe.length}</b><span>nowych partii</span></div><div><b>${ev.length}</b><span>wydarzeń</span></div><div><b>${d.cele.length}</b><span>celów</span></div></div>${ev.length?`<div class="lawheld" style="margin-top:12px">${ev.map(e=>`<div class="lh"><span><b>${esc(e.nazwa)}</b><small>${esc(e.kategoria||'Wydarzenie')} · ${(e.opcje||[]).length} odpowiedzi</small></span></div>`).join('')}</div>`:''}${chains?`<p class="dim" style="margin-top:12px"><b>Łańcuchy:</b><br>${chains}</p>`:''}`,[{l:'Wracam',f:close}]);
 }
+let KRE_TEST=null;
+function kreTestAbs(){return KRE_TEST?(KRE_TEST.term-1)*KRE_TEST.maxWeeks+KRE_TEST.week:0}
+function kreTestPartia(e){
+  if(!KRE_TEST)return null;if(e.party==='gracz'||!e.party)return KRE_TEST.party;
+  if(e.party==='losowa')return krePartieLista().find(k=>k!==KRE_TEST.party&&(+KRE.mandaty[k]||0)>0)||KRE_TEST.party;
+  return KRE.mandaty[e.party]!==undefined?e.party:null;
+}
+function kreTestMozna(e,k){
+  if(!KRE_TEST||!e||!k)return false;const w=e.war||{},st=KRE_TEST.state[e.id]||{},s=KRE_TEST.parties[k]||KRE_TEST.stats,abs=kreTestAbs();
+  const popr=w.poWydarzeniu||w.wymagaWydarzenia;
+  if(popr){const ps=KRE_TEST.state[popr];if(!ps||!ps.ile)return false;if(w.poOpcji&&ps.opcja!==w.poOpcji)return false;if(w.poTygodniach&&abs-(ps.ostatni||0)<+w.poTygodniach)return false}
+  if(w.term&&KRE_TEST.term!==+w.term)return false;if(w.week&&KRE_TEST.week!==+w.week)return false;
+  if(w.odTygodnia&&abs<+w.odTygodnia)return false;if(w.coIle&&abs%Math.max(1,+w.coIle)!==0)return false;
+  if(!w.powtarzalne&&st.ile)return false;if(w.przerwa&&st.ostatni&&abs-st.ostatni<+w.przerwa)return false;
+  if(w.minMandaty&&s.seats<+w.minMandaty)return false;if(w.maxMandaty&&s.seats>+w.maxMandaty)return false;if(w.minSlawa&&s.fame<+w.minSlawa)return false;if(w.maxKontrowersja&&s.ctr>+w.maxKontrowersja)return false;
+  if(w.urzad==='premier'&&KRE.premier!==k)return false;if(w.urzad==='prezydent'&&KRE.prezydent!==k)return false;if(w.urzad==='opozycja'&&KRE.rzadPartie.includes(k))return false;return true;
+}
+function kreTestOpcja(e){
+  const os=e.opcje||[];if(!os.length)return null;if(KRE_TEST.tryb!=='ai')return os[0];const score=o=>{const a=o.ai||{},f=o.efekty||{};return (+a.agresja||0)+(+a.media||0)+(+a.prawo||0)+(+a.koalicje||0)+(+a.rozwoj||0)+(+a.ryzyko||0)+(+f.fame||0)*.025+(+f.cred||0)*.02-(+f.ctr||0)*.012};return os.slice().sort((a,b)=>score(b)-score(a))[0]}
+function kreTestZastosuj(e,k,o){
+  const f=o.efekty||{},s=KRE_TEST.parties[k]||KRE_TEST.stats;['fame','cred','uni','act','ctr','pret'].forEach(x=>{if(isFinite(+f[x]))s[x]=cl(s[x]+(+f[x]||0),-100,100)});if(+f.kapital)KRE_TEST.kapital+=+f.kapital;if(+f.mem)KRE_TEST.ludzie+=+f.mem;
+  const st=KRE_TEST.state[e.id]||{ile:0};st.ile++;st.ostatni=kreTestAbs();st.opcja=o.id||o.nazwa||'';KRE_TEST.state[e.id]=st;KRE_TEST.log.push({week:KRE_TEST.week,term:KRE_TEST.term,event:e.nazwa||'bez nazwy',option:o.nazwa||'odpowiedź',party:krePartiaDane(k)?.ab||k});
+}
+function kreSymulujKrok(){
+  if(!KRE_TEST||KRE_TEST.done)return;const next=kreTestAbs()+1;if(next>KRE_TEST.maxWeeks*KRE_TEST.maxTerms){KRE_TEST.done=true;kreSymulujWidok();return}KRE_TEST.term=Math.floor((next-1)/KRE_TEST.maxWeeks)+1;KRE_TEST.week=((next-1)%KRE_TEST.maxWeeks)+1;
+  let ile=0;KRE_TEST.events.forEach(e=>{const k=kreTestPartia(e);if(k&&kreTestMozna(e,k)){const o=kreTestOpcja(e);if(o){kreTestZastosuj(e,k,o);ile++}}});KRE_TEST.last=ile;kreSymulujWidok();
+}
+function kreSymulujStart(){
+  if(!KRE||kre2Blokuje())return;const party=KRE.wybrana&&KRE.mandaty[KRE.wybrana]!==undefined?KRE.wybrana:krePartieLista()[0],parties={};krePartieLista().forEach(k=>{parties[k]={seats:+KRE.mandaty[k]||0,fame:kre2StatFinal(k,'fame'),cred:kre2StatFinal(k,'cred'),uni:kre2StatFinal(k,'uni'),act:kre2StatFinal(k,'act'),ctr:kre2StatFinal(k,'ctr'),pret:kre2StatFinal(k,'pret')}});
+  KRE_TEST={week:0,term:1,maxWeeks:Math.max(1,+KRE.ef.tygodni||12),maxTerms:3,party,parties,events:JSON.parse(JSON.stringify(KRE.wydarzenia||[])),state:{},log:[],tryb:'pierwsza',done:false,last:0,kapital:+KRE.ef.kapital||0,ludzie:0,stats:parties[party]};kreSymulujWidok();
+}
+function kreSymulujWidok(){
+  if(!KRE_TEST)return;const s=KRE_TEST.stats,party=krePartiaDane(KRE_TEST.party)||{},logs=KRE_TEST.log.slice().reverse();
+  const logHtml=logs.length?logs.map(x=>`<div class="lh"><span><b>K${x.term} · T${x.week}</b> ${esc(x.event)}</span><small>${esc(x.party)}: ${esc(x.option)}</small></div>`).join(''):'<p class="dim">Jeszcze nic się nie wydarzyło. Przewiń pierwszy tydzień.</p>';
+  const body=`<p>Suchy test scenariusza dla partii <b>${esc(party.ab||KRE_TEST.party)}</b>. Nie zmienia prawdziwej rozgrywki.</p><div class="krefinalstats"><div><b>K${KRE_TEST.term} · T${KRE_TEST.week}</b><span>czas testu</span></div><div><b>${KRE_TEST.log.length}</b><span>odpalonych wydarzeń</span></div><div><b>${s.fame}</b><span>sława</span></div><div><b>${s.cred}</b><span>wiarygodność</span></div></div><div class="kretestscores"><span>Jedność <b>${s.uni}</b></span><span>Aktywność <b>${s.act}</b></span><span>Kontrowersja <b>${s.ctr}</b></span><span>Kapitał <b>${KRE_TEST.kapital}</b></span></div><div class="lawheld kretestlog">${logHtml}</div>`;
+  const stop=()=>{KRE_TEST=null;close()};modal('Symulator scenariusza',esc(KRE.nazwa||'Bez nazwy'),body,[{l:KRE_TEST.done?'Koniec testu':'Następny tydzień',s:KRE_TEST.done?'':'Uruchom warunki i wydarzenia',f:()=>kreSymulujKrok(),dis:KRE_TEST.done},{l:KRE_TEST.tryb==='ai'?'Wybór: AI':'Wybór: pierwsza odpowiedź',s:'Zmień sposób podejmowania decyzji',f:()=>{KRE_TEST.tryb=KRE_TEST.tryb==='ai'?'pierwsza':'ai';kreSymulujWidok()}},{l:'Restart',f:()=>kreSymulujStart()},{l:'Zamknij',f:stop}],stop);
+}
+function kreatorSymulator(){kreSymulujStart()}
 function kreatorProbuj(){
   if(kre2Blokuje())return;const dane=kreatorDane(),id='kreator-proba';
   SCEN[id]={n:dane.nazwa,t:dane.trudnosc,d:dane.opis,mod:dane.zmiany,zModa:true,autor:dane.autor,
