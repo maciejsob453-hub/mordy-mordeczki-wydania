@@ -33,9 +33,9 @@ const BAL={
   odejsciaOlbrzym:     .09,    // powyżej 70
   odejsciaKolos:       .11,    // powyżej 100
 
-  // zmęczenie władzą: ile dokłada kadencja u steru i ile zmywa kadencja w opozycji
+  // zmęczenie władzą: liczą się najwyższe urzędy, nie samo siedzenie w koalicji
   znuzeniePremier:     21,
-  znuzenieKoalicja:    11,
+  znuzeniePrezydent:   14,
   znuzenieOpozycja:   -15,
   znuzenieSufit:       72,
   znuzenieSilaSondaz:  290,    // mniejszy dzielnik = mocniej bije po sondażu
@@ -1593,7 +1593,7 @@ function endWeek(){
   aiRekonstrukcja();       // a niewygodnego koalicjanta potrafi wyrzucić
   aiOpozycja();            // opozycja rozlicza rząd bez czekania na gracza
   histPush();SFX.week();
-  G.catUsed={};G.used2={};G.lastCharge=null;podgladCache={};   // ostatnia decyzja przechodzi na kolejny tydzień, żeby kombinacje w ogóle działały
+  G.catUsed={};G.used2={};G.lastCharge=null;G.stolPend=null;podgladCache={};   // niedokończone okno nie może przejść na kolejny tydzień
   /* Nastroje trzech części serwera pozostają lekkim, losowym pulsem elektoratu.
      Nie ma już osobnego systemu zadowolenia grup interesu, który nadpisywał
      ten ruch i drugi raz liczył ten sam podział ludzi. */
@@ -4744,7 +4744,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.80';
+let WERSJA='1.1.81';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4755,6 +4755,12 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.81':{data:'7 sierpnia 2026', zmiany:[
+  'ZMECZENIE WLADZA LICZY TYLKO PREMIERA I PREZYDENTA. Sam udzial w koalicji nie daje juz kary, a stare bledne naliczenia naprawiaja sie po wczytaniu zapisu.',
+  'STOL TYGODNIA NIE DOPISUJE DUCHOW ANI DUPLIKATOW. Cofniete, stare i podwojnie zatwierdzone decyzje nie zajmuja ruchu, zniknal tez mylacy napis o braku zmian cech.',
+  'PARTIE KOMPUTEROWE REGULARNIE SKLADAJA USTAWY. Robi to premier, minister albo silna opozycja, a prezydent podpisuje, wetuje i uruchamia glosowanie nad odrzuceniem weta.',
+  'PODPOWIEDZI SA TAM, GDZIE TRZEBA. Gorny pasek wyjasnia akcje, kapital, energie, sondaz i mandaty, a karty decyzji nie zaslaniaja ekranu dlugimi wykladami.',
+ ]},
  '1.1.80':{data:'7 sierpnia 2026', zmiany:[
   'Sad jest osobnym dzialem. Sejm wybiera sedziow, a partie wnosza sprawy o naduzycie urzedu, korupcje i naruszenie procedury.',
   'Wyroki zapadaja imiennymi glosami sedziow i koncza sie upomnieniem, grzywna, usunieciem z urzedu albo uniewinnieniem.',
@@ -5443,7 +5449,8 @@ function game(){
       if(hasHor(G.me))skl.push('Horda −1');
       return `<div class="rs tip">${ikona('akcje')}<div class="rv"><b>${G.ap}<span class="of">/${G.apMax}</span></b><span>akcje</span></div>
       <div class="tipbox">
-        <div class="tiptyt">Pula działań w tygodniu</div>
+        <div class="tiptyt">Czym są akcje?</div>
+        <div class="tiprada" style="margin:0 0 8px">Akcja to jeden ruch partii. Większość decyzji zużywa jedną, mocniejsze dwie albo trzy. Niewydane akcje przepadają po przejściu tygodnia.</div>
         <div class="l"><span>Podstawa</span><b>3</b></div>
         ${skl.map(x=>`<div class="l"><span>${x}</span></div>`).join('')}
         <div class="tot"><span>Dostępne teraz</span><b class="m">${G.ap} z ${G.apMax}</b></div>
@@ -5451,7 +5458,8 @@ function game(){
       </div></div>`})()}
     ${(()=>{const i=income();return `<div class="rs tip">${ikona('kapital')}<div class="rv"><b class="${G.kp<0?'ujem':''}">${Math.round(G.kp)}<span class="plus">+${i.total}</span></b><span>kapitał</span></div>
       <div class="tipbox">
-        <div class="tiptyt">Wpływy tygodniowe</div>
+        <div class="tiptyt">Czym jest kapitał?</div>
+        <div class="tiprada" style="margin:0 0 8px">Kapitał to kasa całej partii, nie prywatny majątek lidera. Płacisz nim za decyzje, kampanię, media i polityczne układy.</div>
         ${SEG.map(s=>{const per={eli:2.6,int:.95,ser:.18}[s.id];
           return `<div class="l"><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${s.c};margin-right:6px"></i>${s.n} ${p.comp[s.id]}×${per.toFixed(2)}</span><b>${(p.comp[s.id]*per).toFixed(1)}</b></div>`}).join('')}
         <div class="l" style="border-top:1px solid var(--line);padding-top:6px;margin-top:6px">
@@ -5469,7 +5477,8 @@ function game(){
     ${(()=>{const eg=enGain(),ld=lead(G.me);return `<div class="rs tip">${ikona('energia')}
       <div class="rv"><b class="${G.en<25?'ujem':''}">${Math.round(G.en)}<span class="plus" style="color:${eg<8?'var(--neg)':eg<18?'var(--acc)':'var(--pos)'};-webkit-text-fill-color:${eg<8?'var(--neg)':eg<18?'var(--acc)':'var(--pos)'}">+${eg}</span></b><span>energia</span></div>
       <div class="tipbox">
-        <div class="tiptyt">Regeneracja tygodniowa</div>
+        <div class="tiptyt">Czym jest energia?</div>
+        <div class="tiprada" style="margin:0 0 8px">Energia opisuje siły przewodniczącego. Kosztują ją decyzje wymagające osobistego zaangażowania, a co tydzień wraca zależnie od lidera i kondycji partii.</div>
         <div class="l"><span>Podstawa</span><b>${BAL.energiaBaza.toFixed(1)}</b></div>
         <div class="l"><span>Wytrzymałość ${p.lead} (${ld.wytrz})</span><b>+${(ld.wytrz/3.1).toFixed(1)}</b></div>
         <div class="l"><span>Jedność ${Math.round(p.uni)} <span style="color:var(--dim2)">(punkt odniesienia 42)</span></span>
@@ -5482,7 +5491,9 @@ function game(){
     <div class="rgroup polityka">
     <div class="rs tip">${ikona('sondaz')}<div class="rv"><b>${fmt(shown(G.me,sh))}%<span class="plus" style="color:var(--info);-webkit-text-fill-color:var(--info)">?</span></b><span>sondaż</span></div>
       <div class="tipbox" style="width:330px">
-        <div class="tiptyt">Co realnie rusza sondażem</div>
+        <div class="tiptyt">Czym jest sondaż?</div>
+        <div class="tiprada" style="margin:0 0 8px">Sondaż to niedokładny, cotygodniowy pomiar poparcia. Nie daje mandatów i nie jest wynikiem wyborów; pokazuje tylko, jak partia stoi w tej chwili.</div>
+        <div class="tiptyt" style="margin-top:7px">Co realnie rusza sondażem</div>
         <div class="l"><span><b>Liczba i skład partii</b>, decyduje najmocniej</span></div>
         <div style="font-size:11.5px;color:var(--dim2);margin:-2px 0 7px">Dwie trzecie wyniku to twoi ludzie. Elita waży 1,75 głosu, intelektualista 1,10, serwerowicz 0,66.</div>
         <div class="l"><span><b>Obecność w okręgach</b></span><b>×0,45–2,1</b></div>
@@ -5498,7 +5509,10 @@ function game(){
       </div></div>
     <!-- mandaty zdobyte w ostatnich wyborach, nie prognoza z bieżącego przeliczenia:
          liczba ma się zgadzać z tym, co pokazuje sejm, i zmieniać dopiero po urnach -->
-    <div class="rs" title="Mandaty zdobyte w ostatnich wyborach. Zmienią się dopiero po następnych."><i class="ic ic-mandat" aria-hidden="true"></i><div class="rv"><b>${p.seats}</b><span>mandaty</span></div></div>
+    <div class="rs tip"><i class="ic ic-mandat" aria-hidden="true"></i><div class="rv"><b>${p.seats}</b><span>mandaty</span></div>
+      <div class="tipbox"><div class="tiptyt">Czym są mandaty?</div>
+        <div class="tiprada" style="margin:0">Mandaty to miejsca partii w sejmie zdobyte w ostatnich wyborach. Decydują o większości, premierze i ustawach; nie zmienią się aż do następnych wyborów.</div>
+      </div></div>
     </div>
     ${streakBox()}
     </div>
@@ -7117,8 +7131,11 @@ function actFx(id){return AFX[id]||[]}
 const STOL_NAZWY={fame:'sława',cred:'wiarygodność',uni:'jedność',act:'aktywność',mem:'ludzie'};
 function stolTygodnia(){
   const klucz=G.term+'-'+G.week;
-  const zagrane=(G.stolTyg===klucz&&G.stol)?G.stol:[];
-  const wolne=Math.max(0,G.apMax-zagrane.reduce((a,x)=>a+x.ap,0));
+  /* Stare zapisy mogły zawierać puste wpisy utworzone przez samo otwarcie okna.
+     Nie pokazujemy ich jako wykonanych ruchów. Nowe wpisy mają znacznik ok. */
+  const zagrane=(G.stolTyg===klucz&&G.stol?G.stol:[]).filter(x=>
+    x&&x.ap>0&&(x.ok||Object.keys(x.zm||{}).length));
+  const wolne=Math.max(0,Math.min(G.apMax,G.ap));
   const miejsca=[];
   zagrane.forEach(x=>{for(let i=0;i<x.ap;i++)miejsca.push(i===0?x:{ciag:x})});
   for(let i=0;i<wolne;i++)miejsca.push(null);
@@ -7140,7 +7157,7 @@ function stolTygodnia(){
           <div class="ptak"><svg viewBox="0 0 24 24" width="10" height="10" fill="none"
             stroke="#08170a" stroke-width="3" stroke-linecap="round"><path d="M4 13l5 5L20 7"/></svg></div>
           <h4>${m.n}</h4>
-          <div class="skut">${zm||'<span class="n">bez zmian w cechach</span>'}</div>
+          <div class="skut">${zm||'<span class="p">wykonano</span>'}</div>
         </div>`}).join('')}
     </div>
   </div>`;
@@ -7181,23 +7198,6 @@ function inflacja(){
 }
 const inflacjaProc=()=>Math.round((inflacja()-1)*100);
 
-function actPomoc(a,kpC,f,cb){
-  const sf=sizeF(me()), kat=(CATS.find(x=>x[0]===a.cat)||['','Decyzja'])[1];
-  const koszt=`${a.ap} ${pl(a.ap,'akcja','akcje','akcji')}${a.kp?' · '+kpC+' kapitału':''}${a.en>0?' · '+Math.round(a.en*.82*sf.en)+' energii':a.en<0?' · energia +'+(-a.en):''}`;
-  const sila=[];
-  if(f<1)sila.push(`powtarzanie tej decyzji: ×${f.toFixed(2)}`);else sila.push('brak kary za powtarzanie');
-  if(sf.lab)sila.push(`${sf.lab}: koszt kapitału ×${sf.kp.toFixed(2)}, sława ×${sf.fame.toFixed(2)}`);
-  if(cb)sila.push(`${cb.n}: ×${cb.m.toFixed(2)}`);
-  if((G.streak||0)>=3)sila.push(`seria aktywnych tygodni: ×${streakMul().toFixed(2)} do sławy`);
-  const jak=a.cat==='kam'?'Obecność w okręgu, trafiony temat i charyzma lidera podnoszą wynik kampanii.'
-    :a.cat==='wew'?'Jedność, aktywność i kompetencja przewodnictwa ułatwiają pracę wewnątrz partii.'
-    :a.cat==='med'?'Zasięg mediów, charyzma prowadzącego i regularne publikacje zwiększają zwrot.'
-    :a.cat==='dypl'?'Relacje, ideologiczny dystans oraz cechy negocjacyjne lidera decydują o skuteczności.'
-    :'Najlepszy efekt daje świeża decyzja, pełna energia i świadome łączenie jej z poprzednią akcją.';
-  const html=`<b>${a.n}</b><i>${a.d}</i><u><strong>Koszt:</strong> ${koszt}</u><u><strong>Co działa teraz:</strong> ${sila.join(' · ')}</u><u><strong>Jak poprawić:</strong> ${jak}</u><u>Kategoria: ${kat}. Zużycie kategorii i wszystkie blokady są wypisane na karcie.</u>`;
-  return html.replace(/"/g,'&quot;');
-}
-
 function actCards(list,fx){
   return list.map(a=>{
     const f=fat(a.id),done=a.once&&G.once[a.id];
@@ -7218,7 +7218,7 @@ function actCards(list,fx){
       :noShame?'dostępne tylko tuż po wpadce':(a.id==='rekr'&&G.recCd>0)?`nabór wraca za ${G.recCd} ${pl(G.recCd,'tydzień','tygodnie','tygodni')}`
       :G.ap<a.ap?'za mało akcji':G.kp<kpC?'za mało kapitału':(a.en>0&&G.en<a.en)?'za mało energii':'';
     const wym=[a.reg?'okręg':'',a.tem?'temat':'',a.tgt?'cel':'',a.seg?'grupa':''].filter(Boolean);
-    return `<button class="act" ${ok?'':'disabled'} style="--ac:${col}" data-tip="${actPomoc(a,kpC,f,cb)}" onclick="doAct('${a.id}')"
+    return `<button class="act" ${ok?'':'disabled'} style="--ac:${col}" onclick="doAct('${a.id}')"
       onmouseenter="podglad('${a.id}')" onmouseleave="podglad('')">
       <div class="ahd">
         <div style="min-width:0"><h4>${a.n}</h4>
@@ -7662,7 +7662,9 @@ function fire(a,t,r,s,tm){
   if(a.tydz2){if(!G.used2)G.used2={};G.used2[a.id]=(G.used2[a.id]||0)+1}
   const f=fat(a.id);G.used[a.id]=(G.used[a.id]||0)+1;
   // limity zapisujemy razem z kosztem, żeby rezygnacja w oknie cofnęła jedno i drugie
-  G.lastCharge={ap:a.ap,kp:Math.round(a.kp*kpMul),en:(a.en>0?a.en*enMul:a.en),id:a.id,cat:a.cat,
+  G.stolSeq=(G.stolSeq||0)+1;
+  const stolToken=G.stolSeq;
+  G.lastCharge={ap:a.ap,kp:Math.round(a.kp*kpMul),en:(a.en>0?a.en*enMul:a.en),id:a.id,cat:a.cat,token:stolToken,
                 term1:limitStad,once:razStad,
                 /* Cofnięcie musi przywrócić nie tylko walutę. Te trzy pola
                    sterują karą za pusty tydzień, kombinacją i limitem dwa razy
@@ -7735,8 +7737,8 @@ function fire(a,t,r,s,tm){
      zostawiało na stole kafel bez skutków, czasem z liczbami z powietrza.
      Teraz decyzja okienkowa czeka w G.stolPend i wchodzi na stół dopiero
      wtedy, gdy gracz kliknie ten ostatni punkt. Rezygnacja ją stamtąd zdejmuje. */
-  if(msg)stolWpis(a,stolPrzed);
-  else G.stolPend={id:a.id,n:a.n,kat:a.cat,ap:a.ap,przed:stolPrzed};
+  if(msg)stolWpis(a,stolPrzed,stolToken);
+  else G.stolPend={id:a.id,n:a.n,kat:a.cat,ap:a.ap,przed:stolPrzed,token:stolToken,tydzien:stolKlucz};
   checkDeath();
   // uwaga: decyzje z własnym oknem (nabór, rekonstrukcja, ustawa, rebranding) otwierają je w a.f,
   // więc fire nie może tu zamykać niczego, bo skasowałby okno w tej samej klatce
@@ -7745,9 +7747,10 @@ function fire(a,t,r,s,tm){
 /* Oddanie opłaty za decyzję, która nie doszła do skutku. Wydzielone z actBack,
    bo to samo musi się dziać, gdy okno zniknie bez kliknięcia „wstecz”. */
 /* Dopisanie decyzji do stołu tygodnia razem z tym, co realnie zmieniła. */
-function stolWpis(a,przed){
+function stolWpis(a,przed,token){
   const klucz=G.term+'-'+G.week;
   if(!G.stol||G.stolTyg!==klucz){G.stol=[];G.stolTyg=klucz}
+  if(token&&G.stol.some(x=>x&&x.token===token))return;   // podwójne kliknięcie nie mnoży ruchu
   const po=snap(), zm={};
   /* Wszystko poniżej pół punktu zaokrąglało się do zera i znikało ze stołu —
      decyzja realnie dawała +0,4 sławy, a gracz widział, że nie dała nic.
@@ -7756,13 +7759,14 @@ function stolWpis(a,przed){
     const d=po[k]-(przed?przed[k]:po[k]);
     if(Math.abs(d)>=1)zm[k]=Math.round(d);
     else if(Math.abs(d)>=0.12)zm[k]=Math.round(d*10)/10;});
-  G.stol.push({id:a.id,n:a.n,kat:a.cat,ap:a.ap,zm});
+  G.stol.push({id:a.id,n:a.n,kat:a.cat,ap:a.ap,zm,token:token||null,ok:1});
 }
 /* Decyzja okienkowa doszła do skutku — dopiero teraz ląduje na stole. */
 function stolZatwierdz(){
   const w=G&&G.stolPend; if(!w)return;
   G.stolPend=null;
-  stolWpis({id:w.id,n:w.n,cat:w.kat,ap:w.ap},w.przed);
+  if(w.tydzien!==G.term+'-'+G.week)return;               // stare okno nie dopisze się do nowego tygodnia
+  stolWpis({id:w.id,n:w.n,cat:w.kat,ap:w.ap},w.przed,w.token);
 }
 function oddajOplate(){
   if(G)G.stolPend=null;          // rezygnacja zdejmuje decyzję ze stołu
@@ -8552,6 +8556,7 @@ function openWerb2(k){
 }
 function werbDo(n,k,c){
   G.lastCharge=null;
+  stolZatwierdz();              // werbunek jest rozstrzygnięty także wtedy, gdy kandydat odmówi
   const p=me(),o=G.p[k],isL=isLead(o,n);
   if(ch(c)){
     const gr=isL||L(n).komp>=80?'eli':'int';   // ktoś z twarzą i imieniem nigdy nie jest zwykłym serwerowiczem
@@ -8856,7 +8861,7 @@ function openDym(){
     cand.map(k=>{const rs=ministrowieZ(k).map(r=>r.n).join(', ');
       return {l:`Odwołuję ${G.p[k].lead} (${G.p[k].ab})`,
       s:`${rs} · relacje ${Math.round(G.rel[G.me][k])} → −55 · koalicja traci ${G.p[k].seats} ${pl(G.p[k].seats,'mandat','mandaty','mandatów')}`,
-      f:()=>{close();G.lastCharge=null;   // minister odwołany, decyzja doszła do skutkustolZatwierdz();
+      f:()=>{close();G.lastCharge=null;stolZatwierdz();   // minister odwołany, decyzja doszła do skutku
         RESORTY.forEach(r=>{const n=radaKto(r.id);
           if(n&&partiaOsoby(n)===k){delete G.rada[r.id];delete G.radaOd[r.id]}});
         G.rel[G.me][k]=-55;G.rel[k][G.me]=-55;
@@ -9355,18 +9360,24 @@ function aiProposeLaw(){
   const zglaszajacy=[];
   const pmK=G.gov.pm;
   if(pmK&&pmK!==G.me&&G.p[pmK]&&!G.p[pmK].dead)
-    zglaszajacy.push({k:pmK,pula:wolne,szansa:.24});
+    zglaszajacy.push({k:pmK,pula:wolne,rola:3,co:2});
   alive().forEach(k=>{
     if(k===G.me||k===pmK||!G.p[k]||G.p[k].dead)return;
     const resorty=RESORTY.filter(r=>{const n=radaKto(r.id);return n&&partiaOsoby(n)===k}).map(r=>r.id);
-    if(!resorty.length)return;
     const pula=wolne.filter(l=>l.resort&&resorty.includes(l.resort));
-    if(pula.length)zglaszajacy.push({k,pula,szansa:.16});
+    if(pula.length)zglaszajacy.push({k,pula,rola:2,co:3});
+    /* Gdy premierem jest gracz i nie oddał resortów botom, sejm nadal żyje.
+       Najsilniejsza partia opozycyjna może złożyć projekt poselski. */
+    else if(G.p[k].seats>0&&!G.gov.parties.includes(k))zglaszajacy.push({k,pula:wolne,rola:1,co:3});
   });
   if(!zglaszajacy.length)return;
 
-  const wybor=pick(zglaszajacy);
-  if(!ch(wybor.szansa))return;              // mniej więcej raz na kilka tygodni
+  const teraz=absWeek();
+  if(G.aiLawNext&&teraz<G.aiLawNext)return;
+  /* Losowa szansa potrafiła nie wypalić przez całą kadencję. Teraz inicjatywa
+     ma czytelny rytm: rząd co dwa tygodnie, minister lub opozycja co trzy. */
+  const wybor=zglaszajacy.sort((a,b)=>b.rola-a.rola||G.p[b.k].seats-G.p[a.k].seats)[0];
+  G.aiLawNext=teraz+wybor.co;
   const pm=wybor.k, mozliwe=wybor.pula;
   // Składa to, co jemu się opłaca: partia serwerowicka ciśnie rozrywkę,
   // elitarna ekonomię, a ktoś ledwo nad progiem próbuje ruszyć ordynację.
@@ -9393,6 +9404,7 @@ function aiProposeLaw(){
     });
   }
   G.lawTerm[law.id]=1;
+  say(`<b>${G.p[pm].ab} składa projekt:</b> ${law.n}.`,'roy');
   if(me().seats>0)openGlosowanie(law,opcje,pm);   // masz mandaty, więc masz głos
   else rozstrzygnijUstawe(law.id,opcje,pm,undefined);
 }
@@ -11589,21 +11601,32 @@ function memberFlow(){
   });
 }
 /* ══════════ ZNUŻENIE WŁADZĄ ══════════
-   Serwer męczy się tymi, którzy rządzą za długo. Każda kadencja u steru zostawia
-   ślad, każda w opozycji go zmywa. Dzięki temu żadna partia — twoja też — nie
-   zabetonuje się na szczycie: im dłużej trzymasz władzę, tym drożej ją utrzymać.
-   Zmęczenia nie da się „przegrać” ani zbić decyzjami; schodzi tylko czasem poza rządem. */
-const znuzenie=k=>(G.znuz&&G.znuz[k])||0;
+   Serwer męczy się twarzą władzy: premierem i prezydentem. Sam koalicjant nie
+   dostaje tej kary, bo nie prowadzi państwa. Po zejściu z obu urzędów ślad znika
+   z czasem. */
+function mialNajwyzszyUrzad(k){
+  return !!((G.gov&&G.pmOk&&G.gov.pm===k)||(G.prez&&G.prez.party===k)||
+    (G.hist||[]).some(h=>h&&h.pm===k)||(G.prezHist||[]).some(h=>h&&h.winner===k));
+}
+function znuzenie(k){
+  if(!G.znuz)return 0;
+  /* Naprawa starych zapisów: koalicjantom naliczano karę mimo braku urzędu.
+     Zerujemy ją tylko partii, która nigdy nie miała premiera ani prezydenta. */
+  if(G.znuz[k]&&!mialNajwyzszyUrzad(k)){
+    G.znuz[k]=0;if(G.znuzKad)G.znuzKad[k]=0;
+  }
+  return G.znuz[k]||0;
+}
 function naliczZnuzenie(){
   if(!G.znuz)G.znuz={};
   const g=G.gov;
   alive().forEach(k=>{
     const premier=!!(g&&G.pmOk&&g.pm===k);
-    const wRzadzie=!!(g&&g.parties.includes(k));
+    const prezydent=!!(G.prez&&G.prez.party===k);
     let d;
     if(premier)d=BAL.znuzeniePremier;
-    else if(wRzadzie)d=BAL.znuzenieKoalicja;
-    else d=BAL.znuzenieOpozycja;      // opozycja odpoczywa w oczach serwera
+    else if(prezydent)d=BAL.znuzeniePrezydent;
+    else d=BAL.znuzenieOpozycja;      // bez najwyższego urzędu partia odpoczywa
     /* Pierwsza kadencja u władzy jest tania — nikt nie ma dość rządu, który dopiero
        zaczął. Dopiero kolejne bolą coraz mocniej. Wcześniej każda kadencja liczyła
        się tak samo i już po pierwszej znikało kilkanaście procent poparcia. */
@@ -11628,8 +11651,8 @@ function naliczZnuzenie(){
       G.rel[x][k]=cl(G.rel[x][k]-spadek,-100,100)});
   });
   const moje=G.znuz[G.me]||0;
-  if(moje>=48&&(g&&g.parties.includes(G.me)))
-    say(`<b>Serwer ma cię dość.</b> Rządzisz tak długo, że zmęczenie władzą zjada ci ${Math.round(moje/2.9)}% poparcia. Kadencja w opozycji by je zmyła.`,'bad');
+  if(moje>=48&&(isPM()||hasPrez()))
+    say(`<b>Serwer ma cię dość.</b> Tak długo trzymasz najważniejszy urząd, że zmęczenie władzą zjada ci ${Math.round(moje/2.9)}% poparcia. Czas bez fotela premiera i prezydenta je zmywa.`,'bad');
 }
 /* ---- demografia serwera ----
    Serwer żyje własnym życiem: przy dobrej kadencji ludzie się schodzą, przy
