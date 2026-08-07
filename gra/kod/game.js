@@ -4741,10 +4741,11 @@ function modeScreen(){
 }
 /* Autorzy gry. Wersja bierze się z pliku VERSION przy budowaniu wydania. */
 const AUTORZY=['Maciek','Balon'];
+const TESTERZY=['Aryati','loof'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.81';
+let WERSJA='1.1.82';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4755,6 +4756,9 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.82':{data:'7 sierpnia 2026', zmiany:[
+  'ARYATI I LOOF SA WPISANI JAKO TESTERZY. Informacja jest widoczna po kliknieciu Tworcy w menu glownym.',
+ ]},
  '1.1.81':{data:'7 sierpnia 2026', zmiany:[
   'ZMECZENIE WLADZA LICZY TYLKO PREMIERA I PREZYDENTA. Sam udzial w koalicji nie daje juz kary, a stare bledne naliczenia naprawiaja sie po wczytaniu zapisu.',
   'STOL TYGODNIA NIE DOPISUJE DUCHOW ANI DUPLIKATOW. Cofniete, stare i podwojnie zatwierdzone decyzje nie zajmuja ruchu, zniknal tez mylacy napis o braku zmian cech.',
@@ -5254,7 +5258,8 @@ function creditsBox(){
   return `<div class="credits">
     <div class="cline"></div>
     <div class="ctxt"><span class="ck">Mordy Mordeczki · Sejm</span>
-      <b>${AUTORZY.join(' i ')}</b>
+      <div class="crole"><span>twórcy</span><b>${AUTORZY.join(' i ')}</b></div>
+      <div class="ctesters">${TESTERZY.map(n=>`<div class="cperson"><b>${n}</b><span>tester</span></div>`).join('')}</div>
       <span class="cv">wersja ${WERSJA}${PATCHNOTE[WERSJA]?` · <button class="conowego" onclick="pokazPatch()">co nowego</button>`:''}</span></div>
   </div>`;
 }
@@ -12167,7 +12172,7 @@ window.__game={przewidz,podglad,get PROBA(){return PROBA},
   localScore,openRecruit,openTrain,collapseGov,makeBlocs,prezPool,drawFrom,giveBack,purge,eliteRisk,ratio,syncCoal,prezDone,makeNoise,XP,
   giveBackCap,prezRound1,prezRound2,runRunoff,memberFlow,prezWait,prezPush,openPush,crownPrez,hemi,pmBlocked,rotateBench,AVA,TEM,INNATE,conflictOf,buyTrait,buyStat,inflacja,inflacjaProc,INFLACJA_PROG,traitsOf,xpOs,xpPula,COMBO,ostatniWynik,hasCen,hasHeg,LOGOS,applyGoals,checkDeath,isPMperson,isPrezPerson,income,EV,wotumChance,prezGo,A,fire,me,topSeg,sejmVote,setGov,PID,REG,SEG,SID,BASE,COAL,LP,LEAD,THR,
   TOPUP,DIST_SEATS,TOTAL_SEATS,MAJ,accepts,thrFor,
-  feed,runDateAnim,gameDate,dateStr,mapTab,actTab,pollTab,partieTab,sejmTab,leadTab,kingTab,sidebar,setup,pmScreen,prezScreen,marScreen,startMar,marContinue,marDeclare,isMar,isWice,isMarPerson,ownPool,bestRep,runRace,raceScore,results,TRAITS,sizeF,shown,enGain,pickMain,kingScore,kingFactors,kingFav,allBlocs,rebalanceSeats,isLead,lead,L,innAll,GOALS,openStery,sterySet,steryTog,steryOk,creditsBox,AUTORZY,WERSJA,
+  feed,runDateAnim,gameDate,dateStr,mapTab,actTab,pollTab,partieTab,sejmTab,leadTab,kingTab,sidebar,setup,pmScreen,prezScreen,marScreen,startMar,marContinue,marDeclare,isMar,isWice,isMarPerson,ownPool,bestRep,runRace,raceScore,results,TRAITS,sizeF,shown,enGain,pickMain,kingScore,kingFactors,kingFav,allBlocs,rebalanceSeats,isLead,lead,L,innAll,GOALS,openStery,sterySet,steryTog,steryOk,creditsBox,AUTORZY,TESTERZY,WERSJA,
   LAWS,lawVote,proposeLaw,signLaw,odrzucenieWeta,PROG_WETO,applyLaw,lawDone,lawIntake,lawsPending,lawsToSign,startLaw,
   LAWPAR,lawEdytowalna,lawParams,radykalnosc,aiProposeLaw,openEdycja,rozstrzygnijUstawe,
   nastrojSejmu,bylWBloku,doLobby,rysujOkno,
