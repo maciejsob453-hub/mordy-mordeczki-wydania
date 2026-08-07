@@ -1501,7 +1501,7 @@ function endWeek(){
   const p=me();
   const dateFrom=gameDate();
   ustawPlany();
-  ai();drift();aiGoals();aiAgents();aiTransfery();sitTick();
+  ai();drift();aiGoals();aiAgents();aiTransfery();sitTick();scenWydarzeniaTydzien();
   sprzatnijRade();   // po transferach i odejściach rada musi zgadzać się ze składami partii
   sadTydzien();      // sąd sprząta skład i wygasza stare materiały dowodowe
   zwlokaPrezydenta();   // ustawa nie może leżeć na biurku bez końca
@@ -1721,7 +1721,25 @@ const CHAR={
  NBR :{agr:.45,bud:.65},  ZHM :{agr:.35,bud:.65},  DPD :{agr:.35,bud:.72},
  SS  :{agr:.35,bud:.90},
 };
-const charOf=k=>CHAR[k]||{agr:.5,bud:.7};
+const AI_STYLE={
+ domyslny:{n:'Charakter historyczny',agr:.5,bud:.7,media:.55,prawo:.55,koalicje:.55,ryzyko:.5},
+ agresor:{n:'Agresor',agr:.95,bud:.38,media:.55,prawo:.28,koalicje:.18,ryzyko:.9},
+ technokrata:{n:'Technokrata',agr:.18,bud:.76,media:.32,prawo:.98,koalicje:.62,ryzyko:.3},
+ populista:{n:'Medialny populista',agr:.66,bud:.54,media:.98,prawo:.32,koalicje:.3,ryzyko:.78},
+ koalicjant:{n:'Budowniczy koalicji',agr:.12,bud:.68,media:.42,prawo:.6,koalicje:.98,ryzyko:.22},
+ organizator:{n:'Organizator',agr:.2,bud:.98,media:.35,prawo:.52,koalicje:.58,ryzyko:.24},
+ oportunista:{n:'Oportunista',agr:.55,bud:.62,media:.7,prawo:.62,koalicje:.76,ryzyko:.82},
+};
+function aiProfil(k){
+  const cfg=G&&G.aiProfile&&G.aiProfile[k],hist=CHAR[k]||{agr:.5,bud:.7},typ=cfg&&AI_STYLE[cfg.typ]?cfg.typ:'domyslny';
+  const p=Object.assign({},AI_STYLE[typ]);if(typ==='domyslny')Object.assign(p,hist);
+  [['agresja','agr'],['rozwoj','bud'],['media','media'],['prawo','prawo'],['koalicje','koalicje'],['ryzyko','ryzyko']].forEach(([a,b])=>{if(cfg&&isFinite(+cfg[a])&&+cfg[a]>=0)p[b]=cl(+cfg[a]/100,0,1)});p.typ=typ;return p;
+}
+const charOf=k=>aiProfil(k);
+function aiPamiec(k){
+  if(!G.aiMemory)G.aiMemory={};const m=G.aiMemory[k]||(G.aiMemory[k]={wrog:null,sojusznik:null,zdrady:{}}),inni=alive().filter(x=>x!==k);
+  if(inni.length){m.wrog=inni.slice().sort((a,b)=>(G.rel[k][a]||0)-(G.rel[k][b]||0))[0];m.sojusznik=inni.slice().sort((a,b)=>(G.rel[k][b]||0)-(G.rel[k][a]||0))[0]}return m;
+}
 
 /* Na co partia stawia w danym tygodniu. Na początku kadencji buduje zaplecze,
    pod koniec rzuca wszystko w obecność i sławę, bo to one liczą się przy urnach. */
@@ -1772,12 +1790,12 @@ function aiOkreg(k,p){
 }
 /* W kogo uderzyć: w najgroźniejszego, z którym i tak jest źle, a nie w przypadkowego. */
 function aiCel(k,prog){
-  const heg=hegemon();
+  const heg=hegemon(),pam=aiPamiec(k);
   // Przeciw komuś, kto odjeżdża całej stawce, partie zwierają szeregi nawet wtedy,
   // gdy formalnie nic do niego nie mają — dlatego hegemon łapie się na cel mimo dobrych relacji.
   const kand=alive().filter(x=>x!==k&&(G.rel[k][x]<prog||x===heg));
   if(!kand.length)return null;
-  return kand.map(x=>({x,w:(G.p[x].seats*2.2+G.p[x].fame/3+(G.p[x].mom||0))*(x===heg?2.4:1)*(.8+Math.random()*.4)}))
+  return kand.map(x=>({x,w:(G.p[x].seats*2.2+G.p[x].fame/3+(G.p[x].mom||0))*(x===heg?2.4:1)*(x===pam.wrog?1.65:1)*(1+Math.min(1.2,(pam.zdrady[x]||0)*.28))*(.8+Math.random()*.4)}))
     .sort((a,b)=>b.w-a.w)[0].x;
 }
 
@@ -1804,6 +1822,7 @@ function ai(){
           if(!(t2===G.me&&me().pact[k]>G.week)){
             if(ch(.62)){const o=G.p[t2];o.fame=cl(o.fame-R(5,10));o.act=cl(o.act-R(6,12));
               REG.forEach(r2=>o.pres[r2.id]=cl(o.pres[r2.id]*.82));M(o,-6);
+              const pm=aiPamiec(t2);pm.zdrady[k]=(pm.zdrady[k]||0)+1;
               G.rel[k][t2]=cl(G.rel[k][t2]-18,-100,100);G.rel[t2][k]=cl(G.rel[t2][k]-18,-100,100);
               if(t2===G.me)say(`<b>${p.ab} zorganizował sabotaż</b> na twoich kanałach, obecność i aktywność w dół.`,'bad')}
             else {p.cred=cl(p.cred-9);p.ctr=cl(p.ctr+14);p.fame=cl(p.fame-6);
@@ -1814,13 +1833,14 @@ function ai(){
         if(tg.length){const t=tg[0];
           if(t===G.me&&me().pact[k]>G.week)continue;
           if(ch(.62)){const o=G.p[t];o.fame=cl(o.fame-R(1.5,4));o.cred=cl(o.cred-R(1,3.5));p.ctr=cl(p.ctr+4);
+            const pm=aiPamiec(t);pm.zdrady[k]=(pm.zdrady[k]||0)+1;
             G.rel[k][t]=cl(G.rel[k][t]-14,-100,100);G.rel[t][k]=cl(G.rel[t][k]-14,-100,100);
             if(t===G.me)say(`<b>${p.lead} (${p.ab})</b> uderzył w ciebie publicznie.`,'bad')}
           else p.cred=cl(p.cred-4)}}
       else p.act=cl(p.act+R(2,6));
     }
     // AI wymienia słabych liderów
-    if(p.bench.length&&ch(.03)){
+    if(p.bench.length&&ch(.015+aiProfil(k).ryzyko*.035)){
       const best=p.bench.map(L).sort((a,b)=>b.avg-a.avg)[0];
       if(best.avg>L(p.lead).avg+9){const old=p.lead;p.lead=best.n;p.bench=p.bench.filter(x=>x!==best.n);
         if(!p.main.includes(old)&&!p.bench.includes(old))p.bench.push(old);p.uni=cl(p.uni+8);
@@ -1863,10 +1883,11 @@ function aiPlan(k){
   return 'opozycja';
 }
 function ustawPlany(){
-  alive().forEach(k=>{if(k===G.me)return;
+  const nowe=[];alive().forEach(k=>{if(k===G.me)return;
     const p=G.p[k];
     if(p.planTerm===G.term&&p.plan)return;    // zamiar obowiązuje całą kadencję
-    p.plan=aiPlan(k);p.planTerm=G.term});
+    p.plan=aiPlan(k);p.planTerm=G.term;aiPamiec(k);nowe.push(`${p.ab}: ${PLAN_OPIS[p.plan]}`)});
+  if(nowe.length)say(`<b>Strategie na kadencję.</b> ${nowe.join(' · ')}`);
 }
 /* Kto odjeżdża reszcie stawki. Zwraca partię, przeciw której warto się zewrzeć. */
 function hegemon(){
@@ -2760,6 +2781,7 @@ function render(){if(PROBA)return;
     const id=G.sitPending;G.sitPending=null;SITS[id].resolve();
   }
   else if(G.queue&&G.queue.length)showEvent(G.queue.shift());
+  else if(G.scenEventPending){const z=G.scenEventPending,e=(G.scenEvents||[]).find(x=>x.id===z.id);if(e)scenEventPokaz(e,z.k);else G.scenEventPending=null}
 }
 
 let SEL='PPP';
@@ -3341,7 +3363,7 @@ let MODY=[];
 /* Partie i cele zapisane w scenariuszu żyją tylko w tym jednym świecie. Nie
    dopisujemy ich na stałe do wszystkich rozgrywek, bo po wczytaniu dwóch modów
    wybór partii puchłby o cudze szyldy. */
-let SCEN_PARTY_KEYS=[],SCEN_GOAL_KEYS=[],SCEN_PARTY_DEFS=[],SCEN_GOAL_DEFS=[];
+let SCEN_PARTY_KEYS=[],SCEN_GOAL_KEYS=[],SCEN_PARTY_DEFS=[],SCEN_GOAL_DEFS=[],SCEN_EDIT_KEYS=[],SCEN_EDIT_DEFS={};
 function scenLogo(d){
   if(d.logo&&/^data:image\//.test(d.logo))return d.logo;
   const ab=String(d.ab||'?').slice(0,4).toUpperCase(),kol=String(d.c||'#596579');
@@ -3350,10 +3372,10 @@ function scenLogo(d){
 function scenPartiaRejestruj(d){
   if(!d||!d.id)return null;
   const id=String(d.id).replace(/[^A-Za-z0-9_-]/g,'').slice(0,16);if(!id||BASE[id])return null;
-  const comp=d.comp||{},st=d.stat||{},lider=String(d.lider||('Lider '+id)).slice(0,40);
+  const cz=s=>String(s||'').replace(/[<>&]/g,'').trim(),comp=d.comp||{},st=d.stat||{},lider=cz(d.lider||('Lider '+id)).slice(0,40);
   const eli=Math.max(0,Math.round(+comp.eli||0)),inte=Math.max(0,Math.round(+comp.int||0)),ser=Math.max(0,Math.round(+comp.ser||0));
   const mem=Math.max(1,eli+inte+ser),kol=/^#[0-9a-f]{6}$/i.test(d.c||'')?d.c:'#596579';
-  BASE[id]={n:String(d.nazwa||'Nowa partia').slice(0,42),ab:String(d.ab||id).slice(0,4).toUpperCase(),c:kol,
+  BASE[id]={n:cz(d.nazwa||'Nowa partia').slice(0,42),ab:cz(d.ab||id).slice(0,4).toUpperCase(),c:kol,
     founded:String(d.founded||'01.08.2026').slice(0,14),pull:Math.max(.3,+d.pull||1.2),
     fame:cl(+st.fame||35),cred:cl(+st.cred||45),uni:cl(+st.uni||55),act:cl(+st.act||45),
     ctr:cl(+st.ctr||20),pret:cl(+st.pret||30),mem,pot:cl(+st.pot||75,1,200),diff:cl(Math.round(+d.diff||3),1,5),
@@ -3392,15 +3414,32 @@ function scenCelRejestruj(d){
       say(`<b>${String(d.nazwa||'Cel ukończony')}.</b> Scenariusz zmienia dalszą drogę partii.`,'roy');}};
   SCEN_GOAL_KEYS.push(id);
 }
+/* Edycja wbudowanej partii musi być odwracalna. Ekran wyboru ma już pokazywać
+   nazwę, barwę i lidera ze scenariusza, ale po powrocie do zwykłej gry baza ma
+   wrócić bajt w bajt do swojego stanu. */
+function scenEdycjeAktywuj(edycje){
+  Object.keys(edycje||{}).forEach(id=>{
+    if(!BASE[id])return;const e=edycje[id]||{},staryLider=LP[id]&&LP[id].main[0];
+    SCEN_EDIT_KEYS.push({id,base:JSON.parse(JSON.stringify(BASE[id])),lp:JSON.parse(JSON.stringify(LP[id])),logo:LOGOS[id],nowi:[]});
+    const cz=s=>String(s||'').replace(/[<>&]/g,'').trim(),b=BASE[id];if(e.nazwa)b.n=cz(e.nazwa).slice(0,42);if(e.ab)b.ab=cz(e.ab).slice(0,4).toUpperCase();
+    if(/^#[0-9a-f]{6}$/i.test(e.c||''))b.c=e.c;if(e.opis)b.blurb=String(e.opis).slice(0,180);if(e.slabosc)b.flaw=String(e.slabosc).slice(0,180);
+    if(e.logo&&/^data:image\//.test(e.logo))LOGOS[id]=e.logo;
+    if(e.lider&&LP[id]){const n=cz(e.lider).slice(0,40);LP[id].main[0]=n;
+      if(!LEAD[n])SCEN_EDIT_KEYS[SCEN_EDIT_KEYS.length-1].nowi.push(n);
+      LEAD[n]=(e.liderStat||LEAD[staryLider]||[50,50,50,50]).map(x=>cl(Math.round(+x||50),1,99)).slice(0,4)}
+  });
+}
 function scenPartieWyczysc(wymus){
   if(G&&!wymus)return;
   SCEN_GOAL_KEYS.forEach(id=>delete GOALS[id]);SCEN_GOAL_KEYS=[];
+  SCEN_EDIT_KEYS.forEach(x=>{BASE[x.id]=x.base;LP[x.id]=x.lp;if(x.logo===undefined)delete LOGOS[x.id];else LOGOS[x.id]=x.logo;x.nowi.forEach(n=>delete LEAD[n])});SCEN_EDIT_KEYS=[];
   SCEN_PARTY_KEYS.forEach(x=>{delete BASE[x.id];delete LP[x.id];delete LOGOS[x.id];delete LEAD[x.lider];const i=PID.indexOf(x.id);if(i>=0)PID.splice(i,1)});
-  SCEN_PARTY_KEYS=[];SCEN_PARTY_DEFS=[];SCEN_GOAL_DEFS=[];if(!BASE[SEL])SEL='PPP';
+  SCEN_PARTY_KEYS=[];SCEN_PARTY_DEFS=[];SCEN_GOAL_DEFS=[];SCEN_EDIT_DEFS={};if(!BASE[SEL])SEL='PPP';
 }
-function scenPartieAktywuj(id,partie,cele){
+function scenPartieAktywuj(id,partie,cele,edycje){
   scenPartieWyczysc(true);const s=SCEN[id]||{};SCEN_PARTY_DEFS=JSON.parse(JSON.stringify(partie||s.partieNowe||[]));
-  SCEN_GOAL_DEFS=JSON.parse(JSON.stringify(cele||s.cele||[]));SCEN_PARTY_DEFS.forEach(scenPartiaRejestruj);SCEN_GOAL_DEFS.forEach(scenCelRejestruj);
+  SCEN_GOAL_DEFS=JSON.parse(JSON.stringify(cele||s.cele||[]));SCEN_EDIT_DEFS=JSON.parse(JSON.stringify(edycje||s.edycje||{}));
+  scenEdycjeAktywuj(SCEN_EDIT_DEFS);SCEN_PARTY_DEFS.forEach(scenPartiaRejestruj);SCEN_GOAL_DEFS.forEach(scenCelRejestruj);
   if(SCEN_PARTY_DEFS.length)SEL=SCEN_PARTY_DEFS[0].id;
 }
 function modEfekty(ef){
@@ -3496,6 +3535,68 @@ function modEfekty(ef){
     }
   }
 }
+/* Scenariusz V4 nie kończy się po pierwszym renderze. Zachowuje osobowości AI,
+   wydarzenia i ustawienia świata w samym zapisie G, dzięki czemu cudzy plik jest
+   nadal wyłącznie danymi, a kampania może żyć przez wiele kadencji. */
+function scenRuntimeStart(d){
+  d=d||{};G.aiProfile=JSON.parse(JSON.stringify(d.ai||{}));G.aiMemory=G.aiMemory||{};
+  G.scenEvents=JSON.parse(JSON.stringify(d.wydarzenia||[]));G.scenEventState={};G.scenEventPending=null;
+  G.scenWorld=JSON.parse(JSON.stringify(d.swiat||{}));const w=G.scenWorld;
+  Object.keys(w.relacje||{}).forEach(key=>{const [a,b]=key.split('|'),v=cl(Math.round(+w.relacje[key]||0),-100,100);if(G.rel[a]&&G.rel[b])G.rel[a][b]=G.rel[b][a]=v});
+  Object.keys(w.bank||{}).forEach(k=>{if(G.p[k])G.p[k].bank=Math.round(+w.bank[k]||0)});
+  Object.keys(w.obecnosc||{}).forEach(k=>{if(!G.p[k])return;Object.keys(w.obecnosc[k]||{}).forEach(r=>{if(G.p[k].pres[r]!==undefined)G.p[k].pres[r]=cl(Math.round(+w.obecnosc[k][r]||0),0,100)})});
+  const mnoz=cl(+w.majatekMnoznik||100,10,500)/100;if(mnoz!==1)Object.keys(G.kapPryw||{}).forEach(n=>G.kapPryw[n]=Math.round(G.kapPryw[n]*mnoz));
+  if(Array.isArray(w.ustawy)){G.law=G.law||{};w.ustawy.forEach(id=>G.law[String(id).slice(0,20)]=1)}
+  const media=w.media||{};if(Object.values(media).some(x=>+x>0)){G.law=G.law||{};G.law.media=1;G.aiMedia=G.aiMedia||{};
+    Object.keys(media).forEach(k=>{if(!G.p[k])return;const ile=cl(Math.round(+media[k]||0),0,3);G.aiMedia[k]=G.aiMedia[k]||[];
+      ['gazeta','tv','kino'].slice(0,ile).forEach((typ,i)=>{if(!G.aiMedia[k].some(m=>m.typ===typ))G.aiMedia[k].push({typ,nazwa:aiNazwaMedia(k,typ,i),szef:G.p[k].lead,bilans:0,staz:0,serca:0,numery:0,ostatnio:0,ostatnieWyd:-99})})})}
+}
+function scenEventPartia(e){
+  if(e.party==='gracz'||!e.party)return G.me;if(e.party==='losowa'){
+    const a=alive().filter(k=>k!==G.me);return a.length?pick(a):G.me}return G.p[e.party]?e.party:null;
+}
+function scenEventMozna(e,k){
+  if(!e||!k||!G.p[k])return false;const w=e.war||{},p=G.p[k],st=G.scenEventState[e.id]||{};
+  if(w.term&&G.term!==+w.term)return false;if(w.week&&G.week!==+w.week)return false;
+  if(w.odTygodnia&&absWeek()<+w.odTygodnia)return false;if(w.coIle&&absWeek()%Math.max(1,+w.coIle)!==0)return false;
+  if(!w.powtarzalne&&st.ile)return false;if(w.przerwa&&st.ostatni&&absWeek()-st.ostatni<+w.przerwa)return false;
+  if(w.minMandaty&&p.seats<+w.minMandaty)return false;if(w.maxMandaty&&p.seats>+w.maxMandaty)return false;
+  if(w.minSlawa&&p.fame<+w.minSlawa)return false;if(w.maxKontrowersja&&p.ctr>+w.maxKontrowersja)return false;
+  if(w.urzad==='premier'&&!(G.gov&&G.gov.pm===k&&G.pmOk))return false;if(w.urzad==='prezydent'&&!(G.prez&&G.prez.party===k))return false;
+  if(w.urzad==='opozycja'&&G.gov&&G.gov.parties.includes(k))return false;return true;
+}
+function scenEventEfekt(k,ef){
+  const p=G.p[k];if(!p)return;ef=ef||{};
+  ['fame','cred','uni','act','ctr','pret'].forEach(x=>{if(isFinite(+ef[x])&&+ef[x])p[x]=cl(p[x]+ +ef[x])});
+  if(+ef.mem>0){const g=drawFrom('polityka',Math.round(+ef.mem));p.comp.eli+=g.eli;p.comp.int+=g.int;p.comp.ser+=g.ser;p.mem+=g.eli+g.int+g.ser}
+  if(+ef.mem<0)giveBackCap(p,Math.abs(Math.round(+ef.mem)));
+  if(+ef.kapital){if(k===G.me)G.kp+=+ef.kapital;else p.bank=(p.bank||0)+ +ef.kapital}
+  if(+ef.obecnosc)REG.forEach(r=>p.pres[r.id]=cl(p.pres[r.id]+ +ef.obecnosc));
+  const relK=ef.relPartia==='gracz'?G.me:ef.relPartia;if(relK&&relK!==k&&G.rel[k]&&G.rel[relK]){const v=cl((G.rel[k][relK]||0)+(+ef.rel||0),-100,100);G.rel[k][relK]=G.rel[relK][k]=v}
+  if(ef.zmienLidera&&p.bench&&p.bench.length){const old=p.lead,n=p.bench.slice().sort((a,b)=>L(b).avg-L(a).avg)[0];p.lead=n;p.bench=p.bench.filter(x=>x!==n);if(!p.bench.includes(old))p.bench.push(old)}
+  if(ef.nazwa)p.n=String(ef.nazwa).slice(0,42);if(ef.ab)p.ab=String(ef.ab).slice(0,4).toUpperCase();if(/^#[0-9a-f]{6}$/i.test(ef.c||''))p.c=ef.c;
+  if(ef.ustawa){G.law=G.law||{};G.law[String(ef.ustawa).slice(0,20)]=ef.ustawaWlacz===false?0:1}
+}
+function scenEventWybierz(e,k,opcja){
+  if(!e||!opcja)return;scenEventEfekt(k,opcja.efekty);const st=G.scenEventState[e.id]||{ile:0};st.ile++;st.ostatni=absWeek();G.scenEventState[e.id]=st;
+  say(`<b>${esc(e.nazwa)}.</b> ${esc(G.p[k].ab)}: ${esc(opcja.nazwa)}.`,opcja.klasa||'roy');
+}
+function scenEventAiOpcja(e,k){
+  const pr=aiProfil(k);return (e.opcje||[]).map((o,i)=>{const t=o.ai||{},ef=o.efekty||{};let s=1+Math.random()*1.2;
+    s+=(+t.agresja||0)*pr.agr+(+t.media||0)*pr.media+(+t.prawo||0)*pr.prawo+(+t.koalicje||0)*pr.koalicje+(+t.rozwoj||0)*pr.bud+(+t.ryzyko||0)*pr.ryzyko;
+    s+=(+ef.fame||0)*.025+(+ef.cred||0)*.02+(+ef.uni||0)*.02+(+ef.mem||0)*.04-(+ef.ctr||0)*.012;return {o,i,s}}).sort((a,b)=>b.s-a.s)[0]?.o||e.opcje[0];
+}
+function scenEventPokaz(e,k){
+  if(PROBA||!e||!k)return;modal(esc(e.kategoria||'Wydarzenie scenariusza'),esc(e.nazwa),`<p>${esc(e.opis||'')}</p><p class="dim" style="margin-top:10px">Dotyczy: <b>${esc(G.p[k].n)}</b></p>`,
+    (e.opcje||[]).map(o=>({l:esc(o.nazwa||'Wybieram'),s:esc(o.opis||''),f:()=>{scenEventWybierz(e,k,o);G.scenEventPending=null;close();render()}})),
+    ()=>{const o=(e.opcje||[])[0];if(o)scenEventWybierz(e,k,o);G.scenEventPending=null;close();render()});
+}
+function scenWydarzeniaTydzien(){
+  if(PROBA||!G.scenEvents||!G.scenEvents.length)return;let pokaz=null;
+  G.scenEvents.forEach(e=>{const k=scenEventPartia(e);if(!scenEventMozna(e,k))return;
+    if(k===G.me&&!pokaz)pokaz={e,k};else{const o=scenEventAiOpcja(e,k);if(o)scenEventWybierz(e,k,o)}});
+  if(pokaz&&!G.scenEventPending)G.scenEventPending={id:pokaz.e.id,k:pokaz.k};
+}
 /* Scenariusze z modów dokładają się do wbudowanych. Jeśli mod ma zły format,
    pomijamy go bez słowa — jedna literówka w cudzym pliku nie może zablokować gry. */
 function modyDoScen(){
@@ -3508,7 +3609,8 @@ function modyDoScen(){
       d:String(m.opis||'Scenariusz z moda.').slice(0,400),
       mod:String(m.zmiany||'Zmiany opisane przez autora moda.').slice(0,400),
       zModa:true, autor:String(m.autor||'').slice(0,40),efekty:m.efekty||{},partieNowe:m.partieNowe||[],cele:m.cele||[],
-      apply(){try{modEfekty(m.efekty)}catch(e){}}
+      edycje:m.edycje||{},ai:m.ai||{},wydarzenia:m.wydarzenia||[],swiat:m.swiat||{},
+      apply(){try{modEfekty(m.efekty);scenRuntimeStart(m)}catch(e){}}
     };
   });
 }
@@ -3723,13 +3825,14 @@ function krePartiaDane(k){
     fame:x.stat.fame,cred:x.stat.cred,uni:x.stat.uni,act:x.stat.act,ctr:x.stat.ctr,pret:x.stat.pret,pot:x.stat.pot,
     mem:(+c.eli||0)+(+c.int||0)+(+c.ser||0),comp0:[+c.eli||0,+c.int||0,+c.ser||0],diff:x.diff||3,
     blurb:x.opis||'Nowa partia scenariusza.'}}
-  return (G&&G.p&&G.p[k])||BASE[k]||{n:k,ab:k,c:'#8a8a8a',comp0:[0,0,1],mem:1};
+  const b=(G&&G.p&&G.p[k])||BASE[k]||{n:k,ab:k,c:'#8a8a8a',comp0:[0,0,1],mem:1},e=KRE&&KRE.edycje&&KRE.edycje[k];
+  return e?Object.assign({},b,{n:e.nazwa||b.n,ab:e.ab||b.ab,c:e.c||b.c,blurb:e.opis||b.blurb,flaw:e.slabosc||b.flaw}):b;
 }
 const krePartieLista=()=>Object.keys(BASE).concat(KRE&&KRE.nowe?KRE.nowe.map(x=>x.id):[]);
 function kreHerb(k,roz='s'){
-  const x=kreNowaZnajdz(k);if(!x)return crest(k,roz);
+  const x=kreNowaZnajdz(k),e=KRE&&KRE.edycje&&KRE.edycje[k];if(!x&&!e)return crest(k,roz);
   const px=roz==='l'?56:roz==='m'?46:30;
-  return `<img class="crest ${roz}" src="${scenLogo(x)}" alt="${esc(x.ab)}" style="width:${px}px;height:${px}px">`;
+  const d=x||Object.assign({},krePartiaDane(k),{logo:e.logo});return `<img class="crest ${roz}" src="${e&&e.logo?e.logo:scenLogo(d)}" alt="${esc(d.ab)}" style="width:${px}px;height:${px}px">`;
 }
 /* ── kreator scenariuszy ──
    Był ciasnym oknem z listą kilkunastu suwaków, po której nie dało się poznać,
@@ -3949,8 +4052,9 @@ const KRE_NOWA_STAT=[['fame','Sława',0,100],['cred','Wiarygodność',0,100],['u
 const KRE_LIDER_STAT=[['0','Charyzma'],['1','Kompetencja'],['2','Wytrzymałość'],['3','Autorytet']];
 const KRE2_KROKI=[
   ['Tożsamość','Nazwa i opowieść'],['Partie','Nowe i istniejące ugrupowania'],
-  ['Sejm','Dokładnie 40 mandatów'],['Cele','Własne drogi rozwoju'],
-  ['Władza','Rząd, pałac i zasady'],['Finał','Kontrola i uruchomienie'],
+  ['Sejm','Dokładnie 40 mandatów'],['Relacje','Sojusze i wrogowie'],
+  ['AI 2.0','Charakter każdej partii'],['Wydarzenia','Własna historia kampanii'],
+  ['Cele','Własne drogi rozwoju'],['Świat','Władza, media i gospodarka'],['Finał','Kontrola i uruchomienie'],
 ];
 const KRE2_TRUDNOSCI=['Spokojny','Standard','Trudny','Brutalny','Eksperymentalny'];
 const KRE2_RZAD0=['NP','FD','DPD','PLR','POJ','NBR','SS','PP'];
@@ -3961,7 +4065,9 @@ const kre2BazoweMandaty=()=>Object.fromEntries(krePartieLista().map(k=>[k,START_
 function openKreator(){
   KRE={krok:0,nazwa:'',opis:'',trudnosc:'Standard',autor:'',ef:{},partie:{},wybrana:'PPP',
     mandaty:kre2BazoweMandaty(),mandatyZm:false,rzadTryb:'zastany',rzadPartie:KRE2_RZAD0.slice(),
-    premier:'NP',prezTryb:'zastany',prezydent:'KK',relacje:'zastane',nowe:[],cele:[],seq:0,celWybrany:0};
+    premier:'NP',prezTryb:'zastany',prezydent:'KK',relacje:'zastane',nowe:[],cele:[],seq:0,celWybrany:0,
+    edycje:{},ai:{},wydarzenia:[],wydSel:0,relA:'PPP',relB:'KK',
+    swiat:{relacje:{},bank:{},media:{},obecnosc:{},majatekMnoznik:100,ustawy:[]}};
   KRE2_POLA.concat(KRE2_OGOLNE).forEach(([k,,,,dom])=>KRE.ef[k]=dom);
   kreatorRys();
 }
@@ -3979,10 +4085,11 @@ function kreNowaPartia(){
   KRE.nowe.push({id,nazwa:'Nowa partia '+nr,ab:'P'+nr,c:kol,founded:'01.08.2026',lider:'Nowy lider '+nr,zaplecze:'',
     opis:'Nowe ugrupowanie utworzone przez autora scenariusza.',slabosc:'Nie ma jeszcze politycznej historii.',logo:'',diff:3,
     stat:{fame:35,cred:50,uni:60,act:50,ctr:18,pret:30,pot:80},comp:{eli:1,int:3,ser:12},aff:{eli:4,int:5,ser:6},liderStat:[55,55,55,55]});
-  KRE.mandaty[id]=0;KRE.partie[id]={};KRE.wybrana=id;KRE.mandatyZm=true;kreatorRys();
+  KRE.mandaty[id]=0;KRE.partie[id]={};KRE.ai[id]={typ:'oportunista',agresja:55,rozwoj:62,media:70,prawo:62,koalicje:76,ryzyko:82};KRE.wybrana=id;KRE.mandatyZm=true;kreatorRys();
 }
 function kreUsunPartie(id){
   if(!KRE||!kreNowaZnajdz(id))return;KRE.nowe=KRE.nowe.filter(x=>x.id!==id);delete KRE.mandaty[id];delete KRE.partie[id];
+  delete KRE.ai[id];delete KRE.swiat.bank[id];delete KRE.swiat.media[id];delete KRE.swiat.obecnosc[id];Object.keys(KRE.swiat.relacje).filter(x=>x.split('|').includes(id)).forEach(x=>delete KRE.swiat.relacje[x]);
   KRE.rzadPartie=KRE.rzadPartie.filter(k=>k!==id);KRE.cele=KRE.cele.filter(c=>c.party!==id);
   if(KRE.premier===id)KRE.premier=KRE.rzadPartie[0]||null;if(KRE.prezydent===id)KRE.prezydent='KK';
   KRE.wybrana=krePartieLista()[0]||null;KRE.mandatyZm=true;kreatorRys();
@@ -4016,6 +4123,29 @@ function kreCelPole(i,grupa,pole,v,rysuj){
   if(grupa)o[pole]=pole==='urzad'||['nazwa','ab','c'].includes(pole)?String(v||''):Math.max(0,Math.round(+v||0));else o[pole]=String(v||'').slice(0,pole==='opis'?300:70);
   if(rysuj)kreatorRys();
 }
+function kreMeta(k){
+  if(!KRE||kreNowaZnajdz(k))return null;if(!KRE.edycje[k]){const b=BASE[k],lider=LP[k]&&LP[k].main[0];KRE.edycje[k]={nazwa:b.n,ab:b.ab,c:b.c,opis:b.blurb||'',slabosc:b.flaw||'',logo:'',lider,liderStat:(LEAD[lider]||[50,50,50,50]).slice()}}return KRE.edycje[k];
+}
+function kreMetaPole(k,pole,v,rysuj){const e=kreMeta(k);if(!e)return;if(pole.startsWith('lider.'))e.liderStat[+pole.slice(6)]=cl(Math.round(+v||50),1,99);else e[pole]=String(v||'').slice(0,pole==='opis'||pole==='slabosc'?180:42);if(rysuj)kreatorRys()}
+function kreMetaReset(k){if(KRE){delete KRE.edycje[k];kreatorRys()}}
+function kreMetaLogo(inp,k){const e=kreMeta(k),f=inp&&inp.files&&inp.files[0];if(!e||!f)return;const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas'),sc=Math.min(1,160/Math.max(im.width,im.height));cv.width=Math.max(1,Math.round(im.width*sc));cv.height=Math.max(1,Math.round(im.height*sc));cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);e.logo=cv.toDataURL('image/webp',.78);kreatorRys()};im.src=rd.result};rd.readAsDataURL(f)}
+function kreAiGet(k){
+  if(!KRE.ai[k]){const h=CHAR[k]||{},v=x=>Math.round((h[x]??AI_STYLE.domyslny[x])*100);KRE.ai[k]={typ:'domyslny',agresja:v('agr'),rozwoj:v('bud'),media:55,prawo:55,koalicje:55,ryzyko:50}}return KRE.ai[k];
+}
+function kreAiPole(k,pole,v,rysuj){const a=kreAiGet(k);if(pole==='typ'){a.typ=String(v);const s=AI_STYLE[a.typ]||AI_STYLE.domyslny;a.agresja=Math.round(s.agr*100);a.rozwoj=Math.round(s.bud*100);a.media=Math.round(s.media*100);a.prawo=Math.round(s.prawo*100);a.koalicje=Math.round(s.koalicje*100);a.ryzyko=Math.round(s.ryzyko*100)}else a[pole]=cl(Math.round(+v||0),0,100);if(rysuj)kreatorRys()}
+function kreRelUstaw(a,b,v){if(!KRE||!a||!b||a===b)return;const key=[a,b].sort().join('|');KRE.swiat.relacje[key]=cl(Math.round(+v||0),-100,100);kreatorRys()}
+function kreRelUsun(key){if(KRE){delete KRE.swiat.relacje[key];kreatorRys()}}
+function kreSwiatPole(grupa,k,v){if(!KRE)return;if(grupa==='ustawy'){const i=KRE.swiat.ustawy.indexOf(k);if(i>=0)KRE.swiat.ustawy.splice(i,1);else KRE.swiat.ustawy.push(k)}else if(grupa)KRE.swiat[grupa][k]=Math.round(+v||0);else KRE.swiat[k]=Math.round(+v||0);kreatorRys()}
+function kreObecnosc(k,r,v,rysuj){if(!KRE)return;if(!KRE.swiat.obecnosc[k])KRE.swiat.obecnosc[k]={};KRE.swiat.obecnosc[k][r]=cl(Math.round(+v||0),0,100);if(rysuj)kreatorRys()}
+function kreWydDodaj(){
+  if(!KRE||KRE.wydarzenia.length>=24)return;const nr=KRE.wydarzenia.length+1,id='EV'+(++KRE.seq);KRE.wydarzenia.push({id,nazwa:'Nowe wydarzenie '+nr,kategoria:'Wydarzenie scenariusza',opis:'Opisz sytuację, przed którą staje partia.',party:'gracz',war:{term:0,week:0,odTygodnia:0,coIle:0,przerwa:0,powtarzalne:false,minMandaty:0,maxMandaty:0,minSlawa:0,maxKontrowersja:0,urzad:'brak'},opcje:[{nazwa:'Podejmuję ryzyko',opis:'Odważna odpowiedź.',ai:{agresja:1,ryzyko:1,media:0,prawo:0,koalicje:0,rozwoj:0},efekty:{fame:6,cred:0,uni:0,act:3,ctr:5,mem:0,kapital:0,obecnosc:0,rel:0,relPartia:''}},{nazwa:'Gram bezpiecznie',opis:'Ostrożna odpowiedź.',ai:{agresja:0,ryzyko:-1,media:0,prawo:0,koalicje:1,rozwoj:1},efekty:{fame:0,cred:4,uni:3,act:0,ctr:-2,mem:0,kapital:0,obecnosc:0,rel:0,relPartia:''}}]});KRE.wydSel=KRE.wydarzenia.length-1;kreatorRys();
+}
+function kreWydWybierz(i){if(KRE){KRE.wydSel=cl(Math.round(+i||0),0,Math.max(0,KRE.wydarzenia.length-1));kreatorRys()}}
+function kreWydUsun(i){if(KRE){KRE.wydarzenia.splice(i,1);KRE.wydSel=cl(KRE.wydSel,0,Math.max(0,KRE.wydarzenia.length-1));kreatorRys()}}
+function kreWydPole(i,grupa,pole,v,rysuj){const e=KRE&&KRE.wydarzenia[i];if(!e)return;const o=grupa?e[grupa]:e;if(grupa==='war')o[pole]=pole==='urzad'?String(v):pole==='powtarzalne'?!!v:Math.max(0,Math.round(+v||0));else o[pole]=String(v||'').slice(0,pole==='opis'?500:80);if(rysuj)kreatorRys()}
+function kreWydOpcjaDodaj(i){const e=KRE&&KRE.wydarzenia[i];if(!e||e.opcje.length>=4)return;e.opcje.push({nazwa:'Nowa odpowiedź',opis:'',ai:{agresja:0,ryzyko:0,media:0,prawo:0,koalicje:0,rozwoj:0},efekty:{fame:0,cred:0,uni:0,act:0,ctr:0,mem:0,kapital:0,obecnosc:0,rel:0,relPartia:''}});kreatorRys()}
+function kreWydOpcjaUsun(i,j){const e=KRE&&KRE.wydarzenia[i];if(e&&e.opcje.length>1){e.opcje.splice(j,1);kreatorRys()}}
+function kreWydOpcjaPole(i,j,grupa,pole,v,rysuj){const o=KRE&&KRE.wydarzenia[i]&&KRE.wydarzenia[i].opcje[j];if(!o)return;const x=grupa?o[grupa]:o;if(grupa==='ai'||grupa==='efekty'){if(['relPartia','nazwa','ab','c','ustawa'].includes(pole))x[pole]=String(v||'');else if(['zmienLidera','ustawaWlacz'].includes(pole))x[pole]=!!v;else x[pole]=Math.round(+v||0)}else x[pole]=String(v||'').slice(0,pole==='opis'?180:70);if(rysuj)kreatorRys()}
 const kre2SumaMandatow=()=>Object.values(KRE.mandaty).reduce((a,n)=>a+(+n||0),0);
 const kre2PulaMandatow=()=>TOTAL_SEATS-kre2SumaMandatow();
 function kreMandat(k,d){
@@ -4052,7 +4182,8 @@ function kre2StatFinal(k,pole){
 function kre2RzadMandaty(){return KRE.rzadPartie.reduce((a,k)=>a+(KRE.mandaty[k]||0),0)}
 function kre2MaZmiany(){
   return KRE.mandatyZm||KRE.rzadTryb!=='zastany'||KRE.prezTryb!=='zastany'||KRE.relacje!=='zastane'||
-    KRE.nowe.length>0||KRE.cele.length>0||
+    KRE.nowe.length>0||KRE.cele.length>0||KRE.wydarzenia.length>0||Object.keys(KRE.edycje).length>0||Object.keys(KRE.swiat.relacje).length>0||
+    KRE.swiat.majatekMnoznik!==100||Object.keys(KRE.swiat.bank).length>0||Object.keys(KRE.swiat.media).length>0||Object.keys(KRE.swiat.obecnosc).length>0||KRE.swiat.ustawy.length>0||
     KRE2_POLA.concat(KRE2_OGOLNE).some(([k,,,,d])=>KRE.ef[k]!==d)||
     Object.keys(KRE.partie).some(k=>kreIleZmian(k));
 }
@@ -4073,21 +4204,25 @@ function kre2Walidacja(){
     else if(liderzy.has(lid.toLowerCase()))w.push({blok:1,krok:1,t:`Lider „${lid}” już istnieje w innej partii.`});else liderzy.add(lid.toLowerCase());
     if((+x.comp.eli||0)+(+x.comp.int||0)+(+x.comp.ser||0)<1)w.push({blok:1,krok:1,t:`${naz||'Nowa partia'} nie ma ani jednego członka.`});
   });
+  const wszystkie=krePartieLista().map(k=>({k,p:krePartiaDane(k),lider:kreNowaZnajdz(k)?.lider||KRE.edycje[k]?.lider||(LP[k]&&LP[k].main[0])}));
+  const powt=(f,v)=>wszystkie.filter(x=>String(f(x)||'').trim().toLowerCase()===String(v||'').trim().toLowerCase()).length>1;
+  wszystkie.forEach(x=>{if(powt(y=>y.p.n,x.p.n))w.push({blok:1,krok:1,t:`Nazwa „${x.p.n}” występuje w kilku partiach.`});if(powt(y=>y.p.ab,x.p.ab))w.push({blok:1,krok:1,t:`Skrót „${x.p.ab}” występuje w kilku partiach.`});if(x.lider&&powt(y=>y.lider,x.lider))w.push({blok:1,krok:1,t:`Lider „${x.lider}” prowadzi kilka partii.`})});
   if(kre2PulaMandatow()!==0)w.push({blok:1,krok:2,t:`Rozdaj wszystkie mandaty. Zostało: ${kre2PulaMandatow()}.`});
   if(Math.max(...Object.values(KRE.mandaty))>=25)w.push({krok:2,t:'Jedna partia ma samodzielną większość. To może być celowe, ale mocno spłaszcza grę.'});
   KRE.cele.forEach(c=>{
-    if(!String(c.nazwa||'').trim())w.push({blok:1,krok:3,t:'Własny cel nie ma nazwy.'});
-    if(!krePartieLista().includes(c.party))w.push({blok:1,krok:3,t:`Cel „${c.nazwa||'bez nazwy'}” nie ma istniejącej partii.`});
+    if(!String(c.nazwa||'').trim())w.push({blok:1,krok:6,t:'Własny cel nie ma nazwy.'});
+    if(!krePartieLista().includes(c.party))w.push({blok:1,krok:6,t:`Cel „${c.nazwa||'bez nazwy'}” nie ma istniejącej partii.`});
   });
+  KRE.wydarzenia.forEach(e=>{if(!String(e.nazwa||'').trim())w.push({blok:1,krok:5,t:'Wydarzenie nie ma nazwy.'});if(!String(e.opis||'').trim())w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” nie ma opisu.`});if(!['gracz','losowa'].includes(e.party)&&!krePartieLista().includes(e.party))w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” wskazuje nieistniejącą partię.`});if(!e.opcje||!e.opcje.length)w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” nie ma odpowiedzi.`});else e.opcje.forEach(o=>{if(!String(o.nazwa||'').trim())w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” ma pustą odpowiedź.`})})});
   if(KRE.rzadTryb==='wlasny'){
-    if(!KRE.rzadPartie.length)w.push({blok:1,krok:4,t:'Własny rząd nie ma żadnej partii.'});
-    if(KRE.rzadPartie.some(k=>!KRE.mandaty[k]))w.push({blok:1,krok:4,t:'Partia bez mandatu nie może wejść do startowego rządu.'});
-    if(!KRE.rzadPartie.includes(KRE.premier))w.push({blok:1,krok:4,t:'Premier musi pochodzić z partii rządzącej.'});
-    if(KRE.rzadPartie.length&&kre2RzadMandaty()<MAJ)w.push({krok:4,t:`Rząd ma ${kre2RzadMandaty()} mandatów i zacznie jako mniejszościowy.`});
+    if(!KRE.rzadPartie.length)w.push({blok:1,krok:7,t:'Własny rząd nie ma żadnej partii.'});
+    if(KRE.rzadPartie.some(k=>!KRE.mandaty[k]))w.push({blok:1,krok:7,t:'Partia bez mandatu nie może wejść do startowego rządu.'});
+    if(!KRE.rzadPartie.includes(KRE.premier))w.push({blok:1,krok:7,t:'Premier musi pochodzić z partii rządzącej.'});
+    if(KRE.rzadPartie.length&&kre2RzadMandaty()<MAJ)w.push({krok:7,t:`Rząd ma ${kre2RzadMandaty()} mandatów i zacznie jako mniejszościowy.`});
   }
   if(KRE.rzadTryb==='zastany'&&KRE2_RZAD0.some(k=>!KRE.mandaty[k]))
-    w.push({blok:1,krok:4,t:'Rząd zastany zawiera partię bez mandatu. Wybierz własny gabinet albo start bez rządu.'});
-  if(!kre2MaZmiany())w.push({krok:5,t:'Ten scenariusz jest identyczny jak zwykły Sejm zastany.'});
+    w.push({blok:1,krok:7,t:'Rząd zastany zawiera partię bez mandatu. Wybierz własny gabinet albo start bez rządu.'});
+  if(!kre2MaZmiany())w.push({krok:8,t:'Ten scenariusz jest identyczny jak zwykły Sejm zastany.'});
   return w;
 }
 function kre2SeatBar(){return `<div class="kreseatbar">${krePartieLista().filter(k=>KRE.mandaty[k]).map(k=>{const p=krePartiaDane(k);return
@@ -4120,6 +4255,32 @@ function kre3EkranSejm(){
     ${kre2SeatBar()}<div class="kreseatgrid">${lista.map(k=>{const p=krePartiaDane(k),n=KRE.mandaty[k]||0;return `<article class="kreseat" style="--pc:${p.c}"><div class="kreseatid">${kreHerb(k,'m')}<div><b>${esc(p.ab)}</b><span>${esc(p.n)}</span></div></div><div class="kreseatctl"><button onclick="kreMandat('${k}',-1)" ${n<=0?'disabled':''}>−</button><strong>${n}</strong><button onclick="kreMandat('${k}',1)" ${kre2PulaMandatow()<=0?'disabled':''}>+</button></div><div class="kreseatmeter"><i style="width:${Math.min(100,n/12*100)}%"></i></div></article>`}).join('')}</div>
     <div class="krehint ${kre2PulaMandatow()?'warn':''}"><b>${kre2PulaMandatow()?'Podział niedokończony':'Sejm jest poprawny'}</b><span>${kre2PulaMandatow()?`Do rozdania zostało ${kre2PulaMandatow()} mandatów.`:'Wszystkie miejsca mają właściciela.'}</span></div></div>`;
 }
+function kre4EkranRelacje(){
+  const l=krePartieLista(),n=k=>krePartiaDane(k),a=KRE.relA||l[0],b=(KRE.relB&&KRE.relB!==a)?KRE.relB:l.find(x=>x!==a),key=[a,b].sort().join('|'),v=KRE.swiat.relacje[key]??0;
+  return `<div class="krepanel krebig"><div class="kretitle"><span>04</span><div><h2>Rozpisz sojusze i wojny</h2><p>Globalny klimat zostaje bazą, a tutaj ustawiasz konkretne pary od −100 do +100.</p></div></div>
+    <div class="krefinalgrid"><section><div class="sterlab">Pierwsza partia</div><label class="kreselect"><select onchange="kreSet('relA',this.value)">${l.map(k=>`<option value="${k}" ${a===k?'selected':''}>${esc(n(k).n)} (${esc(n(k).ab)})</option>`).join('')}</select></label></section><section><div class="sterlab">Druga partia</div><label class="kreselect"><select onchange="kreSet('relB',this.value)">${l.filter(k=>k!==a).map(k=>`<option value="${k}" ${b===k?'selected':''}>${esc(n(k).n)} (${esc(n(k).ab)})</option>`).join('')}</select></label></section></div>
+    <div class="krerelhero"><div style="--pc:${n(a).c}">${kreHerb(a,'l')}<b>${esc(n(a).ab)}</b></div><main><strong class="${v>=35?'good':v<=-25?'bad':''}">${v>0?'+':''}${v}</strong><span>${v>=60?'twardy sojusz':v>=25?'współpraca':v<=-60?'otwarta wojna':v<=-20?'wrogość':'chłodna neutralność'}</span><input type="range" min="-100" max="100" value="${v}" oninput="this.previousElementSibling.previousElementSibling.textContent=(this.value>0?'+':'')+this.value" onchange="kreRelUstaw('${a}','${b}',this.value)"></main><div style="--pc:${n(b).c}">${kreHerb(b,'l')}<b>${esc(n(b).ab)}</b></div></div>
+    <div class="kresectionhead"><div><span>Wyjątki</span><h3>${Object.keys(KRE.swiat.relacje).length} ustawionych relacji</h3></div></div><div class="krerellista">${Object.keys(KRE.swiat.relacje).length?Object.entries(KRE.swiat.relacje).map(([x,val])=>{const [p,q]=x.split('|');return `<div>${kreHerb(p,'s')}<b>${esc(n(p).ab)}</b><span class="${val>=25?'good':val<=-20?'bad':''}">${val>0?'+':''}${val}</span><b>${esc(n(q).ab)}</b>${kreHerb(q,'s')}<button onclick="kreRelUsun('${x}')">×</button></div>`}).join(''):'<div class="kreempty mini"><b>Brak relacji szczególnych</b><span>Świat użyje wybranego później klimatu sceny.</span></div>'}</div></div>`;
+}
+function kre4EkranAI(){
+  const l=krePartieLista(),k=KRE.wybrana||l[0],p=krePartiaDane(k),a=kreAiGet(k),suw=([x,n])=>`<div class="krestat"><div><b>${n}</b><span>${a[x]}/100</span></div><input type="range" min="0" max="100" value="${a[x]}" oninput="kreAiPole('${k}','${x}',this.value,0);this.previousElementSibling.lastElementChild.textContent=this.value+'/100'"><em>${a[x]}</em></div>`;
+  return `<div class="krepanel krebig"><div class="kretitle"><span>05</span><div><h2>Nadaj partiom charakter</h2><p>AI pamięta plan, wrogów i sojuszników. Te ustawienia zmieniają decyzje, ustawy, media oraz koalicje.</p></div></div><div class="krepartie rozbudowane">${l.map(x=>{const q=krePartiaDane(x);return `<button class="krep ${x===k?'on':''}" onclick="krePartia('${x}')" style="--pc:${q.c}">${kreHerb(x,'s')}<span>${esc(q.ab)}</span></button>`}).join('')}</div>
+    <div class="kreaihero" style="--pc:${p.c}">${kreHerb(k,'l')}<div><span>Dyrekcja strategiczna</span><h3>${esc(p.n)}</h3><small>${AI_STYLE[a.typ]?.n||a.typ}</small></div><label>Archetyp<select onchange="kreAiPole('${k}','typ',this.value,1)">${Object.entries(AI_STYLE).map(([x,q])=>`<option value="${x}" ${a.typ===x?'selected':''}>${q.n}</option>`).join('')}</select></label></div>
+    <div class="kreaitraits">${[['agresja','Agresja'],['rozwoj','Rozbudowa partii'],['media','Głód mediów'],['prawo','Aktywność ustawodawcza'],['koalicje','Skłonność do koalicji'],['ryzyko','Ryzykanctwo']].map(suw).join('')}</div>
+    <div class="krehint"><b>To działa w grze</b><span>Przykład: wysoka aktywność ustawodawcza skraca przerwy między projektami, a koalicyjność podnosi realną szansę wspólnej listy.</span></div></div>`;
+}
+function kre4EkranWydarzenia(){
+  const i=cl(KRE.wydSel||0,0,Math.max(0,KRE.wydarzenia.length-1)),e=KRE.wydarzenia[i],l=krePartieLista(),num=(g,k,n,max=999)=>`<label>${n}<input type="number" min="0" max="${max}" value="${e?e[g][k]||0:0}" onchange="kreWydPole(${i},'${g}','${k}',this.value,1)"></label>`;
+  return `<div class="krepanel krebig"><div class="kretitle"><span>06</span><div><h2>Wyreżyseruj wydarzenia</h2><p>Do 24 sytuacji z warunkami i czterema odpowiedziami. AI wybiera zgodnie ze swoim charakterem.</p></div></div><div class="kresectionhead"><div><span>Oś kampanii</span><h3>${KRE.wydarzenia.length} z 24 wydarzeń</h3></div><button class="btn" onclick="kreWydDodaj()" ${KRE.wydarzenia.length>=24?'disabled':''}>+ Nowe wydarzenie</button></div>
+    ${!e?`<div class="kreempty"><b>Świat jeszcze milczy</b><span>Dodaj kryzys, rozłam, debatę, aferę albo wydarzenie fabularne.</span><button class="btn" onclick="kreWydDodaj()">Tworzę pierwsze wydarzenie</button></div>`:`<div class="krewyd"><aside>${KRE.wydarzenia.map((x,j)=>`<button class="${j===i?'on':''}" onclick="kreWydWybierz(${j})"><i>${j+1}</i><span><b>${esc(x.nazwa)}</b><small>${x.war.term?'K'+x.war.term:'dowolna kadencja'} · ${x.war.week?'T'+x.war.week:'warunkowo'}</small></span></button>`).join('')}</aside><main><div class="kresectionhead"><div><span>Wydarzenie ${i+1}</span><h3>${esc(e.nazwa)}</h3></div><button class="btn g sm" onclick="kreWydUsun(${i})">Usuń</button></div>
+      <div class="kreform trzy"><label>Nazwa<input value="${esc(e.nazwa)}" onchange="kreWydPole(${i},'','nazwa',this.value,1)"></label><label>Kategoria<input value="${esc(e.kategoria)}" onchange="kreWydPole(${i},'','kategoria',this.value,1)"></label><label>Dotyczy<select onchange="kreWydPole(${i},'','party',this.value,1)"><option value="gracz" ${e.party==='gracz'?'selected':''}>partii gracza</option><option value="losowa" ${e.party==='losowa'?'selected':''}>losowej partii AI</option>${l.map(k=>`<option value="${k}" ${e.party===k?'selected':''}>${esc(krePartiaDane(k).ab)}</option>`).join('')}</select></label><label class="wide">Opis<textarea rows="4" maxlength="500" onchange="kreWydPole(${i},'','opis',this.value,1)">${esc(e.opis)}</textarea></label></div>
+      <div class="sterlab">Kiedy się uruchamia — zero oznacza dowolnie</div><div class="krenumbers cele">${num('war','term','Kadencja',50)}${num('war','week','Tydzień',24)}${num('war','odTygodnia','Od tygodnia gry',999)}${num('war','coIle','Co ile tygodni',100)}${num('war','przerwa','Przerwa po odpaleniu',100)}${num('war','minMandaty','Min. mandatów',40)}${num('war','maxMandaty','Maks. mandatów',40)}${num('war','minSlawa','Min. sława',100)}${num('war','maxKontrowersja','Maks. kontrowersja',100)}<label>Urząd<select onchange="kreWydPole(${i},'war','urzad',this.value,1)">${[['brak','bez warunku'],['premier','premier'],['prezydent','prezydent'],['opozycja','opozycja']].map(x=>`<option value="${x[0]}" ${e.war.urzad===x[0]?'selected':''}>${x[1]}</option>`).join('')}</select></label><label class="krecheckline"><input type="checkbox" ${e.war.powtarzalne?'checked':''} onchange="kreWydPole(${i},'war','powtarzalne',this.checked,1)"> Powtarzalne</label></div>
+      <div class="kresectionhead"><div><span>Odpowiedzi</span><h3>${e.opcje.length} z 4 możliwości</h3></div><button class="btn g sm" onclick="kreWydOpcjaDodaj(${i})" ${e.opcje.length>=4?'disabled':''}>+ Odpowiedź</button></div><div class="kreopcje">${e.opcje.map((o,j)=>kre4OpcjaWyd(i,j,o,l)).join('')}</div></main></div>`}</div>`;
+}
+function kre4OpcjaWyd(i,j,o,l){
+  const ef=(k,n)=>`<label>${n}<input type="number" min="-200" max="200" value="${o.efekty[k]||0}" onchange="kreWydOpcjaPole(${i},${j},'efekty','${k}',this.value,1)"></label>`,ai=(k,n)=>`<label>${n}<input type="number" min="-3" max="3" value="${o.ai[k]||0}" onchange="kreWydOpcjaPole(${i},${j},'ai','${k}',this.value,1)"></label>`;
+  return `<article><header><b>Odpowiedź ${j+1}</b><button onclick="kreWydOpcjaUsun(${i},${j})" ${j===0?'disabled':''}>×</button></header><div class="kreform"><label>Napis na przycisku<input value="${esc(o.nazwa)}" onchange="kreWydOpcjaPole(${i},${j},'','nazwa',this.value,1)"></label><label>Podpowiedź<input value="${esc(o.opis)}" onchange="kreWydOpcjaPole(${i},${j},'','opis',this.value,1)"></label></div><div class="sterlab">Skutki</div><div class="krenumbers opcja">${ef('fame','Sława')}${ef('cred','Wiarygodność')}${ef('uni','Jedność')}${ef('act','Aktywność')}${ef('ctr','Kontrowersja')}${ef('mem','Ludzie')}${ef('kapital','Kapitał')}${ef('obecnosc','Obecność')}${ef('rel','Relacja')}<label>Relacja z<select onchange="kreWydOpcjaPole(${i},${j},'efekty','relPartia',this.value,1)"><option value="">nikt</option><option value="gracz" ${o.efekty.relPartia==='gracz'?'selected':''}>gracz</option>${l.map(k=>`<option value="${k}" ${o.efekty.relPartia===k?'selected':''}>${esc(krePartiaDane(k).ab)}</option>`).join('')}</select></label></div><div class="sterlab">Przemiana po odpowiedzi</div><div class="kreform trzy"><label>Nowa nazwa partii<input value="${esc(o.efekty.nazwa||'')}" onchange="kreWydOpcjaPole(${i},${j},'efekty','nazwa',this.value,1)"></label><label>Nowy skrót<input maxlength="4" value="${esc(o.efekty.ab||'')}" onchange="kreWydOpcjaPole(${i},${j},'efekty','ab',this.value,1)"></label><label>Nowy kolor<input type="color" value="${/^#[0-9a-f]{6}$/i.test(o.efekty.c||'')?o.efekty.c:'#d9ab45'}" onchange="kreWydOpcjaPole(${i},${j},'efekty','c',this.value,1)"></label><label class="krecheckline"><input type="checkbox" ${o.efekty.zmienLidera?'checked':''} onchange="kreWydOpcjaPole(${i},${j},'efekty','zmienLidera',this.checked,1)"> Zmień lidera na najlepszego następcę</label><label>Ustawa<select onchange="kreWydOpcjaPole(${i},${j},'efekty','ustawa',this.value,1)"><option value="">bez zmiany</option>${LAWS.map(x=>`<option value="${x.id}" ${o.efekty.ustawa===x.id?'selected':''}>${esc(x.n)}</option>`).join('')}</select></label></div><div class="sterlab">Co lubi AI — od −3 do +3</div><div class="krenumbers opcja">${ai('agresja','Agresja')}${ai('ryzyko','Ryzyko')}${ai('media','Media')}${ai('prawo','Prawo')}${ai('koalicje','Koalicje')}${ai('rozwoj','Rozwój')}</div></article>`;
+}
 function kre3EdytorNowej(x){
   const pole=(lab,k,v,max=42)=>`<label>${lab}<input value="${esc(String(v||''))}" maxlength="${max}" onchange="kreNowaPole('${x.id}','${k}',this.value,1)"></label>`;
   const suw=([k,n,min,max])=>`<div class="krestat"><div><b>${n}</b><span>${x.stat[k]}</span></div><input type="range" min="${min}" max="${max}" value="${x.stat[k]}" oninput="kreNowaPole('${x.id}','stat.${k}',this.value,0);this.previousElementSibling.lastElementChild.textContent=this.value"><em>${x.stat[k]}</em></div>`;
@@ -4131,41 +4292,52 @@ function kre3EdytorNowej(x){
     <div class="krenewcols"><section><div class="sterlab">Lider</div><div class="krestatgrid">${KRE_LIDER_STAT.map(([k,n])=>`<div class="krestat"><div><b>${n}</b><span>${x.liderStat[+k]}</span></div><input type="range" min="1" max="99" value="${x.liderStat[+k]}" oninput="kreNowaPole('${x.id}','lider.${k}',this.value,0);this.previousElementSibling.lastElementChild.textContent=this.value"><em>${x.liderStat[+k]}</em></div>`).join('')}</div></section>
     <section><div class="sterlab">Kogo przyciąga</div><div class="krestatgrid">${[['eli','Elita'],['int','Intelektualiści'],['ser','Serwerowicze']].map(([k,n])=>`<div class="krestat"><div><b>${n}</b><span>${x.aff[k]}/9</span></div><input type="range" min="1" max="9" value="${x.aff[k]}" oninput="kreNowaPole('${x.id}','aff.${k}',this.value,0);this.previousElementSibling.lastElementChild.textContent=this.value+'/9'"><em>${x.aff[k]}</em></div>`).join('')}</div></section></div></div>`;
 }
+function kre3EdytorStarej(k,p,z){
+  const e=kreMeta(k),pole=(n,x,v,max=42)=>`<label>${n}<input value="${esc(String(v||''))}" maxlength="${max}" onchange="kreMetaPole('${k}','${x}',this.value,1)"></label>`;
+  return `<div class="krepartyedit" style="--pc:${p.c}"><div class="krepartyhero">${kreHerb(k,'l')}<div><span>Istniejąca partia — pełna edycja</span><h3>${esc(p.n)}</h3><small>Zmiany obowiązują tylko w tym scenariuszu.</small></div><button class="btn g sm" onclick="kreMetaReset('${k}')">Przywróć tożsamość</button></div>
+    <div class="kreform trzy">${pole('Nazwa','nazwa',e.nazwa)}${pole('Skrót','ab',e.ab,4)}<label>Kolor<input type="color" value="${e.c}" onchange="kreMetaPole('${k}','c',this.value,1)"></label>${pole('Przewodniczący','lider',e.lider)}<label class="kreupload"><input type="file" accept="image/*" onchange="kreMetaLogo(this,'${k}')"><b>${e.logo?'Zmień własny herb':'Wgraj nowy herb'}</b><span>Obowiązuje tylko w scenariuszu.</span></label></div>
+    <div class="kreform"><label class="wide">Opis partii<textarea rows="2" onchange="kreMetaPole('${k}','opis',this.value,1)">${esc(e.opis)}</textarea></label><label class="wide">Słabość<textarea rows="2" onchange="kreMetaPole('${k}','slabosc',this.value,1)">${esc(e.slabosc)}</textarea></label></div>
+    <div class="krenewcols"><section><div class="sterlab">Statystyki lidera</div><div class="krestatgrid">${KRE_LIDER_STAT.map(([x,n])=>`<div class="krestat"><div><b>${n}</b><span>${e.liderStat[+x]}</span></div><input type="range" min="1" max="99" value="${e.liderStat[+x]}" oninput="kreMetaPole('${k}','lider.${x}',this.value,0);this.previousElementSibling.lastElementChild.textContent=this.value"><em>${e.liderStat[+x]}</em></div>`).join('')}</div></section><section><div class="sterlab">Zmiana kondycji startowej</div><div class="krestatgrid">${KRE2_PARTIA.map(([x,n,min,max])=>{const v=z[x]||0,f=kre2StatFinal(k,x);return `<div class="krestat ${v?'ruszony':''}"><div><b>${n}</b><span>${Math.round(p[x]||0)} → <strong>${f}</strong></span></div><input type="range" min="${min}" max="${max}" value="${v}" oninput="krePole('${k}','${x}',this.value)"><em>${v>0?'+':''}${v}</em></div>`}).join('')}</div></section></div></div>`;
+}
 function kre3EkranPartie(){
   const k=KRE.wybrana||krePartieLista()[0],p=krePartiaDane(k),z=KRE.partie[k]||{},nowa=kreNowaZnajdz(k);
   return `<div class="krepanel krebig"><div class="kretitle"><span>02</span><div><h2>Zbuduj partie</h2><p>Możesz zmieniać istniejące ugrupowania albo stworzyć do ośmiu całkiem nowych.</p></div></div>
     <div class="kresectionhead"><div><span>Scena</span><h3>${krePartieLista().length} ugrupowań · ${KRE.nowe.length} własnych</h3></div><button class="btn" onclick="kreNowaPartia()" ${KRE.nowe.length>=8?'disabled':''}>+ Nowa partia</button></div>
     <div class="krepartie rozbudowane">${krePartieLista().map(x=>{const q=krePartiaDane(x),ile=kreIleZmian(x);return `<button class="krep ${x===k?'on':''} ${kreNowaZnajdz(x)?'nowa':''} ${ile?'ma':''}" onclick="krePartia('${x}')" style="--pc:${q.c}">${kreHerb(x,'s')}<span>${esc(q.ab)}</span>${kreNowaZnajdz(x)?'<i>+</i>':ile?`<i>${ile}</i>`:''}</button>`}).join('')}</div>
-    ${nowa?kre3EdytorNowej(nowa):`<div class="krepartyedit" style="--pc:${p.c}"><div class="krepartyhero">${kreHerb(k,'l')}<div><span>Istniejąca partia</span><h3>${esc(p.n)}</h3><small>Tu zmieniasz jej start w tym scenariuszu. Nazwy i lidera nie ruszamy.</small></div><button class="btn g sm" onclick="kreWyczysc('${k}')" ${!kreIleZmian(k)?'disabled':''}>Wyczyść zmiany</button></div><div class="sterlab">Zmiana względem stanu zwykłej gry</div><div class="krestatgrid">${KRE2_PARTIA.map(([pole,opis,min,max])=>{const v=z[pole]||0,f=kre2StatFinal(k,pole);return `<div class="krestat ${v?'ruszony':''}"><div><b>${opis}</b><span>${Math.round(p[pole]||0)} → <strong>${f}</strong></span></div><input type="range" min="${min}" max="${max}" value="${v}" oninput="krePole('${k}','${pole}',this.value)"><em>${v>0?'+':''}${v}</em></div>`}).join('')}</div></div>`}
+    ${nowa?kre3EdytorNowej(nowa):kre3EdytorStarej(k,p,z)}
     <div class="kresectionhead"><div><span>Cała scena</span><h3>Globalny kryzys albo prosperity</h3></div></div><div class="krepresets"><button onclick="krePreset('reset')"><b>Bez zmian</b><span>stan zwykłej gry</span></button><button onclick="krePreset('spokoj')"><b>Krucha zgoda</b><span>więcej jedności</span></button><button onclick="krePreset('kryzys')"><b>Katastrofa</b><span>mniej ludzi i zaufania</span></button><button onclick="krePreset('wrzenie')"><b>Wrzenie</b><span>aktywność i skandale</span></button></div><div class="kresuwaki">${KRE2_POLA.map(kre2SuwakEf).join('')}</div></div>`;
 }
 function kre3EkranCele(){
   const i=Math.max(0,Math.min(KRE.celWybrany||0,KRE.cele.length-1)),c=KRE.cele[i],partie=krePartieLista();
   const num=(g,k,n,max=999)=>`<label>${n}<input type="number" min="0" max="${max}" value="${c?c[g][k]||0:0}" onchange="kreCelPole(${i},'${g}','${k}',this.value,1)"></label>`;
-  return `<div class="krepanel krebig"><div class="kretitle"><span>04</span><div><h2>Napisz własne cele</h2><p>Cel ma warunki, nagrody i może po ukończeniu przemianować partię.</p></div></div><div class="kresectionhead"><div><span>Dziennik</span><h3>${KRE.cele.length} z 12 celów</h3></div><button class="btn" onclick="kreCelDodaj()" ${KRE.cele.length>=12?'disabled':''}>+ Nowy cel</button></div>
+  return `<div class="krepanel krebig"><div class="kretitle"><span>07</span><div><h2>Napisz własne cele</h2><p>Cel ma warunki, nagrody i może po ukończeniu przemianować partię.</p></div></div><div class="kresectionhead"><div><span>Dziennik</span><h3>${KRE.cele.length} z 12 celów</h3></div><button class="btn" onclick="kreCelDodaj()" ${KRE.cele.length>=12?'disabled':''}>+ Nowy cel</button></div>
     ${KRE.cele.length?`<div class="kregoals"><aside>${KRE.cele.map((x,j)=>`<button class="${j===i?'on':''}" onclick="kreCelWybierz(${j})"><b>${esc(x.nazwa)}</b><span>${esc(krePartiaDane(x.party).ab)}</span></button>`).join('')}</aside><main><div class="kresectionhead"><div><span>Edytujesz</span><h3>${esc(c.nazwa)}</h3></div><button class="btn g sm" onclick="kreCelUsun(${i})">Usuń cel</button></div>
       <div class="kreform trzy"><label>Nazwa celu<input maxlength="70" value="${esc(c.nazwa)}" onchange="kreCelPole(${i},'','nazwa',this.value,1)"></label><label>Partia<select onchange="kreCelPole(${i},'','party',this.value,1)">${partie.map(k=>`<option value="${k}" ${c.party===k?'selected':''}>${esc(krePartiaDane(k).n)}</option>`).join('')}</select></label><label class="wide">Opis<textarea rows="3" maxlength="300" onchange="kreCelPole(${i},'','opis',this.value,1)">${esc(c.opis)}</textarea></label></div>
       <div class="sterlab">Warunki — zero oznacza brak warunku</div><div class="krenumbers cele">${num('war','mem','Liczba ludzi',300)}${num('war','seats','Mandaty',40)}${num('war','fame','Sława',100)}${num('war','cred','Wiarygodność',100)}${num('war','uni','Jedność',100)}${num('war','act','Aktywność',100)}${num('war','ctrMax','Maks. kontrowersja',100)}${num('war','term','Kadencja',50)}${num('war','kp','Kapitał',5000)}${num('war','poll','Sondaż %',100)}<label>Urząd<select onchange="kreCelPole(${i},'war','urzad',this.value,1)">${[['brak','bez warunku'],['premier','premier'],['prezydent','prezydent'],['dowolny','premier lub prezydent']].map(x=>`<option value="${x[0]}" ${c.war.urzad===x[0]?'selected':''}>${x[1]}</option>`).join('')}</select></label></div>
       <div class="sterlab">Nagrody</div><div class="krenumbers cele">${num('nagroda','fame','Sława',100)}${num('nagroda','cred','Wiarygodność',100)}${num('nagroda','uni','Jedność',100)}${num('nagroda','act','Aktywność',100)}${num('nagroda','kp','Kapitał',5000)}${num('nagroda','mem','Nowi ludzie',200)}${num('nagroda','ap','Akcje / tydzień',5)}</div><div class="kreform trzy"><label>Nowa nazwa po celu<input value="${esc(c.nagroda.nazwa)}" onchange="kreCelPole(${i},'nagroda','nazwa',this.value,1)"></label><label>Nowy skrót<input maxlength="4" value="${esc(c.nagroda.ab)}" onchange="kreCelPole(${i},'nagroda','ab',this.value,1)"></label><label>Nowy kolor<input type="color" value="${/^#[0-9a-f]{6}$/i.test(c.nagroda.c||'')?c.nagroda.c:'#d9ab45'}" onchange="kreCelPole(${i},'nagroda','c',this.value,1)"></label></div></main></div>`:`<div class="kreempty"><b>Brak własnych celów</b><span>Dodaj cel, wybierz partię, ustaw warunki i zdecyduj, co dostanie po ukończeniu.</span><button class="btn" onclick="kreCelDodaj()">Tworzę pierwszy cel</button></div>`}</div>`;
 }
 function kre3EkranWladza(){
-  const rm=kre2RzadMandaty(),lista=krePartieLista(),n=k=>krePartiaDane(k);
-  return `<div class="krepanel krebig"><div class="kretitle"><span>05</span><div><h2>Rozstaw władzę i zasady</h2><p>Nowa partia może od razu dostać premiera, prezydenta albo miejsce w koalicji.</p></div></div>
+  const rm=kre2RzadMandaty(),lista=krePartieLista(),n=k=>krePartiaDane(k),k=KRE.wybrana||lista[0];
+  return `<div class="krepanel krebig"><div class="kretitle"><span>08</span><div><h2>Ustaw władzę, gospodarkę i media</h2><p>Nowa partia może dostać urząd, własne wydawnictwa, pieniądze i obowiązujące prawo.</p></div></div>
     <div class="kresectionhead"><div><span>Rząd</span><h3>Kto zaczyna w gabinecie?</h3></div>${KRE.rzadTryb==='wlasny'?`<div class="krequorum ${rm>=MAJ?'good':'bad'}">${rm} / ${MAJ} do większości</div>`:''}</div>
     <div class="krechoices trzy"><button class="${KRE.rzadTryb==='zastany'?'on':''}" onclick="kreRzadTryb('zastany')"><b>Rząd zastany</b><span>układ z normalnej gry</span></button><button class="${KRE.rzadTryb==='brak'?'on':''}" onclick="kreRzadTryb('brak')"><b>Bez rządu</b><span>walka rusza od zera</span></button><button class="${KRE.rzadTryb==='wlasny'?'on':''}" onclick="kreRzadTryb('wlasny')"><b>Własny gabinet</b><span>wybierasz cały skład</span></button></div>
     ${KRE.rzadTryb==='wlasny'?`<div class="kregovbox"><div class="krepartie rozbudowane">${lista.map(k=>`<button class="krep ${KRE.rzadPartie.includes(k)?'on':''}" onclick="kreRzadTog('${k}')" ${!KRE.mandaty[k]?'disabled':''} style="--pc:${n(k).c}">${kreHerb(k,'s')}<span>${esc(n(k).ab)}</span><i>${KRE.mandaty[k]||0}</i></button>`).join('')}</div><label class="kreselect">Partia premiera<select onchange="krePremier(this.value)">${KRE.rzadPartie.map(k=>`<option value="${k}" ${KRE.premier===k?'selected':''}>${esc(n(k).n)} (${esc(n(k).ab)})</option>`).join('')}</select></label></div>`:''}
     <div class="kresectionhead"><div><span>Pałac</span><h3>Kto jest prezydentem?</h3></div></div><div class="krechoices trzy"><button class="${KRE.prezTryb==='zastany'?'on':''}" onclick="krePrezydentTryb('zastany')"><b>Stan zastany</b><span>Śledzik pozostaje w pałacu</span></button><button class="${KRE.prezTryb==='brak'?'on':''}" onclick="krePrezydentTryb('brak')"><b>Wakat</b><span>nikt nie wetuje</span></button><button class="${KRE.prezTryb==='partia'?'on':''}" onclick="krePrezydentTryb('partia')"><b>Wskaż partię</b><span>jej lider obejmuje urząd</span></button></div>
     ${KRE.prezTryb==='partia'?`<div class="krepartie prez rozbudowane">${lista.map(k=>`<button class="krep ${KRE.prezydent===k?'on':''}" onclick="krePrezydent('${k}')" style="--pc:${n(k).c}">${kreHerb(k,'s')}<span>${esc(n(k).ab)}</span></button>`).join('')}</div>`:''}
     <div class="kresectionhead"><div><span>Relacje</span><h3>Temperatura całej sceny</h3></div></div><div class="krechoices cztery">${[['zastane','Zastane','historyczne układy'],['zgoda','Odprężenie','wszyscy +32'],['napiecie','Napięcie','wszyscy −10'],['wojna','Wojna','wszyscy −34']].map(x=>`<button class="${KRE.relacje===x[0]?'on':''}" onclick="kreRelacje('${x[0]}')"><b>${x[1]}</b><span>${x[2]}</span></button>`).join('')}</div>
-    <div class="kresectionhead"><div><span>Reguły</span><h3>Tempo rozgrywki</h3></div></div><div class="kresuwaki">${KRE2_OGOLNE.map(kre2SuwakEf).join('')}</div></div>`;
+    <div class="kresectionhead"><div><span>Reguły</span><h3>Tempo rozgrywki</h3></div></div><div class="kresuwaki">${KRE2_OGOLNE.map(kre2SuwakEf).join('')}</div>
+    <div class="kresectionhead"><div><span>Gospodarka</span><h3>Majątek oraz kasa każdej partii</h3></div></div><div class="kresuwaki"><div class="kresuwak"><div><b>Prywatne majątki całego serwera</b><span>100% to stan zwykłej gry</span></div><input type="range" min="10" max="500" value="${KRE.swiat.majatekMnoznik}" oninput="this.nextElementSibling.textContent=this.value+'%'" onchange="kreSwiatPole('','majatekMnoznik',this.value)"><strong class="m">${KRE.swiat.majatekMnoznik}%</strong></div></div>
+    <div class="krepartie rozbudowane">${lista.map(x=>`<button class="krep ${x===k?'on':''}" onclick="krePartia('${x}')" style="--pc:${n(x).c}">${kreHerb(x,'s')}<span>${esc(n(x).ab)}</span></button>`).join('')}</div><div class="kreswiatparty" style="--pc:${n(k).c}">${kreHerb(k,'l')}<div><b>${esc(n(k).n)}</b><span>Startowa kasa i własne media</span></div><label>Kapitał partii<input type="number" min="-500" max="5000" value="${KRE.swiat.bank[k]||0}" onchange="kreSwiatPole('bank','${k}',this.value)"></label><label>Wydawnictwa<select onchange="kreSwiatPole('media','${k}',this.value)">${[0,1,2,3].map(x=>`<option value="${x}" ${(KRE.swiat.media[k]||0)===x?'selected':''}>${x===0?'brak':x===1?'gazeta':x===2?'gazeta + telewizja':'gazeta + telewizja + kino'}</option>`).join('')}</select></label></div>
+    <div class="sterlab" style="margin-top:14px">Obecność ${esc(n(k).ab)} w okręgach na starcie</div><div class="kreokregstart">${REG.map(r=>{const v=KRE.swiat.obecnosc[k]?.[r.id]??15;return `<label><span><b>${esc(r.n)}</b><em>${v}/100</em></span><input type="range" min="0" max="100" value="${v}" oninput="this.previousElementSibling.lastElementChild.textContent=this.value+'/100';kreObecnosc('${k}','${r.id}',this.value,0)" onchange="kreObecnosc('${k}','${r.id}',this.value,1)"></label>`}).join('')}</div>
+    <div class="kresectionhead"><div><span>Prawo na starcie</span><h3>Ustawy już obowiązujące</h3></div></div><div class="krelaws">${LAWS.map(x=>`<button class="${KRE.swiat.ustawy.includes(x.id)?'on':''}" onclick="kreSwiatPole('ustawy','${x.id}',1)"><b>${esc(x.n)}</b><span>${KRE.swiat.ustawy.includes(x.id)?'obowiązuje':'nie obowiązuje'}</span></button>`).join('')}</div></div>`;
 }
 function kre3EkranFinal(){
   const wal=kre2Walidacja(),blok=wal.filter(x=>x.blok),n=k=>krePartiaDane(k);
   const rzad=KRE.rzadTryb==='brak'?'brak rządu':KRE.rzadTryb==='zastany'?'rząd zastany':KRE.rzadPartie.map(k=>n(k).ab).join(' · ');
   const prez=KRE.prezTryb==='brak'?'wakat':KRE.prezTryb==='zastany'?'Śledzik (KK)':`${n(KRE.prezydent).n} — ${n(KRE.prezydent).ab}`;
-  return `<div class="krepanel krebig"><div class="kretitle"><span>06</span><div><h2>Ostatnia kontrola</h2><p>Pełny świat, nie paczka suwaków: partie, ludzie, Sejm, cele i władza.</p></div></div>
+  return `<div class="krepanel krebig"><div class="kretitle"><span>09</span><div><h2>Ostatnia kontrola</h2><p>Pełny świat: partie, AI, wydarzenia, Sejm, cele, gospodarka i władza.</p></div></div>
     <div class="krefinalhero ${blok.length?'bad':'good'}"><div><span>${blok.length?'Scenariusz wymaga poprawki':'Scenariusz gotowy do gry'}</span><h2>${esc(KRE.nazwa)||'Bez nazwy'}</h2><p>${esc(KRE.opis)||'Brak opisu.'}</p></div><strong>${esc(KRE.trudnosc)}</strong></div>
-    <div class="krefinalstats"><div><b>${krePartieLista().length}</b><span>partii</span></div><div><b>${KRE.nowe.length}</b><span>nowych szyldów</span></div><div><b>${KRE.cele.length}</b><span>własnych celów</span></div><div><b>${kre2SumaMandatow()}</b><span>mandatów</span></div></div>
+    <div class="krefinalstats"><div><b>${krePartieLista().length}</b><span>partii</span></div><div><b>${KRE.wydarzenia.length}</b><span>wydarzeń</span></div><div><b>${KRE.cele.length}</b><span>własnych celów</span></div><div><b>${kre2SumaMandatow()}</b><span>mandatów</span></div></div>
     <div class="krefinalgrid"><section><div class="sterlab">Sejm</div>${kre2SeatBar()}<div class="krefinalseats">${krePartieLista().filter(k=>KRE.mandaty[k]).sort((a,b)=>KRE.mandaty[b]-KRE.mandaty[a]).map(k=>`<div>${kreHerb(k,'s')}<span>${esc(n(k).ab)}</span><b>${KRE.mandaty[k]}</b></div>`).join('')}</div></section><section><div class="sterlab">Władza</div><dl class="krefacts"><div><dt>Rząd</dt><dd>${esc(rzad)}</dd></div><div><dt>Prezydent</dt><dd>${esc(prez)}</dd></div><div><dt>Relacje</dt><dd>${esc(KRE.relacje)}</dd></div><div><dt>Kadencja</dt><dd>${KRE.ef.tygodni} tygodni · ${3+KRE.ef.akcje} akcji</dd></div></dl></section></div>
     ${KRE.nowe.length?`<div class="krefinalblock"><div class="sterlab">Nowe partie</div><div class="krefinalpartie">${KRE.nowe.map(x=>`<div>${kreHerb(x.id,'m')}<span><b>${esc(x.nazwa)}</b><small>${esc(x.lider)} · ${x.comp.eli+x.comp.int+x.comp.ser} osób · ${KRE.mandaty[x.id]||0} mandatów</small></span></div>`).join('')}</div></div>`:''}
     ${KRE.cele.length?`<div class="krefinalblock"><div class="sterlab">Własne cele</div>${KRE.cele.map(x=>`<p><b>${esc(n(x.party).ab)}</b> · ${esc(x.nazwa)}</p>`).join('')}</div>`:''}
@@ -4186,13 +4358,13 @@ function kre2EkranFinal(){
 
 function kre2Sidebar(){
   const wal=kre2Walidacja(),blok=wal.filter(x=>x.blok),zm=KRE2_POLA.concat(KRE2_OGOLNE).filter(([k,,,,d])=>KRE.ef[k]!==d).length+
-    Object.keys(KRE.partie).reduce((a,k)=>a+kreIleZmian(k),0)+KRE.nowe.length+KRE.cele.length+(KRE.mandatyZm?1:0)+(KRE.rzadTryb!=='zastany'?1:0)+(KRE.prezTryb!=='zastany'?1:0)+(KRE.relacje!=='zastane'?1:0);
+    Object.keys(KRE.partie).reduce((a,k)=>a+kreIleZmian(k),0)+KRE.nowe.length+KRE.cele.length+KRE.wydarzenia.length+Object.keys(KRE.edycje).length+Object.keys(KRE.ai).length+Object.keys(KRE.swiat.relacje).length+(KRE.mandatyZm?1:0)+(KRE.rzadTryb!=='zastany'?1:0)+(KRE.prezTryb!=='zastany'?1:0)+(KRE.relacje!=='zastane'?1:0);
   return `<aside class="kreprawa"><div class="kreside"><div class="kresideprog"><i style="width:${(KRE.krok+1)/KRE2_KROKI.length*100}%"></i></div><span class="kresideeyebrow">Krok ${KRE.krok+1} z ${KRE2_KROKI.length}</span><h3 class="kreside-name">${esc(KRE.nazwa)||'Nowy scenariusz'}</h3><p class="kreside-desc">${esc(KRE.opis)||KRE2_KROKI[KRE.krok][1]}</p><div class="kresidemeta"><span>${esc(KRE.trudnosc)}</span><span>${kre2SumaMandatow()}/${TOTAL_SEATS} mandatów</span><span>${zm} zmian</span></div>${kre2SeatBar()}${wal.length?`<div class="kresidewarn ${blok.length?'bad':''}"><b>${blok.length?blok.length+' błędy blokujące':wal.length+' uwagi'}</b><span>${esc((blok[0]||wal[0]).t)}</span></div>`:`<div class="kresidewarn good"><b>Wszystko się zgadza</b><span>Scenariusz przechodzi kontrolę.</span></div>`}<div class="kresidenav">${KRE.krok>0?`<button class="btn g" onclick="kreDalej(-1)">← Wstecz</button>`:''}${KRE.krok<KRE2_KROKI.length-1?`<button class="btn" onclick="kreDalej(1)">Dalej: ${KRE2_KROKI[KRE.krok+1][0]} →</button>`:`<button class="btn" onclick="kreatorProbuj()" ${blok.length?'disabled':''}>Zagraj próbnie</button><button class="btn g" onclick="kreatorZapisz()" ${blok.length?'disabled':''}>Zapisz na listę</button><button class="btn g" onclick="kreatorDoPliku()" ${blok.length?'disabled':''}>Zapisz plik .mmscen</button>`}</div><button class="kreodrzuc" onclick="kreWyjdz()">Odrzuć projekt</button></div></aside>`;
 }
 
 function kreatorEkran(){
-  const ekran=[kre2EkranOpis,kre3EkranPartie,kre3EkranSejm,kre3EkranCele,kre3EkranWladza,kre3EkranFinal][KRE.krok]();
-  app.innerHTML=`<div class="kreekran"><header class="krehead"><div><div class="kick">Kreator scenariuszy</div><h1>Reżyseria nowego świata</h1><p>Sześć kroków. Tworzysz partie, liderów, skład Sejmu, cele i cały układ władzy.</p></div><button class="btn g sm" onclick="kreWyjdz()">← Lista scenariuszy</button></header>${kre2Stepper()}<div class="krebody"><main class="krelewa">${ekran}</main>${kre2Sidebar()}</div></div>`;
+  const ekran=[kre2EkranOpis,kre3EkranPartie,kre3EkranSejm,kre4EkranRelacje,kre4EkranAI,kre4EkranWydarzenia,kre3EkranCele,kre3EkranWladza,kre3EkranFinal][KRE.krok]();
+  app.innerHTML=`<div class="kreekran"><header class="krehead"><div><div class="kick">Kreator kampanii</div><h1>Reżyseria żywego świata</h1><p>Dziewięć etapów: partie, liderzy, Sejm, relacje, AI, wydarzenia, cele, gospodarka i władza.</p></div><button class="btn g sm" onclick="kreWyjdz()">← Lista scenariuszy</button></header>${kre2Stepper()}<div class="krebody"><main class="krelewa">${ekran}</main>${kre2Sidebar()}</div></div>`;
   ['#kn','#ka','#ko'].forEach(s=>{const e=document.querySelector(s);if(e)e.oninput=()=>{kreCzytaj();kreOdswiezPodglad()}});
 }
 function kreCzytaj(){
@@ -4211,9 +4383,13 @@ function kre2Blokuje(){
 function kreatorDane(){
   const zmiany=[],mod={nazwa:KRE.nazwa.trim(),opis:KRE.opis.trim()||'Scenariusz z kreatora.',
     trudnosc:KRE.trudnosc||'Standard',autor:KRE.autor.trim(),efekty:{wszystkie:{},partie:{}},
-    partieNowe:JSON.parse(JSON.stringify(KRE.nowe)),cele:JSON.parse(JSON.stringify(KRE.cele))};
+    partieNowe:JSON.parse(JSON.stringify(KRE.nowe)),cele:JSON.parse(JSON.stringify(KRE.cele)),
+    edycje:JSON.parse(JSON.stringify(KRE.edycje)),ai:JSON.parse(JSON.stringify(KRE.ai)),
+    wydarzenia:JSON.parse(JSON.stringify(KRE.wydarzenia)),swiat:JSON.parse(JSON.stringify(KRE.swiat))};
   if(KRE.nowe.length)zmiany.push(`${KRE.nowe.length} ${pl(KRE.nowe.length,'nowa partia','nowe partie','nowych partii')}`);
   if(KRE.cele.length)zmiany.push(`${KRE.cele.length} ${pl(KRE.cele.length,'własny cel','własne cele','własnych celów')}`);
+  if(KRE.wydarzenia.length)zmiany.push(`${KRE.wydarzenia.length} ${pl(KRE.wydarzenia.length,'wydarzenie','wydarzenia','wydarzeń')}`);
+  if(Object.keys(KRE.edycje).length)zmiany.push(`${Object.keys(KRE.edycje).length} edytowanych partii`);
   KRE2_POLA.forEach(([k,opis,,,dom])=>{if(KRE.ef[k]!==dom){mod.efekty.wszystkie[k]=KRE.ef[k];zmiany.push(`${opis}: ${KRE.ef[k]>0?'+':''}${KRE.ef[k]}`)}});
   KRE2_OGOLNE.forEach(([k,opis,,,dom])=>{if(KRE.ef[k]!==dom){mod.efekty[k]=KRE.ef[k];zmiany.push(`${opis}: ${KRE.ef[k]>0?'+':''}${KRE.ef[k]}`)}});
   Object.keys(KRE.partie).forEach(k=>{if(kreIleZmian(k)){mod.efekty.partie[k]=Object.assign({},KRE.partie[k]);zmiany.push(kre2OpisPartii(k))}});
@@ -4232,7 +4408,8 @@ function kreatorDane(){
 function kreatorProbuj(){
   if(kre2Blokuje())return;const dane=kreatorDane(),id='kreator-proba';
   SCEN[id]={n:dane.nazwa,t:dane.trudnosc,d:dane.opis,mod:dane.zmiany,zModa:true,autor:dane.autor,
-    efekty:dane.efekty,partieNowe:dane.partieNowe,cele:dane.cele,apply(){modEfekty(dane.efekty)}};
+    efekty:dane.efekty,partieNowe:dane.partieNowe,cele:dane.cele,edycje:dane.edycje,ai:dane.ai,wydarzenia:dane.wydarzenia,swiat:dane.swiat,
+    apply(){modEfekty(dane.efekty);scenRuntimeStart(dane)}};
   SCENSEL=id;KRE=null;G=null;MENU=false;MODE='free';scenPartieAktywuj(id);render();
 }
 async function kreatorDoPliku(){
@@ -4949,7 +5126,7 @@ const TESTERZY=['Aryati','loof'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.83';
+let WERSJA='1.1.84';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4960,6 +5137,12 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.84':{data:'7 sierpnia 2026', zmiany:[
+  'AI 2.0 NADAJE PARTIOM PRAWDZIWE CHARAKTERY. Agresor, technokrata, populista, koalicjant, organizator i oportunista inaczej planuja, buduja media, skladaja ustawy i dobieraja sojusze.',
+  'KREATOR WYDARZEN POZWALA REZYSEROWAC CALA KAMPANIE. Ustawisz wyzwalacze, warunki, odpowiedzi gracza i AI, skutki polityczne, zmiany liderow oraz aktywowanie ustaw.',
+  'KREATOR SCENARIUSZY MA DZIEWIEC ETAPOW. Doszly relacje, profile AI, gospodarka, media, obecnosc w okregach, ustawy startowe i pelna kontrola nad swiatem.',
+  'ISTNIEJACE PARTIE MOZNA PRZEBUDOWAC OD PODSTAW. Zmienisz nazwe, skrot, kolor, herb, opis, lidera i jego statystyki bez psucia zwyklej gry.',
+ ]},
  '1.1.83':{data:'7 sierpnia 2026', zmiany:[
   'KREATOR SCENARIUSZY TWORZY TERAZ CALE UGRUPOWANIA. Ustawisz nazwe, skrot, kolor, herb, lidera, zaplecze, sklad ludzi, statystyki i sympatie grup.',
   'NOWE PARTIE NAPRAWDE WCHODZA DO GRY. Dostaja mandaty, moga prowadzic rzad, objac prezydentury i zostaja zachowane w pliku scenariusza oraz zapisie rozgrywki.',
@@ -6320,12 +6503,13 @@ function aiMedia(k){
   const p=G.p[k]; if(!p||p.dead)return;
   const szef=p.lead, moje=G.aiMedia[k], teraz=absWeek();
   moje.forEach((m,i)=>{if(!m.nazwa||/[📰📺🎬]$/.test(m.nazwa))m.nazwa=aiNazwaMedia(k,m.typ,i)});
-  if(G.aiMediaPlan[k]===undefined)G.aiMediaPlan[k]=teraz+RI(0,2);
+  const profil=aiProfil(k),limit=profil.media>.78?3:profil.media>.42?2:1;
+  if(G.aiMediaPlan[k]===undefined)G.aiMediaPlan[k]=teraz+RI(0,Math.max(1,Math.round(3-profil.media*2)));
 
   /* Bot zawsze zaczyna od gazety, a droższe formaty dokłada dopiero później.
      Losowa szansa zakupu sprawiała, że część partii przez całe kadencje nie robiła
      nic; plan tygodniowy jest widoczny, przewidywalny i nadal zależy od pieniędzy. */
-  if(moje.length<3&&teraz>=G.aiMediaPlan[k]){
+  if(moje.length<limit&&teraz>=G.aiMediaPlan[k]){
     const maj=kapPryw(szef);
     const kolejnosc=['gazeta','tv','kino'];
     const chce=kolejnosc.find(t=>!moje.some(m=>m.typ===t)&&maj>=MEDIA_TYP[t].koszt*1.18);
@@ -6335,7 +6519,7 @@ function aiMedia(k){
       const nazwa=aiNazwaMedia(k,chce,moje.length);
       moje.push({typ:chce,nazwa,szef,bilans:0,staz:0,serca:0,numery:0,
                  ostatnio:0,ostatnieWyd:-99});
-      G.aiMediaPlan[k]=teraz+RI(4,7);
+      G.aiMediaPlan[k]=teraz+RI(Math.max(2,Math.round(7-profil.media*4)),Math.max(3,Math.round(9-profil.media*4)));
       say(`<b>${p.ab} zakłada ${nazwa}.</b> ${szef} wyłożył ${kasaSkrot(koszt)}.`,'');
     }else G.aiMediaPlan[k]=teraz+2;
   }
@@ -9591,8 +9775,8 @@ function aiProposeLaw(){
   if(G.aiLawNext&&teraz<G.aiLawNext)return;
   /* Losowa szansa potrafiła nie wypalić przez całą kadencję. Teraz inicjatywa
      ma czytelny rytm: rząd co dwa tygodnie, minister lub opozycja co trzy. */
-  const wybor=zglaszajacy.sort((a,b)=>b.rola-a.rola||G.p[b.k].seats-G.p[a.k].seats)[0];
-  G.aiLawNext=teraz+wybor.co;
+  const wybor=zglaszajacy.sort((a,b)=>(b.rola*(.55+aiProfil(b.k).prawo))-(a.rola*(.55+aiProfil(a.k).prawo))||G.p[b.k].seats-G.p[a.k].seats)[0];
+  G.aiLawNext=teraz+Math.max(1,Math.round(wybor.co+1-aiProfil(wybor.k).prawo*2));
   const pm=wybor.k, mozliwe=wybor.pula;
   // Składa to, co jemu się opłaca: partia serwerowicka ciśnie rozrywkę,
   // elitarna ekonomię, a ktoś ledwo nad progiem próbuje ruszyć ordynację.
@@ -11018,9 +11202,10 @@ function aiCoal(){
     const mojProc=proc(anchor);
     // im bliżej progu, tym mocniej partia szuka koła ratunkowego
     const zagrozenie=cl((THR.base+2-mojProc)/4,0,1);
-    if(!ch(cl(.22+zagrozenie*.62,.08,.9)))return;
+    const profil=aiProfil(anchor);
+    if(!ch(cl(.08+profil.koalicje*.42+zagrozenie*.58,.05,.96)))return;
 
-    const kand=rank.filter(k=>k!==anchor&&!used.has(k)&&G.rel[k][anchor]>=20&&G.rel[anchor][k]>=20&&ideo(k,anchor)<8)
+    const pam=aiPamiec(anchor),kand=rank.filter(k=>k!==anchor&&!used.has(k)&&G.rel[k][anchor]>=20&&G.rel[anchor][k]>=20&&ideo(k,anchor)<8&&(pam.zdrady[k]||0)<2)
       .map(k=>({k,w:proc(k)*1.4+G.rel[k][anchor]/8}))
       .sort((a,b)=>b.w-a.w);
     if(!kand.length)return;
@@ -12204,7 +12389,7 @@ function b64d(s){try{
   return new TextDecoder().decode(b)}catch(e){return ''}}
 const ZAPIS_WERSJA=2;
 function saveCode(){
-  const snap={v:ZAPIS_WERSJA,gra:WERSJA,G,CUSTOM,SCEN_PARTIES:SCEN_PARTY_DEFS,SCEN_GOALS:SCEN_GOAL_DEFS,
+  const snap={v:ZAPIS_WERSJA,gra:WERSJA,G,CUSTOM,SCEN_PARTIES:SCEN_PARTY_DEFS,SCEN_GOALS:SCEN_GOAL_DEFS,SCEN_EDITS:SCEN_EDIT_DEFS,
     REG:REG.map(r=>({id:r.id,n:r.n,pop:r.pop,eng:r.eng,seats:r.seats,x:r.x,y:r.y,mix:r.mix,d:r.d})),
     LUP:G.lup,LEADX:Object.fromEntries(Object.keys(LEAD).filter(n=>!AVA[n]).map(n=>[n,LEAD[n]]))};
   return 'MM'+b64e(JSON.stringify(snap));
@@ -12238,7 +12423,7 @@ function loadCode(code){
   REG.length=0;s.REG.forEach(r=>REG.push(r));
   DIST_SEATS=REG.reduce((a,r)=>a+r.seats,0);
   Object.assign(LEAD,s.LEADX||{});
-  scenPartieAktywuj((s.G&&s.G.scen)||'zapis',s.SCEN_PARTIES||[],s.SCEN_GOALS||[]);
+  scenPartieAktywuj((s.G&&s.G.scen)||'zapis',s.SCEN_PARTIES||[],s.SCEN_GOALS||[],s.SCEN_EDITS||{});
   if(s.CUSTOM&&s.CUSTOM.id)registerCustom(s.CUSTOM);
   G=s.G;
   // partie dodane po powstaniu zapisu dolaczaja z wartosciami startowymi
@@ -12368,7 +12553,9 @@ Object.assign(window,{radykalowie,iskra,waznePozycje,waznePasek,modyfikatory,pod
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;MENU=true;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 Object.assign(window,{kreMandat,kreResetMandaty,krePreset,kreRzadTryb,kreRzadTog,krePremier,
   krePrezydentTryb,krePrezydent,kreRelacje,kreKrok,kreDalej,kreatorDoPliku,kreatorProbuj,
-  kreNowaPartia,kreUsunPartie,kreNowaPole,kreNowaLogo,kreCelDodaj,kreCelUsun,kreCelWybierz,kreCelPole});
+  kreNowaPartia,kreUsunPartie,kreNowaPole,kreNowaLogo,kreCelDodaj,kreCelUsun,kreCelWybierz,kreCelPole,
+  kreMetaPole,kreMetaReset,kreMetaLogo,kreAiPole,kreRelUstaw,kreRelUsun,kreSwiatPole,kreObecnosc,
+  kreWydDodaj,kreWydWybierz,kreWydUsun,kreWydPole,kreWydOpcjaDodaj,kreWydOpcjaUsun,kreWydOpcjaPole});
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
   get KRE(){return KRE}, SCEN, kreatorDane,
   myGoals,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,
@@ -12388,10 +12575,11 @@ window.__game={przewidz,podglad,get PROBA(){return PROBA},
   LAWS,lawVote,proposeLaw,signLaw,odrzucenieWeta,PROG_WETO,applyLaw,lawDone,lawIntake,lawsPending,lawsToSign,startLaw,
   LAWPAR,lawEdytowalna,lawParams,radykalnosc,aiProposeLaw,openEdycja,rozstrzygnijUstawe,
   nastrojSejmu,bylWBloku,doLobby,rysujOkno,
-  CHAR,charOf,aiWagi,aiLos,aiOkreg,aiCel,ai,POSTERS,aiCoal,aiGoals,aiAgents,campInit,aiPrzemiana,obsadz,openResort,partiaOsoby,premierTab,prezydentTab,TOTAL_SEATS_LIVE,
+  CHAR,AI_STYLE,charOf,aiProfil,aiWagi,aiLos,aiOkreg,aiCel,ai,POSTERS,aiCoal,aiGoals,aiAgents,campInit,aiPrzemiana,obsadz,openResort,partiaOsoby,premierTab,prezydentTab,TOTAL_SEATS_LIVE,
   openCamp,campBar,campRank,runFinalCamp,closeFinalCamp,
   get G(){return G}, setRender(f){render=f}, setModal(f){modal=f},
-  MODY:()=>MODY, ustawMody:v=>{MODY=Array.isArray(v)?v:[]}, wczytajMody, modEfekty, modyDoScen};
+  MODY:()=>MODY, ustawMody:v=>{MODY=Array.isArray(v)?v:[]}, wczytajMody, modEfekty, modyDoScen,
+  scenRuntimeStart,scenWydarzeniaTydzien,scenEventWybierz};
 render();
 /* Mody dociągamy po pierwszym rysowaniu: most do Pythona wstaje chwilę po stronie,
    a ekran wyboru scenariusza i tak przerysuje się, gdy lista dojdzie. */
