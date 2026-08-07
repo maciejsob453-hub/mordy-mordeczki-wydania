@@ -2602,3 +2602,93 @@ body{font-size:15px}
 .mapwrap>.card{grid-column:1}
 .mapwrap>.card.okr{grid-column:2}
 .hexsvg{min-height:clamp(420px,52vh,760px)}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   KREATOR SCENARIUSZY V2 — pięć czytelnych etapów zamiast ściany suwaków.
+   Każdy wybór jest ciemną płytką, złoto zostaje dla aktualnego kroku i głównej
+   akcji. Dzięki temu kreator pasuje do menu, ale nie świeci jak automat.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.kreekran{max-width:min(1660px,96vw);padding:22px 0 64px}
+.krehead{margin-bottom:16px;padding:0 2px 18px;align-items:center}
+.krehead h1{font-size:38px;margin:5px 0 2px;letter-spacing:.01em}
+.krehead p{font-size:13px;color:var(--dim);margin:0}
+.kresteps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-bottom:16px}
+.krestep{min-height:64px;display:flex;align-items:center;gap:10px;padding:8px 12px;text-align:left;
+  color:var(--dim);background:linear-gradient(180deg,rgba(24,38,31,.96),rgba(7,16,13,.98));
+  border:1px solid #33463c;position:relative;overflow:hidden}
+.krestep::after{content:'';position:absolute;left:0;right:100%;bottom:0;height:3px;background:var(--acc);transition:right .2s}
+.krestep:hover{color:var(--tx);border-color:#65715f}
+.krestep.on{color:var(--tx);border-color:var(--acc);background:linear-gradient(180deg,rgba(70,57,25,.42),rgba(9,20,16,.98))}
+.krestep.on::after,.krestep.done::after{right:0}
+.krestep i{width:29px;height:29px;display:grid;place-items:center;flex:none;border-radius:50%;font-style:normal;
+  font:700 11px var(--m);border:1px solid #526156;color:var(--dim);background:rgba(0,0,0,.28)}
+.krestep.on i,.krestep.done i{color:#171108;background:var(--acc);border-color:#f4d886}
+.krestep span{display:flex;min-width:0;flex-direction:column;gap:1px}.krestep b{font-size:13px;color:inherit}
+.krestep small{font:8px var(--m);letter-spacing:.11em;text-transform:uppercase;color:var(--dim2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.krebody{grid-template-columns:minmax(0,1fr) 350px;gap:16px}
+.krelewa{display:block}.kreprawa{top:14px}
+.krepanel,.kreside{border:1px solid #4a543e;background:
+  linear-gradient(135deg,rgba(218,176,72,.045),transparent 34%),
+  linear-gradient(180deg,rgba(20,36,29,.98),rgba(6,15,12,.985));
+  box-shadow:inset 0 1px rgba(255,255,255,.035),0 22px 50px -38px #000}
+.krepanel{padding:18px}.krebig{min-height:620px}.kreside{padding:17px}
+.kretitle{display:flex;align-items:center;gap:13px;padding-bottom:15px;margin-bottom:17px;border-bottom:1px solid #33443a}
+.kretitle>span{font:700 25px var(--m);color:var(--acc);opacity:.72}.kretitle h2{font-size:26px;margin:0 0 2px}
+.kretitle p{font-size:12.5px;color:var(--dim);margin:0}
+.kreform{display:grid;grid-template-columns:2fr 1fr;gap:13px;margin-bottom:20px}
+.kreform label,.kreselect{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:var(--dim)}
+.kreform label.wide{grid-column:1/-1;position:relative}.kreform label.wide>small{position:absolute;right:9px;bottom:7px;font:9px var(--m);color:var(--dim2)}
+.kreform input,.kreform textarea,.kreselect select{width:100%;box-sizing:border-box;color:var(--tx);background:#07120e;
+  border:1px solid #3c4d42;padding:10px 12px;font:13px var(--f);outline:none;resize:vertical}
+.kreform input:focus,.kreform textarea:focus,.kreselect select:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(217,171,69,.1)}
+.kreform textarea{line-height:1.55;min-height:116px;padding-bottom:22px}
+.krediff,.krepresets,.krechoices{display:grid;gap:7px;margin:8px 0 18px}
+.krediff{grid-template-columns:repeat(5,minmax(0,1fr))}.krepresets{grid-template-columns:repeat(4,minmax(0,1fr))}
+.krechoices.trzy{grid-template-columns:repeat(3,minmax(0,1fr))}.krechoices.cztery{grid-template-columns:repeat(4,minmax(0,1fr))}
+.krediff button,.krepresets button,.krechoices button{min-height:66px;padding:10px 11px;text-align:left;display:flex;flex-direction:column;gap:4px;
+  color:var(--dim);background:linear-gradient(180deg,#14251e,#09140f);border:1px solid #34473c}
+.krediff button:hover,.krepresets button:hover,.krechoices button:hover{border-color:#73806e;color:var(--tx)}
+.krediff button.on,.krechoices button.on{border-color:var(--acc);color:var(--tx);box-shadow:inset 3px 0 var(--acc),0 0 24px -18px var(--acc)}
+.krediff b,.krepresets b,.krechoices b{font-size:12.5px;color:inherit}.krediff span,.krepresets span,.krechoices span{font-size:10.5px;line-height:1.35;color:var(--dim2)}
+.krehint{display:flex;align-items:center;gap:12px;padding:11px 13px;border-left:3px solid #65a777;background:rgba(62,119,78,.1);font-size:12px}
+.krehint b{flex:none;color:#8ed49e}.krehint span{color:var(--dim);line-height:1.45}.krehint.warn{border-color:var(--acc);background:rgba(217,171,69,.08)}.krehint.warn b{color:var(--acc)}
+.kresejmhead{display:flex;align-items:center;gap:9px;margin-bottom:10px}.kresejmhead>div{min-width:112px;display:flex;flex-direction:column;padding:8px 11px;border:1px solid #394b40;background:#0a1712}
+.kresejmhead span{font:8.5px var(--m);letter-spacing:.12em;text-transform:uppercase;color:var(--dim2)}.kresejmhead b{font:700 18px var(--m);color:var(--tx)}
+.kresejmhead .good b{color:var(--pos)}.kresejmhead .bad b{color:var(--neg)}.kresejmhead .btn{margin-left:auto}
+.kreseatbar{height:10px;display:flex;overflow:hidden;background:#030907;border:1px solid #39483e;margin:9px 0 14px}.kreseatbar i{height:100%;min-width:2px;box-shadow:inset -1px 0 rgba(0,0,0,.5)}
+.kreseatgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:15px}
+.kreseat{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:9px;border:1px solid color-mix(in srgb,var(--pc) 42%,#2d4035);background:linear-gradient(135deg,color-mix(in srgb,var(--pc) 13%,#102019),#08130f);overflow:hidden}
+.kreseatid{display:flex;align-items:center;gap:8px;min-width:0}.kreseatid .crest{width:34px;height:34px;flex:none}.kreseatid>div{display:flex;flex-direction:column;min-width:0}.kreseatid b{font:700 13px var(--m);color:var(--tx)}
+.kreseatid span{font-size:9.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kreseatctl{display:flex;align-items:center;gap:4px}.kreseatctl button{width:27px;height:27px;color:var(--tx);background:#13241c;border:1px solid #516257;font:700 17px var(--m)}
+.kreseatctl button:hover:not(:disabled){border-color:var(--acc);color:var(--acc)}.kreseatctl button:disabled{opacity:.2}.kreseatctl strong{width:24px;text-align:center;font:700 17px var(--m);color:var(--tx)}
+.kreseatmeter{grid-column:1/-1;height:2px;background:#05100c}.kreseatmeter i{display:block;height:100%;background:var(--pc)}
+.kresuwaki{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:8px 0 17px}
+.kresuwak{display:grid;grid-template-columns:minmax(145px,1fr) minmax(110px,1.2fr) 42px;align-items:center;gap:9px;padding:8px 10px;background:#0a1712;border:1px solid #2f4237}
+.kresuwak.ruszony{border-color:#806b35;background:linear-gradient(90deg,rgba(217,171,69,.09),#0a1712)}
+.kresuwak>div{display:flex;flex-direction:column}.kresuwak b{font-size:11.5px;color:var(--tx)}.kresuwak span{font-size:9.5px;color:var(--dim2)}
+.kresuwak input,.krestat input{width:100%;accent-color:var(--acc)}.kresuwak strong{font:700 11px var(--m);text-align:right;color:var(--acc)}
+.kresectionhead{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:21px 0 8px;padding-top:14px;border-top:1px solid #34473c}
+.kresectionhead>div>span{font:8.5px var(--m);letter-spacing:.15em;text-transform:uppercase;color:var(--acc)}.kresectionhead h3{margin:2px 0 0;font-size:19px}
+.krepartie{margin:8px 0 11px;gap:5px}.krep{padding:6px 8px;background:#0b1913;border-color:#34483b}.krep.on{border-color:var(--pc,var(--acc));box-shadow:inset 0 -2px var(--pc,var(--acc))}.krep:disabled{opacity:.25}
+.krepartyedit,.kregovbox{padding:13px;border:1px solid #425347;background:linear-gradient(135deg,color-mix(in srgb,var(--pc,#d9ab45) 9%,#0b1914),#08120e)}
+.krepartyhero{display:flex;align-items:center;gap:11px;margin-bottom:11px}.krepartyhero .crest{width:50px;height:50px}.krepartyhero>div{display:flex;flex-direction:column}.krepartyhero span{font:8px var(--m);letter-spacing:.13em;text-transform:uppercase;color:var(--pc)}.krepartyhero h3{margin:2px 0;font-size:19px}.krepartyhero small{color:var(--dim);font-size:10.5px}
+.krestatgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.krestat{display:grid;grid-template-columns:128px minmax(90px,1fr) 35px;gap:8px;align-items:center;padding:7px 9px;border:1px solid #2b3d32;background:rgba(0,0,0,.17)}
+.krestat.ruszony{border-color:color-mix(in srgb,var(--pc) 65%,#6b592f)}.krestat>div{display:flex;flex-direction:column}.krestat b{font-size:11px}.krestat span{font:9px var(--m);color:var(--dim)}.krestat span strong{color:var(--pc)}.krestat em{font:700 10px var(--m);font-style:normal;text-align:right;color:var(--pc)}
+.krequorum{padding:6px 10px;border:1px solid #425347;font:700 10px var(--m);color:var(--dim)}.krequorum.good{color:var(--pos);border-color:#396e46}.krequorum.bad{color:var(--neg);border-color:#74423d}
+.kregovbox{margin-top:8px}.kreselect{max-width:520px;margin-top:10px}.krepartie.prez{padding:8px;border:1px solid #34483b;background:#0a1712}
+.krefinalhero{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:15px;border-left:3px solid var(--pos);background:rgba(71,136,87,.1);margin-bottom:13px}.krefinalhero.bad{border-color:var(--neg);background:rgba(160,65,55,.09)}
+.krefinalhero>div>span{font:8.5px var(--m);letter-spacing:.15em;text-transform:uppercase;color:var(--pos)}.krefinalhero.bad>div>span{color:var(--neg)}.krefinalhero h2{margin:4px 0;font-size:24px}.krefinalhero p{max-width:72ch;margin:0;color:var(--dim);font-size:12px;line-height:1.5}.krefinalhero>strong{padding:5px 10px;border:1px solid var(--acc2);font:9px var(--m);letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
+.krefinalgrid{display:grid;grid-template-columns:1.15fr .85fr;gap:10px}.krefinalgrid>section,.krefinalblock{padding:12px;border:1px solid #34473c;background:#09150f}.krefinalseats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.krefinalseats>div{display:flex;align-items:center;gap:5px;padding:4px 6px;background:#0e1d16}.krefinalseats .crest{width:22px;height:22px}.krefinalseats span{font-size:10px}.krefinalseats b{margin-left:auto;font:700 11px var(--m);color:var(--acc)}
+.krefacts{margin:6px 0 0}.krefacts>div{display:grid;grid-template-columns:82px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid #293b30}.krefacts dt{font:8.5px var(--m);letter-spacing:.1em;text-transform:uppercase;color:var(--dim2)}.krefacts dd{margin:0;font-size:11px;line-height:1.4;color:var(--tx)}
+.krefinalblock{margin-top:10px}.krefinalblock p{margin:5px 0;font:10.5px var(--m);color:var(--dim)}
+.krecheck{margin-top:12px}.krecheck>button{width:100%;display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;text-align:left;border:1px solid #71572e;background:rgba(217,171,69,.07);color:var(--tx);margin-top:5px}.krecheck>button.bad{border-color:#793e38;background:rgba(170,65,55,.09)}.krecheck>button i,.kreok i{width:22px;height:22px;display:grid;place-items:center;border-radius:50%;font-style:normal;background:var(--acc);color:#111}.krecheck>button.bad i{background:var(--neg)}.krecheck>button span{font-size:11px}.krecheck>button b{font-size:10px;color:var(--acc)}
+.kreok{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(65,133,82,.1);border:1px solid #3e704a;font-size:11px;color:var(--dim)}.kreok i{background:var(--pos)}
+.kresideprog{height:3px;background:#07100c;margin:-17px -17px 16px}.kresideprog i{display:block;height:100%;background:var(--acc);box-shadow:0 0 14px var(--acc)}
+.kresideeyebrow{font:8.5px var(--m);letter-spacing:.16em;text-transform:uppercase;color:var(--acc)}.kreside h3{font-size:22px;margin:6px 0}.kreside-desc{font-size:11.5px;line-height:1.5;color:var(--dim);min-height:35px;margin:0 0 10px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.kresidemeta{display:flex;gap:5px;flex-wrap:wrap}.kresidemeta span{padding:3px 7px;background:#0a1712;border:1px solid #34473c;font:8.5px var(--m);color:var(--dim)}
+.kresidewarn{display:flex;flex-direction:column;gap:3px;padding:9px 10px;margin:12px 0;background:rgba(217,171,69,.07);border-left:2px solid var(--acc)}.kresidewarn.bad{background:rgba(178,65,54,.08);border-color:var(--neg)}.kresidewarn.good{background:rgba(65,133,82,.08);border-color:var(--pos)}.kresidewarn b{font-size:11px}.kresidewarn span{font-size:10px;line-height:1.4;color:var(--dim)}
+.kresidenav{display:flex;flex-direction:column;gap:6px}.kresidenav .btn{width:100%;justify-content:center}.kreodrzuc{display:block;width:100%;margin-top:10px;padding:5px;color:var(--dim2);background:none;border:0;font-size:10px;text-decoration:underline}.kreodrzuc:hover{color:var(--neg)}
+@media(max-width:1260px){.kreseatgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.krediff{grid-template-columns:repeat(3,1fr)}.krepresets{grid-template-columns:repeat(2,1fr)}.kresuwaki,.krestatgrid{grid-template-columns:1fr}}
+@media(max-width:1080px){.krebody{grid-template-columns:1fr}.kreprawa{position:static;grid-row:1}.kreside{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:7px 16px}.kresideprog{grid-column:1/-1}.kresideeyebrow,.kreside h3,.kreside-desc,.kresidemeta,.kreside>.kreseatbar{grid-column:1}.kresidewarn,.kresidenav,.kreodrzuc{grid-column:2}.kresidewarn{grid-row:2/5}.kresidenav{grid-row:5/8}.kreodrzuc{grid-row:8}.kresteps{grid-template-columns:repeat(5,1fr)}.krestep small{display:none}}
+@media(max-width:720px){.kreekran{max-width:calc(100vw - 24px)}.krehead h1{font-size:28px}.krehead p{display:none}.kresteps{display:flex;overflow-x:auto}.krestep{min-width:112px}.krebody{gap:10px}.krepanel,.kreside{padding:12px}.kreside{display:block}.kresideprog{margin:-12px -12px 12px}.kreform,.krefinalgrid{grid-template-columns:1fr}.kreform label.wide{grid-column:auto}.krediff,.krepresets,.krechoices.trzy,.krechoices.cztery{grid-template-columns:1fr 1fr}.kreseatgrid{grid-template-columns:1fr}.kresuwak{grid-template-columns:1fr 35px}.kresuwak input{grid-column:1/-1;grid-row:2}.krestat{grid-template-columns:110px 1fr 34px}.krefinalseats{grid-template-columns:repeat(3,1fr)}}
