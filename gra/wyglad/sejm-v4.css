@@ -492,3 +492,125 @@ body:not(:has(.mg)) .ph-flagi b{display:block;margin-top:3px;font-size:12px;line
 #app .btn:disabled *,#app .opt:disabled *{color:inherit!important;-webkit-text-fill-color:currentColor!important}
 
 @media (max-width:1080px){body:not(:has(.mg)) .sidebar>.kond{position:static}}
+
+/* 1.1.76: ekran wyboru działa jak selektor drużyny. Profil zostaje po lewej,
+   a po prawej widać całą stawkę bez przewijania przez pół strony. */
+body:not(:has(.mg)) .pick.v3.partyselect{
+  display:grid;grid-template-columns:minmax(500px,600px) minmax(0,1fr);gap:16px;
+  max-width:1500px;align-items:start;
+}
+body:not(:has(.mg)) .wrap:has(.partyselect)>.intro{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;
+  max-width:1500px;margin:0 auto 16px;padding:17px 20px;border:1px solid rgba(214,170,88,.24);
+  background:linear-gradient(100deg,rgba(21,40,33,.9),rgba(10,23,18,.72));
+}
+body:not(:has(.mg)) .wrap:has(.partyselect)>.intro .kick{grid-column:1;grid-row:1;margin:0}
+body:not(:has(.mg)) .wrap:has(.partyselect)>.intro h1{grid-column:1;grid-row:2;margin:2px 0 0;font-size:38px;line-height:1}
+body:not(:has(.mg)) .wrap:has(.partyselect)>.intro>p,
+body:not(:has(.mg)) .wrap:has(.partyselect)>.intro>.facts{display:none}
+body:not(:has(.mg)) .wrap:has(.partyselect)>.intro>.ekstopka{grid-column:2;grid-row:1/3;align-self:center;margin:0;padding:0;border:0;background:none}
+body:not(:has(.mg)) .wrap:has(.partyselect)>.intro>.ekstopka .ekleg{display:none}
+body:not(:has(.mg)) .pick.v3.partyselect>.pickmain{
+  grid-column:1;grid-row:1;position:sticky;top:18px;min-height:618px;padding:27px 28px;
+  display:flex;flex-direction:column;
+}
+body:not(:has(.mg)) .pick.v3.partyselect>.partyroster{grid-column:2;grid-row:1;min-width:0}
+body:not(:has(.mg)) .partyselect .partyherohead .crest{width:88px!important;height:88px!important}
+body:not(:has(.mg)) .partyselect .pickhd h2{font-size:31px}
+body:not(:has(.mg)) .partyselect .partyblurb{min-height:66px;margin-top:5px!important}
+body:not(:has(.mg)) .partyselect .partystats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;max-width:none;width:100%}
+body:not(:has(.mg)) .partyselect .partyfacts{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:4px!important}
+body:not(:has(.mg)) .partyselect .partyfacts span{margin:0;padding:8px 9px;border-right:1px solid rgba(214,170,88,.12)}
+body:not(:has(.mg)) .partyselect .partyleader{max-width:none;width:100%;margin-top:13px}
+body:not(:has(.mg)) .partyselect .pickstart{width:100%!important;margin-top:auto!important}
+body:not(:has(.mg)) .partyselect .picklist{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:7px}
+body:not(:has(.mg)) .partyselect .pickcell{min-height:82px;padding:9px 11px;grid-template-columns:46px minmax(0,1fr) auto}
+body:not(:has(.mg)) .partyselect .pcimg .crest{width:40px;height:40px}
+body:not(:has(.mg)) .partyselect .pickcell.on{box-shadow:inset 4px 0 var(--pc),0 0 0 1px rgba(214,170,88,.22)}
+
+/* Scenariusze używają tego samego języka, ale każda karta mówi już, co zmienia. */
+body:not(:has(.mg)) .pick.v3.scenv3{display:grid;grid-template-columns:minmax(430px,520px) minmax(0,1fr);gap:16px;max-width:1500px;align-items:start}
+body:not(:has(.mg)) .pick.v3.scenv3>.pickmain{grid-column:1;grid-row:1;position:sticky;top:18px;min-height:420px;padding:26px 27px}
+body:not(:has(.mg)) .pick.v3.scenv3>div:not(.pickmain){grid-column:2;grid-row:1;min-width:0}
+body:not(:has(.mg)) .scenv3 .picklist{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px}
+body:not(:has(.mg)) .pick.v3.scenv3 .scenrow{min-height:128px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr auto;align-content:start;text-align:left}
+body:not(:has(.mg)) .scenv3 .scenrow .pcname{grid-column:1;grid-row:1;font-family:var(--fd);font-size:19px;color:#f0ead8}
+body:not(:has(.mg)) .scenv3 .scenrow .scenopis{grid-column:1/-1;grid-row:2;margin-top:8px;color:#aeb9ae;font-size:11.5px;line-height:1.42;font-family:var(--f);letter-spacing:0;font-weight:400}
+body:not(:has(.mg)) .scenv3 .scenrow .pcrow{grid-column:2;grid-row:1;align-self:center}
+body:not(:has(.mg)) .scenv3 .scenrow.on{box-shadow:inset 4px 0 var(--v4-brass),0 0 0 1px rgba(214,170,88,.18)}
+
+/* HUD ma dwa czytelne stany nazwy: pełny na szerokim ekranie i skrót na ciasnym.
+   Ucinanie jej wielokropkiem wyglądało jak zepsuty tekst. */
+body:not(:has(.mg)) .hud{gap:8px!important}
+body:not(:has(.mg)) .hud .id{flex:0 0 270px!important;max-width:270px!important;padding-right:10px}
+body:not(:has(.mg)) .hud .id h2{font-size:14.5px;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.08}
+body:not(:has(.mg)) .hud .id h2 .skrot{display:none}
+body:not(:has(.mg)) .hud .rgroup{gap:2px;padding:2px}
+body:not(:has(.mg)) .hud .rgroup .rs{min-width:86px;padding:5px 8px}
+body:not(:has(.mg)) .hud .datechip{min-width:154px}
+body:not(:has(.mg)) .hud .btn.tura{min-width:170px}
+body:not(:has(.mg)) .hudend{gap:5px}
+
+/* Kondycja jest pierwsza, ale nie przykleja się już nad innymi kartami podczas
+   przewijania. Poprzednie sticky powodowało realne nakładanie dwóch paneli. */
+body:not(:has(.mg)) .sidebar>.kond{position:relative;top:auto}
+body:not(:has(.mg)) .sidebar .kond .odczyt{display:inline-flex;align-items:center;gap:5px}
+body:not(:has(.mg)) .sidebar .kond .msc{min-width:25px;padding:2px 4px;border:1px solid rgba(214,170,88,.18);border-radius:2px;color:#a99e88;font-size:8px;text-align:center}
+
+/* Drugorzędne dane nie zajmują pięciu ekranów. Są pod ręką, ale domyślnie złożone. */
+body:not(:has(.mg)) .sidebar>.sidefold{order:20;overflow:hidden}
+body:not(:has(.mg)) .sidefold>summary{position:relative;display:flex;align-items:center;gap:10px;min-height:48px;padding:11px 16px;cursor:pointer;list-style:none;border-bottom:0;background:rgba(3,12,9,.18)}
+body:not(:has(.mg)) .sidefold>summary::-webkit-details-marker{display:none}
+body:not(:has(.mg)) .sidefold>summary::before{content:"+";display:grid;place-items:center;width:19px;height:19px;border:1px solid rgba(214,170,88,.3);color:#d8b25e;font-family:var(--m);font-size:13px}
+body:not(:has(.mg)) .sidefold[open]>summary::before{content:"−"}
+body:not(:has(.mg)) .sidefold[open]>summary{border-bottom:1px solid rgba(214,170,88,.15)}
+body:not(:has(.mg)) .sidefold>summary h3{flex:1;margin:0;font-family:var(--fd);font-size:18px;color:#eee7d4}
+body:not(:has(.mg)) .sidefold>summary .n{font-family:var(--m);font-size:8px;letter-spacing:.09em;text-transform:uppercase;color:#9eaa9e}
+
+/* Karty wolnych ludzi mają miejsce na zdanie i statystyki. Cztery w rzędzie
+   robiły z opisów wąskie paragrafy; trzy są szybsze do przeskanowania. */
+body:not(:has(.mg)) .agrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+body:not(:has(.mg)) .agent{min-height:245px;padding:13px;display:flex;flex-direction:column}
+body:not(:has(.mg)) .agent .adesc{min-height:55px}
+body:not(:has(.mg)) .agent .btn{margin-top:auto}
+
+/* Złoto oznacza zatwierdzenie, nie każdy możliwy wybór. Dziewięć złotych
+   przycisków w jednym oknie zlewało się w jedną plamę i odbierało hierarchię. */
+body:not(:has(.mg)) .mdl .opt:not(:disabled){
+  background:linear-gradient(180deg,#263d32,#13251d)!important;color:#efe5cf!important;
+  -webkit-text-fill-color:#efe5cf!important;border-color:#5f8069!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.06),0 2px 6px rgba(0,0,0,.22)!important;
+}
+body:not(:has(.mg)) .mdl .opt:not(:disabled):hover{
+  background:linear-gradient(180deg,#355340,#1b3427)!important;color:#fff0c5!important;
+  -webkit-text-fill-color:#fff0c5!important;border-color:#d8b35d!important;
+}
+body:not(:has(.mg)) .mdl .opt:not(:disabled) span{color:#aebcab!important;-webkit-text-fill-color:#aebcab!important}
+
+/* Zamknięcie wyboru należy do ramy okna. Wcześniej odziedziczony styl potrafił
+   ustawić krzyżyk pośrodku zawartości zamiast w prawym górnym rogu. */
+body:not(:has(.mg)) .mdl{position:relative}
+body:not(:has(.mg)) .mdl>.mdlx{position:absolute!important;top:12px!important;right:12px!important;left:auto!important;margin:0!important;z-index:5}
+
+@media (max-width:1500px){
+  /* Po odjęciu nawigacji i pulpitu kondycji zostaje zbyt mało miejsca na mapę
+     obok opisu okręgu. W tym rozmiarze mapa bierze cały główny pas, a opis
+     schodzi pod nią. */
+  body:not(:has(.mg)) .mapwrap{grid-template-columns:minmax(0,1fr)}
+  body:not(:has(.mg)) .mapwrap>.card,body:not(:has(.mg)) .mapwrap>.card.okr{grid-column:1;position:static}
+  body:not(:has(.mg)) .hud .id{flex-basis:104px!important;max-width:104px!important}
+  body:not(:has(.mg)) .hud .id h2 .pelna{display:none}
+  body:not(:has(.mg)) .hud .id h2 .skrot{display:inline}
+  body:not(:has(.mg)) .hud .datechip{min-width:142px}
+  body:not(:has(.mg)) .hud .btn.tura{min-width:150px}
+}
+@media (max-width:1180px){
+  body:not(:has(.mg)) .pick.v3.partyselect,body:not(:has(.mg)) .pick.v3.scenv3{grid-template-columns:1fr}
+  body:not(:has(.mg)) .pick.v3.partyselect>.pickmain,body:not(:has(.mg)) .pick.v3.scenv3>.pickmain{grid-column:1;grid-row:1;position:static;min-height:0}
+  body:not(:has(.mg)) .pick.v3.partyselect>.partyroster,body:not(:has(.mg)) .pick.v3.scenv3>div:not(.pickmain){grid-column:1;grid-row:2}
+  body:not(:has(.mg)) .agrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:720px){
+  body:not(:has(.mg)) .partyselect .picklist,body:not(:has(.mg)) .scenv3 .picklist,body:not(:has(.mg)) .agrid{grid-template-columns:1fr}
+  body:not(:has(.mg)) .partyselect .partyfacts{grid-template-columns:1fr}
+}

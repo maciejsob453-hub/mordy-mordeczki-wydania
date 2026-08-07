@@ -3472,6 +3472,7 @@ function scenScreen(){
           return `<button class="pickcell scenrow ${wybId===id?'on':''}" onclick="podejrzyjScen('${id}')">
           <i class="pcbar"></i>
           <span class="pcname">${esc(x.n)}</span>
+          <span class="scenopis">${esc(x.d)}</span>
           <div class="pcrow"><span class="pcseat">${esc(x.t)}${x.zModa?' · mod':''}</span></div>
         </button>`}).join('')}
       </div>
@@ -4559,7 +4560,7 @@ const AUTORZY=['Maciek','Balon'];
 /* Numer wpisuje tu build z pliku VERSION. Przy uruchamianiu ze źródeł, bez budowania,
    warstwa desktopowa podmienia go na prawdziwy — inaczej stopka pokazywałaby numer
    z ostatniego wydania i kłamała. */
-let WERSJA='1.1.75';
+let WERSJA='1.1.76';
 function ustawWersje(v){
   if(typeof v==='string'&&/^\d+\.\d+\.\d+$/.test(v.trim())){WERSJA=v.trim();return true}
   return false;
@@ -4570,6 +4571,16 @@ function ustawWersje(v){
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.76':{data:'7 sierpnia 2026', zmiany:[
+  'Wybor partii dziala jak selektor druzyny: pelny profil zostaje po lewej, a cala stawka miesci sie po prawej bez przewijania przez sciane kart.',
+  'Scenariusze dostaly ten sam uklad i od razu pokazuja opis kazdego swiata, zamiast samych nazw i poziomu trudnosci.',
+  'Kondycja partii jest na gorze prawego pulpitu, nie nachodzi juz na kolejne karty, a Serwer, Zaplecze i Relacje sa domyslnie zlozone.',
+  'HUD pokazuje pelna nazwe partii na szerokim ekranie, czytelna date i wszystkie kluczowe zasoby bez wykresow ostatnich odczytow i majatku prywatnego.',
+  'Mapa zachowuje regularne szesciokaty. Trzy rowne obrysy pokazuja lidera, druga partie i twoja obecnosc, a przy mniejszym oknie mapa bierze cala szerokosc.',
+  'Przyciski maja jasna hierarchie: glowna akcja jest zlota, wybory w oknach sa ciemnozielone, a zablokowane akcje pozostaja czytelne.',
+  'Krzyzyk siedzi w prawym gornym rogu okna. Cofniecie wyboru okregu, tematu albo decyzji z wlasnym oknem nie zuzywa ruchu ani limitu.',
+  'Transfery sa w trzech czytelnych kolumnach, a Sejm pokazuje najwazniejsze uklady bez sciany kart list wyborczych.',
+ ]},
  '1.1.75':{data:'7 sierpnia 2026', zmiany:[
   'Kondycja partii nie ma juz wykresu radarowego. Zamiast niego jest ocena kondycji, trend tygodnia, mocna strona i rzecz do naprawy.',
   'Przyciski dostaly druga warstwe czytelnosci bez zaleznosci od wygladu ekranu: dotyczy to mediow, transferow, list i modali.',
@@ -5156,7 +5167,7 @@ function setup(){
   <div class="pick v3 partyselect">
     <div class="pickmain" id="pmain"></div>
     <div class="partyroster">
-      <div class="partyrosterhead">${PID.length} ugrupowań <span>wybierz szyld, po prawej dostajesz pełny profil</span></div>
+      <div class="partyrosterhead">${PID.length} ugrupowań <span>wybierz szyld — pełny profil jest po lewej</span></div>
       <div class="picklist">
         ${PID.map(k=>{const st=START_SEATS[k]||0,d=BASE[k].diff||3;
           return `<button class="pickcell ${k===SEL?'on':''}" onclick="pickParty('${k}')" style="--pc:${BASE[k].c}">
@@ -5199,7 +5210,7 @@ function game(){
   const role=isPM()?'PREMIER':inGov()?'KOALICJA':'OPOZYCJA';
   app.innerHTML=`
   <div class="hud" style="--partia:${p.c}">
-    <div class="id">${crest(G.me,'m')}<div style="min-width:0"><h2>${p.n}</h2>
+    <div class="id">${crest(G.me,'m')}<div style="min-width:0"><h2><span class="pelna">${p.n}</span><span class="skrot">${p.ab}</span></h2>
       <div class="sub">${p.lead} · <span class="rola ${role.toLowerCase()}">${role}</span>${hasPrez()?' · <span class="rola prezydent">PREZYDENT</span>':''}</div></div></div>
     <!-- Górny poziom paska: co PRZYBĘDZIE w tym tygodniu, na zielono.
          Dolny: stan na teraz. Dokładnie ten układ, co w pasku Victorii —
@@ -6407,10 +6418,10 @@ function sidebar(p,q){
     const mie=r?(()=>{const odwr=!!CECHA_ODWROTNA[k];
       const lepsi=alive().filter(x=>x!==G.me&&!G.p[x].dead&&(odwr?G.p[x][k]<v:G.p[x][k]>v)).length;
       return lepsi+1})():0;
-    return `<div class="st"><div class="l"><span>${l}${statTip(k)}</span><span>
+    return `<div class="st"><div class="l"><span>${l}${statTip(k)}</span><span class="odczyt">
       <b class="wart" data-c="${k}" data-v="${Math.round(v)}">${Math.round(v)}</b>${
       Math.abs(d)>.6?`<span class="d ${d>0?'up':'dn'}">${d>0?'+':''}${Math.round(d)}</span>`:''}${
-      mie?`<span class="msc" title="twoje miejsce w stawce">${mie}.</span>`:''}</span></div>
+      mie?`<span class="msc" title="twoje miejsce w stawce">#${mie}</span>`:''}</span></div>
       <div class="trk" data-c="${k}" data-v="${cl(v)}"><i style="width:${cl(v)}%;background:${c}"></i>
       <u class="duch"></u>${
       r?`<span class="rywal" style="left:${cl(r.v)}%" data-kto="${r.ab}"
@@ -6450,7 +6461,7 @@ function sidebar(p,q){
       Kontrowersja rośnie o ${(eliteRisk(p)*6).toFixed(1)} tygodniowo.</div>`:''}
     ${p.mem>4&&ratio(p,'ser')>.72?`<div style="margin-top:10px;font-size:12.5px;color:var(--dim);background:#0b0e13;
       border-left:2px solid var(--acc2);padding:8px 10px;border-radius:0 5px 5px 0;line-height:1.45">
-      Partia niemal wyłącznie serwerowicka, jedność leci w dół, kontrowersja w górę.</div>`:''}
+      <b>${Math.round(ratio(p,'ser')*100)}% serwerowiczów.</b> Jedność spada, kontrowersja rośnie.</div>`:''}
   </div></div>
   <div class="card kond"><div class="h"><h3>Kondycja partii</h3><span class="n">mapa</span></div><div class="b">
     ${radar(p)}
@@ -6487,30 +6498,30 @@ function sidebar(p,q){
     ${(()=>{
       // Prawdziwy stan serwera, a nie stała z początku gry: ludzie przychodzą i odchodzą
       const ludzie=used+freeTot(), zmiana=ludzie-SERVER;
-      return `<div class="card"><div class="h"><h3>Serwer</h3>
-      <span class="n">${ludzie} ${zmiana?`<span style="color:${zmiana>0?'var(--pos)':'var(--neg)'}">${zmiana>0?'+':''}${zmiana}</span>`:''}</span></div><div class="b">
+      return `<details class="card sidefold serwerfold"><summary><h3>Serwer</h3>
+      <span class="n">${ludzie} ${zmiana?`<span style="color:${zmiana>0?'var(--pos)':'var(--neg)'}">${zmiana>0?'+':''}${zmiana}</span>`:''}</span></summary><div class="b">
     <div class="st"><div class="l"><span>W partiach</span><b class="m">${used}</b></div>
       <div class="trk"><i style="width:${cl(used/Math.max(1,ludzie)*100)}%;background:var(--acc)"></i></div></div>
     <div class="st" style="margin:0"><div class="l"><span>Niezrzeszonych</span><b class="m">${freeTot()}</b></div>
       <div class="trk"><i style="width:${cl(freeTot()/Math.max(1,ludzie)*100)}%;background:var(--pos)"></i></div></div>`})()}
     <div style="display:flex;gap:10px;margin-top:9px;font-family:var(--m);font-size:11px;color:var(--dim)">
       ${SEG.map(s=>`<span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${s.c};margin-right:4px"></i>${G.free[s.id]}</span>`).join('')}</div>
-  </div></div>
-  <div class="card skl"><div class="h"><h3>Zaplecze</h3><span class="n">${benchAll.length} ${pl(benchAll.length,'osoba','osoby','osób')}</span></div><div class="b">
+  </div></details>
+  <details class="card sidefold zaplecze"><summary><h3>Zaplecze</h3><span class="n">${benchAll.length} ${pl(benchAll.length,'osoba','osoby','osób')}</span></summary><div class="b">
     <div class="benchgrid">
       ${benchAll.map(n=>`<div class="bperson ${isLead(p,n)?'lead':''}" title="${n} — kapitał prywatny ${kasa(kapPryw(n))}${ranga(n)?' · '+ranga(n).n:''}">
         ${ava(n,p.c,34)}<span>${n}</span>
         <em class="kappryw">${mordedolar(11)} ${kasaSkrot(kapPryw(n))}</em>
         ${rangaOdznaka(n)}</div>`).join('')||'<span class="dim">Nikogo poza przewodniczącym.</span>'}
     </div>
-  </div></div>
-  <div class="card rel"><div class="h"><h3>Relacje</h3></div><div class="b">
+  </div></details>
+  <details class="card sidefold rel"><summary><h3>Relacje</h3><span class="n">${alive().length-1} partii</span></summary><div class="b">
     ${alive().filter(k=>k!==G.me).sort((a,b2)=>G.rel[b2][G.me]-G.rel[a][G.me]).map(k=>{
       const v=Math.round(G.rel[G.me][k]);
       return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12.5px">
         ${crest(k,'s')}<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${G.p[k].ab} <span class="dim">${G.p[k].lead}</span></span>
         <b class="m" style="color:${v<0?'var(--neg)':v>30?'var(--pos)':'var(--dim)'}">${v>0?'+':''}${v}</b></div>`}).join('')}
-  </div></div>`;
+  </div></details>`;
 }
 
 /* ---- sala sejmowa ----
@@ -6645,24 +6656,25 @@ function mapTab(q,AL){
         <rect x="0" y="0" width="800" height="620" fill="url(#grid)" rx="12"/>
         <rect x="0" y="0" width="800" height="620" fill="url(#vig)" rx="12"/>
         ${REG.map(x=>{
-          /* Trzy łuki są zawsze tej samej grubości: zewnętrzny to lider,
-             przerywany pod nim to druga partia, a najbliższy środkowi to ty.
-             Wcześniej szerokość rosła razem z obecnością i mapa wyglądała,
-             jakby część granic przypadkiem była pogrubiona. */
+          /* Trzy obrysy są zawsze tej samej grubości: zewnętrzny to lider,
+             środkowy to druga partia, a najbliższy polu to gracz. Wcześniej
+             szerokość rosła razem z obecnością i mapa wyglądała, jakby część
+             granic przypadkiem była pogrubiona. */
           const rank=alive().slice().sort((a,b)=>G.p[b].pres[x.id]-G.p[a].pres[x.id]);
           const Lk=rank[0],drugi=rank[1]||null;
           const c=G.p[Lk].c,pr=p.pres[x.id],on=x.id===G.sel,crestSrc=(G.p[Lk].logo&&LOGOS[G.p[Lk].logo])||LOGOS[Lk]||'';
-          const R0=102, arc=presArc(x.x,x.y,R0+2,cl(pr,0,100)/100);
-          const dom=Lk, dp=G.p[dom].pres[x.id], darc=presArc(x.x,x.y,R0+16,cl(dp,0,100)/100);
-          const dp2=drugi?G.p[drugi].pres[x.id]:0,darc2=drugi?presArc(x.x,x.y,R0+9,cl(dp2,0,100)/100):'';
+          const R0=102,dom=Lk,dp=cl(G.p[Lk].pres[x.id],0,100),dp2=drugi?cl(G.p[drugi].pres[x.id],0,100):0;
           const glosy=ld[x.id];
           return `<g class="hex" onclick="setSel('${x.id}')">
             <polygon class="hglow" points="${hexPts(x.x,x.y,R0)}" fill="${c}" filter="url(#soft)"/>
             <polygon class="hf" points="${hexPts(x.x,x.y,R0)}" fill="${c}" fill-opacity="${(.17+dp/155).toFixed(3)}"
-              stroke="${on?'var(--acc)':c}" stroke-width="${on?3.6:1.6}" stroke-opacity="${on?1:.72}"/>
-            <path d="${darc}" fill="none" stroke="${G.p[dom].c}" stroke-width="4" stroke-linecap="round" stroke-opacity=".92"/>
-            ${drugi?`<path d="${darc2}" fill="none" stroke="${G.p[drugi].c}" stroke-width="2" stroke-linecap="round" stroke-dasharray="7 6" stroke-opacity=".95"/>`:''}
-            ${dom===G.me?'':`<path d="${arc}" fill="none" stroke="${p.c}" stroke-width="2" stroke-linecap="round" stroke-opacity=".88"/>`}
+              stroke="${on?'var(--acc)':c}" stroke-width="2" stroke-opacity="${on?1:.72}"/>
+            <polygon points="${hexPts(x.x,x.y,R0+12)}" pathLength="100" fill="none" stroke="${G.p[dom].c}"
+              stroke-width="4" stroke-linecap="round" stroke-dasharray="${Math.max(.1,dp)} 100" stroke-opacity=".94"/>
+            ${drugi?`<polygon points="${hexPts(x.x,x.y,R0+7)}" pathLength="100" fill="none" stroke="${G.p[drugi].c}"
+              stroke-width="2" stroke-linecap="round" stroke-dasharray="${Math.max(.1,dp2)} 100" stroke-opacity=".95"/>`:''}
+            ${dom===G.me?'':`<polygon points="${hexPts(x.x,x.y,R0+2)}" pathLength="100" fill="none" stroke="${p.c}"
+              stroke-width="2" stroke-linecap="round" stroke-dasharray="${Math.max(.1,cl(pr,0,100))} 100" stroke-opacity=".86"/>`}
             <rect x="${x.x-19}" y="${x.y-72}" width="38" height="38" rx="7" fill="#f4f1ea" fill-opacity=".93"/>
             <image class="hcrest" href="${crestSrc}" x="${x.x-17}" y="${x.y-70}" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>
             <text x="${x.x}" y="${x.y-12}" text-anchor="middle" fill="var(--tx)" font-size="17.5" font-weight="660">${x.n}</text>
@@ -6675,7 +6687,7 @@ function mapTab(q,AL){
       </svg></div>
       <div class="legend">${alive().sort((a,b)=>q.res[b].tot-q.res[a].tot).slice(0,7)
         .map(k=>`<span><i style="background:${G.p[k].c}"></i>${G.p[k].ab}</span>`).join('')}
-        <span class="dim" style="margin-left:auto">Barwa kanału i zewnętrzny łuk: kto ma tu największą obecność. Wewnętrzny łuk: twoja obecność.</span></div>
+        <span class="dim" style="margin-left:auto">Zewnętrzny obrys: lider obecności. Środkowy obrys: druga partia. Wewnętrzny obrys: twoja obecność.</span></div>
     </div>
     <div class="card okr"><div class="h"><h3>${r.n}</h3><span class="n">${r.seats} ${pl(r.seats,'mandat','mandaty','mandatów')}</span></div>
       <div class="b regbox">
@@ -7390,7 +7402,7 @@ function actBack(){   // rezygnacja w oknie decyzji oddaje to, co pobrała sama 
 function chooseReg(){const p=me();
   modal('Wybór okręgu',pend.a.n,`<p>${pend.a.d}</p>`,REG.map(r=>({l:r.n,
     s:`${r.seats} ${pl(r.seats,'mandat','mandaty','mandatów')} · obecność ${Math.round(p.pres[r.id])}/100 · ${r.pop} osób`,
-    f:()=>{pend.r=r.id;close();step()}})))}
+    f:()=>{pend.r=r.id;close();step()}})),()=>{pend=null;close();render()})}
 function chooseTem(){
   const r=pend.r?REG.find(x=>x.id===pend.r):null;
   modal('Temat wystąpienia',pend.a.n,
@@ -7401,16 +7413,21 @@ function chooseTem(){
        pasuje / wrogie" zamieniała wybór w czytanie etykietki. */
     TEM.map(t=>({l:t.n,
       s:SID.filter(s=>(t.w[s]||0)>=1.5).map(sn).join(', '),
-      f:()=>{pend.tem=t.id;close();step()}})))}
+      f:()=>{pend.tem=t.id;close();step()}})),()=>{
+        /* Przy wystąpieniu drugi krok wraca do okręgu. Gracz nie powinien
+           tracić decyzji tylko dlatego, że zajrzał do listy tematów. */
+        if(pend&&pend.r){pend.r=null;close();chooseReg()}
+        else{pend=null;close();render()}
+      })}
 function chooseTgt(){
   modal('Wybór celu',pend.a.n,`<p>${pend.a.d}</p>`,alive().filter(k=>k!==G.me).map(k=>({
     l:`${G.p[k].n}, ${G.p[k].lead}`,
     s:`relacje ${G.rel[G.me][k]>0?'+':''}${Math.round(G.rel[G.me][k])} · sława ${Math.round(G.p[k].fame)} · ${G.p[k].mem} osób · ${G.p[k].seats} mand. · kompetencja lidera ${L(G.p[k].lead).komp}`,
-    f:()=>{pend.t=k;close();step()}})))}
+    f:()=>{pend.t=k;close();step()}})),()=>{pend=null;close();render()})}
 function chooseSeg(){
   modal('Wybór grupy',pend.a.n,`<p>${pend.a.d}</p>`,SEG.map(s=>({l:s.n,
     s:`dopasowanie ${me().aff[s.id].toFixed(1)} · udział w elektoracie ${Math.round(segShare(s.id)*100)}%`,
-    f:()=>{pend.s=s.id;close();step()}})))}
+    f:()=>{pend.s=s.id;close();step()}})),()=>{pend=null;close();render()})}
 function segShare(id){let a=0,b=0;REG.forEach(r=>{const v=regVotes(r);a+=v*r.mix[id];b+=v});return a/b}
 
 /* ---- pula ludzi w rozbiciu na grupy ---- */
