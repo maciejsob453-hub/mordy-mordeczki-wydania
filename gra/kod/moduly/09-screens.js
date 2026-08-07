@@ -112,13 +112,41 @@ function kreRelUstaw(a,b,v){if(!KRE||!a||!b||a===b)return;const key=[a,b].sort()
 function kreRelUsun(key){if(KRE){delete KRE.swiat.relacje[key];kreatorRys()}}
 function kreSwiatPole(grupa,k,v){if(!KRE)return;if(grupa==='ustawy'){const i=KRE.swiat.ustawy.indexOf(k);if(i>=0)KRE.swiat.ustawy.splice(i,1);else KRE.swiat.ustawy.push(k)}else if(grupa)KRE.swiat[grupa][k]=Math.round(+v||0);else KRE.swiat[k]=Math.round(+v||0);kreatorRys()}
 function kreObecnosc(k,r,v,rysuj){if(!KRE)return;if(!KRE.swiat.obecnosc[k])KRE.swiat.obecnosc[k]={};KRE.swiat.obecnosc[k][r]=cl(Math.round(+v||0),0,100);if(rysuj)kreatorRys()}
-function kreWydDodaj(){
+const KRE_WZORY_WYDARZEN={
+  afera:{kategoria:'Afera',nazwa:'Wyciek z kanału',opis:'Ktoś wrzucił do sieci fragment rozmowy. Serwer żąda reakcji.',war:{odTygodnia:2},opcje:[
+    {nazwa:'Pokaż kulisy',opis:'Więcej wiarygodności, ale tracisz twarz.',ai:{agresja:0,ryzyko:-1,media:0,prawo:1,koalicje:0,rozwoj:1},efekty:{fame:-2,cred:5,uni:0,act:0,ctr:0,mem:0,kapital:0,obecnosc:0,rel:0,relPartia:''}},
+    {nazwa:'Idź w zaparte',opis:'Zyskujesz rozgłos, gdy afera nie przygaśnie.',ai:{agresja:2,ryzyko:2,media:1,prawo:0,koalicje:0,rozwoj:0},efekty:{fame:7,cred:-4,uni:0,act:0,ctr:6,mem:0,kapital:0,obecnosc:0,rel:0,relPartia:''}}
+  ]},
+  kryzys:{kategoria:'Kryzys',nazwa:'Pęka koalicja',opis:'Koalicjant grozi odejściem. Trzeba wybrać cenę spokoju.',war:{odTygodnia:3},opcje:[
+    {nazwa:'Oddaj im resort',opis:'Rząd trwa, ale twoja partia słabnie.',ai:{agresja:0,ryzyko:-1,media:0,prawo:0,koalicje:2,rozwoj:0},efekty:{fame:0,cred:4,uni:-2,act:0,ctr:0,mem:0,kapital:-10,obecnosc:0,rel:0,relPartia:''}},
+    {nazwa:'Zaryzykuj nowe wybory',opis:'Możesz wygrać albo rozpętać chaos.',ai:{agresja:2,ryzyko:2,media:0,prawo:0,koalicje:-1,rozwoj:0},efekty:{fame:5,cred:0,uni:0,act:0,ctr:8,mem:0,kapital:0,obecnosc:0,rel:-8,relPartia:''}}
+  ]},
+  media:{kategoria:'Media',nazwa:'Wielki wywiad',opis:'Redakcja daje ci pierwszą stronę i oczekuje jasnej deklaracji.',war:{odTygodnia:1},opcje:[
+    {nazwa:'Mów o konkretach',opis:'Spokojna odpowiedź buduje zaufanie.',ai:{agresja:0,ryzyko:0,media:1,prawo:1,koalicje:0,rozwoj:2},efekty:{fame:0,cred:6,uni:0,act:3,ctr:0,mem:0,kapital:0,obecnosc:0,rel:0,relPartia:''}},
+    {nazwa:'Zrób show',opis:'Serwer zapamięta wystąpienie, ale nie każdy je polubi.',ai:{agresja:1,ryzyko:2,media:2,prawo:0,koalicje:0,rozwoj:0},efekty:{fame:10,cred:-2,uni:0,act:0,ctr:4,mem:0,kapital:0,obecnosc:0,rel:0,relPartia:''}}
+  ]}
+};
+function kreWydSzablon(typ){const s=KRE_WZORY_WYDARZEN[typ];return s?JSON.parse(JSON.stringify(s)):null}
+function kreWydDodaj(typ){
+  if(typ){
+    if(!KRE||KRE.wydarzenia.length>=24)return;
+    const nr=KRE.wydarzenia.length+1,id='EV'+(++KRE.seq),sz=kreWydSzablon(typ);
+    const e=sz||{nazwa:'Nowe wydarzenie '+nr,kategoria:'Wydarzenie scenariusza',opis:'Opisz sytuację, przed którą staje partia.',party:'gracz',opcje:[]};
+    e.id=id;e.party=e.party||'gracz';e.war=Object.assign({term:0,week:0,odTygodnia:0,coIle:0,przerwa:0,powtarzalne:false,minMandaty:0,maxMandaty:0,minSlawa:0,maxKontrowersja:0,urzad:'brak',poWydarzeniu:'',poTygodniach:0,poOpcji:''},e.war||{});
+    e.opcje=(e.opcje&&e.opcje.length?e.opcje:[{nazwa:'Podejmuję ryzyko',opis:'Odważna odpowiedź.',ai:{},efekty:{}},{nazwa:'Gram bezpiecznie',opis:'Ostrożna odpowiedź.',ai:{},efekty:{}}]).map((o,j)=>Object.assign({id:'O'+(j+1)},o));
+    KRE.wydarzenia.push(e);KRE.wydSel=KRE.wydarzenia.length-1;kreatorRys();return;
+  }
   if(!KRE||KRE.wydarzenia.length>=24)return;const nr=KRE.wydarzenia.length+1,id='EV'+(++KRE.seq);KRE.wydarzenia.push({id,nazwa:'Nowe wydarzenie '+nr,kategoria:'Wydarzenie scenariusza',opis:'Opisz sytuację, przed którą staje partia.',party:'gracz',war:{term:0,week:0,odTygodnia:0,coIle:0,przerwa:0,powtarzalne:false,minMandaty:0,maxMandaty:0,minSlawa:0,maxKontrowersja:0,urzad:'brak'},opcje:[{nazwa:'Podejmuję ryzyko',opis:'Odważna odpowiedź.',ai:{agresja:1,ryzyko:1,media:0,prawo:0,koalicje:0,rozwoj:0},efekty:{fame:6,cred:0,uni:0,act:3,ctr:5,mem:0,kapital:0,obecnosc:0,rel:0,relPartia:''}},{nazwa:'Gram bezpiecznie',opis:'Ostrożna odpowiedź.',ai:{agresja:0,ryzyko:-1,media:0,prawo:0,koalicje:1,rozwoj:1},efekty:{fame:0,cred:4,uni:3,act:0,ctr:-2,mem:0,kapital:0,obecnosc:0,rel:0,relPartia:''}}]});KRE.wydSel=KRE.wydarzenia.length-1;kreatorRys();
 }
+function kreWydDuplikuj(i){
+  if(!KRE||!KRE.wydarzenia[i]||KRE.wydarzenia.length>=24)return;
+  const e=JSON.parse(JSON.stringify(KRE.wydarzenia[i]));e.id='EV'+(++KRE.seq);e.nazwa=(e.nazwa||'Wydarzenie')+' — kopia';
+  KRE.wydarzenia.push(e);KRE.wydSel=KRE.wydarzenia.length-1;kreatorRys();
+}
 function kreWydWybierz(i){if(KRE){KRE.wydSel=cl(Math.round(+i||0),0,Math.max(0,KRE.wydarzenia.length-1));kreatorRys()}}
-function kreWydUsun(i){if(KRE){KRE.wydarzenia.splice(i,1);KRE.wydSel=cl(KRE.wydSel,0,Math.max(0,KRE.wydarzenia.length-1));kreatorRys()}}
-function kreWydPole(i,grupa,pole,v,rysuj){const e=KRE&&KRE.wydarzenia[i];if(!e)return;const o=grupa?e[grupa]:e;if(grupa==='war')o[pole]=pole==='urzad'?String(v):pole==='powtarzalne'?!!v:Math.max(0,Math.round(+v||0));else o[pole]=String(v||'').slice(0,pole==='opis'?500:80);if(rysuj)kreatorRys()}
-function kreWydOpcjaDodaj(i){const e=KRE&&KRE.wydarzenia[i];if(!e||e.opcje.length>=4)return;e.opcje.push({nazwa:'Nowa odpowiedź',opis:'',ai:{agresja:0,ryzyko:0,media:0,prawo:0,koalicje:0,rozwoj:0},efekty:{fame:0,cred:0,uni:0,act:0,ctr:0,mem:0,kapital:0,obecnosc:0,rel:0,relPartia:''}});kreatorRys()}
+function kreWydUsun(i){if(KRE){const id=KRE.wydarzenia[i]?.id;KRE.wydarzenia.splice(i,1);KRE.wydarzenia.forEach(x=>{if(x.war?.poWydarzeniu===id){x.war.poWydarzeniu='';x.war.poOpcji=''}});KRE.wydSel=cl(KRE.wydSel,0,Math.max(0,KRE.wydarzenia.length-1));kreatorRys()}}
+function kreWydPole(i,grupa,pole,v,rysuj){const e=KRE&&KRE.wydarzenia[i];if(!e)return;const o=grupa?e[grupa]:e;if(grupa==='war')o[pole]=['urzad','poWydarzeniu','poOpcji'].includes(pole)?String(v||''):pole==='powtarzalne'?!!v:Math.max(0,Math.round(+v||0));else o[pole]=String(v||'').slice(0,pole==='opis'?500:80);if(rysuj)kreatorRys()}
+function kreWydOpcjaDodaj(i){const e=KRE&&KRE.wydarzenia[i];if(!e||e.opcje.length>=4)return;e.opcje.push({id:'O'+(e.opcje.length+1),nazwa:'Nowa odpowiedź',opis:'',ai:{agresja:0,ryzyko:0,media:0,prawo:0,koalicje:0,rozwoj:0},efekty:{fame:0,cred:0,uni:0,act:0,ctr:0,mem:0,kapital:0,obecnosc:0,rel:0,relPartia:''}});kreatorRys()}
 function kreWydOpcjaUsun(i,j){const e=KRE&&KRE.wydarzenia[i];if(e&&e.opcje.length>1){e.opcje.splice(j,1);kreatorRys()}}
 function kreWydOpcjaPole(i,j,grupa,pole,v,rysuj){const o=KRE&&KRE.wydarzenia[i]&&KRE.wydarzenia[i].opcje[j];if(!o)return;const x=grupa?o[grupa]:o;if(grupa==='ai'||grupa==='efekty'){if(['relPartia','nazwa','ab','c','ustawa'].includes(pole))x[pole]=String(v||'');else if(['zmienLidera','ustawaWlacz'].includes(pole))x[pole]=!!v;else x[pole]=Math.round(+v||0)}else x[pole]=String(v||'').slice(0,pole==='opis'?180:70);if(rysuj)kreatorRys()}
 const kre2SumaMandatow=()=>Object.values(KRE.mandaty).reduce((a,n)=>a+(+n||0),0);
@@ -189,6 +217,8 @@ function kre2Walidacja(){
     if(!krePartieLista().includes(c.party))w.push({blok:1,krok:6,t:`Cel „${c.nazwa||'bez nazwy'}” nie ma istniejącej partii.`});
   });
   KRE.wydarzenia.forEach(e=>{if(!String(e.nazwa||'').trim())w.push({blok:1,krok:5,t:'Wydarzenie nie ma nazwy.'});if(!String(e.opis||'').trim())w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” nie ma opisu.`});if(!['gracz','losowa'].includes(e.party)&&!krePartieLista().includes(e.party))w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” wskazuje nieistniejącą partię.`});if(!e.opcje||!e.opcje.length)w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” nie ma odpowiedzi.`});else e.opcje.forEach(o=>{if(!String(o.nazwa||'').trim())w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” ma pustą odpowiedź.`})})});
+  const eventIds=new Set(KRE.wydarzenia.map(e=>e.id));
+  KRE.wydarzenia.forEach(e=>{const war=e.war||{};if(war.poWydarzeniu&&(war.poWydarzeniu===e.id||!eventIds.has(war.poWydarzeniu)))w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” ma nieprawidłowego poprzednika.`});if(war.poTygodniach<0)w.push({blok:1,krok:5,t:`Wydarzenie „${e.nazwa||'bez nazwy'}” ma ujemne opóźnienie.`})});
   if(KRE.rzadTryb==='wlasny'){
     if(!KRE.rzadPartie.length)w.push({blok:1,krok:7,t:'Własny rząd nie ma żadnej partii.'});
     if(KRE.rzadPartie.some(k=>!KRE.mandaty[k]))w.push({blok:1,krok:7,t:'Partia bez mandatu nie może wejść do startowego rządu.'});
@@ -245,11 +275,12 @@ function kre4EkranAI(){
     <div class="krehint"><b>To działa w grze</b><span>Przykład: wysoka aktywność ustawodawcza skraca przerwy między projektami, a koalicyjność podnosi realną szansę wspólnej listy.</span></div></div>`;
 }
 function kre4EkranWydarzenia(){
-  const i=cl(KRE.wydSel||0,0,Math.max(0,KRE.wydarzenia.length-1)),e=KRE.wydarzenia[i],l=krePartieLista(),num=(g,k,n,max=999)=>`<label>${n}<input type="number" min="0" max="${max}" value="${e?e[g][k]||0:0}" onchange="kreWydPole(${i},'${g}','${k}',this.value,1)"></label>`;
-  return `<div class="krepanel krebig"><div class="kretitle"><span>06</span><div><h2>Wyreżyseruj wydarzenia</h2><p>Do 24 sytuacji z warunkami i czterema odpowiedziami. AI wybiera zgodnie ze swoim charakterem.</p></div></div><div class="kresectionhead"><div><span>Oś kampanii</span><h3>${KRE.wydarzenia.length} z 24 wydarzeń</h3></div><button class="btn" onclick="kreWydDodaj()" ${KRE.wydarzenia.length>=24?'disabled':''}>+ Nowe wydarzenie</button></div>
-    ${!e?`<div class="kreempty"><b>Świat jeszcze milczy</b><span>Dodaj kryzys, rozłam, debatę, aferę albo wydarzenie fabularne.</span><button class="btn" onclick="kreWydDodaj()">Tworzę pierwsze wydarzenie</button></div>`:`<div class="krewyd"><aside>${KRE.wydarzenia.map((x,j)=>`<button class="${j===i?'on':''}" onclick="kreWydWybierz(${j})"><i>${j+1}</i><span><b>${esc(x.nazwa)}</b><small>${x.war.term?'K'+x.war.term:'dowolna kadencja'} · ${x.war.week?'T'+x.war.week:'warunkowo'}</small></span></button>`).join('')}</aside><main><div class="kresectionhead"><div><span>Wydarzenie ${i+1}</span><h3>${esc(e.nazwa)}</h3></div><button class="btn g sm" onclick="kreWydUsun(${i})">Usuń</button></div>
+  const i=cl(KRE.wydSel||0,0,Math.max(0,KRE.wydarzenia.length-1)),e=KRE.wydarzenia[i],l=krePartieLista(),num=(g,k,n,max=999)=>`<label>${n}<input type="number" min="0" max="${max}" value="${e?e[g][k]||0:0}" onchange="kreWydPole(${i},'${g}','${k}',this.value,1)"></label>`,poprzednicy=KRE.wydarzenia.map((x,j)=>[x.id||'EV'+j,x.nazwa||x.id]).filter((x,j)=>j!==i),poprzednik=e&&KRE.wydarzenia.find(x=>x.id===e.war?.poWydarzeniu),sel=(arr,v)=>arr.map(([a,b])=>`<option value="${esc(a)}" ${String(a)===String(v||'')?'selected':''}>${esc(b)}</option>`).join(''),odpowiedzi=[['','dowolna odpowiedź'],...(poprzednik?.opcje||[]).map((o,j)=>[o.id||'O'+(j+1),o.nazwa||'Odpowiedź '+(j+1)])];
+  return `<div class="krepanel krebig"><div class="kretitle"><span>06</span><div><h2>Wyreżyseruj wydarzenia</h2><p>Do 24 sytuacji z warunkami i czterema odpowiedziami. AI wybiera zgodnie ze swoim charakterem.</p></div></div><div class="kresectionhead"><div><span>Oś kampanii</span><h3>${KRE.wydarzenia.length} z 24 wydarzeń</h3></div><div class="krewydtemplates"><button class="btn" onclick="kreWydDodaj('custom')" ${KRE.wydarzenia.length>=24?'disabled':''}>+ Wydarzenie</button><button class="btn g sm" onclick="kreWydDodaj('afera')" ${KRE.wydarzenia.length>=24?'disabled':''}>Afera</button><button class="btn g sm" onclick="kreWydDodaj('kryzys')" ${KRE.wydarzenia.length>=24?'disabled':''}>Kryzys</button><button class="btn g sm" onclick="kreWydDodaj('media')" ${KRE.wydarzenia.length>=24?'disabled':''}>Media</button></div></div>
+    ${!e?`<div class="kreempty"><b>Świat jeszcze milczy</b><span>Dodaj kryzys, rozłam, debatę, aferę albo wydarzenie fabularne.</span><button class="btn" onclick="kreWydDodaj('custom')">Tworzę pierwsze wydarzenie</button></div>`:`<div class="krewyd"><aside>${KRE.wydarzenia.map((x,j)=>`<button class="${j===i?'on':''}" onclick="kreWydWybierz(${j})"><i>${j+1}</i><span><b>${esc(x.nazwa)}</b><small>${x.war.term?'K'+x.war.term:'dowolna kadencja'} · ${x.war.week?'T'+x.war.week:'warunkowo'}</small></span></button>`).join('')}</aside><main><div class="kresectionhead"><div><span>Wydarzenie ${i+1}</span><h3>${esc(e.nazwa)}</h3></div><div class="krewydactions"><button class="btn g sm" onclick="kreWydDuplikuj(${i})">Duplikuj</button><button class="btn g sm" onclick="kreWydUsun(${i})">Usuń</button></div></div>
       <div class="kreform trzy"><label>Nazwa<input value="${esc(e.nazwa)}" onchange="kreWydPole(${i},'','nazwa',this.value,1)"></label><label>Kategoria<input value="${esc(e.kategoria)}" onchange="kreWydPole(${i},'','kategoria',this.value,1)"></label><label>Dotyczy<select onchange="kreWydPole(${i},'','party',this.value,1)"><option value="gracz" ${e.party==='gracz'?'selected':''}>partii gracza</option><option value="losowa" ${e.party==='losowa'?'selected':''}>losowej partii AI</option>${l.map(k=>`<option value="${k}" ${e.party===k?'selected':''}>${esc(krePartiaDane(k).ab)}</option>`).join('')}</select></label><label class="wide">Opis<textarea rows="4" maxlength="500" onchange="kreWydPole(${i},'','opis',this.value,1)">${esc(e.opis)}</textarea></label></div>
       <div class="sterlab">Kiedy się uruchamia — zero oznacza dowolnie</div><div class="krenumbers cele">${num('war','term','Kadencja',50)}${num('war','week','Tydzień',24)}${num('war','odTygodnia','Od tygodnia gry',999)}${num('war','coIle','Co ile tygodni',100)}${num('war','przerwa','Przerwa po odpaleniu',100)}${num('war','minMandaty','Min. mandatów',40)}${num('war','maxMandaty','Maks. mandatów',40)}${num('war','minSlawa','Min. sława',100)}${num('war','maxKontrowersja','Maks. kontrowersja',100)}<label>Urząd<select onchange="kreWydPole(${i},'war','urzad',this.value,1)">${[['brak','bez warunku'],['premier','premier'],['prezydent','prezydent'],['opozycja','opozycja']].map(x=>`<option value="${x[0]}" ${e.war.urzad===x[0]?'selected':''}>${x[1]}</option>`).join('')}</select></label><label class="krecheckline"><input type="checkbox" ${e.war.powtarzalne?'checked':''} onchange="kreWydPole(${i},'war','powtarzalne',this.checked,1)"> Powtarzalne</label></div>
+      <div class="krechain"><div class="sterlab">?a?cuch wydarze?</div><div class="kreform trzy"><label>Po wydarzeniu<select onchange="kreWydPole(${i},'war','poWydarzeniu',this.value,1)"><option value="">bez poprzednika</option>${sel(poprzednicy,e.war.poWydarzeniu)}</select></label><label>Po konkretnej odpowiedzi<select onchange="kreWydPole(${i},'war','poOpcji',this.value,1)">${sel(odpowiedzi,e.war.poOpcji)}</select></label><label>Op??nienie po poprzedniku<input type="number" min="0" max="100" value="${e.war.poTygodniach||0}" onchange="kreWydPole(${i},'war','poTygodniach',this.value,1)"></label></div></div>
       <div class="kresectionhead"><div><span>Odpowiedzi</span><h3>${e.opcje.length} z 4 możliwości</h3></div><button class="btn g sm" onclick="kreWydOpcjaDodaj(${i})" ${e.opcje.length>=4?'disabled':''}>+ Odpowiedź</button></div><div class="kreopcje">${e.opcje.map((o,j)=>kre4OpcjaWyd(i,j,o,l)).join('')}</div></main></div>`}</div>`;
 }
 function kre4OpcjaWyd(i,j,o,l){
@@ -339,7 +370,7 @@ function kre2Sidebar(){
 
 function kreatorEkran(){
   const ekran=[kre2EkranOpis,kre3EkranPartie,kre3EkranSejm,kre4EkranRelacje,kre4EkranAI,kre4EkranWydarzenia,kre3EkranCele,kre3EkranWladza,kre3EkranFinal][KRE.krok]();
-  app.innerHTML=`<div class="kreekran"><header class="krehead"><div><div class="kick">Kreator kampanii</div><h1>Reżyseria żywego świata</h1><p>Dziewięć etapów: partie, liderzy, Sejm, relacje, AI, wydarzenia, cele, gospodarka i władza.</p></div><button class="btn g sm" onclick="kreWyjdz()">← Lista scenariuszy</button></header>${kre2Stepper()}<div class="krebody"><main class="krelewa">${ekran}</main>${kre2Sidebar()}</div></div>`;
+  app.innerHTML=`<div class="kreekran"><header class="krehead"><div><div class="kick">Kreator kampanii</div><h1>Reżyseria żywego świata</h1><p>Dziewięć etapów: partie, liderzy, Sejm, relacje, AI, wydarzenia, cele, gospodarka i władza.</p><div class="kretools"><button class="btn g sm" onclick="kreatorPodglad()">Podgląd</button><button class="btn g sm" onclick="kreatorDraftZapisz()">Zapisz szkic</button><button class="btn g sm" onclick="kreatorDraftWczytaj()">Wczytaj szkic</button><button class="btn g sm" onclick="kreatorEksportJSON()">Eksport JSON</button><button class="btn g sm" onclick="kreatorImportJSON()">Import JSON</button></div></div><button class="btn g sm" onclick="kreWyjdz()">← Lista scenariuszy</button></header>${kre2Stepper()}<div class="krebody"><main class="krelewa">${ekran}</main>${kre2Sidebar()}</div></div>`;
   ['#kn','#ka','#ko'].forEach(s=>{const e=document.querySelector(s);if(e)e.oninput=()=>{kreCzytaj();kreOdswiezPodglad()}});
 }
 function kreCzytaj(){
@@ -360,7 +391,7 @@ function kreatorDane(){
     trudnosc:KRE.trudnosc||'Standard',autor:KRE.autor.trim(),efekty:{wszystkie:{},partie:{}},
     partieNowe:JSON.parse(JSON.stringify(KRE.nowe)),cele:JSON.parse(JSON.stringify(KRE.cele)),
     edycje:JSON.parse(JSON.stringify(KRE.edycje)),ai:JSON.parse(JSON.stringify(KRE.ai)),
-    wydarzenia:JSON.parse(JSON.stringify(KRE.wydarzenia)),swiat:JSON.parse(JSON.stringify(KRE.swiat))};
+    wydarzenia:JSON.parse(JSON.stringify(KRE.wydarzenia)),swiat:JSON.parse(JSON.stringify(KRE.swiat)),konfiguracja:{mandaty:JSON.parse(JSON.stringify(KRE.mandaty)),mandatyZm:!!KRE.mandatyZm,rzadTryb:KRE.rzadTryb,rzadPartie:KRE.rzadPartie.slice(),premier:KRE.premier,prezTryb:KRE.prezTryb,prezydent:KRE.prezydent,relacje:KRE.relacje}};
   if(KRE.nowe.length)zmiany.push(`${KRE.nowe.length} ${pl(KRE.nowe.length,'nowa partia','nowe partie','nowych partii')}`);
   if(KRE.cele.length)zmiany.push(`${KRE.cele.length} ${pl(KRE.cele.length,'własny cel','własne cele','własnych celów')}`);
   if(KRE.wydarzenia.length)zmiany.push(`${KRE.wydarzenia.length} ${pl(KRE.wydarzenia.length,'wydarzenie','wydarzenia','wydarzeń')}`);
@@ -380,6 +411,39 @@ function kreatorDane(){
   }
   mod.zmiany=zmiany.join(' · ')||'Bez zmian względem zwykłej gry.';return mod;
 }
+const KRE_DRAFT_KEY='mm_kreator_scenariusza_v3';
+function kreDraftZapiszCichy(){try{if(KRE)localStorage.setItem(KRE_DRAFT_KEY,JSON.stringify(KRE))}catch(e){}}
+function kreDraftUsun(){try{localStorage.removeItem(KRE_DRAFT_KEY)}catch(e){}}
+function kreDraftNormalizuj(){
+  if(!KRE)return;
+  KRE.ef=Object.assign({},KRE.ef||{});KRE.partie=Object.assign({},KRE.partie||{});KRE.nowe=Array.isArray(KRE.nowe)?KRE.nowe:[];KRE.cele=Array.isArray(KRE.cele)?KRE.cele:[];KRE.edycje=Object.assign({},KRE.edycje||{});KRE.ai=Object.assign({},KRE.ai||{});KRE.wydarzenia=Array.isArray(KRE.wydarzenia)?KRE.wydarzenia:[];KRE.swiat=Object.assign({relacje:{},bank:{},media:{},obecnosc:{},majatekMnoznik:100,ustawy:[]},KRE.swiat||{});KRE.swiat.relacje=Object.assign({},KRE.swiat.relacje||{});KRE.swiat.bank=Object.assign({},KRE.swiat.bank||{});KRE.swiat.media=Object.assign({},KRE.swiat.media||{});KRE.swiat.obecnosc=Object.assign({},KRE.swiat.obecnosc||{});KRE.swiat.ustawy=Array.isArray(KRE.swiat.ustawy)?KRE.swiat.ustawy:[];
+  KRE.wydarzenia.forEach((e,j)=>{e.id=e.id||'EV'+(j+1);e.war=Object.assign({term:0,week:0,odTygodnia:0,coIle:0,przerwa:0,powtarzalne:false,minMandaty:0,maxMandaty:0,minSlawa:0,maxKontrowersja:0,urzad:'brak',poWydarzeniu:'',poTygodniach:0,poOpcji:''},e.war||{});e.opcje=(Array.isArray(e.opcje)?e.opcje:[]).map((o,k)=>Object.assign({id:'O'+(k+1),ai:{},efekty:{}},o))});
+}
+function kreatorDraftZapisz(){if(!KRE)return;kreDraftZapiszCichy();modal('Kreator','Szkic zapisany',`<p>Robocza wersja <b>${esc(KRE.nazwa||'bez nazwy')}</b> jest zapisana na tym komputerze. Możesz do niej wrócić po ponownym wejściu do kreatora.</p>`,[{l:'Dobrze',f:close}])}
+function kreatorDraftWczytaj(){
+  let d=null;try{d=JSON.parse(localStorage.getItem(KRE_DRAFT_KEY)||'null')}catch(e){}
+  if(!d)return modal('Kreator','Brak szkicu','<p>Nie ma jeszcze zapisanego szkicu scenariusza.</p>',[{l:'Wracam',f:close}]);
+  openKreator();KRE=Object.assign(KRE,d);kreDraftNormalizuj();kreatorRys();
+}
+async function kreatorEksportJSON(){
+  if(!KRE)return;const json=JSON.stringify(kreatorDane(),null,2);
+  try{await navigator.clipboard.writeText(json);modal('Kreator','JSON skopiowany','<p>Pełny scenariusz jest w schowku. Możesz wkleić go komuś albo zachować jako kopię.</p>',[{l:'Dobrze',f:close}])}
+  catch(e){window.prompt('Skopiuj JSON scenariusza:',json)}
+}
+function kreatorImportJSON(){
+  const raw=window.prompt('Wklej JSON scenariusza:','');if(!raw)return;
+  try{
+    const d=JSON.parse(raw);if(!d||typeof d!=='object')throw new Error('Niepoprawny obiekt');
+    openKreator();
+    if(d.krok!==undefined&&Array.isArray(d.wydarzenia))KRE=Object.assign(KRE,d);
+    else {KRE.nazwa=d.nazwa||'';KRE.opis=d.opis||'';KRE.trudnosc=d.trudnosc||'Standard';KRE.autor=d.autor||'';KRE.nowe=d.partieNowe||[];KRE.cele=d.cele||[];KRE.edycje=d.edycje||{};KRE.ai=d.ai||{};KRE.wydarzenia=d.wydarzenia||[];KRE.swiat=d.swiat||KRE.swiat;const ef=d.efekty||{};KRE.ef=Object.assign(KRE.ef,ef.wszystkie||{});KRE.partie=Object.assign(KRE.partie,ef.partie||{});if(ef.mandatyStart){KRE.mandaty=Object.assign(KRE.mandaty,ef.mandatyStart);KRE.mandatyZm=true}const cfg=d.konfiguracja||{};if(cfg.mandaty)KRE.mandaty=Object.assign(KRE.mandaty,cfg.mandaty);if(cfg.rzadTryb)KRE.rzadTryb=cfg.rzadTryb;if(Array.isArray(cfg.rzadPartie))KRE.rzadPartie=cfg.rzadPartie.slice();if(cfg.premier)KRE.premier=cfg.premier;if(cfg.prezTryb)KRE.prezTryb=cfg.prezTryb;if(cfg.prezydent)KRE.prezydent=cfg.prezydent;if(cfg.relacje)KRE.relacje=cfg.relacje}
+    kreDraftNormalizuj();kreatorRys();
+  }catch(e){modal('Kreator','Nie udało się wczytać JSON','<p>Plik ma zły format albo pochodzi ze starej wersji.</p>',[{l:'Wracam',f:close}])}
+}
+function kreatorPodglad(){
+  if(!KRE)return;const d=kreatorDane(),ev=d.wydarzenia||[],chains=ev.filter(e=>e.war&&e.war.poWydarzeniu).map(e=>`${esc(e.nazwa)} ← ${esc(e.war.poWydarzeniu)}${e.war.poOpcji?' / '+esc(e.war.poOpcji):''}`).join('<br>');
+  modal('Podgląd scenariusza',esc(d.nazwa||'Bez nazwy'),`<p>${esc(d.opis||'')}</p><div class="krefinalstats"><div><b>${d.partieNowe.length}</b><span>nowych partii</span></div><div><b>${ev.length}</b><span>wydarzeń</span></div><div><b>${d.cele.length}</b><span>celów</span></div></div>${ev.length?`<div class="lawheld" style="margin-top:12px">${ev.map(e=>`<div class="lh"><span><b>${esc(e.nazwa)}</b><small>${esc(e.kategoria||'Wydarzenie')} · ${(e.opcje||[]).length} odpowiedzi</small></span></div>`).join('')}</div>`:''}${chains?`<p class="dim" style="margin-top:12px"><b>Łańcuchy:</b><br>${chains}</p>`:''}`,[{l:'Wracam',f:close}]);
+}
 function kreatorProbuj(){
   if(kre2Blokuje())return;const dane=kreatorDane(),id='kreator-proba';
   SCEN[id]={n:dane.nazwa,t:dane.trudnosc,d:dane.opis,mod:dane.zmiany,zModa:true,autor:dane.autor,
@@ -395,7 +459,7 @@ async function kreatorZapisz(){
   if(!KRE||kre2Blokuje())return;const mod=kreatorDane(),a=(window.pywebview&&window.pywebview.api)||null;
   if(!a||!a.mod_zapisz)return modal('Kreator','Nie mam gdzie tego zapisać','<p>Zapis modów działa w wersji na komputer. W przeglądarce nie ma dostępu do plików.</p>',[{l:'Rozumiem',f:()=>{close();render()}}]);
   let wynik=null;try{wynik=await a.mod_zapisz(mod)}catch(e){wynik={ok:false,blad:e.message}}
-  KRE=null;close();
+  kreDraftUsun();KRE=null;close();
   if(wynik&&wynik.ok){await wczytajMody();render();modal('Kreator','Scenariusz zapisany',`<p><b>${esc(mod.nazwa)}</b> jest już na liście scenariuszy.</p><p style="margin-top:10px">Plik leży w katalogu modów — możesz go wysłać komuś, a on zagra w ten sam świat.</p>`,[{l:'Dobrze',f:()=>{close();render()}}])}
   else modal('Kreator','Nie udało się zapisać',`<p>${esc((wynik&&wynik.blad)||'Nieznany błąd.')}</p>`,[{l:'Trudno',f:()=>{close();render()}}]);
 }

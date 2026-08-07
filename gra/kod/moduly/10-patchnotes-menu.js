@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.86':{data:'7 sierpnia 2026', zmiany:[
+  'KREATOR MA ZAPIS ROBOCZY, PODGLAD, DUPLIKOWANIE ORAZ IMPORT I EKSPORT JSON.',
+  'WYDARZENIA MOZNA TWORZYC Z GOTOWYCH SZABLONOW AFERA, KRYZYS I MEDIA.',
+  'WYDARZENIA MOGA TWORZYC LANCUCHY ZALEZNOSCI, ODPOWIEDZI I OPOZNIENIA.',
+ ]},
  '1.1.85':{data:'7 sierpnia 2026', zmiany:[
   'KOD GRY ZOSTAL PODZIELONY NA 19 MODULOW. Partie, wybory, Sejm, AI, ekonomia, media, sad, ustawy, interfejs i zapisy maja teraz osobne miejsca.',
   'ZACHOWANA ZOSTALA PELNA ZGODNOSC Z GRA. Kolejnosc ladowania, window API, format zapisow, mody, wyglad i zasady rozgrywki pozostaly takie same.',

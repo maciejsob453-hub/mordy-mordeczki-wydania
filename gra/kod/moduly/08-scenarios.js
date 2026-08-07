@@ -203,6 +203,8 @@ function scenEventPartia(e){
 }
 function scenEventMozna(e,k){
   if(!e||!k||!G.p[k])return false;const w=e.war||{},p=G.p[k],st=G.scenEventState[e.id]||{};
+  const poprzednik=w.poWydarzeniu||w.wymagaWydarzenia;
+  if(poprzednik){const ps=G.scenEventState[poprzednik];if(!ps||!ps.ile)return false;if(w.poOpcji&&ps.opcja!==w.poOpcji)return false;if(w.poTygodniach&&absWeek()-(ps.ostatni||0)<+w.poTygodniach)return false}
   if(w.term&&G.term!==+w.term)return false;if(w.week&&G.week!==+w.week)return false;
   if(w.odTygodnia&&absWeek()<+w.odTygodnia)return false;if(w.coIle&&absWeek()%Math.max(1,+w.coIle)!==0)return false;
   if(!w.powtarzalne&&st.ile)return false;if(w.przerwa&&st.ostatni&&absWeek()-st.ostatni<+w.przerwa)return false;
@@ -224,7 +226,7 @@ function scenEventEfekt(k,ef){
   if(ef.ustawa){G.law=G.law||{};G.law[String(ef.ustawa).slice(0,20)]=ef.ustawaWlacz===false?0:1}
 }
 function scenEventWybierz(e,k,opcja){
-  if(!e||!opcja)return;scenEventEfekt(k,opcja.efekty);const st=G.scenEventState[e.id]||{ile:0};st.ile++;st.ostatni=absWeek();G.scenEventState[e.id]=st;
+  if(!e||!opcja)return;scenEventEfekt(k,opcja.efekty);const st=G.scenEventState[e.id]||{ile:0};st.ile++;st.ostatni=absWeek();st.opcja=opcja.id||opcja.nazwa||'';G.scenEventState[e.id]=st;
   say(`<b>${esc(e.nazwa)}.</b> ${esc(G.p[k].ab)}: ${esc(opcja.nazwa)}.`,opcja.klasa||'roy');
 }
 function scenEventAiOpcja(e,k){
@@ -619,7 +621,7 @@ async function kreatorDoPliku(){
      wczyta go przyciskiem <b>Wczytaj z pliku</b> na liście scenariuszy.</p>`,
     [{l:'Dobra',f:close}]);
 }
-function kreatorRys(){kreatorEkran()}
+function kreatorRys(){if(typeof kreDraftZapiszCichy==='function')kreDraftZapiszCichy();kreatorEkran()}
 /* Jedno miejsce, w którym powstaje scenariusz. Zapis na listę i zapis do pliku
    biorą stąd to samo, więc plik wysłany koledze zadziała identycznie. */
 function kreatorDane(){

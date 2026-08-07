@@ -160,7 +160,8 @@ Object.assign(window,{kreMandat,kreResetMandaty,krePreset,kreRzadTryb,kreRzadTog
   krePrezydentTryb,krePrezydent,kreRelacje,kreKrok,kreDalej,kreatorDoPliku,kreatorProbuj,
   kreNowaPartia,kreUsunPartie,kreNowaPole,kreNowaLogo,kreCelDodaj,kreCelUsun,kreCelWybierz,kreCelPole,
   kreMetaPole,kreMetaReset,kreMetaLogo,kreAiPole,kreRelUstaw,kreRelUsun,kreSwiatPole,kreObecnosc,
-  kreWydDodaj,kreWydWybierz,kreWydUsun,kreWydPole,kreWydOpcjaDodaj,kreWydOpcjaUsun,kreWydOpcjaPole});
+  kreWydDodaj,kreWydSzablon,kreWydDuplikuj,kreWydWybierz,kreWydUsun,kreWydPole,kreWydOpcjaDodaj,kreWydOpcjaUsun,kreWydOpcjaPole,
+  kreatorDraftZapisz,kreatorDraftWczytaj,kreatorEksportJSON,kreatorImportJSON,kreatorPodglad});
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
   get KRE(){return KRE}, SCEN, kreatorDane,
   myGoals,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,

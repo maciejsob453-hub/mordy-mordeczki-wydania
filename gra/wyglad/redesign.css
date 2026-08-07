@@ -2738,3 +2738,7 @@ body:has(.kreekran) .appbg{opacity:.16}
 .kreekran .kreform input,.kreekran .kreform textarea,.kreekran .kreselect select,
 .kreekran .kreseat,.kreekran .kresuwak,.kreekran .krestat,.kreekran .krefinalgrid>section,
 .kreekran .krefinalblock{background-color:rgba(3,13,9,.77);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+.kretools,.krewydtemplates{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.kretools .btn,.krewydtemplates .btn{font-size:11px;white-space:nowrap}
+.krechain{margin:12px 0 16px;padding:12px;border:1px solid rgba(198,155,56,.3);border-radius:8px;background:rgba(30,20,30,.42)}
+.krechain .sterlab{margin-bottom:8px}
