@@ -77,23 +77,25 @@ function sadZapewnijSklad(){
   if(!lawDone('sady'))return;
   const s=sadInit(), cel=sadNastawy().sklad;
   if(s.sedziowie.length>cel)s.sedziowie=s.sedziowie.slice(0,cel);
-  /* Pierwszy skład musi powstać od razu po ustawie. Symulujemy te same głosowania,
-     które później gracz widzi przy wakacie; inaczej nowy system byłby martwy przez
-     kilka tygodni tylko dlatego, że nikt jeszcze nie otworzył jego zakładki. */
-  if(!s.sedziowie.length){
-    for(const n of sadKandydaci().slice(0,12)){
-      sadWybierz(n,undefined,true);
-      if(s.sedziowie.length>=cel)break;
-    }
-  }
+}
+/* Ustawa otwiera wakaty, nie teleportuje sędziów do składu. Brakujące miejsce
+   jest stanem gry, który trzeba świadomie uzupełnić głosowaniem izby. */
+function sadWymagaObslugi(){
+  if(!lawDone('sady'))return false;
+  return sadSklad().length<sadNastawy().sklad&&sadKandydaci().length>0;
 }
 function sadSklad(){sadInit();return lawDone('sady')?G.sad.sedziowie.slice():[]}
 function sadDowody(nick,typ){
   const k=partiaOsoby(nick), p=k?G.p[k]:null;if(!p)return 0;
   const trop=(G.sad&&G.sad.tropy&&G.sad.tropy[k])||0;
-  if(typ==='urzad')return Math.round(cl(18+p.ctr*.42+(G.gov&&G.gov.parties.includes(k)?13:0)+trop,5,95));
-  if(typ==='korupcja')return Math.round(cl(12+p.ctr*.32+Math.log10(Math.max(10,kapPryw(nick)))*5+trop*.7,5,95));
-  return Math.round(cl(20+p.pret*.35+(100-p.cred)*.28+trop*.85,5,95));
+  /* Sama wysoka statystyka nie jest dowodem. Materiał powstaje po tropie z
+     konkretnej decyzji albo po naprawdę skrajnym skandalu; bez tego wynik jest
+     celowo za niski, żeby nie dało się skazywać losowych ludzi z listy. */
+  const zdarzenie=trop>=12, skandal=p.ctr>=86;
+  if(!zdarzenie&&!skandal)return 18;
+  if(typ==='urzad')return Math.round(cl(24+p.ctr*.34+(G.gov&&G.gov.parties.includes(k)?10:0)+trop*1.2,25,92));
+  if(typ==='korupcja')return Math.round(cl(18+p.ctr*.25+Math.log10(Math.max(10,kapPryw(nick)))*4+trop,22,90));
+  return Math.round(cl(22+p.pret*.24+(100-p.cred)*.22+trop*1.05,22,90));
 }
 function sadOpenSprawa(nick){
   if(!lawDone('sady')||sadSklad().length<2)return;
@@ -102,12 +104,14 @@ function sadOpenSprawa(nick){
     `<p>Wybierz zarzut. Wniesienie sprawy kosztuje <b>1 akcję i 8 kapitału</b>.
      Jeśli oskarżenie upadnie, twoja wiarygodność spadnie.</p>`,
     Object.keys(SAD_ZARZUTY).map(id=>{const z=SAD_ZARZUTY[id],d=sadDowody(nick,id);
-      return {l:z.n,s:`${z.d} · materiał dowodowy ${d}/100`,dis:G.ap<1||G.kp<8,
+      const podst=d>=42;
+      return {l:z.n,s:podst?`${z.d} · materiał dowodowy ${d}/100`:`Brak konkretnego zdarzenia (tylko ${d}/100)`,dis:!podst||G.ap<1||G.kp<8,
         f:()=>{close();sadWnies(nick,id)}}}).concat([{l:'Rezygnuję',f:close}]),close);
 }
 function sadWnies(nick,typ,cicho){
   const k=partiaOsoby(nick), z=SAD_ZARZUTY[typ], sklad=sadSklad();
   if(!k||!z||sklad.length<2||(!cicho&&(G.ap<1||G.kp<8)))return;
+  if(sadDowody(nick,typ)<42)return;
   if(!cicho){G.ap--;G.kp-=8;G.actedWeek=G.term+'-'+G.week}
   const n=sadNastawy(), dow=sadDowody(nick,typ), glosy=[];
   sklad.forEach(s=>{
@@ -328,8 +332,8 @@ function sidebar(p,q){
     ${b('Jedność',p.uni,'var(--pos)','uni')}
     ${b('Aktywność',p.act,'#9b7fd4','act')}
     ${b('Kontrowersja',p.ctr,'var(--neg)','ctr')}
-    ${p.ctr>=90?`<div class="ctrwarn bad"><b>Paraliż</b> Sondaż liczony na pół, kapitał wycieka, co tydzień ktoś odchodzi. Schładzaj: przeprosiny, wyciszenie sporu, otwarte konsultacje.</div>`
-      :p.ctr>=70?`<div class="ctrwarn"><b>Uwaga na kontrowersję</b> Przy 90 partia wpada w paraliż. Zostało ci ${Math.round(90-p.ctr)} punktów luzu.</div>`:''}
+    ${p.ctr>=96?`<div class="ctrwarn bad"><b>Paraliż</b> Sondaż słabnie, kapitał wycieka, co tydzień ktoś odchodzi. Schładzaj: przeprosiny, wyciszenie sporu, otwarte konsultacje.</div>`
+      :p.ctr>=70?`<div class="ctrwarn"><b>Uwaga na kontrowersję</b> Przy 96 partia wpada w paraliż. Zostało ci ${Math.round(96-p.ctr)} punktów luzu.</div>`:''}
     ${b('Pretensjonalność',p.pret,'#d98b4a','pret')}
     <div id="podgNota" class="podgnota"></div>
     </div>
@@ -380,4 +384,3 @@ function sidebar(p,q){
         <b class="m" style="color:${v<0?'var(--neg)':v>30?'var(--pos)':'var(--dim)'}">${v>0?'+':''}${v}</b></div>`}).join('')}
   </div></details>`;
 }
-

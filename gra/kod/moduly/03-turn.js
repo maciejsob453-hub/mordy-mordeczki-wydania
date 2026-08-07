@@ -53,6 +53,15 @@ function endWeek(){
     render();
     return;
   }
+  if(typeof sadWymagaObslugi==='function'&&sadWymagaObslugi()){
+    G.tab='sad';
+    modal('Sąd','Najpierw obsadź skład sądu',
+      `<p>Ustawa o sądzie weszła w życie, ale nadal brakuje sędziów. Każda kandydatura musi przejść przez głosowanie sejmu.</p>
+       <p class="dim">Tydzień nie może się skończyć, dopóki nie obsadzisz wszystkich wakatów albo nie zabraknie legalnych kandydatów.</p>`,
+      [{l:'Idę do Sądu',f:()=>{close();G.tab='sad';render()}}]);
+    render();
+    return;
+  }
   const p=me();
   const dateFrom=gameDate();
   ustawPlany();
@@ -160,15 +169,15 @@ function endWeek(){
   G.queue=buildEvents();
   {
     // ostrzeżenia nie mogą wstrzymywać kalendarza, inaczej wybory nigdy nie nadchodzą
-    if(p.ctr>=90){
-      // partia w paraliżu: sondaż na pół, kasa wycieka, ludzie uciekają
+    if(p.ctr>=96){
+      // partia w paraliżu: sondaż słabnie, kasa wycieka, ludzie uciekają
       const ucieklo=giveBackCap(p,2), n=ucieklo.eli+ucieklo.int+ucieklo.ser;
       G.kp=Math.max(0,G.kp-Math.round(8+p.mem*.35));   // kasa może się skończyć, ale nie zejść pod zero
       p.fame=cl(p.fame-3);p.act=cl(p.act-3);p.uni=cl(p.uni-3);
-      say(`<b>Paraliż: kontrowersja ${Math.round(p.ctr)}/100.</b> Sondaż liczony na pół, z kasy ucieka ${Math.round(8+p.mem*.35)} kapitału`
+      say(`<b>Paraliż: kontrowersja ${Math.round(p.ctr)}/100.</b> Sondaż słabnie, z kasy ucieka ${Math.round(8+p.mem*.35)} kapitału`
         +(n?`, odchodzi ${n} ${pl(n,'osoba','osoby','osób')}`:'')+'. Schłodź to, zanim zostanie sam szyld.','bad');
     }
-    else if(p.ctr>=70)say(`<b>Kontrowersja ${Math.round(p.ctr)}/100.</b> Przy 90 partia wpada w paraliż: sondaż na pół, kapitał na minus, ludzie wychodzą.`,'bad');
+    else if(p.ctr>=70)say(`<b>Kontrowersja ${Math.round(p.ctr)}/100.</b> Przy 96 partia wpada w paraliż: sondaż słabnie, kapitał ucieka, ludzie wychodzą.`,'bad');
     else if(p.fame<=9&&p.act<=9)say(`<b>${p.lead} ma dość.</b> Sława ${Math.round(p.fame)}, aktywność ${Math.round(p.act)}, o partii nikt już nie pamięta. Rozwiązać cię nikt nie rozwiąże, ale tak się nie wygrywa wyborów.`,'bad');
     if(ostatniTydzien){G.phase='finalcamp';absolutorium()}
     else if(G.prez2&&G.week>=G.prez2.week){runRunoff();return}

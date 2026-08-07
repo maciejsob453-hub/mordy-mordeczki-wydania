@@ -298,7 +298,7 @@ function rozliczenieKadencji(){
   dodaj('Sława',teraz.fame-przed.fame,'pkt','Ile osób w ogóle o tobie słyszało.');
   dodaj('Jedność',teraz.uni-przed.uni,'pkt','Rozsypana partia gorzej mobilizuje swoich.');
   dodaj('Wiarygodność',teraz.cred-przed.cred,'pkt','Decyduje, czy ktoś ci uwierzy.');
-  dodaj('Kontrowersja',teraz.ctr-przed.ctr,'pkt','Powyżej 90 sondaż liczy się na pół.',teraz.ctr<przed.ctr);
+  dodaj('Kontrowersja',teraz.ctr-przed.ctr,'pkt','Powyżej 96 sondaż słabnie, a paraliż kosztuje ludzi i kapitał.',teraz.ctr<przed.ctr);
   dodaj('Zmęczenie władzą',(teraz.znuz||0)-(przed.znuz||0),'pkt',
     'Zjada poparcie za samo siedzenie u steru. Zmywa je tylko kadencja w opozycji.',
     (teraz.znuz||0)<(przed.znuz||0));

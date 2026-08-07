@@ -4,6 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.88':{data:'7 sierpnia 2026', zmiany:[
+  'WYBOR PARTII DOSTAL KARUZELE JAK W FIFIE. Logo, nazwa i pelny profil sa na jednej karcie, a partie zmieniasz strzalkami.',
+  'KOALICJANT MOZE ROZMAWIAC Z PREMIEREM O MINISTERSTWIE. Relacja i kompetencja zaplecza zmieniaja szanse zgody.',
+  'SEDZIOW NIE MA JUZ Z AUTOMATU. Ustawe o sadzie trzeba domknac prawdziwymi glosowaniami, a sprawa bez dowodu nie ruszy.',
+  'USTAWY MAJA OSOBNY PROCES, KONTROWERSJA PARALIZUJE DOPIERO PRZY 96, A SONDAZ I KROL DOSTALY NOWE NAGLOWKI. Bluetes i Pablo sa teraz w NP z mandatami.',
+ ]},
  '1.1.87':{data:'7 sierpnia 2026', zmiany:[
   'KREATOR MA SYMULATOR TYGODNI. Sprawdzisz warunki, lancuchy i skutki wydarzen bez ruszania prawdziwej gry.',
   'WALIDATOR WYKRYWA PETLE, NIEOSIAGALNE WYDARZENIA, SPRZECZNE WARUNKI I BRAK PUNKTU STARTOWEGO.',
@@ -593,7 +599,7 @@ const TUT=[
  {t:'Ludzie, dyplomacja i kontrowersja',
   d:'Ludzi zdobywasz naborem, transferami, werbunkiem imiennym z cudzych partii i na koniec kadencji, jeśli sława i wiarygodność '
    +'są wyższe od progu zależnego od wielkości partii. Relacje z innymi decydują o koalicjach i o tym, kto da ci kogoś podebrać. '
-   +'A kontrowersji pilnuj: przy 90 partia wpada w paraliż, sondaż liczy się na pół i ludzie wychodzą.',
+   +'A kontrowersji pilnuj: przy 96 partia wpada w paraliż, sondaż słabnie i ludzie wychodzą.',
   ok:()=>true},
  {t:'Dograj kadencję do wyborów',
   d:'Reszta należy do ciebie. Buduj obecność, zbieraj ludzi, wydawaj kapitał. Przed wyborami zdecydujesz, czy startujesz sam przy progu 5%, '
@@ -667,8 +673,10 @@ function setup(){
   <!-- Układ z ekranu startu Victorii: lista po lewej, panel wybranego po prawej.
        Ich wiersze mają 560x105, panel boczny 420, odstęp 5 — te proporcje
        przenosimy tutaj, samą grafikę rysujemy po swojemu. -->
-  <div class="pick v3 partyselect">
-    <div class="pickmain" id="pmain"></div>
+  <div class="pick v3 partyselect fifa">
+    <button class="partyarrow left" aria-label="Poprzednia partia" onclick="pickPartyKrok(-1)">‹</button>
+    <div class="pickmain fifaparty" id="pmain"></div>
+    <button class="partyarrow right" aria-label="Następna partia" onclick="pickPartyKrok(1)">›</button>
     <div class="partyroster">
       <div class="partyrosterhead">${PID.length} ugrupowań <span>wybierz szyld — pełny profil jest po lewej</span></div>
       <div class="picklist">
@@ -688,6 +696,8 @@ function setup(){
           <div class="pcrow"><span class="pcseat">kreator</span><span class="pcdiff">☆☆☆☆☆</span></div></button>
       </div>
     </div>
+    <div class="partycarouselmeta"><span>← / → zmienia partię</span><b>${PID.length} grywalnych ugrupowań</b><span>wybierz i prowadź</span></div>
+    <button class="partycreatorlink" onclick="openCreator()">＋ Załóż własną partię</button>
   </div>`;
   pickMain();
 }

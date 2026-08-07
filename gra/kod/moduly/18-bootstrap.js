@@ -151,11 +151,13 @@ Object.assign(window,{radykalowie,iskra,waznePozycje,waznePasek,modyfikatory,pod
   majatekSzefa,panelGlosowania,nextCandidate,pkbZapiszOdczyt,
   RANGI,ranga,rangaNr,nastepnaRanga,mnoznikRangi,rangiStart,sprawdzRangi,absolutorium,
   rangaKoszt,rangaWymog,oknoAbsolutorium,sadTab,sadSklad,sadInit,sadZglos,sadWybierz,
-  sadOpenSprawa,sadWnies,sadDowody,sadTydzien,nagranieStart,liveLap,DANINA_ZA_PUNKT,NAGR_TRYBY,
+  sadOpenSprawa,sadWnies,sadDowody,sadWymagaObslugi,sadTydzien,nagranieStart,liveLap,DANINA_ZA_PUNKT,NAGR_TRYBY,
   mediaTab,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,mediaTydzien,mediaBilans,
   zasiegMediow,aiMedia,dlugTydzien,kieszenSzefa,MEDIA_ZASIEG,MEDIA_UTRZYMANIE,absWeek,tally,
   mediaOdcinekGraj,mediaFilmGraj,serduszka,MEDIA_TYP,nagranieMAN,mediaNumer,mediaGotowe,mediaZa,mediaJest,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;MENU=true;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
+window.pickPartyKrok=pickPartyKrok;
+window.premierRozmowa=premierRozmowa;
 Object.assign(window,{kreMandat,kreResetMandaty,krePreset,kreRzadTryb,kreRzadTog,krePremier,
   krePrezydentTryb,krePrezydent,kreRelacje,kreKrok,kreDalej,kreatorDoPliku,kreatorProbuj,
   kreNowaPartia,kreUsunPartie,kreNowaPole,kreNowaLogo,kreCelDodaj,kreCelUsun,kreCelWybierz,kreCelPole,
@@ -181,7 +183,7 @@ window.__game={przewidz,podglad,get PROBA(){return PROBA},
   LAWS,lawVote,proposeLaw,signLaw,odrzucenieWeta,PROG_WETO,applyLaw,lawDone,lawIntake,lawsPending,lawsToSign,startLaw,
   LAWPAR,lawEdytowalna,lawParams,radykalnosc,aiProposeLaw,openEdycja,rozstrzygnijUstawe,
   nastrojSejmu,bylWBloku,doLobby,rysujOkno,
-  CHAR,AI_STYLE,charOf,aiProfil,aiWagi,aiLos,aiOkreg,aiCel,ai,POSTERS,aiCoal,aiGoals,aiAgents,campInit,aiPrzemiana,obsadz,openResort,partiaOsoby,premierTab,prezydentTab,TOTAL_SEATS_LIVE,
+  CHAR,AI_STYLE,charOf,aiProfil,aiWagi,aiLos,aiOkreg,aiCel,ai,POSTERS,aiCoal,aiGoals,aiAgents,campInit,aiPrzemiana,obsadz,openResort,premierRozmowa,partiaOsoby,premierTab,prezydentTab,TOTAL_SEATS_LIVE,
   openCamp,campBar,campRank,runFinalCamp,closeFinalCamp,
   get G(){return G}, setRender(f){render=f}, setModal(f){modal=f},
   MODY:()=>MODY, ustawMody:v=>{MODY=Array.isArray(v)?v:[]}, wczytajMody, modEfekty, modyDoScen,

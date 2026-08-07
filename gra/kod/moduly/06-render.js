@@ -154,6 +154,14 @@ function render(){if(PROBA)return;
 
 let SEL='PPP';
 function pickParty(k){SEL=k;render()}
+/* Wybór partii działa jak wybór drużyny: jedna karta zostaje na środku,
+   a strzałki zmieniają tylko szyld. Dzięki temu porównujesz partie bez
+   przekopywania się przez ścianę małych kafli. */
+function pickPartyKrok(d){
+  const i=PID.indexOf(SEL),n=PID.length;
+  if(!n)return;
+  pickParty(PID[(i+(+d||0)+n)%n]);
+}
 function setupScenEf(){return (SCENSEL&&SCEN[SCENSEL]&&SCEN[SCENSEL].efekty)||null}
 function setupScenMandaty(k){
   const ef=setupScenEf();return ef&&ef.mandatyStart?Math.max(0,Math.round(+ef.mandatyStart[k]||0)):(START_SEATS[k]||0);

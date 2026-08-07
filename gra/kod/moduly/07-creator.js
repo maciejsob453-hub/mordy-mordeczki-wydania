@@ -272,7 +272,7 @@ const STATHELP={
  ctr:['Kontrowersja','Ile awantur ciągnie się za partią. Zniechęca elity i intelektualistów, a przyciąga serwerowiczów.',
   'Rośnie: donosy do administracji, sabotaż, przekupstwa, memy, przerost elit, zaleganie z kapitałem.',
   'Spada: 1,4 tygodniowo, przeprosiny, wyciszenie sporu, konsultacje, ustawa o kodeksie karnym.',
-  'Przy 90 partia wpada w paraliż: sondaż liczony na pół, kapitał wycieka, co tydzień ktoś odchodzi.'],
+  'Przy 96 partia wpada w paraliż: sondaż słabnie, kapitał wycieka, co tydzień ktoś odchodzi.'],
  pret:['Pretensjonalność','Jak bardzo partia brzmi jak wykład. Elity i intelektualiści to lubią, serwerowicze uciekają, a obecność w kanałach przelicza się gorzej.',
   'Rośnie: manifesty, statuty, przewaga intelektualistów, szkoła kadr.',
   'Spada: luźny stream, otwarte konsultacje, zejście na ziemię, serwerowicze w składzie.'],

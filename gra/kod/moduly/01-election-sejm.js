@@ -44,7 +44,7 @@ function score(k,r,s){
     const pv=p.pres[r.id]*(1-cl((p.pret-38)/150,0,.42));
   v*=Math.pow(cl(.34+pv/60,.34,2.7),1.32);
   if(p.marg)v*=.75;
-  if(p.ctr>=90)v*=.5;   // paraliż kontrowersji: połowa poparcia znika
+  if(p.ctr>=96)v*=.68;  // twardy paraliż dopiero przy skrajnym skandalu
   v*=(1-znuzenie(k)/BAL.znuzenieSilaSondaz);   // zmęczenie władzą
   v*=doganianie(k);                            // głos protestu idzie do słabszych
   if(G.gov){const g=G.gov.parties.includes(k);
@@ -69,7 +69,7 @@ function tally(){
     if(G.gov&&G.pmOk&&G.gov.pm===k)m*=BAL.premierGlosy;
     if(G.prez&&G.prez.party===k)m*=BAL.prezydentGlosy;
     if(G.gov&&G.gov.parties.includes(k)&&G.gov.pm!==k)m*=BAL.koalicjaGlosy;
-    if(G.p[k].ctr>=90)m*=.5;   // paraliż kontrowersji zjada połowę twardego elektoratu
+    if(G.p[k].ctr>=96)m*=.68;  // paraliż kontrowersji osłabia, ale nie kasuje elektoratu
     m*=(1-znuzenie(k)/BAL.znuzenieSilaTwardy);    // zmęczenie władzą zniechęca nawet własnych
     /* Nawet własni ludzie muszą mieć po co wyjść do urn. Martwa partia nie dowozi
        swoich: wcześniej twardy elektorat zależał wyłącznie od liczby nazwisk, więc
@@ -243,4 +243,3 @@ function sejmVote(kind,tgt,pro,myVote){
   });
   return {yes,no,abst,by,bribed,pass:(kind==='pm')?(yes>=MAJ):(yes>no)};
 }
-

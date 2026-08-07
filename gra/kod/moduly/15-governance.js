@@ -205,6 +205,23 @@ function sprzatnijRade(){
 function partiaOsoby(nick){
   return alive().find(k=>roster(G.p[k]).includes(nick))||null;
 }
+/* Koalicjant nie dostaje ministerstwa z automatu. Musi przekonać premiera,
+   a rozmowa bierze pod uwagę relację i realną kompetencję proponowanej osoby. */
+function premierRozmowa(id,nick){
+  const pm=G.gov&&G.gov.pm, res=RESORTY.find(r=>r.id===id);
+  if(!pm||!res||pm===G.me||!G.gov.parties.includes(G.me))return;
+  const rel=(G.rel[G.me]&&G.rel[G.me][pm])||0, komp=L(nick).komp;
+  const szansa=cl(.28+rel/220+(komp-50)/180+(me().seats/(TOTAL_SEATS*6)),.05,.9);
+  modal('Rozmowa z premierem',res.n,
+    `<p>Proponujesz <b>${esc(nick)}</b> na ministra. Premier <b>${esc(G.p[pm].lead)}</b> patrzy na relację między partiami i kompetencję kandydata.</p>
+     <div class="talkmeter"><span>relacja ${Math.round(rel)}</span><b>${Math.round(szansa*100)}% szansy</b><span>kompetencja ${komp}</span></div>
+     <p class="dim">Lepsza relacja i kompetentne zaplecze zwiększają zgodę. Odmowa psuje relacje, ale nie blokuje kolejnej rozmowy w późniejszym tygodniu.</p>`,
+    [{l:'Składam propozycję',f:()=>{
+      close();
+      if(ch(szansa)){obsadz(id,nick,null);say(`<b>Premier zgadza się.</b> ${nick} obejmuje resort ${res.n}.`,'good')}
+      else{G.rel[G.me][pm]=cl((G.rel[G.me][pm]||0)-5,-100,100);G.rel[pm][G.me]=cl((G.rel[pm][G.me]||0)-5,-100,100);me().ctr=cl(me().ctr+2);say(`<b>Premier odmawia.</b> Uważa, że ${nick} nie pasuje do resortu ${res.n}. Relacje spadają.`,'bad');render()}
+    }},{l:'Jeszcze nie teraz',f:close}],close);
+}
 function openResort(id){
   radaInit();
   const res=RESORTY.find(r=>r.id===id);if(!res)return;
@@ -221,10 +238,11 @@ function openResort(id){
     .slice(0,4).forEach(n=>obcy.push([n,k])));
 
   const opcje=[];
+  const rozmowa=!isPM()&&G.gov&&G.gov.parties.includes(G.me);
   moi.slice(0,8).forEach(n=>opcje.push({
-    l:`${n} <span class="ok">(twoja partia)</span>`,
-    s:`kompetencja ${L(n).komp} · sława +3, aktywność +2`,
-    f:()=>obsadz(id,n,null)}));
+    l:rozmowa?`Proponuję ${n} premierowi`:`${n} <span class="ok">(twoja partia)</span>`,
+    s:rozmowa?`relacja z premierem i kompetencja wpływają na zgodę · komp. ${L(n).komp}`:`kompetencja ${L(n).komp} · sława +3, aktywność +2`,
+    f:()=>rozmowa?premierRozmowa(id,n):obsadz(id,n,null)}));
   obcy.slice(0,10).forEach(([n,k])=>opcje.push({
     l:`${n} <span class="dim">(${G.p[k].ab})</span>`,
     s:`kompetencja ${L(n).komp} · relacje z ${G.p[k].ab} +10`,

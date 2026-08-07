@@ -505,6 +505,43 @@ body::after{
 .btn.g,.btn.r{box-shadow:var(--sh1)}
 .btn.g:hover{box-shadow:var(--sh1), 0 0 18px -12px var(--acc)}
 
+/* Wybór partii: centralna karta jak wybór drużyny, bez listy kafli ściskającej
+   logo i opis. Strzałka ma być dużym, oczywistym uchwytem na małym ekranie. */
+.partyselect.fifa{position:relative;display:grid;grid-template-columns:74px minmax(0,1fr) 74px;
+  grid-template-rows:auto auto auto;align-items:center;gap:14px;max-width:1180px;margin:0 auto}
+.partyselect.fifa .fifaparty{grid-column:2;grid-row:1;min-height:520px;width:100%;display:flex;align-items:stretch}
+.partyselect.fifa .partyroster{display:none}
+.partyarrow{grid-row:1;width:64px;height:110px;border:1px solid var(--line2);border-radius:16px;
+  color:var(--acc);background:linear-gradient(180deg,var(--p2),rgba(0,0,0,.38));
+  font:600 58px/1 var(--fd);cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),var(--sh1);
+  transition:transform .16s,border-color .16s,background .16s}
+.partyarrow:hover{transform:scale(1.06);border-color:var(--acc);background:linear-gradient(180deg,rgba(217,171,69,.18),var(--p1))}
+.partyarrow.left{grid-column:1}.partyarrow.right{grid-column:3}
+.partycarouselmeta{grid-column:1 / -1;grid-row:2;display:flex;justify-content:center;gap:28px;align-items:center;
+  color:var(--dim2);font:11px var(--m);letter-spacing:.12em;text-transform:uppercase}
+.partycarouselmeta b{color:var(--acc);font-weight:700}
+.partycreatorlink{grid-column:1 / -1;grid-row:3;justify-self:center;padding:9px 20px;border:1px dashed var(--line2);
+  border-radius:8px;background:transparent;color:var(--dim);font:12px var(--m);cursor:pointer}
+.partycreatorlink:hover{color:var(--acc);border-color:var(--acc)}
+@media(max-width:760px){.partyselect.fifa{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}.partyarrow{width:40px;height:76px;font-size:40px}.partyselect.fifa .fifaparty{min-height:470px}.partycarouselmeta{gap:8px;font-size:9px;letter-spacing:.05em}}
+.lawintro{display:flex;gap:14px;align-items:center;padding:13px 15px;margin:0 0 14px;
+  border:1px solid var(--line2);border-left:3px solid var(--acc);border-radius:8px;
+  background:linear-gradient(90deg,rgba(217,171,69,.12),rgba(0,0,0,.16));color:var(--dim)}
+.lawintro b{color:var(--acc);white-space:nowrap;font-family:var(--m);font-size:12px;letter-spacing:.05em}
+.lawintro span{font-size:13px;line-height:1.45}
+.talkmeter{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;
+  margin:14px 0;padding:12px;border:1px solid var(--line);border-radius:8px;background:rgba(0,0,0,.22);
+  color:var(--dim2);font:11px var(--m)}
+.talkmeter b{color:var(--acc);font-size:18px}.talkmeter span:last-child{text-align:right}
+.pollhero,.royalhero{display:flex;justify-content:space-between;align-items:center;gap:22px;padding:22px 26px;
+  border:1px solid var(--line2);border-radius:14px;background:radial-gradient(520px 180px at 0 0,rgba(90,155,232,.13),transparent 70%),linear-gradient(160deg,var(--p2),rgba(0,0,0,.35));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),var(--sh1)}
+.pollhero h2,.royalhero h2{margin:5px 0 4px;font:600 28px var(--fd);color:var(--tx)}
+.pollhero p,.royalhero p{margin:0;color:var(--dim);font-size:13px}.eyebrow{font:700 10px var(--m);letter-spacing:.18em;color:var(--acc)}
+.pollheroStats{display:flex;gap:1px;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--line);flex:none}
+.pollheroStats>div{min-width:104px;padding:12px 14px;background:linear-gradient(180deg,var(--p3),var(--p1));text-align:center}.pollheroStats b{display:block;font:700 24px var(--m);color:var(--acc)}.pollheroStats b.up{color:var(--pos)}.pollheroStats b.down{color:var(--neg)}.pollheroStats span,.royalbadge span{display:block;margin-top:4px;color:var(--dim2);font:9px var(--m);letter-spacing:.08em;text-transform:uppercase}
+.royalhero{margin-bottom:14px;background:radial-gradient(520px 180px at 0 0,rgba(155,127,184,.18),transparent 70%),linear-gradient(160deg,var(--p2),rgba(0,0,0,.35))}.royalbadge{min-width:150px;padding:15px 20px;text-align:center;border:1px solid rgba(217,171,69,.45);border-radius:10px;background:rgba(0,0,0,.2)}.royalbadge b{display:block;font:700 34px var(--m);color:var(--acc);margin-top:2px}
+@media(max-width:760px){.pollhero,.royalhero{display:block;padding:17px}.pollheroStats{margin-top:14px;width:100%}.pollheroStats>div{min-width:0;flex:1;padding:10px 5px}.royalbadge{margin-top:14px}}
+
 /* ─────────── CECHY PRZEWODNICZĄCEGO ───────────
    Cztery liczby, na które gracz patrzy najczęściej po sondażu. Były czterema
    szarymi kwadratami; teraz to odczyty, a nie tło. */

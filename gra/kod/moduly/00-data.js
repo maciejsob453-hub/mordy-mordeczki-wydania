@@ -243,12 +243,12 @@ function aiAgents(){
   });
 }
 const LP={
- PPP:{main:['Lager'],bench:['kenzo','bluetes33','Kocur','Antoniopl','x_avi','Garibaldi','Pablo']},
+ PPP:{main:['Lager'],bench:['kenzo','Kocur','Antoniopl','x_avi','Garibaldi']},
  KK:{main:['Peterdeus'],bench:['warrior','alan','Śledzik','Serty','Animu Player']},
  FD:{main:['loof'],bench:['Heraquik','Wiktor z Aeterny','Góra','Klabar','Bober','Oli','Mietek Nocul']},
  PLR:{main:['Sulejman','Aryati'],bench:['Prjonnek','balon']},
  // its.r3dz0l.eq przyszedł z rozwiązanej Chrześcijańskiej Partii Cesarskiej razem z mandatem
- NP:{main:['kisielek48'],bench:['Jugen','mentos','ekologiaball','Franzon','Prewencjusz','Silesia','its.r3dz0l.eq']},
+ NP:{main:['kisielek48'],bench:['Jugen','mentos','ekologiaball','Franzon','Prewencjusz','Silesia','its.r3dz0l.eq','bluetes33','Pablo']},
  PKD:{main:['Bartek'],bench:['Ignacy']},
  ROM:{main:['cargrzybov'],bench:[]},
  PP:{main:['Fazmiś'],bench:['Włóczykij','Rax']},
@@ -610,7 +610,9 @@ function newGame(id){
 /* Z PPP i z Kongresu Koronnego ludzie odeszli. Mandaty nie wyparowały: zabrał je
    sąsiad z tego samego obozu — republikański PKD i monarchistyczny ROM. Oba stoją
    poza gabinetem, więc rząd kisielka48 dalej ma równo 26 z 40. */
-const START_SEATS={PPP:6,KK:3,ROM:2,FD:7,NP:8,PLR:3,PKD:2,PP:1,POJ:1,NBR:1,ZHM:1,DPD:4,SS:1};
+/* Bluetes i Pablo przeszli do Nowej Perspektywy razem z mandatami. To korekta
+   stanu zastanego, a nie bonus znikąd: PPP oddaje dwa miejsca, NP je przejmuje. */
+const START_SEATS={PPP:4,KK:3,ROM:2,FD:7,NP:10,PLR:3,PKD:2,PP:1,POJ:1,NBR:1,ZHM:1,DPD:4,SS:1};
 function seedSeats(){
   // sejm zastany: rząd kisielka48 ma 26 z 40, monarchiści idą w opozycję
   const s=Object.assign({},START_SEATS);

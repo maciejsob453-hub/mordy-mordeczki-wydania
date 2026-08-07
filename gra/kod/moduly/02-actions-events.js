@@ -425,7 +425,7 @@ const EV=[
 {id:'delegal',w:()=>eliteRisk(me())>0&&me().ctr>72?9:0,k:'Administracja',t:'Wniosek o delegalizację partii',
  x:()=>`Na kanale administracyjnym pojawił się wniosek: ${me().n} to „klika kilku ludzi, która przejęła serwer”.
    Elita to ${Math.round(ratio(me(),'eli')*100)}% twojego składu, kontrowersja ${Math.round(me().ctr)}/100.
-   Przy 90 partia wpada w paraliż: sondaż na pół, kapitał na minus, ludzie wychodzą.`,
+   Przy 96 partia wpada w paraliż: sondaż słabnie, kapitał ucieka, ludzie wychodzą.`,
  o:[{l:'Wypraszam część elity',s:'Tracisz najcenniejszych ludzi, kontrowersja mocno w dół',
      f:p=>{const q=purge(p,'eli',Math.max(1,Math.round(p.comp.eli*.4)));p.ctr=cl(p.ctr-22);p.uni=cl(p.uni-5);
        return `${q} ${pl(q,'osoba odchodzi','osoby odchodzą','osób odchodzi')} z elity. Kontrowersja −22.`}},
@@ -537,4 +537,3 @@ const EV=[
        G.rel[G.prez.party][G.me]=cl(G.rel[G.prez.party][G.me]+18,-100,100);APPR(+3);p.pret=cl(p.pret+3);return 'Napięcie zdjęte.'}},
       {l:'Ignoruję pałac',s:'Poparcie −2',f:p=>{APPR(-2);return 'Milczenie odczytano jako słabość.'}}]}}},
 ];
-

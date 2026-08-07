@@ -139,7 +139,7 @@ const GOALS={
    p.uni=cl(p.uni+7);p.cred=cl(p.cred+8);p.pret=cl(p.pret-8);p.act=cl(p.act+5);M(p,10);
    say('<b>Ani w lewo, ani w prawo.</b> Partia Centrum wchodzi na scenę i po raz pierwszy od dawna nikt nie wie, na kogo się obrazić.','roy')}},
  hegemon:{n:'Hegemon Perspektywiczny',for:['NP'],logo:'HEG',bots:0,
-  what:'Nowa Perspektywa przestaje być jedną z partii i staje się punktem odniesienia dla całego serwera. Jugen, Prewencjusz i kisielek48 w jednym składzie, urząd w ręku i kasa w skarbcu.',
+  what:'Nowa Perspektywa przestaje być jedną z partii i staje się punktem odniesienia dla całego serwera. Jugen, Kenzo i kisielek48 w jednym składzie, urząd w ręku i kasa w skarbcu.',
   req:[
    {t:'Co najmniej 50 osób w partii',v:()=>me().mem+' / 50',ok:()=>me().mem>=50},
    {t:'Twoja partia ma obecnie premiera albo prezydenta',v:()=>isPM()?'premier':hasPrez()?'prezydent':'brak',ok:()=>isPM()||hasPrez()},
@@ -147,9 +147,9 @@ const GOALS={
     v:()=>ostatniWynik()===null?'jeszcze nie było wyborów':fmt(ostatniWynik())+'% / >25%',
     ok:()=>(ostatniWynik()||0)>25},
    {t:'Dopiero od piątej kadencji',v:()=>'kadencja '+G.term+' / 5+',ok:()=>G.term>=5},
-   {t:'Jugen, Prewencjusz i kisielek48 w partii',
-    v:()=>{const o=roster(me());return ['Jugen','Prewencjusz','kisielek48'].filter(n=>o.includes(n)).length+' / 3'},
-    ok:()=>{const o=roster(me());return ['Jugen','Prewencjusz','kisielek48'].every(n=>o.includes(n))}},
+   {t:'Jugen, Kenzo i kisielek48 w partii',
+    v:()=>{const o=roster(me());return ['Jugen','kenzo','kisielek48'].filter(n=>o.includes(n)).length+' / 3'},
+    ok:()=>{const o=roster(me());return ['Jugen','kenzo','kisielek48'].every(n=>o.includes(n))}},
    {t:'Ponad 500 kapitału w kasie',v:()=>Math.round(G.kp)+' / >500',ok:()=>G.kp>500},
   ],
   cons:['Partia występuje odtąd jako Hegemonia Perspektywiczna.',
@@ -580,7 +580,10 @@ function goalTab(){
 function pollTab(q,AL){
   const sh=Object.fromEntries(alive().map(k=>[k,shown(k,q.res[k].tot/q.total*100)]));
   const rows=alive().sort((a,b)=>sh[b]-sh[a]);   // kolejność zgodna z tym, co widać
-  return histChart()+`<div class="card" style="margin-top:14px"><div class="h"><h3>Sondaż, kadencja ${G.term}, tydzień ${G.week}</h3>
+  const mine=sh[G.me]||0, poprzedni=(G.prevShown&&G.prevShown[G.me]);
+  const trend=poprzedni===undefined?0:mine-poprzedni;
+  return `<div class="pollhero"><div><span class="eyebrow">LIVE · SERWEROWY POMIAR</span><h2>Sondaż tygodnia</h2><p>Poparcie miękkie, nastroje i zasięg mediów — wszystko w jednym odczycie.</p></div>
+    <div class="pollheroStats"><div><b>${fmt(mine)}%</b><span>twoja partia</span></div><div><b class="${trend>=0?'up':'down'}">${trend>0?'+':''}${fmt(trend)}</b><span>trend od ostatniego</span></div><div><b>${alive().length}</b><span>aktywnych partii</span></div></div></div>`+histChart()+`<div class="card" style="margin-top:14px"><div class="h"><h3>Sondaż, kadencja ${G.term}, tydzień ${G.week}</h3>
     <span class="n">progi ${THR.base}% / ${THR.base+3}% / ${THR.base+8}%</span></div><div class="b">
     <div class="note" style="margin:0 0 14px">Sondaż to badanie, nie wynik, pojedyncza pozycja bywa przestrzelona
     nawet o <b>sześć punktów</b> w jedną albo drugą stronę. Mandaty obok liczone są z prawdziwego poparcia, którego nie widzisz.
@@ -879,6 +882,7 @@ function kingTab(){
   const medal=i=>i===0?'#d9ab45':i===1?'#c7c7cf':i===2?'#c98a52':null;
   const maxAbs=Math.max(2,...f.map(x=>Math.abs(x.w)));
   return `
+  <div class="royalhero"><div><span class="eyebrow">DWÓR MORDY MORDECZKI</span><h2>Król i desygnacja</h2><p>Nie wystarczy mieć rację. Trzeba jeszcze dostać zgodę na wejście do gry.</p></div><div class="royalbadge"><span>twoja przychylność</span><b>${fav>0?'+':''}${Math.round(fav)}</b></div></div>
   <div class="card kroyal"><div class="b">
     <div class="crown">
       <div class="ofc">
@@ -1060,4 +1064,3 @@ function showEvent(e){
   const T=typeof e.t==='function'?e.t():e.t, X=typeof e.x==='function'?e.x():e.x;
   modal(e.k,T,`<p>${X}</p>`,e.o.map(o=>({l:o.l,s:o.s,f:()=>{
     const r=o.f(me());if(r)say(`<b>${T}.</b> ${r}`);checkDeath();close();render()}})))}
-

@@ -730,7 +730,7 @@ function kurier(){
   }
   const lead=alive().sort((a,b)=>G.p[b].seats-G.p[a].seats)[0];
   const naglowki=[];
-  if(p.ctr>=90)naglowki.push([`${p.ab} TONIE W AWANTURACH`,'Serwer mówi już tylko o tym, komu podpadliście w tym tygodniu.']);
+  if(p.ctr>=96)naglowki.push([`${p.ab} TONIE W AWANTURACH`,'Serwer mówi już tylko o tym, komu podpadliście w tym tygodniu.']);
   if(isPM())naglowki.push([`RZĄD ${p.ab} PRACUJE`,`${p.lead} zapowiada, że wszystko idzie zgodnie z planem. Nikt nie zna planu.`]);
   if(skok&&skok.d>0)naglowki.push([`${G.p[skok.k].ab} W GÓRĘ O ${fmt(skok.d)} PKT`,`Najlepszy tydzień ${G.p[skok.k].n} od dawna.`]);
   if(skok&&skok.d<0)naglowki.push([`${G.p[skok.k].ab} TRACI ${fmt(-skok.d)} PKT`,`W kuluarach mówią o zmianie kursu.`]);
@@ -810,7 +810,7 @@ function waznePozycje(){
   if(mediaJest())(G.media||[]).filter(m=>mediaGotowe(m)).forEach(m=>
     w.push({i:'📰',n:`${m.nazwa} czeka na wydanie`,d:'Wydawnictwo jest gotowe, a nic z niego nie wychodzi.',t:'media'}));
   const p=me();
-  if(p.ctr>=82)w.push({i:'✖',n:'Kontrowersja pod sufitem',d:`${Math.round(p.ctr)}/100. Przy 90 partia wpada w paraliż.`,t:'mapa',pilne:1});
+  if(p.ctr>=82)w.push({i:'✖',n:'Kontrowersja pod sufitem',d:`${Math.round(p.ctr)}/100. Przy 96 partia wpada w paraliż.`,t:'mapa',pilne:1});
   const szef=p.lead, kies=szef?kapPryw(szef):0;
   if(kies<0)w.push({i:'✖',n:'Przewodniczący pod kreską',d:`Dług rośnie o ${Math.round(DLUG_ODSETKI*100)}% tygodniowo.`,t:'ekonomia',pilne:1});
   return w;

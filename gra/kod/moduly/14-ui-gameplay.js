@@ -290,6 +290,9 @@ function inflacja(){
 const inflacjaProc=()=>Math.round((inflacja()-1)*100);
 
 function actCards(list,fx){
+  /* Ustawa ma własny proces sejmu i własną kartę w Kancelarii. Nie może
+     udawać zwykłej decyzji tygodnia, bo znika poczucie osobnego głosowania. */
+  list=(list||[]).filter(a=>a.id!=='ustawa');
   return list.map(a=>{
     const f=fat(a.id),done=a.once&&G.once[a.id];
     const usedT=(a.term1&&G.useTerm[a.id]);
@@ -377,13 +380,14 @@ function premierTab(){
 function lawsCard(){
   lawsInit();
   const pend=G.lawPend?lawById(G.lawPend.id):null;
-  return `<div class="card urzad ustawy" style="margin-top:14px"><div class="h"><h3>Ustawy</h3>
-    <span class="n">${G.lawPend?'jedna u prezydenta':'możesz zgłosić'}</span></div><div class="b">
+  return `<div class="card urzad ustawy lawprocess" style="margin-top:14px"><div class="h"><h3>Proces legislacyjny</h3>
+    <span class="n">${G.lawPend?'jedna u prezydenta':'osobna ścieżka sejmu'}</span></div><div class="b">
     ${pend?`<div class="lawpend">
       <div class="lp1">Czeka na podpis prezydenta</div>
       <b>${pend.n}</b>
       <span>Sejm: za ${G.lawPend.za}, przeciw ${G.lawPend.przeciw}. Dopóki nie zapadnie decyzja, nie zgłosisz kolejnej.</span>
     </div>`:''}
+    <div class="lawintro"><b>Ustawa nie zajmuje slotu decyzji.</b><span>To osobne głosowanie sejmu: wybierasz projekt, ustawiasz kierunek i obserwujesz, czy rząd ma większość.</span></div>
     <div class="note" style="margin:${pend?'14px 0':'0 0 14px'}">Każda ustawa wchodzi w życie na stałe i działa do końca rozgrywki.
     Za przegłosowaną dostajesz <b>+1 osobę, +1 aktywność i +2 sławy</b>. Jedno podejście do każdej ustawy na kadencję,
     a sejm rozpatruje <b>jeden projekt tygodniowo</b>.</div>
@@ -719,8 +723,8 @@ function doAct(id){
   pend={a,t:null,r:null,s:null,tem:null};
   if(me().ctr>=70&&actFx(a.id).includes('ctr')&&!G.noWarn){
     return modal('Ostrożnie','Ta decyzja podbije kontrowersję',
-      `<p>Masz już <b>${Math.round(me().ctr)}/100</b> kontrowersji. Przy 90 partia wpada w paraliż:
-       sondaż liczony na pół, kapitał wycieka, a co tydzień ktoś odchodzi. Na pewno w to idziesz?</p>`,
+      `<p>Masz już <b>${Math.round(me().ctr)}/100</b> kontrowersji. Przy 96 partia wpada w paraliż:
+       sondaż słabnie, kapitał wycieka, a co tydzień ktoś odchodzi. Na pewno w to idziesz?</p>`,
       [{l:'Tak, robię to',s:a.n,f:()=>{close();step()}},
        {l:'Nie, odpuszczam',s:'Nie tracisz nic',f:()=>{pend=null;close();render()}},
        {l:'Tak i nie pytaj mnie więcej w tej rozgrywce',s:'Wyłącza ostrzeżenie do końca gry',
@@ -1515,4 +1519,3 @@ function openTrainFor(kto){
           G.lastCharge=null;stolZatwierdz();close();render()}}})   // szkolenie się odbyło
       .concat([{l:'Rezygnuję',s:'Nie tracisz akcji ani kapitału',f:actBack}]),actBack)
 }
-
