@@ -7,7 +7,9 @@ function hemi(order,w,mode){
   const n=order.length;if(!n)return '';
   const W=w||600, cx=W/2;
   const rows=n>48?6:n>34?5:n>18?4:3;
-  const rad=Math.max(5.5,Math.min(13,W/n*0.72));
+  // Kulka nie może rosnąć razem z szerokością pustej karty. Przy 720 px
+  // skrajne miejsca robiły się wielkie, a zewnętrzny łuk wychodził za viewBox.
+  const rad=Math.max(4.8,Math.min(9.5,W/n*0.50));
   const Rmax=W/2-rad-10, Rmin=Rmax*0.42;
   /* W widoku Sejmu półkole jest celowo wyższe od geometrycznego. Zwykły łuk 2:1
      wyglądał jak spłaszczony wykres i ściskał pięć rzędów mandatów. */
@@ -35,7 +37,9 @@ function hemi(order,w,mode){
   const moje=G.p[G.me]?G.p[G.me].seats:0;
   const prog=Math.min(MAJ,n);
   const kątProgu=pts[prog-1]?pts[prog-1].t:Math.PI/2;
-  const Rzew=Rmax+rad+7, Rwew=Rmin-rad-7;
+  // Łuk dostaje margines wewnątrz viewBoxu. Wcześniej Rmax+rad+7 ucinał
+  // końcowe kulki i sprawiał wrażenie, jakby granica „zjadała” mandaty.
+  const Rzew=Math.min(W/2-3,Rmax+rad+7), Rwew=Math.max(4,Rmin-rad-7);
 
   /* Łuk ma domykać się za ostatnim zajętym fotelem, a nie w jego środku —
      inaczej zielona kreska nad ławami rządu wyraźnie nie dociąga. */

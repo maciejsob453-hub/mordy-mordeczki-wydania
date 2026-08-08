@@ -832,11 +832,14 @@ function waznePozycje(){
 }
 function waznePasek(){
   const w=waznePozycje(); if(!w.length)return '';
+  // Pasek ma pomagać, nie zamieniać się w drugi dziennik. Pokazujemy dwa
+  // najpilniejsze tropy; reszta zostaje widoczna jako licznik i w badge'ach.
+  const pokaz=w.slice().sort((a,b)=>Number(!!b.pilne)-Number(!!a.pilne)).slice(0,2);
   return `<div class="wazne">
     <span class="wazneet" title="Ważne rzeczy do zrobienia">!</span>
-    <div class="waznelista">${w.map(x=>
+    <div class="waznelista">${pokaz.map(x=>
       `<button class="waz ${x.pilne?'pilne':''}" onclick="setTab('${x.t}')" title="${esc(x.d)}">
-        <i>${x.i}</i><span>${esc(x.n)}</span></button>`).join('')}</div>
+        <i>${x.i}</i><span>${esc(x.n)}</span></button>`).join('')}${w.length>pokaz.length?`<span class="wazwiecej">+${w.length-pokaz.length} w zakładkach</span>`:''}</div>
   </div>`;
 }
 

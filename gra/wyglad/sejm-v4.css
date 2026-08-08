@@ -531,6 +531,79 @@ body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partyarrow.right{grid-column:3}
 body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partycarouselmeta{grid-column:1 / -1;grid-row:2}
 body:not(:has(.mg)) .pick.v3.partyselect.fifa>.partycreatorlink{grid-column:1 / -1;grid-row:3}
 @media(max-width:760px){body:not(:has(.mg)) .pick.v3.partyselect.fifa{grid-template-columns:42px minmax(0,1fr) 42px;gap:6px}body:not(:has(.mg)) .pick.v3.partyselect.fifa>.pickmain{grid-column:2;min-height:470px;padding:18px}.partyselect.fifa .partyarrow{width:40px;height:76px;font-size:40px}}
+
+/* ══════════ 1.1.91 · ZWARTY SEJM I ARCHIWUM ══════════
+   Poprzednie reguły dla sali występowały w dwóch skalach i późniejsza wersja
+   rozpychała pustą kartę. Ten blok jest jednym, końcowym kontraktem layoutu. */
+body:not(:has(.mg)) .sejm-sala{max-width:900px;margin:0 auto 16px;padding:13px 15px 12px}
+body:not(:has(.mg)) .hemi-scena{max-width:620px;margin:0 auto 8px}
+body:not(:has(.mg)) .hemi-scena .hemi{filter:drop-shadow(0 8px 13px rgba(0,0,0,.3))}
+body:not(:has(.mg)) .sejm-sala .hemipod{max-width:620px;margin:5px auto 0}
+body:not(:has(.mg)) .sejm-sala .hemipod>span{min-height:38px;padding:6px 8px;font-size:12px}
+body:not(:has(.mg)) .sejm-sala .hemipod>span b{font-size:16px}
+body:not(:has(.mg)) .sejm-sala .hemistan{min-height:34px!important;font-size:12px!important}
+body:not(:has(.mg)) .sejm-sala .sejmleg{max-width:760px;gap:5px 7px;margin:9px auto 0}
+body:not(:has(.mg)) .sejm-sala .sejmleg .sl{min-height:30px;padding:4px 7px;font-size:11px}
+body:not(:has(.mg)) .wladza{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:13px}
+body:not(:has(.mg)) .wcard{min-width:0;padding:10px 11px;border-radius:8px}
+body:not(:has(.mg)) .wcard .wlab{font-size:8px;letter-spacing:.16em;margin-bottom:7px}
+body:not(:has(.mg)) .wcard .wbody{gap:8px}
+body:not(:has(.mg)) .wcard .wbody b{font-size:13px}
+body:not(:has(.mg)) .wcard .wbody span{font-size:11px;line-height:1.25}
+body:not(:has(.mg)) .wcard .wex{font-size:10.5px;line-height:1.25}
+body:not(:has(.mg)) .wcard .ava{width:34px!important;height:34px!important}
+body:not(:has(.mg)) .wcard-zbiorczy{grid-column:span 2}
+body:not(:has(.mg)) .sejmgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:start}
+body:not(:has(.mg)) .sejmgrid>.card{min-width:0}
+body:not(:has(.mg)) .sejmgrid>.card>.h{min-height:42px;padding:10px 13px}
+body:not(:has(.mg)) .sejmgrid>.card>.h h3{font-size:16px}
+body:not(:has(.mg)) .sejmgrid>.card>.b{padding:12px 13px}
+body:not(:has(.mg)) .sejmgrid .govcontract{padding:7px 8px;margin-bottom:7px;font-size:10.5px}
+body:not(:has(.mg)) .sejmgrid .minrow{min-height:31px;padding:4px 0!important;gap:6px;font-size:11px}
+body:not(:has(.mg)) .sejmgrid .minrow .dots{transform:scale(.82);transform-origin:right center}
+body:not(:has(.mg)) .sejmgrid .lawmini{gap:4px}
+body:not(:has(.mg)) .sejmgrid .lawm{padding:7px 8px;grid-template-columns:minmax(0,1fr) auto;gap:5px}
+@media(max-width:1260px){body:not(:has(.mg)) .wladza{grid-template-columns:repeat(2,minmax(0,1fr))}body:not(:has(.mg)) .sejmgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){body:not(:has(.mg)) .wladza,body:not(:has(.mg)) .sejmgrid{grid-template-columns:1fr}body:not(:has(.mg)) .wcard-zbiorczy{grid-column:auto}}
+
+/* Cichy pasek orientacyjny: jeden rzut oka, zero modalnych wyskakujących okien. */
+body:not(:has(.mg)) .wazne{margin:7px 0 9px;padding:5px 8px;border:1px solid color-mix(in srgb,var(--game-accent) 22%,var(--line));border-radius:8px;background:rgba(0,0,0,.14)}
+body:not(:has(.mg)) .wazneet{width:19px;height:19px;font-size:11px}
+body:not(:has(.mg)) .waznelista{gap:5px}
+body:not(:has(.mg)) .waz{padding:5px 8px;font-size:11px}
+body:not(:has(.mg)) .wazwiecej{align-self:center;color:var(--dim2);font:10px var(--m);letter-spacing:.06em;white-space:nowrap}
+
+/* Mordepedia: archiwum ma być chłodniejsze i spokojniejsze od pulpitu. */
+.mordekran{display:grid;gap:12px}
+.mordehero{display:flex;justify-content:space-between;align-items:center;min-height:130px;padding:22px 26px;border:1px solid color-mix(in srgb,var(--game-accent) 34%,#3b4b43);border-radius:12px;background:linear-gradient(112deg,rgba(8,18,14,.96),rgba(20,26,24,.88));overflow:hidden}
+.mordeyear{font:700 9px var(--m,monospace);letter-spacing:.2em;color:var(--game-accent,#9bbb75)}
+.mordehero h2{margin:6px 0 5px;font:600 29px/1.05 var(--ser,Georgia,serif);color:var(--tx)}
+.mordehero p{margin:0;color:var(--dim);font-size:13px}
+.mordeseal{display:grid;place-items:center;width:92px;height:92px;border:1px solid color-mix(in srgb,var(--game-accent) 42%,transparent);border-radius:50%;font:600 49px Georgia;color:color-mix(in srgb,var(--game-accent) 70%,#eee 30%);box-shadow:0 0 0 7px rgba(255,255,255,.018),inset 0 0 25px rgba(0,0,0,.25)}
+.mordeseal small{font:8px var(--m);letter-spacing:.13em;text-align:center;line-height:1.25;color:var(--dim2)}
+.mordesnapshot{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line);border-radius:9px;background:rgba(0,0,0,.14)}
+.mordesnapshot>div{padding:11px 14px;border-right:1px solid var(--line)}.mordesnapshot>div:last-child{border-right:0}
+.mordesnapshot span,.mordesek header span{display:block;font:700 8px var(--m);letter-spacing:.16em;color:var(--dim2)}
+.mordesnapshot b{display:block;margin-top:5px;font-size:14px}
+.mordecols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.mordesek{border:1px solid var(--line);border-radius:9px;background:linear-gradient(145deg,rgba(26,31,28,.8),rgba(11,17,14,.93));overflow:hidden}
+.mordesek header{display:flex;align-items:baseline;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}.mordesek header h3{margin:0;font:600 20px var(--ser,Georgia,serif)}.mordesek header em{margin-left:auto;font:10px var(--m);color:var(--dim2);font-style:normal}
+.mordelist{display:grid;gap:6px;padding:10px}
+.mordekarta{position:relative;display:grid;gap:3px;padding:10px 11px 10px 14px;border-left:3px solid var(--mc,var(--acc));border-radius:6px;background:rgba(0,0,0,.18)}
+.mordekarta span{font:700 8px var(--m);letter-spacing:.13em;color:var(--dim2)}.mordekarta b{font-size:13px}.mordekarta small{font-size:11px;color:var(--dim)}
+.mordenote{display:flex;gap:10px;align-items:center;padding:10px 13px;border:1px dashed color-mix(in srgb,var(--game-accent) 30%,var(--line));border-radius:8px;color:var(--dim);font-size:11.5px}.mordenote b{color:var(--game-accent);white-space:nowrap}
+.mordelock{min-height:300px;display:grid;align-content:center;justify-items:start;gap:10px;padding:28px 32px;border:1px solid color-mix(in srgb,var(--game-accent) 38%,#3d4941);border-radius:12px;background:linear-gradient(120deg,rgba(8,18,14,.95),rgba(20,24,21,.82))}.mordelock h2{margin:0;font:600 30px var(--ser,Georgia,serif)}.mordelock p{max-width:620px;margin:0;color:var(--dim);line-height:1.55}.mordelockfact{display:grid;grid-template-columns:auto 1fr;gap:3px 9px;margin:8px 0;padding:11px 13px;border-left:3px solid var(--game-accent);background:rgba(0,0,0,.2)}.mordelockfact small{grid-column:2;color:var(--dim2)}
+@media(max-width:760px){.mordecols,.mordesnapshot{grid-template-columns:1fr}.mordesnapshot>div{border-right:0;border-bottom:1px solid var(--line)}.mordesnapshot>div:last-child{border-bottom:0}.mordehero{padding:18px}.mordeseal{width:68px;height:68px;font-size:35px}.mordelock{padding:22px}}
+
+/* `.mg` bywa obecne na body także po wejściu do gry. Układ Sejmu nie może od
+   niego zależeć, bo wtedy wcześniejszy limit 620 px w ogóle się nie aktywuje. */
+.sejm-sala{max-width:900px!important;margin-left:auto!important;margin-right:auto!important}
+.hemi-scena{max-width:620px!important;margin-left:auto!important;margin-right:auto!important}
+.sejm-sala .hemipod{max-width:620px!important;margin-left:auto!important;margin-right:auto!important}
+.wladza{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.sejmgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+@media(max-width:1260px){.wladza{grid-template-columns:repeat(2,minmax(0,1fr))!important}.sejmgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:760px){.wladza,.sejmgrid{grid-template-columns:1fr!important}}
 body:not(:has(.mg)) .pick.v3.scenv3 .scenrow{min-height:128px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr auto;align-content:start;text-align:left}
 body:not(:has(.mg)) .scenv3 .scenrow .pcname{grid-column:1;grid-row:1;font-family:var(--fd);font-size:19px;color:#f0ead8}
 body:not(:has(.mg)) .scenv3 .scenrow .scenopis{grid-column:1/-1;grid-row:2;margin-top:8px;color:#aeb9ae;font-size:11.5px;line-height:1.42;font-family:var(--f);letter-spacing:0;font-weight:400}

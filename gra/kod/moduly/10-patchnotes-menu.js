@@ -4,6 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.91':{data:'8 sierpnia 2026', zmiany:[
+  'SEJM I WLADZA SA ZWARTE. Gabinet, rada i ustawy nie rozlewaja sie juz po pustej karcie, a sala ma mniejsze, rowno rozmieszczone miejsca.',
+  'SKRAJNE KULKI SEJMU NIE SA OBCINANE. Luk dostal bezpieczny margines wewnatrz obrazu.',
+  'DODANO CICHE PODPOWIEDZI. Pasek pokazuje najwyzej dwa najpilniejsze tropy, a reszte tylko liczniki w zakladkach.',
+  'MORDEPEDIA JEST NOWA ZAKLADKA. Najpierw zamknieta ustawa, potem archiwum premierow i prezydentow z kolejnych kadencji.',
+ ]},
  '1.1.90':{data:'8 sierpnia 2026', zmiany:[
   'DECYZJE MAJA CZAS TRWANIA. Zwykly ruch zajmuje dzien lub dwa, ustawa i debata kilka dni, a luka tygodnia nadal odnawia limity co siedem dni.',
   'PKB MOZE SPADAC PRZEZ KONKRETNE BLEDY. Przegrane ustawy, brak rzadu i zle decyzje zostawiaja czasowy cios w obrocie zamiast losowego pecha.',
@@ -845,6 +851,7 @@ function game(){
         : '<span class="dim" style="margin-left:auto;font-size:12.5px">Nie ma cię w dogrywce.</span>'}
     </div></div>`:''}
   ${lukKadencji()}
+  ${waznePasek()}
   <div class="nav">
     ${(()=>{const wazne=new Set(waznePozycje().map(x=>x.t));
       const nazwa=(k,n)=>n+(wazne.has(k)?'<span class="badge">!</span>':'');
@@ -861,6 +868,7 @@ function game(){
       // zamknięte, żeby gracz od razu wiedział, co może odblokować w Sejmie.
       nv.push(['media','Media'+(mediaJest()?'':'<span class="badge wip">zamk.</span>')]);
       nv.push(['sad','Sąd'+(lawDone('sady')?'':'<span class="badge wip">zamk.</span>')]);
+      nv.push(['mordepedia','Mordepedia'+(lawDone('mordepedia')?'':'<span class="badge wip">zamk.</span>')]);
       return nv.map(([k,n])=>`<button class="${G.tab===k?'on':''}" onclick="setTab('${k}')">${n}</button>`).join('')})()}
   </div>
   <div class="layout">
@@ -869,7 +877,7 @@ function game(){
       :G.tab==='cele'?goalTab():G.tab==='lider'?leadTab():G.tab==='krol'?kingTab()
       :G.tab==='premier'?premierTab():G.tab==='prezydent'?prezydentTab()
       :G.tab==='ekonomia'?ekonomiaTab()
-      :G.tab==='media'?mediaTab():G.tab==='sad'?sadTab():sejmTab()}</div>
+      :G.tab==='media'?mediaTab():G.tab==='sad'?sadTab():G.tab==='mordepedia'?mordepediaTab():sejmTab()}</div>
   </div>`;
   G._we=0;
 }

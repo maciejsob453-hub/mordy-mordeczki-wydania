@@ -675,6 +675,35 @@ function ustawyPodglad(){
       <div class="dim" style="font-size:11.5px;margin-top:8px">Po prawej partia, która ustawę przepchnęła — to ona zbiera z niej najwięcej.</div>`:''}
   </div></div>`;
 }
+/* ══════════ MORDEPEDIA ══════════
+   To nie jest kolejna karta z liczbami. Mordepedia zbiera ślady kolejnych
+   kadencji i pokazuje je dopiero po uchwaleniu własnej ustawy — dzięki temu
+   odblokowanie ma sens fabularny, a stary zapis nie potrzebuje migracji. */
+function mordepediaTab(){
+  const odblokowana=lawDone('mordepedia');
+  if(!odblokowana)return `<div class="mordekran"><section class="mordelock">
+    <span class="mordeyear">ARCHIWUM SERWERA · ZAMKNIĘTE</span><h2>Mordepedia</h2>
+    <p>Encyklopedia pamięci serwera. Zapisuje premierów, prezydentów i przełomowe kadencje, ale potrzebuje ustawy o archiwum.</p>
+    <div class="mordelockfact"><b>Brakuje:</b><span>Ustawa o Mordopedii</span><small>Złóż ją w Sejmie, gdy masz właściwy resort albo fotel premiera.</small></div>
+    <button class="btn" onclick="setTab('sejm')">Przejdź do ustaw →</button>
+  </section></div>`;
+  const pm=(G.hist||[]).slice().reverse().map(h=>{
+    const k=h.pm,p=k&&G.p[k],n=p?p.n:'rząd bez premiera';
+    return `<article class="mordekarta" style="--mc:${p?p.c:'var(--acc)'}"><span>KADENCJA ${h.term||'—'}</span><b>${esc(n)}</b><small>${p?p.ab:'wakat'} · ${h.seats&&G.me in h.seats?h.seats[G.me]+' mandatów twojej partii':'wynik zapisany w kronice'}</small></article>`;
+  });
+  const prez=(G.prezHist||[]).slice().reverse().map(h=>{
+    const k=h.winner,p=k&&G.p[k],n=p?p.n:'nieznany prezydent';
+    return `<article class="mordekarta" style="--mc:${p?p.c:'var(--roy)'}"><span>PAŁAC · KADENCJA ${h.term||'—'}</span><b>${esc(n)}</b><small>${p?p.ab:'wakat'} · zapis wyboru prezydenckiego</small></article>`;
+  });
+  const aktualny=G.gov&&G.gov.pm?G.p[G.gov.pm]:null,prezAkt=G.prez&&G.p[G.prez.party]?G.p[G.prez.party]:null;
+  return `<div class="mordekran"><section class="mordehero"><div><span class="mordeyear">ARCHIWUM SERWERA · AKTYWNE</span><h2>Mordepedia</h2><p>Historia, która nie znika po przejściu do następnej kadencji.</p></div><div class="mordeseal">§<small>ustawa<br>obowiązuje</small></div></section>
+    <div class="mordesnapshot"><div><span>TERAZ · RZĄD</span><b>${aktualny?esc(aktualny.n):'brak gabinetu'}</b></div><div><span>TERAZ · PAŁAC</span><b>${prezAkt?esc(prezAkt.n):'wakat'}</b></div><div><span>ZAPISANE KADENCJE</span><b>${(G.hist||[]).length}</b></div></div>
+    <div class="mordecols"><section class="mordesek"><header><span>01</span><h3>Premierzy</h3><em>${pm.length} zapisów</em></header><div class="mordelist">${pm.join('')||'<p class="dim">Pierwsza kadencja dopiero się pisze.</p>'}</div></section>
+      <section class="mordesek"><header><span>02</span><h3>Prezydenci</h3><em>${prez.length} zapisów</em></header><div class="mordelist">${prez.join('')||'<p class="dim">Pałac nie ma jeszcze pełnego wpisu.</p>'}</div></section></div>
+    <div class="mordenote"><b>Co będzie dalej</b><span>Każdy kolejny system pamięci może dostać własną kartę: marszałkowie, ustawy przełomowe, kryzysy i decyzje, które zmieniły serwer.</span></div>
+  </div>`;
+}
+
 function sejmTab(){
   const arr=[];alive().sort((a,b)=>G.p[b].seats-G.p[a].seats).forEach(k=>{for(let i=0;i<G.p[k].seats;i++)arr.push(k)});
   const g=G.gov;
@@ -696,7 +725,7 @@ function sejmTab(){
       return `<div class="sejm-sala">${true?`<div class="hemi-filtry">
         <button class="hfil ${m==='party'?'on':''}" onclick="setHemi('party')">Podział partyjny</button>
         <button class="hfil ${m==='bloc'?'on':''}" onclick="setHemi('bloc')">Podział koalicyjny</button></div>`:''}
-      <div class="hemi-scena">${hemi(arrS,720,m)}</div>
+      <div class="hemi-scena">${hemi(arrS,620,m)}</div>
       <div class="sejmleg">
         ${grupy.map(g2=>{
           const wRzadzie=g2.k&&G.gov&&G.gov.parties.includes(g2.k);
