@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.101':{data:'8 sierpnia 2026', zmiany:[
+  'Naprawiony glowny uklad gry: szeroka scena wraca do mapy, Sejmu, mediow i ustaw, a panel boczny ma stala szerokosc.',
+  'Sejm, Sad, Media, Ekonomia, Krol i Pedia dostaly wspolna kompozycje instytucji oraz nowa generowana teksture atlasu.',
+ ]},
  '1.1.100':{data:'8 sierpnia 2026', zmiany:[
   'Noc wyborcza i wyniki dostaly wspolna sale protokolow: spokojniejszy atlas, wyrazniejsze liczby i mniej przypadkowych kart.',
   'Paski komisji, listy oraz rozliczenie kadencji maja teraz jedna hierarchie i dzialaja tak samo na desktopie i telefonie.',

@@ -1,10 +1,10 @@
 {
- "wersja": "1.1.100",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/c6a2e6eaa7b43a8a80fe21cc878644b49dad27f4",
+ "wersja": "1.1.101",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "b9881126410d3dcc9b2254d8206176ddeab357f54d3497fc8ca770f551872580",
+   "sha": "a7383c068fe0482cf69297308ff61c631f16f0c706fbf49a480a8adb6c22a4c8",
    "bajtow": 1979
   },
   {
@@ -14,7 +14,7 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "339a68907b12a5f1c055919ea46992d2f090d9359a422d3459151f091e88f58b",
+   "sha": "a1f036ce48b68c6c6b0f46322d7c51ada1811a89de66e572b10db3314170eac6",
    "bajtow": 531
   },
   {
@@ -69,8 +69,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "fb5b8f089e271682f0d39297cd829efd328dd21f9d61b044f9408ed69343e1a3",
-   "bajtow": 90793
+   "sha": "8dabddf27971bf1bdfb3f8acf7d61af062a30d846e595b05c95528af8efb2534",
+   "bajtow": 91086
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
@@ -718,6 +718,11 @@
    "bajtow": 121104
   },
   {
+   "sciezka": "gra/obrazki/ui-institution-map.webp",
+   "sha": "678e6dd3765aba829fa4ac89601aa2e2bf8db4ab9ff931431949dfc5078a3d8a",
+   "bajtow": 206730
+  },
+  {
    "sciezka": "gra/obrazki/ui-ledger-header.webp",
    "sha": "083b9b4db665ca0a6afc552895ae96d4b4be23bd7d76020ce1a8e12dc4268d40",
    "bajtow": 23650
@@ -734,8 +739,8 @@
   },
   {
    "sciezka": "gra/wyglad/sejm-v4.css",
-   "sha": "f5bc70d8808d9d36b590f369f9bb67506c6ab9785beab96e87ffe328dca6f266",
-   "bajtow": 121319
+   "sha": "98afe2460424d70fc8fec1bf4e63ce37218253453ab9f9eac16ccfe67a5ff9bb",
+   "bajtow": 128668
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -760,6 +765,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "c6a2e6eaa7b43a8a80fe21cc878644b49dad27f4"
+ }
 }
