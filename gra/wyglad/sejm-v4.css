@@ -2191,6 +2191,14 @@ body:has(.hud) .widok[data-tab="krol"]>.royalhero{
 }
 body:has(.hud) .widok[data-tab="krol"] .kfrow{background:rgba(4,9,8,.5);border-color:rgba(196,154,75,.2)}
 
+/* 1.1.133: kazda karta Dworu ma ten sam material co scena i hero. Dzieki
+   temu ranking, kronika i decyzje nie wygladaja jak obcy panel z atlasu. */
+body:has(.hud) .widok[data-tab="krol"]>.card{
+  background:linear-gradient(150deg,rgba(25,18,22,.86),rgba(6,12,10,.97)),url("../obrazki/ui-royal-court.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,#b896d8) 40%,rgba(196,154,75,.28));
+  box-shadow:0 16px 38px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.045)
+}
+
 /* 1.1.128: Mordepedia jest archiwum pamieci serwera, wiec ksiegi i lampy
    buduja ramy, a srodek pozostaje pusty dla wpisow i list kadencji. */
 body:has(.hud) .widok[data-tab="mordepedia"]{
