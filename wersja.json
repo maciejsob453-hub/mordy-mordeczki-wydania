@@ -1,10 +1,10 @@
 {
- "wersja": "1.1.102",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/e9aa371632dbebc0e6d3d9e8fc0af2c2585c2e04",
+ "wersja": "1.1.103",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "0a816f6b02a8bcdc7122dc9ad31b7c2681376b696c0cc7a01dbbd3d5903c2e0b",
+   "sha": "994ff342e395f6bfcd1de5c56b89a4f7152677770276963a054ce101a383b3ca",
    "bajtow": 1979
   },
   {
@@ -14,7 +14,7 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "c7489e49dec726264783f65af6978e4eec0debbab92c04162424a6ce2136df93",
+   "sha": "2e3b15c0294392c0b38a38bd1fc2c0d04ded9757fd92559000cf93f84982bdc4",
    "bajtow": 531
   },
   {
@@ -69,8 +69,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "c6a9e5cdc8a00b867cb66a00c4676588093a5244fe59fbaba298bba7648b24d8",
-   "bajtow": 91358
+   "sha": "4c05787bfbf207513ab4c11699d5f586fec861c2582b966c7c3674839cc45356",
+   "bajtow": 91664
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
@@ -718,6 +718,11 @@
    "bajtow": 121104
   },
   {
+   "sciezka": "gra/obrazki/ui-creator-workbench.webp",
+   "sha": "3d4ac46245319de97086be02aefd4514d7cbf24e4fa960f44012bfaca2315385",
+   "bajtow": 243632
+  },
+  {
    "sciezka": "gra/obrazki/ui-institution-map.webp",
    "sha": "678e6dd3765aba829fa4ac89601aa2e2bf8db4ab9ff931431949dfc5078a3d8a",
    "bajtow": 206730
@@ -739,8 +744,8 @@
   },
   {
    "sciezka": "gra/wyglad/sejm-v4.css",
-   "sha": "b5513829ebc0232f79624c6c555a3c4c9ce4c2672da269fa30f137694a8980a4",
-   "bajtow": 132279
+   "sha": "35d2ea4df8f82cb526863ad734e04a89450cc3a22570b7bc5b3e651a3c1170ce",
+   "bajtow": 138194
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -765,6 +770,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "e9aa371632dbebc0e6d3d9e8fc0af2c2585c2e04"
+ }
 }

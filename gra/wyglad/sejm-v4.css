@@ -1731,3 +1731,77 @@ body:has(.hud) .sidebar>.kond>.h{background:linear-gradient(90deg,color-mix(in s
   body:has(.hud) .kurier{grid-template-columns:1fr;gap:7px}
   body:has(.hud) .kurier .kglowa span{margin-left:auto}
 }
+
+/* PRACOWNIA KREATORA: faktura, etapy i panel roboczy. */
+body:has(.kreekran){
+  background:linear-gradient(180deg,rgba(4,10,7,.34),rgba(4,10,7,.9)),url("../obrazki/ui-creator-workbench.webp") center top/cover fixed no-repeat,var(--atlas-ink)
+}
+body:has(.kreekran) .kreekran{
+  position:relative;isolation:isolate;overflow:hidden;max-width:1700px;padding:20px 20px 54px;
+  border:1px solid rgba(196,154,75,.42);border-radius:4px;
+  background:linear-gradient(180deg,rgba(10,22,15,.88),rgba(5,12,8,.96)),url("../obrazki/ui-creator-workbench.webp") center/cover;
+  box-shadow:0 24px 62px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.06)
+}
+body:has(.kreekran) .kreekran::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.22;background:repeating-linear-gradient(135deg,transparent 0 17px,rgba(224,188,112,.04) 18px,transparent 19px 36px)}
+body:has(.kreekran) .krehead{
+  min-height:126px;box-sizing:border-box;margin:0;padding:3px 8px 22px 18px;display:flex;align-items:flex-start;gap:22px;
+  border-bottom:1px solid rgba(196,154,75,.34);background:linear-gradient(90deg,rgba(196,154,75,.11),transparent 52%)
+}
+body:has(.kreekran) .krehead>div:first-child{position:relative;flex:1;min-width:0;padding-left:15px}
+body:has(.kreekran) .krehead>div:first-child::before{content:"";position:absolute;left:0;top:2px;bottom:0;width:3px;background:var(--atlas-brass);box-shadow:0 0 16px rgba(196,154,75,.35)}
+body:has(.kreekran) .krehead .kick{color:#d6b46d;letter-spacing:.18em}
+body:has(.kreekran) .krehead h1{margin:10px 0 6px;font-size:40px;line-height:1.02;text-shadow:0 2px 18px rgba(0,0,0,.35)}
+body:has(.kreekran) .krehead p{max-width:66ch;margin:0;color:#b7c4b7;line-height:1.55}
+body:has(.kreekran) .krehead>button{margin-top:17px;flex:none}
+body:has(.kreekran) .kretools{margin-top:15px;padding-top:10px;border-top:1px solid rgba(196,154,75,.14)}
+body:has(.kreekran) .kresteps{
+  position:relative;z-index:1;box-sizing:border-box;display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:7px;
+  margin:17px 0 20px;padding:7px;border:1px solid rgba(196,154,75,.3);border-radius:3px;background:rgba(4,11,7,.72)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.04),0 10px 26px rgba(0,0,0,.2)!important
+}
+body:has(.kreekran) .krestep{min-width:0;min-height:66px;padding:9px 10px;background:rgba(12,25,18,.82);border-color:rgba(196,154,75,.22);border-radius:2px}
+body:has(.kreekran) .krestep span{min-width:0}
+body:has(.kreekran) .krestep b{font-family:var(--fd);font-size:14px;color:#eee0bd}
+body:has(.kreekran) .krestep small{font-size:8px;color:#96a496}
+body:has(.kreekran) .krestep.on{background:linear-gradient(180deg,rgba(196,154,75,.2),rgba(10,22,15,.96));border-color:#d2a653;box-shadow:inset 0 -3px #d2a653,0 0 0 1px rgba(214,170,88,.1)}
+body:has(.kreekran) .krestep.done{border-color:rgba(116,174,101,.52)}
+body:has(.kreekran) .krestep i{width:29px;height:29px;border-radius:2px;background:#17291f;color:#e1bd6b}
+body:has(.kreekran) .krestep.on i,body:has(.kreekran) .krestep.done i{background:var(--atlas-brass);color:#171108}
+body:has(.kreekran) .krebody{grid-template-columns:minmax(0,1fr) 360px;gap:20px}
+body:has(.kreekran) .krelewa{min-width:0}
+body:has(.kreekran) .kreprawa{position:sticky;top:18px}
+body:has(.kreekran) .krepanel,body:has(.kreekran) .kreside{border-radius:3px;border-color:rgba(196,154,75,.34);background:linear-gradient(180deg,rgba(23,39,30,.96),rgba(7,15,11,.98)),url("../obrazki/ui-creator-workbench.webp") center/cover;box-shadow:0 17px 36px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.05)}
+body:has(.kreekran) .krepanel{padding:22px 23px}
+body:has(.kreekran) .kreside{padding:18px;border-left:3px solid rgba(196,154,75,.65)}
+body:has(.kreekran) .krepanel.krebig{min-height:620px}
+body:has(.kreekran) .kretitle{padding-bottom:15px;margin-bottom:19px;border-bottom-color:rgba(196,154,75,.25)}
+body:has(.kreekran) .kretitle>span{font-size:24px;color:#d5ad59}
+body:has(.kreekran) .kretitle h2{font-size:27px;color:#f0e1bd}
+body:has(.kreekran) .kretitle p{color:#aebbb0}
+body:has(.kreekran) .krehint,body:has(.kreekran) .kreok{background:rgba(196,154,75,.1);border-color:rgba(196,154,75,.32)}
+body:has(.kreekran) .kresideprog{background:#06100a}
+body:has(.kreekran) .kresideeyebrow{color:#d6b46d}
+body:has(.kreekran) .kresidemeta span{background:rgba(6,17,11,.82);border-color:rgba(196,154,75,.24)}
+
+/* Lista scenariuszy korzysta z tej samej faktury, ale trzyma fokus na nazwach. */
+body:has(.scenv3) .scenv3{background:linear-gradient(110deg,rgba(6,15,10,.86),rgba(8,18,12,.95)),url("../obrazki/ui-creator-workbench.webp") center/cover}
+body:has(.scenv3) .scenv3 .pickmain{background:linear-gradient(180deg,rgba(22,39,30,.95),rgba(7,15,11,.98)),url("../obrazki/ui-ledger-header.webp") center/cover}
+body:has(.scenv3) .scenv3 .scenlist{padding:2px}
+body:has(.scenv3) .scenv3 .scenrow{position:relative;overflow:hidden;min-height:132px;padding-left:18px;background:rgba(6,16,11,.74)}
+body:has(.scenv3) .scenv3 .scenrow::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--party-theme,var(--atlas-brass));opacity:.8}
+body:has(.scenv3) .scenv3 .scenrow.on{background:rgba(196,154,75,.13);border-color:#c49a4b;box-shadow:inset 0 0 0 1px rgba(214,170,88,.12)}
+
+@media(max-width:1080px){
+  body:has(.kreekran) .kresteps{grid-template-columns:repeat(9,140px);overflow-x:auto}
+  body:has(.kreekran) .krebody{grid-template-columns:1fr}
+  body:has(.kreekran) .kreprawa{position:static}
+}
+@media(max-width:720px){
+  body:has(.kreekran) .kreekran{padding:14px 11px 36px}
+  body:has(.kreekran) .krehead{min-height:0;padding:2px 4px 17px;gap:10px}
+  body:has(.kreekran) .krehead h1{font-size:30px}
+  body:has(.kreekran) .krehead>button{margin-top:9px}
+  body:has(.kreekran) .kresteps{margin:12px 0 14px;padding:5px;gap:5px}
+  body:has(.kreekran) .krepanel{padding:15px 13px}
+  body:has(.kreekran) .kreside{padding:14px}
+}

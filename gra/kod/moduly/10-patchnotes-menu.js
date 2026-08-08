@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.103':{data:'8 sierpnia 2026', zmiany:[
+  'Kreator scenariuszy dostal wlasna pracownie z faktura archiwum, wyraznym naglowkiem i czytelniejszym paskiem dziewieciu etapow.',
+  'Lista scenariuszy korzysta z tego samego rejestru, a karty wybranego scenariusza maja mocniejszy akcent i hierarchie.',
+ ]},
  '1.1.102':{data:'8 sierpnia 2026', zmiany:[
   'Serwerowy Kurier i mapa okregow korzystaja teraz z tej samej ciemnej scenografii atlasu co reszta gry.',
   'Panel boczny ma przywrocona hierarchie: przewodnictwo, kondycja, kronika, sklad, zaplecze, serwer i relacje.',
