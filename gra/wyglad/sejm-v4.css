@@ -2044,3 +2044,12 @@ body:has(.nocekran) .nocekran,body:has(.wynik) .wynik{
   background:linear-gradient(180deg,rgba(5,12,8,.42),rgba(4,10,7,.8)),url("../obrazki/ui-election-protocol.webp") center/cover!important;
   border-color:rgba(196,154,75,.46);box-shadow:0 24px 56px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.05)
 }
+
+/* 1.1.118: modal jest dokumentem na stole, nie jednolita zielona plama.
+   Warstwa przyciemnia fakture, bo czytelnosc i kontrast opcji maja pierwszenstwo. */
+body:not(:has(.mg)) .veil .mdl{
+  background:linear-gradient(150deg,rgba(20,36,28,.9),rgba(8,18,13,.97)),url("../obrazki/ui-ledger-header.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 60%,rgba(214,170,88,.45));
+  box-shadow:0 30px 90px rgba(0,0,0,.68),inset 0 1px rgba(255,255,255,.08)
+}
+body:not(:has(.mg)) .veil .mdl>.h{background:linear-gradient(90deg,rgba(4,12,8,.72),rgba(4,12,8,.28)),url("../obrazki/ui-ledger-header.webp") center/cover}
