@@ -2134,6 +2134,10 @@ body:not(:has(.mg)) .wrap:has(.modepick) .modes{background:transparent}
   body:has(.hud) .sidebar{display:flex!important;flex-direction:column!important;gap:10px!important}
   body:has(.hud) .sidebar>.card{width:100%!important;grid-column:1/-1!important}
 }
+@media(min-width:521px) and (max-width:720px){
+  body:has(.hud) .sidebar{display:flex!important;flex-direction:column!important;gap:10px!important}
+  body:has(.hud) .sidebar>.card{width:100%!important;grid-column:1/-1!important}
+}
 
 /* 1.1.140: modal decyzji jest osobna teczka sprawy, a nie kolejna karta z
    ogolnego atlasu. Obrzeza obrazu buduja kontekst, srodek zostaje spokojny

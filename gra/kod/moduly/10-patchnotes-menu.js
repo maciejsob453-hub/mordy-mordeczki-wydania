@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.147':{data:'8 sierpnia 2026',zmiany:[
+  'Tablet do 720 pikseli korzysta z jednej pelnej kolumny bocznego pulpitu.',
+  'Dwie kolumny wracaja dopiero wtedy, gdy karta ma na to bezpieczna szerokosc.',
+ ]},
  '1.1.146':{data:'8 sierpnia 2026',zmiany:[
   'Boczny pulpit na telefonie uklada karty w jedna pelna kolumne.',
   'Kondycja, kronika i relacje nie sa juz scisniete po 136 pikseli.',
