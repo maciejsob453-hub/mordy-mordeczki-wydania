@@ -2219,3 +2219,28 @@ body:has(.hud) .widok[data-tab="sondaz"]>.card{
 }
 body:has(.hud) .widok[data-tab="sondaz"] .pollheroStats,
 body:has(.hud) .widok[data-tab="sondaz"] table.t{background:rgba(4,10,8,.5);border-color:rgba(196,154,75,.2)}
+
+/* 1.1.131: tabela sondażu ma na telefonie zwięzły protokół. Lider i blok są
+   informacją drugiego rzędu, więc znikają poniżej 420 px zamiast rozszerzać
+   wiersz do 441 px; nazwa partii dostaje resztę miejsca i elipsę. */
+@media(max-width:420px){
+  body:has(.hud) .widok[data-tab="sondaz"] table.t{width:100%;table-layout:fixed;min-width:0}
+  body:has(.hud) .widok[data-tab="sondaz"] table.t th,
+  body:has(.hud) .widok[data-tab="sondaz"] table.t td{min-width:0;padding:6px 4px;font-size:9px}
+  body:has(.hud) .widok[data-tab="sondaz"] table.t th:nth-child(2),
+  body:has(.hud) .widok[data-tab="sondaz"] table.t td:nth-child(2),
+  body:has(.hud) .widok[data-tab="sondaz"] table.t th:nth-child(3),
+  body:has(.hud) .widok[data-tab="sondaz"] table.t td:nth-child(3){display:none}
+  body:has(.hud) .widok[data-tab="sondaz"] table.t th:nth-child(1),
+  body:has(.hud) .widok[data-tab="sondaz"] table.t td:nth-child(1){width:48%}
+  body:has(.hud) .widok[data-tab="sondaz"] table.t th:nth-child(4),
+  body:has(.hud) .widok[data-tab="sondaz"] table.t td:nth-child(4){width:17%}
+  body:has(.hud) .widok[data-tab="sondaz"] table.t th:nth-child(5),
+  body:has(.hud) .widok[data-tab="sondaz"] table.t td:nth-child(5){width:17%}
+  body:has(.hud) .widok[data-tab="sondaz"] table.t th:nth-child(6),
+  body:has(.hud) .widok[data-tab="sondaz"] table.t td:nth-child(6){width:9%}
+  body:has(.hud) .widok[data-tab="sondaz"] table.t th:nth-child(7),
+  body:has(.hud) .widok[data-tab="sondaz"] table.t td:nth-child(7){width:9%}
+  body:has(.hud) .widok[data-tab="sondaz"] table.t .nm{min-width:0;gap:4px}
+  body:has(.hud) .widok[data-tab="sondaz"] table.t .nm span{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}

@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.131':{data:'8 sierpnia 2026', zmiany:[
+  'Tabela sondazu na telefonie nie rozpycha juz panelu poza ekran.','Lider i blok sa schowane tylko na waskim ekranie, a partia, trend, poparcie i mandaty zostaja czytelne.',
+ ]},
  '1.1.130':{data:'8 sierpnia 2026', zmiany:[
   'Sondaz dostaje wlasny pokoj pomiarow z tablicami wykresow, kartami odpowiedzi i lampka analityka.','Hero, historia i tabela odczytow maja teraz scenografie politycznego rejestru zamiast starej tapety.',
  ]},
