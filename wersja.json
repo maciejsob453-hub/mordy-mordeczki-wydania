@@ -1,10 +1,10 @@
 {
- "wersja": "1.1.94",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/c4457b3dbc6b835800c638284dc7e87ca7fe7e30",
+ "wersja": "1.1.95",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "6d8489884b209bc0e0d08f1af499ad30c2fbc21d6935ce0ec1a0a2ff6cebfb55",
+   "sha": "85ac336a7fa8e03f1896bd7ea7957136f9dd8fad95ad192d66a8b76ff88dcee3",
    "bajtow": 1954
   },
   {
@@ -14,7 +14,7 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "56ffe6a0ba4808fdd8233132040a4cc8fd4ca6c33476a30a1ad1f63fc573fe32",
+   "sha": "ead5fa387dfd8ec5766b9309032bba4cd9528a8ff473941ada34a4368a58a092",
    "bajtow": 530
   },
   {
@@ -69,8 +69,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "84c3d6da8be7a5969b7bc6978de641529d39c590b68ce9b27dfea410d56c6de5",
-   "bajtow": 88887
+   "sha": "2aa43f2b819c85c5ef6358b9acecf0ea9507db1ef4631b497af3cc0c4276a2bd",
+   "bajtow": 89228
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
@@ -668,9 +668,29 @@
    "bajtow": 2182786
   },
   {
+   "sciezka": "gra/obrazki/tlo-kampania-ai.webp",
+   "sha": "a687e86276c0b37005dc960a7a5322daa5b8eb634fc76e904741d5426095dc0e",
+   "bajtow": 53974
+  },
+  {
+   "sciezka": "gra/obrazki/tlo-krol-ai.webp",
+   "sha": "fd7bc602a1bd02689fffcc6be8f3ce12e4d2547b716b6e2bccd94a082fca6b22",
+   "bajtow": 54120
+  },
+  {
    "sciezka": "gra/obrazki/tlo-media-ai.png",
    "sha": "ede19fb0563396de5bc9263d052a31bb99b23f1edc9a2dbd1963133130eab3b6",
    "bajtow": 2495053
+  },
+  {
+   "sciezka": "gra/obrazki/tlo-mordepedia-ai.webp",
+   "sha": "138dc90ef9ac2d7e2c17b24a30b776320e17d22d08275ad828e1969ccfd5cea1",
+   "bajtow": 115880
+  },
+  {
+   "sciezka": "gra/obrazki/tlo-partyselect-ai.webp",
+   "sha": "7956068a07cfae91e5658ad7606e24ae22f50ad43193d519192741eaa9c9c5c0",
+   "bajtow": 71904
   },
   {
    "sciezka": "gra/obrazki/tlo-sad-ai.png",
@@ -681,6 +701,16 @@
    "sciezka": "gra/obrazki/tlo-sejm-ai.png",
    "sha": "a85debccfcb4569d36e9c087ef36357637676c7586cae396e7a1ad81770d84e6",
    "bajtow": 1900677
+  },
+  {
+   "sciezka": "gra/obrazki/tlo-sondaz-ai.webp",
+   "sha": "c672f7abfc5e19f8fa1562f013e32983b56e5eb624ab69af45eca740311fe089",
+   "bajtow": 33824
+  },
+  {
+   "sciezka": "gra/obrazki/tlo-wybory-ai.webp",
+   "sha": "685addae0d041b1d7d62b827a0904993d3ae0f2921bb4ed0fc530d56cd5f8deb",
+   "bajtow": 55230
   },
   {
    "sciezka": "gra/wyglad/desktop.css",
@@ -694,8 +724,8 @@
   },
   {
    "sciezka": "gra/wyglad/sejm-v4.css",
-   "sha": "d73f81dc94a60c793a139245bc2619af820c190f42ad336bd934c065c103a39a",
-   "bajtow": 77877
+   "sha": "ae0ec9f76ab4c8030d12b7d614750a9bd8b732d9499e9540e6d6f77f12313812",
+   "bajtow": 80651
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -720,6 +750,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "c4457b3dbc6b835800c638284dc7e87ca7fe7e30"
+ }
 }
