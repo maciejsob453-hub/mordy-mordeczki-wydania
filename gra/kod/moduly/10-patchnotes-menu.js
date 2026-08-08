@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.151':{data:'8 sierpnia 2026',zmiany:[
+  'Zakladki gry dostaja wlasny pionowy grzbiet kartotekowy z mosiadznymi detalami.',
+  'Aktywny kanal ma przygaszona szybe, wiec tekst pozostaje czytelny na fakturze.',
+ ]},
  '1.1.150':{data:'8 sierpnia 2026',zmiany:[
   'Przewodnictwo dostaje wlasny gabinet lidera z portretami na obrzezach.',
   'Karta lidera i ekran rozwoju nie zlewaja sie juz z ogolnym dossier partii.',
