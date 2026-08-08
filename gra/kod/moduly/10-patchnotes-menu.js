@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.126':{data:'8 sierpnia 2026', zmiany:[
+  'Ekonomia dostaje osobny pulpit rachunkowy z wykresami i dokumentami na obrzezach.','PKB, kapital prywatny i mnoznik obrotu maja teraz scenografie skarbca zamiast ogolnego rejestru.',
+ ]},
  '1.1.125':{data:'8 sierpnia 2026', zmiany:[
   'Przewodnictwo, zaplecza i cele dostaja osobna teczke partyjna zamiast wspolnego tla ekonomii.','Nowa faktura prowadzi wzrok do kart i zostawia spokojny srodek na liczby oraz opisy.',
  ]},
