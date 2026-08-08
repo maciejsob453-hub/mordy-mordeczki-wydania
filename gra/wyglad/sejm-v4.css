@@ -2673,3 +2673,25 @@ body:has(.hud) .mapwrap .hexsvg{
     line-height:1.18!important;margin-bottom:7px!important
   }
 }
+
+/* 1.1.170: wspolne przewijanie nie moze wygladac jak jasny element Edge.
+   Cienki scrollbar i ta sama barwa akcentu lacza mape, tabele, kreator i
+   boczne rejestry, ale nie zmieniaja ich szerokosci ani zachowania. */
+body:has(.hud) *,
+body:has(.kreekran) *{
+  scrollbar-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 68%,#26352c) rgba(3,9,6,.55);
+  scrollbar-width:thin
+}
+body:has(.hud) *::-webkit-scrollbar,
+body:has(.kreekran) *::-webkit-scrollbar{width:7px;height:7px}
+body:has(.hud) *::-webkit-scrollbar-track,
+body:has(.kreekran) *::-webkit-scrollbar-track{background:rgba(3,9,6,.55)}
+body:has(.hud) *::-webkit-scrollbar-thumb,
+body:has(.kreekran) *::-webkit-scrollbar-thumb{
+  background:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 68%,#26352c);
+  border:1px solid rgba(4,10,7,.72);border-radius:7px
+}
+body:has(.hud) *::-webkit-scrollbar-thumb:hover,
+body:has(.kreekran) *::-webkit-scrollbar-thumb:hover{
+  background:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 84%,#d9bb76)
+}
