@@ -2389,3 +2389,27 @@ body:has(.hud) .widok[data-tab="sondaz"] table.t{background:rgba(4,10,8,.5);bord
   body:has(.hud) .widok[data-tab="sondaz"] table.t .nm{min-width:0;gap:4px}
   body:has(.hud) .widok[data-tab="sondaz"] table.t .nm span{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
+
+/* 1.1.149: sklad partii ma osobny rejestr czlonkow, zeby nie dzielic jednej
+   faktury z kronika i nie gubic hierarchii bocznego pulpitu. */
+body:has(.hud) .sidebar>.card.skl{
+  background:linear-gradient(155deg,rgba(17,31,24,.82),rgba(5,12,9,.96)),url("../obrazki/ui-party-roster.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--game-accent,var(--atlas-brass))) 46%,rgba(196,154,75,.34));
+  box-shadow:0 18px 40px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.05)
+}
+body:has(.hud) .sidebar>.card.skl .b{
+  background:linear-gradient(90deg,rgba(4,10,8,.72),rgba(4,10,8,.18));
+  border-left:1px solid rgba(196,154,75,.28);padding-left:12px
+}
+
+/* 1.1.149: kronika musi wygrac z bazowa faktura bocznego pulpitu, bo ten
+   selektor jest pozniej niz stare reguly dziedziczone z poprzednich wersji. */
+body:has(.hud) .sidebar>.card.kronika{
+  background:linear-gradient(155deg,rgba(17,31,24,.84),rgba(5,12,9,.96)),url("../obrazki/ui-party-chronicle.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--game-accent,var(--atlas-brass))) 42%,rgba(196,154,75,.34));
+  box-shadow:0 18px 40px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.05)
+}
+body:has(.hud) .sidebar>.card.kronika .log{
+  background:linear-gradient(90deg,rgba(4,10,8,.46),rgba(4,10,8,.12));
+  border-left:1px solid rgba(196,154,75,.3);padding-left:12px
+}
