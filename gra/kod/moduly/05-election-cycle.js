@@ -267,6 +267,11 @@ function isMarPerson(n){return !!(G.sejmPrez&&G.sejmPrez.marszalekLead&&G.sejmPr
 function startPM(){
   G.pmOk=false;
   G.sejmPrez=null; // prezydium poprzedniej kadencji wygasa wraz z sejmem
+  if(G.partyCouncil&&G.partyCouncil.party===G.me){
+    /* Nominacja premiera jest osobną decyzją rady, więc nie przenosimy jej
+       bez pytania z poprzedniego gabinetu. */
+    G.partyCouncil.pm=null;G.partyCouncil.pmParty=null;
+  }
   G.pmProc={round:1,tries:[],cand:null,by:null,vote:null,triedThisCycle:[]};
   G.phase='pmvote';
   nextCandidate();

@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.179':{data:'9 sierpnia 2026',zmiany:[
+  'Rada Partyjna pozwala wskazac konkretna osobe na premiera, nie tylko partie.',
+  'Granica czasu nie zapetla absolutorium ani procedur wyborczych, gdy swiat plynie automatycznie.'
+ ]},
  '1.1.178':{data:'9 sierpnia 2026',zmiany:[
   'Alternatywa Zydowska dostaje dwa rozwidlenia narodowe: droge republikanow i Aurea Libertas.',
   'Rada Partyjna pozwala wybrac pieciu czlonkow i uruchamia prawybory prezydenckie.',

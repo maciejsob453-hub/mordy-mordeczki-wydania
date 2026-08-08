@@ -643,6 +643,8 @@ function setMarWho(n){G.marWho=n;render()}
 function pmScreen(){
   const pr=G.pmProc;
   if(pr.vote&&pr.vote.pass)return pmDone();
+  const councilPm=G.partyCouncil&&G.partyCouncil.party===G.me&&Array.isArray(G.partyCouncil.members)&&G.partyCouncil.members.length===5;
+  if(!pr.vote&&pr.cand===G.me&&councilPm&&!pr.pmPerson)return pmCouncilPersonScreen();
   const pool=alive().filter(k=>G.p[k].seats>0&&!pr.tries.map(t=>t.cand).includes(k));
   const cand=pr.cand;
   // gęsty akapit z czterema liczbami rozbity na tabliczki — czyta się je raz,
@@ -701,6 +703,10 @@ function pmScreen(){
    :`<div class="card"><div class="b"><p>Nie ma już kandydatów. Przedterminowe wybory.</p>
       <button class="btn" onclick="pmNext()">Dalej →</button></div></div>`}`);
 }
+function pmCouncilPersonScreen(){
+  const pr=G.pmProc,members=G.partyCouncil.members.filter(n=>!isPrezPerson(n)&&!isMarPerson(n));
+  app.innerHTML=ekran(`<div class="card"><div class="h"><div class="k">RADA PARTYJNA · DESYGNACJA</div><h2>Wybierz osobę na premiera</h2></div><div class="b"><p>Twoja partia wskazała kandydata partyjnego. Teraz rada wybiera konkretną osobę z pięciu członków — dopiero potem Sejm głosuje nad jej rządem.</p><div class="council-primary-grid">${members.map(n=>{const x=L(n);return `<button class="opt" onclick="pmPickPerson('${esc(n)}')"><div style="display:flex;align-items:center;gap:10px">${ava(n,me().c,42)}<span><b>${n}</b><small>autorytet ${x.autor} · kompetencja ${x.komp} · charyzma ${x.char}</small></span></div></button>`}).join('')}</div><p class="dim" style="margin-top:12px">Desygnacja ${pr.round} z 3 · kandydat partyjny pozostaje ${G.p[G.me].ab}.</p></div></div>`);
+}
 function predict(k){let y=0;alive().forEach(x=>{if(G.p[x].seats&&stance(x,'pm',k,k)>12)y+=G.p[x].seats});return y}
 function voteBox(v,cand){
   const tot=v.yes+v.no+v.abst||1;
@@ -722,7 +728,16 @@ function voteBox(v,cand){
         ${v.by[k]>0?'ZA':v.by[k]<0?'PRZECIW':'WSTRZ.'}</span></div>`).join('')}
   </div></div>`;
 }
-function pmPick(k){doPMVote(k,undefined)}
+function pmPick(k){
+  const council=G.partyCouncil&&G.partyCouncil.party===G.me&&Array.isArray(G.partyCouncil.members)&&G.partyCouncil.members.length===5;
+  if(k===G.me&&council){G.pmProc.cand=k;G.pmProc.pmPerson=null;render();return}
+  doPMVote(k,undefined)
+}
+function pmPickPerson(n){
+  const pr=G.pmProc,council=G.partyCouncil&&G.partyCouncil.party===G.me&&Array.isArray(G.partyCouncil.members)&&G.partyCouncil.members.length===5;
+  if(!pr||pr.cand!==G.me||!council||!G.partyCouncil.members.includes(n))return;
+  G.partyCouncil.pm=n;G.partyCouncil.pmParty=G.me;pr.pmPerson=n;doPMVote(G.me,undefined);
+}
 function pmVote(v){doPMVote(G.pmProc.cand,v)}
 function pmNext(){pmFailForward()}
 function pmDone(){

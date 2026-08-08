@@ -16,6 +16,15 @@ function realClockPaint(){
   G.dzienTygodnia=Math.min(7,Math.floor(G.czasTygodnia)+1);
   G.godzina=(8+(G.czasGodzTygodnia%24))%24;
   if(G.czasGodzTygodnia>=168){
+    /* Ekrany przejściowe (absolutorium i wybory) mają własne kroki procedury.
+       Zegar nie może w tym momencie odpalić ukrytego ticka ponownie co sekundę,
+       bo ostatni tydzień kadencji zapętlał absolutorium albo mnożył noc wyborczą.
+       Świat pozostaje uruchomiony, ale granica tygodnia czeka na zakończenie
+       procedury, tak jak w prawdziwym kalendarzu parlamentarnym. */
+    if(G.phase&&G.phase!=='camp'){
+      G.czasGodzTygodnia=167.999;G.czasTygodnia=6;G.dzienTygodnia=7;G.godzina=23.99;
+      render();return;
+    }
     /* EndWeek jest teraz niewidocznym tickiem symulacji: odświeża gospodarkę,
        AI i limity tygodniowe, ale nie czeka na kliknięcie „następny tydzień”. */
     G.czasGodzTygodnia=168;G.czasTygodnia=7;G.dzienTygodnia=7;G.godzina=8;
