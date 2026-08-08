@@ -1973,3 +1973,29 @@ body:has(.hud) .widok[data-tab="krol"]>.card:last-child>.b>.minrow{min-width:0;b
   body:not(:has(.mg)) .hudend .datechip span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   body:not(:has(.mg)) .hudend>.btn.tura{flex:1 1 150px;min-width:0}
 }
+
+/* 1.1.114: na laptopie i telefonie nawigacja jest grzbietem poziomym.
+   Wczesniejsza regula zostawiala jej szerokosc bocznego menu, mimo ze miala
+   juz byc przyklejona nad trescia. Efekt byl absurdalny: dwanascie zakladek
+   zabieralo cala wysokosc ekranu, a sam widok zaczynal sie pod nimi. */
+@media(max-width:1120px){
+  body:not(:has(.mg)) .wrap>.nav{
+    position:sticky!important;left:auto!important;right:auto!important;top:0!important;bottom:auto!important;
+    z-index:60;width:100%!important;height:auto!important;min-height:46px;max-height:58px;
+    margin:0 0 12px!important;padding:5px 8px!important;display:flex!important;flex-direction:row!important;
+    align-items:center;gap:3px;overflow-x:auto!important;overflow-y:hidden!important;
+    border:1px solid var(--v4-line);border-radius:3px;box-shadow:0 8px 22px rgba(0,0,0,.22);
+  }
+  body:not(:has(.mg)) .wrap>.nav button{
+    flex:0 0 auto!important;min-height:34px!important;padding:6px 10px!important;
+    border:1px solid transparent;border-radius:2px;text-align:center;white-space:nowrap;
+  }
+  body:not(:has(.mg)) .wrap>.nav button:hover{padding-left:10px!important}
+  body:not(:has(.mg)) .wrap:has(>.nav){grid-template-columns:minmax(0,1fr)!important}
+  body:not(:has(.mg)) .wrap:has(>.nav)>*{grid-column:1!important}
+}
+@media(max-width:720px){
+  body:not(:has(.mg)) .wrap{padding-left:10px!important;padding-right:10px!important}
+  body:not(:has(.mg)) .wrap>.nav{min-height:42px;max-height:48px;margin-bottom:9px!important;padding:4px 5px!important}
+  body:not(:has(.mg)) .wrap>.nav button{min-height:30px!important;padding:5px 8px!important;font-size:9px;letter-spacing:.045em}
+}
