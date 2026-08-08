@@ -1825,3 +1825,33 @@ body:has(.hud) .widok[data-tab="premier"]>.card.urzad.prem:nth-child(2),
 body:has(.hud) .widok[data-tab="prezydent"]>.card.urzad.prez:nth-child(2){
   border-left:3px solid rgba(196,154,75,.68);background:rgba(7,17,12,.82)
 }
+
+/* Gabinet ma rytm 2+1 zamiast czterech pelnych szerokosci. */
+body:has(.hud) .widok[data-tab="premier"]{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:10px 12px 28px;align-content:start
+}
+body:has(.hud) .widok[data-tab="premier"]>.card{min-width:0;margin:0}
+body:has(.hud) .widok[data-tab="premier"]>.card.urzad.prem:nth-child(2){grid-column:auto!important}
+body:has(.hud) .widok[data-tab="premier"]>.lawprocess,
+body:has(.hud) .widok[data-tab="premier"]>.card:last-child{grid-column:1/-1}
+body:has(.hud) .widok[data-tab="prezydent"]{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:10px 12px 28px;align-content:start
+}
+body:has(.hud) .widok[data-tab="prezydent"]>.card{min-width:0;margin:0}
+body:has(.hud) .widok[data-tab="prezydent"]>.card:last-child{grid-column:1/-1}
+body:has(.hud) .lawprocess .lawintro{margin-bottom:10px;padding:10px 12px;border-radius:2px}
+body:has(.hud) .lawprocess .note{margin-bottom:10px;padding:10px 12px;border-radius:2px}
+body:has(.hud) .lawprocess .lawgrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+body:has(.hud) .lawprocess .law{min-width:0;padding:10px 11px;gap:5px;border-radius:2px}
+body:has(.hud) .lawprocess .law h4{font-size:12.5px;line-height:1.18}
+body:has(.hud) .lawprocess .law .ld{font-size:11.3px;line-height:1.34}
+body:has(.hud) .lawprocess .law .lsk{font-size:10.7px;line-height:1.34}
+body:has(.hud) .lawprocess .law .lft{font-size:9px;padding-top:5px}
+body:has(.hud) .lawprocess .lkat{border-radius:2px;padding:2px 5px;background:rgba(4,11,7,.6);font-size:8.5px}
+
+@media(max-width:900px){
+  body:has(.hud) .widok[data-tab="premier"],body:has(.hud) .widok[data-tab="prezydent"]{grid-template-columns:1fr;padding:8px 8px 22px}
+  body:has(.hud) .widok[data-tab="premier"]>.card,body:has(.hud) .widok[data-tab="prezydent"]>.card{grid-column:1/-1}
+  body:has(.hud) .lawprocess .lawgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:560px){body:has(.hud) .lawprocess .lawgrid{grid-template-columns:1fr}}
