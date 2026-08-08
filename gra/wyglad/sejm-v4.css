@@ -2105,6 +2105,14 @@ body:has(.hud) .widok[data-tab="lider"] .act:hover:not([disabled]){
   body:has(.hud) .sejm-partietabela .t .crest.s{width:20px;height:20px;flex:none}
 }
 
+/* 1.1.138: wybor trybu ma wlasny stol wejscia do gry. Stare tlo Sejmu bylo
+   mylace zanim powstal hud; spokojne centrum zostawia kartom miejsce na tekst. */
+body:not(:has(.mg)) .wrap:has(.modepick){
+  background:linear-gradient(180deg,rgba(4,10,7,.14),rgba(4,10,7,.86)),url("../obrazki/ui-mode-selection.webp") center/cover fixed no-repeat!important;
+}
+body:not(:has(.mg)) .wrap:has(.modepick) .modepick,
+body:not(:has(.mg)) .wrap:has(.modepick) .modes{background:transparent}
+
 /* 1.1.123: dziewiec krokow kreatora nie jest juz poziomym paskiem na 320 px.
    Siatka 3x3 pokazuje cala sciezke od razu; opisy sa ukryte, ale numer i nazwa
    etapu zostaja, wiec nie trzeba zgadywac, gdzie jest final. */
