@@ -2817,3 +2817,66 @@ body:not(:has(.mg)):has(.hud) .veil .mdl .actopt:hover{
   body:not(:has(.mg)):has(.nocekran) .nocekran,
   body:not(:has(.mg)):has(.wynik) .wynik{border-radius:3px!important}
 }
+
+/* 1.1.174: Dwor i noc wyborcza dostaja wlasne sceny. Stare tlo krola bylo
+   zbyt podobne do zwyklej karty, a noc wyborcza miala dekoracje bez punktu
+   skupienia. Te dwa materialy maja pusty srodek pod dane i ciezar na bokach. */
+body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"]{
+  background-image:
+    linear-gradient(180deg,rgba(7,5,8,.18),rgba(4,10,8,.94)),
+    url("../obrazki/ui-royal-court-v2.webp")!important;
+  background-position:center top!important;background-size:cover!important;background-attachment:local!important
+}
+body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"]>.royalhero,
+body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"]>.card{
+  background:
+    linear-gradient(150deg,rgba(20,14,20,.9),rgba(4,11,9,.97)),
+    url("../obrazki/ui-royal-court-v2.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,#b896d8) 50%,rgba(196,154,75,.32))!important;
+  box-shadow:0 20px 46px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.05)!important
+}
+body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"] .royalhero{
+  min-height:170px;grid-template-columns:minmax(0,1fr) minmax(280px,.72fr);padding:28px 30px!important;
+  border-left:3px solid color-mix(in srgb,var(--party-theme,#b896d8) 76%,#b896d8)!important
+}
+body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"] .royalhero h2{font-size:32px;letter-spacing:.02em}
+body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"] .kroyal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"] .kroyal>.h{grid-column:1/-1}
+body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"] .kfrow{min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(4,9,8,.56);border-color:rgba(184,150,216,.25);border-radius:3px}
+body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"] .kfrow:hover{background:rgba(184,150,216,.1);border-color:rgba(184,150,216,.52)}
+
+body:not(:has(.mg)):has(.nocekran),
+body:not(:has(.mg)):has(.wynik){
+  background-image:
+    linear-gradient(180deg,rgba(3,9,13,.18),rgba(3,9,7,.94)),
+    url("../obrazki/ui-election-protocol-v2.webp")!important;
+  background-position:center top!important;background-size:cover!important;background-attachment:fixed!important
+}
+body:not(:has(.mg)):has(.nocekran) .nocekran,
+body:not(:has(.mg)):has(.wynik) .wynik{
+  background:
+    linear-gradient(180deg,rgba(5,15,18,.86),rgba(3,10,8,.97)),
+    url("../obrazki/ui-election-protocol-v2.webp") center/cover!important;
+  border-color:rgba(112,152,157,.45)!important;
+  box-shadow:0 26px 66px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.055)!important
+}
+body:not(:has(.mg)):has(.nocekran) .nocsz,
+body:not(:has(.mg)):has(.wynik) .wynczolo{
+  background:linear-gradient(90deg,rgba(82,131,142,.15),transparent 76%)!important;
+  border-bottom-color:rgba(112,152,157,.32)!important
+}
+body:not(:has(.mg)):has(.nocekran) .noccokol,
+body:not(:has(.mg)):has(.nocekran) .nocplyta,
+body:not(:has(.mg)):has(.wynik) .seatchart{
+  background:rgba(3,12,14,.7)!important;border-color:rgba(112,152,157,.3)!important
+}
+body:not(:has(.mg)):has(.nocekran) .nrow,
+body:not(:has(.mg)):has(.wynik) .stube{
+  background:linear-gradient(90deg,rgba(14,35,39,.86),rgba(4,15,15,.96))!important
+}
+body:not(:has(.mg)):has(.nocekran) .nrow::before{background:var(--pc,var(--atlas-brass));box-shadow:0 0 12px color-mix(in srgb,var(--pc,var(--atlas-brass)) 55%,transparent)}
+
+@media(max-width:900px){
+  body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"] .royalhero{grid-template-columns:1fr;padding:21px 19px!important}
+  body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"] .kroyal{grid-template-columns:1fr}
+}
