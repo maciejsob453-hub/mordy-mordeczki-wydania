@@ -2463,3 +2463,17 @@ body:not(:has(.mg)):has(.hud) #app .widok button.btn.btn:not(.tura):not(.g):not(
 body:not(:has(.mg)):has(.hud) #app .widok button.btn.btn:not(.tura):not(.g):not(.r):not(.red):hover:not(:disabled){
   border-color:color-mix(in srgb,var(--party-theme,var(--game-accent,var(--atlas-brass))) 70%,rgba(170,184,172,.3))!important;background:linear-gradient(180deg,rgba(43,62,48,.98),rgba(16,29,22,.98))!important;color:#f2ead1!important
 }
+
+/* 1.1.155: podpowiedzi sa malymi notatkami z archiwum, nie czarnymi
+   prostokatami. Faktura jest przygaszona, zeby liczby i opis pozostaly ostre. */
+body:not(:has(.mg)):has(.hud) #app .tipbox{
+  background:linear-gradient(155deg,rgba(20,28,22,.9),rgba(7,12,9,.97)),url("../obrazki/ui-tooltip-paper.webp") center/cover!important;
+  border-color:rgba(196,154,75,.48)!important;border-radius:3px!important;
+  box-shadow:0 16px 38px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.05)!important;
+  color:#dfe8dc
+}
+body:not(:has(.mg)):has(.hud) #app .tipbox::before{
+  background:rgba(14,22,17,.96);border-color:rgba(196,154,75,.48)
+}
+body:not(:has(.mg)):has(.hud) #app .tipbox .l b,
+body:not(:has(.mg)):has(.hud) #app .tipbox .tot{color:#f0e3bf}

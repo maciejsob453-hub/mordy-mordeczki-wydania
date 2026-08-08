@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.155':{data:'8 sierpnia 2026',zmiany:[
+  'Podpowiedzi zasobow i kart maja wlasna papierowa oprawe archiwum.',
+  'Dymki zachowuja bezpieczna szerokosc na telefonie, ale wygladaja jak czesc tego samego UI.',
+ ]},
  '1.1.154':{data:'8 sierpnia 2026',zmiany:[
   'Zwykle przyciski maja neutralna szybe zamiast automatycznego zlotego gradientu.',
   'Zloto zostaje dla glownej akcji tygodnia, a czerwien dla decyzji ryzykownych.',
