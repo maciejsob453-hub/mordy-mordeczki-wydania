@@ -1898,6 +1898,11 @@ body:has(.hud) .widok[data-tab="partie"] .pzap{padding:15px 14px;border:1px soli
 body:has(.hud) .widok[data-tab="partie"] .pzap:first-of-type{padding-top:15px;border-top:1px solid rgba(196,154,75,.18)}
 body:has(.hud) .widok[data-tab="partie"] .benchgrid{gap:7px}
 body:has(.hud) .widok[data-tab="partie"] .bperson{background:rgba(12,25,17,.74);border-color:rgba(196,154,75,.2);min-height:42px}
+@media(min-width:1181px){
+  body:has(.hud) .widok[data-tab="partie"]>.card>.b{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;align-items:start}
+  body:has(.hud) .widok[data-tab="partie"]>.card>.b>.note{grid-column:1/-1}
+  body:has(.hud) .widok[data-tab="partie"]>.card>.b>.pzap{min-width:0;margin:0}
+}
 body:has(.hud) .widok[data-tab="cele"] .dziennik{position:relative;overflow:hidden}
 body:has(.hud) .widok[data-tab="cele"] .dziennik::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--party-theme,var(--atlas-brass));opacity:.9}
 body:has(.hud) .widok[data-tab="cele"] .dziennik>.h,body:has(.hud) .widok[data-tab="cele"] .dziennik>.b{position:relative}
