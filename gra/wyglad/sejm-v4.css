@@ -2003,6 +2003,23 @@ body:has(.hud) .widok[data-tab="sejm"] .sejmleg{
   body:has(.hud) .widok[data-tab="krol"]>.card{min-width:0;margin-top:0!important}
 }
 
+/* 1.1.162: breakpoint 1500 px ustawial identyfikacje partii na 104 px,
+   chociaz reszta pulpitu miala jeszcze duzo miejsca. Szeroki HUD dostaje
+   stala strefe tozsamosci, a ciasne breakpointy ponizej 1180 px zostaja bez
+   zmian i nadal skladaja belke w bezpieczny uklad. */
+@media(min-width:1180px){
+  body:has(.hud) .hud{
+    grid-template-columns:minmax(210px,220px) minmax(430px,1fr) auto!important;
+  }
+  body:has(.hud) .hud .id{
+    width:100%!important;max-width:none!important;flex:none!important;
+  }
+  body:has(.hud) .hudcenter{overflow:visible!important}
+}
+@media(min-width:1501px){
+  body:has(.hud) .hud{grid-template-columns:280px minmax(590px,1fr) auto!important}
+}
+
 /* Sondaz: historia jest dziennikiem odczytow, a tabela ma rytm rejestru. */
 body:has(.hud) .widok[data-tab="sondaz"]>.card:nth-child(2){background:linear-gradient(110deg,rgba(19,36,27,.92),rgba(7,15,11,.97)),url("../obrazki/ui-ledger-header.webp") center/cover;border-left:3px solid rgba(110,169,226,.7)}
 body:has(.hud) .widok[data-tab="sondaz"]>.card:nth-child(3){background:linear-gradient(180deg,rgba(20,35,26,.92),rgba(7,15,11,.98)),url("../obrazki/ui-civic-ledger.webp") center/cover;border-left:3px solid color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 80%,rgba(196,154,75,.3))}

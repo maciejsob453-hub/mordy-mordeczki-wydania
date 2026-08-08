@@ -2,6 +2,6 @@
 
 Tu leżą gotowe pliki gry, z których korzysta launcher. Kod źródłowy jest prywatny.
 
-Aktualna wersja: **1.1.161**
+Aktualna wersja: **1.1.162**
 
 Grę pobierzesz ze strony gry na itch.io albo przez launcher.

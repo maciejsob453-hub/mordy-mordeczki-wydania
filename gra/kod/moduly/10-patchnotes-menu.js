@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.162':{data:'8 sierpnia 2026',zmiany:[
+  'Gorna belka na szerokim ekranie ma teraz rowne strefy: partia, zasoby i sterowanie.',
+  'Pelna nazwa partii nie jest juz wciskana w waski pasek przy dacie.',
+ ]},
  '1.1.161':{data:'8 sierpnia 2026',zmiany:[
   'Dwor Mordeczki ma teraz uklad pulpitu: skarbiec, czynniki i ranking sa widoczne obok siebie.',
   'Na mniejszych ekranach karty nadal ukladaja sie pionowo, bez sciskania tresci.',
