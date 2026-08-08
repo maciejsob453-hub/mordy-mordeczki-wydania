@@ -2081,3 +2081,26 @@ body:has(.hud) .widok[data-tab="akcje"] .act:hover:not([disabled]),
 body:has(.hud) .widok[data-tab="lider"] .act:hover:not([disabled]){
   border-left-color:var(--game-accent)!important
 }
+
+/* 1.1.122: tabela klubow nie scroluje sie juz poziomo na telefonie. Lider jest
+   wart osobnego ekranu, a w tak waskim protokole najwazniejsze sa partia,
+   mandaty, status i relacja. */
+@media(max-width:420px){
+  body:has(.hud) .sejm-partieb{overflow:hidden;padding:0 7px 8px}
+  body:has(.hud) .sejm-partietabela .t{width:100%;table-layout:fixed}
+  body:has(.hud) .sejm-partietabela .t th,
+  body:has(.hud) .sejm-partietabela .t td{padding:6px 4px;font-size:9px;min-width:0}
+  body:has(.hud) .sejm-partietabela .t th:nth-child(2),
+  body:has(.hud) .sejm-partietabela .t td:nth-child(2){display:none}
+  body:has(.hud) .sejm-partietabela .t th:nth-child(1),
+  body:has(.hud) .sejm-partietabela .t td:nth-child(1){width:46%}
+  body:has(.hud) .sejm-partietabela .t th:nth-child(3),
+  body:has(.hud) .sejm-partietabela .t td:nth-child(3){width:14%}
+  body:has(.hud) .sejm-partietabela .t th:nth-child(4),
+  body:has(.hud) .sejm-partietabela .t td:nth-child(4){width:26%}
+  body:has(.hud) .sejm-partietabela .t th:nth-child(5),
+  body:has(.hud) .sejm-partietabela .t td:nth-child(5){width:14%}
+  body:has(.hud) .sejm-partietabela .t .nm{min-width:0;gap:4px}
+  body:has(.hud) .sejm-partietabela .t .nm span{min-width:0;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  body:has(.hud) .sejm-partietabela .t .crest.s{width:20px;height:20px;flex:none}
+}
