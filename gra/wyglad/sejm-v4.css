@@ -2205,3 +2205,17 @@ body:has(.hud) .widok[data-tab="sad"] .sadekran>.card{
 }
 body:has(.hud) .widok[data-tab="sad"] .sadhist>div,
 body:has(.hud) .widok[data-tab="sad"] .sadwyrok{background:rgba(4,10,8,.5);border-color:rgba(196,154,75,.2)}
+
+/* 1.1.130: sondaż ma własny pokój pomiarów; wykresy na ścianach i karty
+   odpowiedzi są tylko ramą, żeby odczyty pozostały pierwszym planem. */
+body:has(.hud) .widok[data-tab="sondaz"]{
+  background-image:linear-gradient(180deg,rgba(4,10,7,.18),rgba(4,10,7,.93)),url("../obrazki/ui-polling-room.webp");
+  background-position:center top;background-size:cover;background-attachment:local
+}
+body:has(.hud) .widok[data-tab="sondaz"] .pollhero,
+body:has(.hud) .widok[data-tab="sondaz"]>.card{
+  background:linear-gradient(155deg,rgba(18,31,29,.86),rgba(4,11,8,.97)),url("../obrazki/ui-polling-room.webp") center/cover!important;
+  border-color:rgba(110,169,226,.34);box-shadow:0 20px 48px rgba(0,0,0,.36),inset 0 1px rgba(255,255,255,.05)
+}
+body:has(.hud) .widok[data-tab="sondaz"] .pollheroStats,
+body:has(.hud) .widok[data-tab="sondaz"] table.t{background:rgba(4,10,8,.5);border-color:rgba(196,154,75,.2)}
