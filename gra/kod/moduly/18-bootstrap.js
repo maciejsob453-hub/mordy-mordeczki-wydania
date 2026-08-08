@@ -181,7 +181,7 @@ Object.assign(window,{kreMandat,kreResetMandaty,krePreset,kreRzadTryb,kreRzadTog
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
   get rng(){return G&&G.rng},get aiLedger(){return G&&G.aiLedger||[]},
   get KRE(){return KRE}, SCEN, kreatorDane,
-  myGoals,myPartyGoals,myNationalGoals,chooseNationalBranch,chooseNationalOptional,openPartyCouncil,partyCouncilCandidates,nationalGoalReady,nationalGoalDone,nationalGoalProgress,nationalGoalTick,NATIONAL_GOALS,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,
+  myGoals,myPartyGoals,myNationalGoals,chooseNationalBranch,chooseNationalOptional,openPartyCouncil,partyCouncilCandidates,goalsFocus,nationalGoalReady,nationalGoalDone,nationalGoalProgress,nationalGoalTick,NATIONAL_GOALS,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,
   openDym,pusteResorty,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
   zawiedzeniKoalicjanci,demografiaSerwera,SERVER,SERVER_MAX,AGENTS,mogeZglosic,rozwiazChance,radaKto,RESORTY,pmOsoba,pmOsoby,leads,roster,
   aiTransfery,aiOpozycja,aiObsadzRade,aiRekonstrukcja,aiSad,znuzenie,hegemon,resortyPartii,leadWybrany,aiPlan,ustawPlany,aiPamiec,aiPamietaj,aiAgenda,govKontraktTick,

@@ -1344,3 +1344,76 @@ function goalTab(){
   if(!national.length&&!party.length)out+=`<div class="card"><div class="h"><h3>Brak celów</h3></div><div class="b"><p class="dim">Ta partia nie ma obecnie osobnego dziennika celów.</p></div></div>`;
   return out;
 }
+
+/* -------------------------------------------------------------------------
+   CENTRUM DOWODZENIA CELAMI
+   Stary ekran drukowaĹ‚ kaĹĽdy cel jako peĹ‚nÄ… kartÄ™ jeden pod drugim. Przy
+   kilku celach gracz widziaĹ‚ opis, ale nie widziaĹ‚ drogi. Ten widok trzyma
+   dane w tych samych funkcjach co wczeĹ›niej, a zmienia tylko ich prezentacjÄ™:
+   drzewo poĹ›rodku, inspektor po prawej i alerty na dole. */
+function partyGoalView(id){
+  const g=GOALS[id];if(!g)return null;
+  const req=reqOf(id),done=goalDone(id),ready=goalOk(id),ok=req.filter(r=>r.ok()).length;
+  return {id,type:'party',g,name:typeof g.n==='function'?g.n():g.n,done,active:false,ready,progress:req.length?Math.round(ok/req.length*100):0,ok,total:req.length,icon:g.avatar||LOGOS[g.logo]||'',status:done?'wypełniony':ready?'gotowy':'zablokowany'};
+}
+function nationalGoalView(id){
+  const g=NATIONAL_GOALS[id],p=nationalGoalProgress(id),s=nationalState(),reason=nationalGoalReason(id);
+  if(!g)return null;
+  return {id,type:'national',g,name:g.n,done:p.done,active:p.active,ready:!reason,progress:p.pct,ok:p.pct,total:g.days,icon:g.avatar||LOGOS[g.logo]||'',status:p.done?'ukończony':p.active?'w toku':reason?'zablokowany':'czeka',reason,opted:!!(s.optional&&s.optional[id])};
+}
+function goalViewById(id){
+  return (NATIONAL_GOALS[id]?nationalGoalView(id):partyGoalView(id));
+}
+function goalsFocus(id){
+  if(!G||!goalViewById(id))return;
+  G.goalFocus=id;render();
+}
+function goalsAllViews(party,national){
+  return party.map(partyGoalView).concat(national.map(nationalGoalView)).filter(Boolean);
+}
+function goalNode(item,index,total){
+  const active=item.active,selected=G.goalFocus===item.id;
+  const state=item.done?'done':active?'active':item.ready?'ready':'locked';
+  const mark=item.done?'✓':active?'●':item.ready?'◆':'·';
+  const pct=item.type==='national'?`${item.progress}%`:`${item.progress}%`;
+  return `<div class="goal-node-wrap ${index===total-1?'last':''}">
+    <button class="goal-node ${state} ${selected?'selected':''}" onclick="goalsFocus('${esc(item.id)}')" aria-label="${esc(item.name)}">
+      <span class="goal-node-mark">${mark}</span><span class="goal-node-icon">${item.icon?`<img src="${item.icon}" alt="">`:'<i>✦</i>'}</span>
+      <span class="goal-node-copy"><em>${item.type==='national'?'CEL NARODOWY':'CEL PARTYJNY'}</em><b>${item.name}</b><small>${item.done?'UKOŃCZONY':item.active?'W TOKU · '+pct:item.ready?'DOSTĘPNY':'ZABLOKOWANY'}</small></span>
+    </button>
+  </div>`;
+}
+function goalsTreeBlock(label,sub,items,kind){
+  if(!items.length)return '';
+  return `<section class="goals-tree-block ${kind}"><header><div><span class="eyebrow">${kind==='national'?'NATIONAL DIRECTIVE':'PARTY DIRECTIVE'}</span><h3>${label}</h3><p>${sub}</p></div><b>${items.filter(x=>x.done).length}/${items.length}</b></header><div class="goal-tree-row">${items.map((x,i)=>goalNode(x,i,items.length)).join('')}</div></section>`;
+}
+function goalsBranchPanel(){
+  const s=nationalState();if(!s||!s.done.nplr_star||s.branch)return '';
+  return `<div class="goals-branch-alert"><span class="goal-node-mark">◆</span><div><b>ROZWIDLENIE PO ALTERNATYWIE ŻYDOWSKIEJ</b><p>Wybierz jedną drogę. Decyzji nie można cofnąć w tej kampanii.</p></div><div class="goals-branch-actions"><button class="goals-action royal" onclick="chooseNationalBranch('republican')">REPUBLIKANIE</button><button class="goals-action freedom" onclick="chooseNationalBranch('freedom')">AUREA LIBERTAS</button></div></div>`;
+}
+function goalsInspector(item){
+  if(!item)return `<aside class="goals-inspector empty"><span class="goal-inspector-glyph">✦</span><h3>Wybierz węzeł</h3><p>Kliknij cel w drzewie, żeby otworzyć warunki, konsekwencje i decyzję.</p></aside>`;
+  const g=item.g,req=item.type==='party'?reqOf(item.id):null;
+  const conditions=item.type==='party'?req.map(r=>{const yes=r.ok()||item.done;return `<li class="${yes?'yes':'no'}"><span>${yes?'✓':'×'}</span><div><b>${typeof r.t==='function'?r.t():r.t}</b><small>${item.done?'spełnione':r.v()}</small></div></li>`}).join(''):
+    `<li class="${item.ready||item.done?'yes':'no'}"><span>${item.done?'✓':item.ready?'✓':'×'}</span><div><b>Warunek dostępu</b><small>${item.done?'cel wykonany':item.reason||g.accessText||'Poprzedni cel musi być ukończony.'}</small></div></li>`;
+  let action='';
+  if(item.type==='party'&&!item.done)action=`<button class="goals-action primary" ${item.ready?'':'disabled'} onclick="doGoal('${esc(item.id)}')">${item.ready?'WYPEŁNIJ CEL':'WARUNKI JESZCZE NIE SPEŁNIONE'} <span>→</span></button>`;
+  if(item.type==='national'&&g.optional&&!item.done&&!item.active&&item.opted===false&&nationalGoalAccess(item.id))action=`<button class="goals-action primary" onclick="chooseNationalOptional('${esc(item.id)}')">PODEJMIJ CEL OPCJONALNY <span>→</span></button>`;
+  if(item.type==='national'&&item.id==='nplr_council'&&item.done&&!(G.partyCouncil&&G.partyCouncil.members&&G.partyCouncil.members.length===5))action=`<button class="goals-action primary" onclick="openPartyCouncil()">WYBIERZ RADĘ PARTYJNĄ <span>→</span></button>`;
+  if(item.done)action=`<div class="goals-complete-stamp">✓ CEL ZREALIZOWANY</div>`;
+  return `<aside class="goals-inspector"><div class="goal-inspector-top"><span class="goal-inspector-type">${item.type==='national'?'CEL NARODOWY':'CEL PARTYJNY'} · ${item.status.toUpperCase()}</span><span class="goal-inspector-id">${item.type==='national'?item.g.days+' DNI':'PROGRAM'}</span></div><div class="goal-inspector-title"><div class="goal-inspector-seal">${item.icon?`<img src="${item.icon}" alt="">`:'✦'}</div><div><h2>${item.name}</h2><p>${g.what||''}</p></div></div><div class="goal-inspector-progress"><div><span>POSTĘP</span><b>${item.progress}%</b></div><div class="goal-progress-track"><i style="width:${item.progress}%"></i></div></div><h4>WARUNKI OPERACYJNE</h4><ul class="goal-condition-list">${conditions}</ul><h4>SKUTKI POLITYCZNE</h4><div class="goal-effect-list">${(g.cons||[]).map(c=>`<div><span>◆</span>${c}</div>`).join('')}</div>${action}</aside>`;
+}
+function goalTabCommand(){
+  nationalGoalTick();
+  const party=myPartyGoals(),national=myNationalGoals(),items=goalsAllViews(party,national);
+  if(!items.length)return identSwitcher()+`<div class="goals-command-empty"><span>✦</span><h2>Brak aktywnego programu</h2><p>Ta partia nie ma obecnie osobnej ścieżki celów.</p></div>`;
+  const active=items.find(x=>x.active)||items.find(x=>!x.done)||items[items.length-1];
+  if(!G.goalFocus||!items.some(x=>x.id===G.goalFocus))G.goalFocus=active.id;
+  const selected=goalViewById(G.goalFocus)||active,p=me(),done=items.filter(x=>x.done).length;
+  const date=dateStr(gameDate()),time=`${String(G.godzina??8).padStart(2,'0')}:00`,branch=goalsBranchPanel();
+  const notices=[active&&active.active?`Trwa: <b>${active.name}</b>`:`Najbliższy cel: <b>${active?active.name:'brak'}</b>`,`${done}/${items.length} celów zamkniętych`,`Kadencja ${G.term} · tydzień ${G.week}`];
+  return `<div class="goals-command"><header class="goals-command-header"><div class="goals-command-title"><span class="eyebrow">CENTRUM DOWODZENIA · PROGRAM PARTII</span><h1>${p.n}</h1><p>Drzewo decyzji strategicznych · cele narodowe i partyjne w jednym miejscu</p></div><div class="goals-command-readout"><span>DATA SYMULACJI</span><b>${date}</b><small>${time} · ${G.realPaused?'PAUZA':'ŚWIAT PŁYNIE'} · x${G.realSpeed||1}</small></div></header><div class="goals-command-layout"><aside class="goals-rail"><div class="goals-rail-label">CENTRUM</div><button class="goals-rail-button on" onclick="goalsFocus('${esc(active.id)}')"><span>◆</span><b>AKTYWNY CEL</b><small>${active.name}</small></button><button class="goals-rail-button" onclick="setTab('akcje')"><span>⚑</span><b>DECYZJE</b><small>${G.ap||0} akcji do rozdania</small></button><button class="goals-rail-button" onclick="setTab('sondaz')"><span>◈</span><b>SONDAŻ</b><small>${fmt(shown(G.me,(G.polls&&G.polls.length?G.polls[G.polls.length-1]:0)))}%</small></button><div class="goals-rail-divider"></div><div class="goals-rail-label">STATUS PARTII</div><div class="goals-rail-stat"><span>SŁAWA</span><b>${Math.round(p.fame)}</b></div><div class="goals-rail-stat"><span>WIARYGODNOŚĆ</span><b>${Math.round(p.cred)}</b></div><div class="goals-rail-stat"><span>JEDNOŚĆ</span><b>${Math.round(p.uni)}</b></div><div class="goals-rail-stat"><span>ZAPLECZE</span><b>${p.mem}</b></div><div class="goals-rail-legend"><span><i class="done"></i> ukończony</span><span><i class="active"></i> w toku</span><span><i class="locked"></i> zablokowany</span></div></aside><main class="goals-command-main">${branch}<div class="goals-tree-toolbar"><div><span class="eyebrow">MAPA CELÓW</span><h2>Strategiczna ścieżka partii</h2></div><div class="goals-tree-counter"><b>${done}</b><span>/ ${items.length}<br>WYKONANYCH</span></div></div>${goalsTreeBlock('Cele narodowe','Długoterminowe przełomy prowadzone przez kalendarz.',national.map(nationalGoalView),'national')}${goalsTreeBlock('Cele partyjne','Program partii i przemiany, które możesz uruchomić decyzją.',party.map(partyGoalView),'party')}<div class="goals-alert-strip">${notices.map((n,i)=>`<span class="goals-alert ${i===0?'hot':''}"><i>${i===0?'!':'·'}</i>${n}</span>`).join('')}</div></main>${goalsInspector(selected)}</div><footer class="goals-command-footer"><div><span class="eyebrow">KONTROLA CZASU</span><b>Świat działa niezależnie od twoich decyzji</b></div><div class="goals-clock-dock"><button class="goals-clock-button" onclick="realClockToggle()">${G.realPaused?'▶ WZNÓW':'Ⅱ PAUZA'}</button><select onchange="realClockSpeed(this.value)">${[.5,1,2,4].map(v=>`<option value="${v}" ${G.realSpeed===v?'selected':''}>x${v}</option>`).join('')}</select></div><span class="goals-footer-note">${notices.join(' · ')}</span></footer></div>`;
+}
+/* Nadpisanie starego renderera celów. Mechanika pozostaje w goalCard/doGoal,
+   a ten ekran tylko układa te same dane w drzewo i panel inspektora. */
+goalTab=goalTabCommand;
