@@ -292,7 +292,7 @@ function mediaTab(){
   const rynek=alive().filter(k=>k!==G.me).flatMap(k=>((G.aiMedia&&G.aiMedia[k])||[]).map(m=>({k,m})))
     .sort((a,b)=>zasiegMediow(b.k)-zasiegMediow(a.k));
   return `
-  <div class="ekoblok">
+  <div class="ekoblok mediaekran">
     <div class="card"><div class="h"><h3>Twoje wydawnictwa</h3>
       <span class="n">${lista.length} · bilans ${kasaSkrot(mediaBilans())}</span></div><div class="b">
       <div class="tabliczki" style="margin:0 0 14px">

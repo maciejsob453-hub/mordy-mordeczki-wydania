@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.94':{data:'8 sierpnia 2026', zmiany:[
+  'NOWE TLA DLA SADU, MEDIOW I SEJMU. Generowane tekstury wzmacniaja klimat dzialow, ale zostawiaja srodek czytelny dla danych i mapy.',
+  'MEDIA I SAD MAJA JEDEN JEZYK SCENOGRAFII. Zamkniete i otwarte ekrany nie wygladaja juz jak gole gradienty.',
+ ]},
  '1.1.93':{data:'8 sierpnia 2026', zmiany:[
   'AUDYT BALANSU PRZYHAMOWUJE BETONOWANIE SCENY. Seryjny zwyciezca traci przewage, a komputerowy PPP dostaje hamulec; gracz zachowuje pelna sile tej partii.',
   'SMOKE TEST STARTUJE PRAWDZIWA PARTIE. Zapis i odczyt sa sprawdzane po uruchomieniu rozgrywki, nie tylko na ekranie trybu.',
