@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.180':{data:'9 sierpnia 2026',zmiany:[
+  'Republika po zlotym swicie jest teraz naprawde opcjonalnym celem: mozesz go podjac po Aurea Libertas albo zakonczyc sciezke.',
+  'Dodano jawny przycisk podjecia opcjonalnego celu i migracje stanu starych zapisow.'
+ ]},
  '1.1.179':{data:'9 sierpnia 2026',zmiany:[
   'Rada Partyjna pozwala wskazac konkretna osobe na premiera, nie tylko partie.',
   'Granica czasu nie zapetla absolutorium ani procedur wyborczych, gdy swiat plynie automatycznie.'

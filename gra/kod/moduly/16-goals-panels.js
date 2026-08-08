@@ -554,6 +554,7 @@ function nationalState(){
   s.started=s.started&&typeof s.started==='object'?s.started:{};
   s.done=s.done&&typeof s.done==='object'?s.done:{};
   s.completedAt=s.completedAt&&typeof s.completedAt==='object'?s.completedAt:{};
+  s.optional=s.optional&&typeof s.optional==='object'?s.optional:{};
   if(s.active===undefined)s.active=null;
   if(s.branch!==null&&!NATIONAL_BRANCHES[s.branch])s.branch=null;
   return s;
@@ -571,6 +572,13 @@ function chooseNationalBranch(branch){
   say(`<b>Rozwidlenie celu narodowego.</b> Wybrano: ${NATIONAL_BRANCHES[branch].name}.`,'roy');
   nationalGoalTick();render();
 }
+function chooseNationalOptional(id){
+  const g=NATIONAL_GOALS[id],s=nationalState();
+  if(!G||G.me!=='PLR'||!g||!g.optional||!s||s.done[id]||s.optional[id]||!nationalGoalAccess(id))return;
+  s.optional[id]=1;s.waiting=null;
+  say(`<b>Cel opcjonalny przyjęty.</b> ${g.n} zacznie odliczanie, gdy zakończy się poprzedni etap.`,'roy');
+  nationalGoalTick();render();
+}
 function nationalGoalAccess(id){
   const g=NATIONAL_GOALS[id];if(!g||!G)return false;
   try{return !g.access||!!g.access()}catch(e){return false}
@@ -586,6 +594,7 @@ function nationalGoalReason(id){
   if(g.branch&&!s.branch)return 'Najpierw wybierz jedno z dwóch rozwidleń.';
   if(g.prev&&!s.done[g.prev])return 'Najpierw ukończ: '+NATIONAL_GOALS[g.prev].n+'.';
   if(!nationalGoalAccess(id))return g.accessText||'Warunek dostępu nie jest jeszcze spełniony.';
+  if(g.optional&&!s.optional[id])return 'Cel opcjonalny: wybierz go, jeśli chcesz i masz spełnione warunki.';
   return '';
 }
 function nationalComplete(id){
@@ -610,6 +619,7 @@ function nationalGoalTick(){
     }
     if(g.prev&&!s.done[g.prev])return;
     if(!nationalGoalAccess(id)){s.waiting=id;return;}
+    if(g.optional&&!s.optional[id]){s.waiting='optional:'+id;return;}
     s.active=id;s.waiting=null;s.started[id]={day:today,term:G.term,week:G.week};
     say(`<b>Nowy cel narodowy.</b> ${g.n} rozpoczyna odliczanie: ${g.days} dni.`,'roy');
     return;
@@ -770,6 +780,7 @@ function nationalGoalCard(id){
       <h4>Warunek dostępu</h4><div class="national-goal-access">${g.accessText||'Poprzedni cel musi być ukończony.'}</div>
       <h4>Konsekwencje</h4>${g.cons.map(c=>`<div class="national-goal-consequence">${c}</div>`).join('')}
       ${id==='nplr_council'&&p.done?`<div class="council-callout"><b>Rada Partyjna</b><span>${G.partyCouncil&&G.partyCouncil.members&&G.partyCouncil.members.length===5?'Skład zapisany · '+G.partyCouncil.members.join(', '):'Nie wybrano jeszcze pięciu członków.'}</span>${G.partyCouncil&&G.partyCouncil.members&&G.partyCouncil.members.length===5?'':'<button class="btn sm" onclick="openPartyCouncil()">Wybierz radę →</button>'}</div>`:''}
+      ${g.optional&&!p.done&&!p.active&&nationalGoalAccess(id)&&!nationalState().optional[id]?`<div class="council-callout optional-goal"><b>To jest opcjonalne rozwidlenie</b><span>Możesz zakończyć ścieżkę na Aurea Libertas albo iść dalej ku Republice.</span><button class="btn sm" onclick="chooseNationalOptional('${id}')">Podejmuję cel →</button></div>`:''}
     </div>
   </article>`;
 }
