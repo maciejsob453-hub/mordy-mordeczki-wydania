@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.157':{data:'8 sierpnia 2026',zmiany:[
+  'Pasek koncowki kampanii ma teraz wlasny blat roboczy z oprawy decyzji.',
+  'Tryb runoff zachowuje osobny zloty sygnal, zeby urny pozostaly czytelne.',
+ ]},
  '1.1.156':{data:'8 sierpnia 2026',zmiany:[
   'Pola kreatora, mediow i paneli korzystaja z jednej wygenerowanej karty formularza.',
   'Focus jest wyrazniejszy, ale wpisywany tekst nadal ma spokojne, ciemne tlo.',

@@ -2493,3 +2493,11 @@ body:not(:has(.mg)) #app .kreform select:focus,
 body:not(:has(.mg)) #app .inp:focus{
   border-color:var(--game-accent,var(--atlas-brass))!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--game-accent,var(--atlas-brass)) 28%,transparent),inset 0 1px rgba(255,255,255,.06)!important;outline:0
 }
+
+/* 1.1.157: pasek koncowki kampanii dostaje spokojny blat roboczy. Runoff
+   zostaje osobnym stanem, bo jego zloty przycisk ma sygnalizowac urny. */
+body:not(:has(.mg)):has(.hud) #app .campbar:not(.runoff){
+  background:linear-gradient(110deg,rgba(8,18,13,.9),rgba(5,11,8,.96)),url("../obrazki/ui-action-desk.webp") center/cover!important;
+  border-color:rgba(196,154,75,.34)!important;box-shadow:0 15px 34px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.05)!important
+}
+body:not(:has(.mg)):has(.hud) #app .campbar:not(.runoff) .pill{background:rgba(5,12,8,.56);border-color:rgba(196,154,75,.28)}
