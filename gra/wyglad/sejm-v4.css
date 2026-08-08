@@ -1957,6 +1957,30 @@ body:has(.hud) .widok[data-tab="sejm"] .hemipod{background:rgba(4,11,8,.67);bord
 body:has(.hud) .widok[data-tab="sejm"] .sejmleg .sl{background:rgba(5,13,9,.76);border-color:color-mix(in srgb,var(--c,#c49a4b) 44%,rgba(196,154,75,.22));box-shadow:inset 0 1px rgba(255,255,255,.035)}
 body:has(.hud) .widok[data-tab="sejm"] .sejmgrid>.card{background:linear-gradient(180deg,rgba(19,34,25,.92),rgba(7,15,11,.98)),url("../obrazki/ui-civic-ledger.webp") center/cover;border-color:rgba(196,154,75,.3)}
 
+/* 1.1.159: scena Sejmu ma byc czytelna plansza, nie tapeta pod SVG.
+   Nowe tlo zostawia pusty, matowy srodek na kropki i podpisy, a architekture
+   trzyma na obrzezach. Dodatkowa szyba wokol polkola rozdziela dane od faktury. */
+body:has(.hud) .widok[data-tab="sejm"] .sejm-sala{
+  background:
+    linear-gradient(180deg,rgba(4,11,8,.22),rgba(4,10,7,.72)),
+    url("../obrazki/ui-parliament-floor-v2.webp") center/cover no-repeat!important;
+  border-color:rgba(196,154,75,.5);
+  box-shadow:0 20px 44px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.07)
+}
+body:has(.hud) .widok[data-tab="sejm"] .hemi-scena{
+  padding:8px 10px 4px;
+  border:1px solid rgba(196,154,75,.2);
+  border-radius:3px;
+  background:radial-gradient(ellipse at 50% 42%,rgba(20,40,28,.18),rgba(3,9,6,.34) 75%);
+  box-shadow:inset 0 1px rgba(255,255,255,.035)
+}
+body:has(.hud) .widok[data-tab="sejm"] .sejmleg{
+  padding:10px 10px 4px;
+  border-top:1px solid rgba(196,154,75,.2);
+  border-bottom:1px solid rgba(196,154,75,.12);
+  background:rgba(3,9,6,.3)
+}
+
 /* Sondaz: historia jest dziennikiem odczytow, a tabela ma rytm rejestru. */
 body:has(.hud) .widok[data-tab="sondaz"]>.card:nth-child(2){background:linear-gradient(110deg,rgba(19,36,27,.92),rgba(7,15,11,.97)),url("../obrazki/ui-ledger-header.webp") center/cover;border-left:3px solid rgba(110,169,226,.7)}
 body:has(.hud) .widok[data-tab="sondaz"]>.card:nth-child(3){background:linear-gradient(180deg,rgba(20,35,26,.92),rgba(7,15,11,.98)),url("../obrazki/ui-civic-ledger.webp") center/cover;border-left:3px solid color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 80%,rgba(196,154,75,.3))}
