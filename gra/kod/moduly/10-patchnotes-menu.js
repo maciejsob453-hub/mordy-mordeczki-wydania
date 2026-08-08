@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.97':{data:'8 sierpnia 2026', zmiany:[
+  'Domkniety redesign ekranow wejscia: wybor partii, scenariusze i kreator maja ten sam jezyk atlasu co gra.',
+  'Okna decyzji maja stala rame, przycisk zamkniecia w prawym rogu i czytelne opcje z wlasnym tlem.',
+  'Karty partii, kroki kreatora i formularze dostaly rowne odstepy, mocniejsza hierarchie i responsywne zwijanie.',
+ ]},
  '1.1.96':{data:'8 sierpnia 2026', zmiany:[
   'Pelny redesign interfejsu gry: wspolny atlas polityczny, plaskie panele i czytelniejsza hierarchia informacji.',
   'Nowa generowana scenografia UI spina ekran kampanii, Sejm, sad, media, sondaz, Krola, Pedia i kreator.',

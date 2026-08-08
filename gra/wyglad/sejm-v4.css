@@ -1255,3 +1255,134 @@ body:has(.hud) .nocekran h1,body:has(.hud) .wynik h1{font-family:var(--fd);font-
   body:has(.hud) .pollheroStats{grid-template-columns:1fr}
   body:has(.hud) .pollheroStats>div{border-right:0;border-bottom:1px solid rgba(196,154,75,.18)}
 }
+
+/* ------------------------------------------------------------------------
+   DRUGA FALA: EKRANY PRZED GRA I OKNA
+   Pierwsza fala obejmowala HUD po starcie. Te reguly domykaja wybor partii,
+   scenariusze, kreator oraz decyzje wywolywane modalem, zeby wejscie do gry
+   nie wracalo do starego czarno-zlotego komponentu.
+   ------------------------------------------------------------------------ */
+body:has(.partyselect),body:has(.scenv3),body:has(.kreekran),body:has(.nocekran),body:has(.wynik){
+  background:
+    linear-gradient(180deg,rgba(5,10,9,.35),rgba(5,10,9,.82)),
+    url("../obrazki/ui-atlas-surface.webp") center top/cover fixed no-repeat,
+    var(--atlas-ink);
+}
+body:has(.partyselect) .wrap,body:has(.scenv3) .wrap{max-width:1700px;padding:28px 22px 44px}
+
+/* Karuzela partii: panel z mapa w tle, herb i liczby sa hierarchia pierwsza. */
+body:has(.partyselect.fifa) .partyselect.fifa{
+  max-width:1280px;grid-template-columns:82px minmax(0,1fr) 82px;gap:18px;
+  padding:18px;border-radius:4px;border:1px solid rgba(196,154,75,.4);
+  background:
+    linear-gradient(110deg,rgba(7,15,11,.79),rgba(9,19,14,.91)),
+    url("../obrazki/ui-atlas-surface.webp") center/cover;
+  box-shadow:0 22px 58px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.05);
+}
+body:has(.partyselect.fifa) .partyselect.fifa>.pickmain{
+  min-height:560px;padding:30px 34px;border-radius:3px;border:1px solid rgba(196,154,75,.32);
+  background:linear-gradient(180deg,rgba(28,42,34,.96),rgba(8,16,12,.98));
+  box-shadow:0 14px 34px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.045);
+}
+body:has(.partyselect.fifa) .partyselect .partyarrow{
+  width:68px;height:102px;align-self:center;border:1px solid rgba(196,154,75,.43);border-radius:3px;
+  background:rgba(10,19,14,.86);color:#e2bd6d;font-family:var(--fd);font-size:52px;line-height:1;
+  box-shadow:inset 0 1px rgba(255,255,255,.06),0 10px 24px rgba(0,0,0,.22);
+}
+body:has(.partyselect.fifa) .partyselect .partyarrow:hover{background:rgba(196,154,75,.18);border-color:#e4c477;transform:translateY(-2px)}
+body:has(.partyselect.fifa) .partyherohead{padding-bottom:18px;margin-bottom:16px;border-bottom:1px solid rgba(196,154,75,.22)}
+body:has(.partyselect.fifa) .partyherohead .crest{width:92px!important;height:92px!important;padding:5px!important;border-radius:3px!important;border:1px solid rgba(196,154,75,.42);background:#f0ede2;box-shadow:0 8px 22px rgba(0,0,0,.26)}
+body:has(.partyselect.fifa) .partyherohead h2{font-family:var(--fd);font-size:31px;line-height:1.05;letter-spacing:.01em;color:#f0e1bd}
+body:has(.partyselect.fifa) .partyherohead .meta{font:10px var(--m);letter-spacing:.1em;text-transform:uppercase;color:#a7b2a5;margin-top:7px}
+body:has(.partyselect.fifa) .partyblurb{max-width:75ch!important;font-size:15px!important;line-height:1.62!important;color:#c0c9bd!important}
+body:has(.partyselect.fifa) .partystats{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px!important;margin-top:20px!important}
+body:has(.partyselect.fifa) .partystats .row{padding:10px 12px;border:1px solid rgba(196,154,75,.22);border-radius:2px;background:rgba(5,12,8,.48)}
+body:has(.partyselect.fifa) .partystats .row .l{font-family:var(--m);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+body:has(.partyselect.fifa) .partystats .row .l b{font-size:16px;color:#e6d4a3}
+body:has(.partyselect.fifa) .partystats .trk{margin-top:8px;height:5px;background:#07100c}
+body:has(.partyselect.fifa) .partyfacts{padding:10px 0!important;border-top:1px solid rgba(196,154,75,.18);border-bottom:1px solid rgba(196,154,75,.18);font-size:10px!important;letter-spacing:.04em;text-transform:uppercase}
+body:has(.partyselect.fifa) .partyfacts span{display:inline-flex;gap:5px}
+body:has(.partyselect.fifa) .partyleader{margin-top:15px;padding:12px 14px;border:1px solid color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 50%,rgba(196,154,75,.24));border-left:3px solid var(--party-theme,var(--atlas-brass));border-radius:2px;background:rgba(4,11,8,.5)}
+body:has(.partyselect.fifa) .partyleader .n{font-family:var(--fd);font-size:17px;color:#e7d9b7}
+body:has(.partyselect.fifa) .partyleader .s{font:10px var(--m);color:#a8b3a8;letter-spacing:.03em;margin-top:3px}
+body:has(.partyselect.fifa) .pickstart{margin-top:18px!important;padding:13px 16px!important;border-radius:2px!important;background:var(--party-theme,var(--atlas-brass))!important;border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 72%,#f5e4b5)!important;color:#10130d!important;font-family:var(--m);font-size:13px!important;letter-spacing:.03em}
+body:has(.partyselect.fifa) .pickstart:hover{filter:brightness(1.1);transform:translateY(-1px)}
+body:has(.partyselect.fifa) .partycarouselmeta{padding:11px 0 2px;color:#96a59a;font:10px var(--m);letter-spacing:.11em;text-transform:uppercase}
+body:has(.partyselect.fifa) .partycarouselmeta b{color:#e2bd6d}
+body:has(.partyselect.fifa) .partycreatorlink{grid-column:1/-1!important;justify-self:center;padding:9px 16px;border:1px solid rgba(196,154,75,.35);border-radius:2px;background:rgba(12,23,17,.86);color:#d9c28b;font:11px var(--m);letter-spacing:.03em}
+body:has(.partyselect.fifa) .partycreatorlink:hover{border-color:#e4c477;background:rgba(196,154,75,.14)}
+
+/* Lista scenariuszy: ten sam panel, ale z czytelna osia wyboru. */
+body:has(.scenv3) .scenv3{max-width:1580px;border-radius:4px;border:1px solid rgba(196,154,75,.4);background:linear-gradient(110deg,rgba(7,15,11,.81),rgba(9,19,14,.93)),url("../obrazki/ui-atlas-surface.webp") center/cover;box-shadow:0 22px 58px rgba(0,0,0,.34);padding:22px}
+body:has(.scenv3) .scenv3 .pickmain{border-radius:3px;background:rgba(17,30,23,.88);border-color:rgba(196,154,75,.29);box-shadow:inset 0 1px rgba(255,255,255,.04)}
+body:has(.scenv3) .scenv3 .scenlist{gap:7px}
+body:has(.scenv3) .scenv3 .scenlist button,body:has(.scenv3) .scenv3 .scenrow{border-radius:2px;border:1px solid rgba(196,154,75,.23);background:rgba(7,16,11,.68);box-shadow:none}
+body:has(.scenv3) .scenv3 .scenlist button:hover,body:has(.scenv3) .scenv3 .scenrow:hover{background:rgba(196,154,75,.12);border-color:#c49a4b}
+body:has(.scenv3) .scenv3 .btn{border-radius:2px}
+
+/* Kreator: narzedzie ma wyglad pracowni, nie strony formularza. */
+body:has(.kreekran) .wrap{max-width:1780px;padding:14px 22px 42px}
+body:has(.kreekran) .kreekran{max-width:1700px;padding:22px 0 60px}
+body:has(.kreekran) .krehead{padding:0 4px 20px;border-bottom:1px solid rgba(196,154,75,.28)}
+body:has(.kreekran) .krehead h1{font-family:var(--fd);font-size:39px;letter-spacing:.015em;color:#f0e1bd}
+body:has(.kreekran) .krehead p{color:#aeb9ae;line-height:1.55}
+body:has(.kreekran) .kresteps{gap:5px;margin:16px 0 19px}
+body:has(.kreekran) .krestep{border-radius:2px;border:1px solid rgba(196,154,75,.25);background:rgba(11,22,16,.9);box-shadow:none}
+body:has(.kreekran) .krestep.on{background:rgba(196,154,75,.18);border-color:#d2a653;box-shadow:inset 0 -3px #d2a653}
+body:has(.kreekran) .krestep.done{border-color:rgba(115,171,100,.45)}
+body:has(.kreekran) .krestep i{border-radius:2px;background:#17271e;color:#e0be70}
+body:has(.kreekran) .krepanel,body:has(.kreekran) .kreside{border-radius:3px;border-color:rgba(196,154,75,.28);background:linear-gradient(180deg,rgba(25,39,31,.96),rgba(8,16,12,.98));box-shadow:0 16px 32px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.04)}
+body:has(.kreekran) .kretitle{border-bottom:1px solid rgba(196,154,75,.2);padding-bottom:13px;margin-bottom:16px}
+body:has(.kreekran) .kretitle h2{font-family:var(--fd);font-size:25px;letter-spacing:.01em;color:#efe0bb}
+body:has(.kreekran) .kretitle p{color:#aeb9ae;line-height:1.5}
+body:has(.kreekran) .kreform input,body:has(.kreekran) .kreform textarea,body:has(.kreekran) .kreselect select,body:has(.kreekran) .krenumbers input,body:has(.kreekran) .krenumbers select{border-radius:2px;background:#09140f;border-color:rgba(196,154,75,.28);color:#e9eee7}
+body:has(.kreekran) .kreform input:focus,body:has(.kreekran) .kreform textarea:focus,body:has(.kreekran) .kreselect select:focus{outline:0;border-color:#d2a653;box-shadow:0 0 0 2px rgba(196,154,75,.12)}
+body:has(.kreekran) .krehint,body:has(.kreekran) .kreok{border-radius:2px;background:rgba(196,154,75,.08);border-color:rgba(196,154,75,.3)}
+body:has(.kreekran) .kreseat,body:has(.kreekran) .kresuwak,body:has(.kreekran) .krestat,body:has(.kreekran) .krefinalgrid>section,body:has(.kreekran) .krefinalblock{border-radius:2px;background:rgba(7,17,12,.76);border-color:rgba(196,154,75,.21)}
+body:has(.kreekran) .krewyd>aside button,body:has(.kreekran) .kregoals>aside button{border-radius:2px;background:rgba(7,17,12,.86);border-color:rgba(196,154,75,.21)}
+body:has(.kreekran) .krewyd>aside button.on,body:has(.kreekran) .kregoals>aside button.on{border-color:#d2a653;box-shadow:inset 3px 0 #d2a653;background:rgba(196,154,75,.14)}
+
+/* Modale: zamkniecie w rogu, stala rama i wybor jako menu decyzji. */
+.veil{background:rgba(3,8,6,.78);backdrop-filter:blur(9px) saturate(.85)}
+.veil .mdl{width:min(780px,94vw);border-radius:3px;border:1px solid rgba(196,154,75,.44);background:linear-gradient(180deg,rgba(27,41,33,.98),rgba(8,15,11,.99)),url("../obrazki/ui-atlas-surface.webp") center/cover;box-shadow:0 26px 70px rgba(0,0,0,.52),inset 0 1px rgba(255,255,255,.05)}
+.veil .mdl>.h{padding:15px 58px 14px 19px;background:linear-gradient(90deg,rgba(196,154,75,.16),transparent 72%);border-bottom:1px solid rgba(196,154,75,.28)}
+.veil .mdl>.h h2{font-family:var(--fd);font-size:24px;color:#f0e1bd}
+.veil .mdl>.h .k{font:9px var(--m);letter-spacing:.16em;color:#bda66e}
+.veil .mdl>.h::after{height:2px;background:linear-gradient(90deg,#c49a4b,transparent 75%)}
+.veil .mdlx{right:13px;top:13px;transform:none;width:28px;height:28px;border-radius:2px;border:1px solid rgba(196,154,75,.42);background:rgba(7,15,11,.75);color:#e2c176;font:700 17px/1 var(--m)}
+.veil .mdlx:hover{background:rgba(196,154,75,.18);border-color:#e4c477}
+.veil .mdl .bd{padding:19px;color:#c0c9bf;line-height:1.55}
+.veil .mdl .op{padding:13px 17px;border-top:1px solid rgba(196,154,75,.24);background:rgba(4,10,7,.58)}
+.veil .opt,.veil .lchip{border-radius:2px;border:1px solid rgba(196,154,75,.27);background:rgba(10,20,14,.92);box-shadow:none;color:#e5ece3}
+.veil .opt:hover:not(:disabled),.veil .lchip:hover:not(:disabled){border-color:#d2a653;background:rgba(196,154,75,.14);transform:translateX(2px)}
+
+@media(max-width:760px){
+  body:has(.partyselect.fifa) .partyselect.fifa{grid-template-columns:42px minmax(0,1fr) 42px;padding:9px;gap:7px}
+  body:has(.partyselect.fifa) .partyselect.fifa>.pickmain{min-height:510px;padding:21px 18px}
+  body:has(.partyselect.fifa) .partyherohead .crest{width:70px!important;height:70px!important}
+  body:has(.partyselect.fifa) .partyherohead h2{font-size:24px}
+  body:has(.partyselect.fifa) .partyselect .partyarrow{width:40px;height:78px;font-size:37px}
+  body:has(.partyselect.fifa) .partystats{grid-template-columns:1fr}
+  body:has(.kreekran) .wrap{padding:9px 10px 30px}
+  body:has(.kreekran) .krehead h1{font-size:30px}
+}
+
+/* Ten selektor musi miec #app: starsza warstwa ma globalna regule z !important.
+   Bez tego glowny przycisk wyboru partii wracal do zoltego gradientu. */
+body:has(.partyselect.fifa) #app .partyselect .pickstart:not(:disabled){
+  background:var(--party-theme,var(--atlas-brass))!important;
+  color:#10130d!important;-webkit-text-fill-color:#10130d!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 72%,#f5e4b5)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.28),0 4px 12px rgba(0,0,0,.24)!important;
+}
+body:has(.partyselect.fifa) #app .partyselect .pickcell{
+  color:#b3c0b4!important;border-color:rgba(196,154,75,.16)!important;
+  background:rgba(8,18,12,.62)!important;box-shadow:inset 0 1px rgba(255,255,255,.035)!important;
+}
+body:has(.partyselect.fifa) #app .partyselect .pickcell:hover{color:#eee1bc!important;border-color:rgba(196,154,75,.48)!important;background:rgba(196,154,75,.12)!important}
+body:has(.partyselect.fifa) #app .partyselect .pickcell.on{color:#f1dfb0!important;border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 65%,#c49a4b)!important;background:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 17%,#0b1710)!important;box-shadow:inset 0 -2px var(--party-theme,var(--atlas-brass))!important}
+body:has(.scenv3) #app .scenv3 .btn.btn.btn:not(:disabled),body:has(.kreekran) #app .kreekran .btn.btn.btn:not(:disabled){
+  border-radius:2px!important;background:rgba(16,29,22,.95)!important;color:#e3eadf!important;-webkit-text-fill-color:#e3eadf!important;
+  border-color:rgba(196,154,75,.34)!important;box-shadow:inset 0 1px rgba(255,255,255,.05),0 3px 9px rgba(0,0,0,.18)!important;text-shadow:none!important;
+}
+body:has(.scenv3) #app .scenv3 .btn.btn.btn:hover:not(:disabled),body:has(.kreekran) #app .kreekran .btn.btn.btn:hover:not(:disabled){background:rgba(196,154,75,.16)!important;border-color:#d8b566!important;color:#f0dfb7!important;-webkit-text-fill-color:#f0dfb7!important}
