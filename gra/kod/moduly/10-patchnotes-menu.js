@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.142':{data:'8 sierpnia 2026',zmiany:[
+  'Lista scenariuszy trafia do osobnej czytelni archiwum z lampa i regalami.',
+  'Opis wybranego swiata zostaje na spokojnym tle, bez walki z lista modow.',
+ ]},
  '1.1.141':{data:'8 sierpnia 2026',zmiany:[
   'Wybieranie partii dostaje wlasna sale z dwoma pulpitami dossier.',
   'Karta wybranej partii pozostaje czytelna, ale caly wybor ma teraz ceremonialny charakter.',
