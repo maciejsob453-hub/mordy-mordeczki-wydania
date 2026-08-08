@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.107':{data:'8 sierpnia 2026', zmiany:[
+  'Ekrany partii, celow, lidera i ekonomii dostaly osobne tlo archiwum, zeby nie wygladaly jak jedna domyslna karta.',
+  'Media i sad maja teraz wlasne scenografie takze w stanie zamknietym; naprawiony zostal pusty poziomy pasek na desktopie.',
+ ]},
  '1.1.106':{data:'8 sierpnia 2026', zmiany:[
   'Ekran decyzji kampanii ma osobny stol akcji z kolorami kategorii, a transfery bezpartyjnych osobny rejestr ludzi.',
   'Karty akcji i transferow maja teraz mocniejsza krawedz, spokojniejsze tla i czytelniejszy podzial funkcji.',

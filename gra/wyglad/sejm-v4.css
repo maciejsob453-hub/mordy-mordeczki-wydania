@@ -1871,3 +1871,54 @@ body:has(.hud) .widok[data-tab="akcje"]>.card:has(.agrid){
 body:has(.hud) .widok[data-tab="akcje"] .agent{border-left:3px solid color-mix(in srgb,var(--ac,var(--atlas-brass)) 70%,rgba(196,154,75,.25));background:rgba(7,17,12,.78)}
 body:has(.hud) .widok[data-tab="akcje"] .agent:hover{border-left-color:var(--ac,var(--atlas-brass));background:rgba(196,154,75,.09)}
 body:has(.hud) .widok[data-tab="akcje"] .agent .btn{margin-top:8px}
+
+/*
+   TRZECIA FALA: POKOJE SYSTEMOWE
+   Ekrany poza kampania nie moga wygladac jak jedna domyslna karta. Kazdy z nich
+   dostaje material swojego urzedu, a tresc nadal zostaje czytelna pod warstwa.
+   Przy okazji przycinamy winiete poza menu: zoom body powieksza fixed pseudo-
+   elementy i na desktopie tworzyl pusty poziomy pasek przewijania.
+*/
+body:not(:has(.mg)){overflow-x:clip}
+body:has(.hud) .widok[data-tab="partie"],
+body:has(.hud) .widok[data-tab="cele"],
+body:has(.hud) .widok[data-tab="lider"],
+body:has(.hud) .widok[data-tab="ekonomia"]{
+  background-image:linear-gradient(180deg,rgba(5,12,8,.26),rgba(5,11,8,.9)),url("../obrazki/ui-civic-ledger.webp");
+  background-position:center top;background-size:cover;background-attachment:local
+}
+body:has(.hud) .widok[data-tab="partie"]>.card,
+body:has(.hud) .widok[data-tab="cele"]>.card,
+body:has(.hud) .widok[data-tab="lider"]>.card,
+body:has(.hud) .widok[data-tab="ekonomia"] .ekoblok>.card{
+  background:linear-gradient(180deg,rgba(20,34,26,.91),rgba(7,15,11,.975)),url("../obrazki/ui-civic-ledger.webp") center/cover;
+  border-color:rgba(196,154,75,.38);box-shadow:0 17px 36px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.045)
+}
+body:has(.hud) .widok[data-tab="partie"] .pzap{padding:15px 14px;border:1px solid rgba(196,154,75,.18);border-left:3px solid color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 65%,rgba(196,154,75,.35));border-radius:3px;background:rgba(5,13,9,.42);margin:0 0 9px}
+body:has(.hud) .widok[data-tab="partie"] .pzap:first-of-type{padding-top:15px;border-top:1px solid rgba(196,154,75,.18)}
+body:has(.hud) .widok[data-tab="partie"] .benchgrid{gap:7px}
+body:has(.hud) .widok[data-tab="partie"] .bperson{background:rgba(12,25,17,.74);border-color:rgba(196,154,75,.2);min-height:42px}
+body:has(.hud) .widok[data-tab="cele"] .dziennik{position:relative;overflow:hidden}
+body:has(.hud) .widok[data-tab="cele"] .dziennik::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--party-theme,var(--atlas-brass));opacity:.9}
+body:has(.hud) .widok[data-tab="cele"] .dziennik>.h,body:has(.hud) .widok[data-tab="cele"] .dziennik>.b{position:relative}
+body:has(.hud) .widok[data-tab="lider"]>.card{border-left:3px solid color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 78%,rgba(196,154,75,.35))}
+body:has(.hud) .widok[data-tab="lider"] .liderhero,body:has(.hud) .widok[data-tab="lider"] .leadhero{background:linear-gradient(110deg,rgba(21,41,29,.92),rgba(7,16,11,.72));border-bottom:1px solid rgba(196,154,75,.2)}
+body:has(.hud) .widok[data-tab="ekonomia"] .ekoblok>.card:first-child{background:linear-gradient(180deg,rgba(21,39,29,.88),rgba(7,15,11,.96)),url("../obrazki/ui-civic-ledger.webp") center/cover;border-top:3px solid rgba(143,195,109,.72)}
+body:has(.hud) .widok[data-tab="ekonomia"] .pkbplyta{background:linear-gradient(110deg,rgba(7,19,12,.86),rgba(23,43,28,.64));border-color:rgba(143,195,109,.3);box-shadow:inset 0 1px rgba(255,255,255,.04)}
+body:has(.hud) .widok[data-tab="ekonomia"] .ekocz{background:rgba(5,14,9,.52);border-color:rgba(196,154,75,.18)}
+
+/* Media jest osobnym pokojem, a zamkniety sad ma wyglad urzedowego archiwum. */
+body:has(.hud) .widok[data-tab="media"]{background-image:linear-gradient(180deg,rgba(12,12,15,.22),rgba(8,10,10,.91)),url("../obrazki/ui-media-archive.webp");background-position:center top;background-size:cover;background-attachment:local}
+body:has(.hud) .widok[data-tab="media"] .mediazamkniete,
+body:has(.hud) .widok[data-tab="media"] .mediaekran>.card{background:linear-gradient(180deg,rgba(31,25,27,.9),rgba(10,12,12,.975)),url("../obrazki/ui-media-archive.webp") center/cover;border-color:rgba(178,117,92,.44);box-shadow:0 18px 40px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.045)}
+body:has(.hud) .widok[data-tab="media"] .sadhero{border-left-color:#b8785e}
+body:has(.hud) .widok[data-tab="sad"]{background-image:linear-gradient(180deg,rgba(5,12,8,.26),rgba(5,11,8,.91)),url("../obrazki/ui-civic-ledger.webp");background-position:center top;background-size:cover;background-attachment:local}
+body:has(.hud) .widok[data-tab="sad"] .sadzamkniety,
+body:has(.hud) .widok[data-tab="sad"] .sadekran>.card{background:linear-gradient(180deg,rgba(22,36,27,.91),rgba(6,14,10,.975)),url("../obrazki/ui-civic-ledger.webp") center/cover;border-color:rgba(143,195,109,.4);box-shadow:0 18px 40px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.045)}
+body:has(.hud) .widok[data-tab="sad"] .sadhero{border-left-color:#8fc36d}
+body:has(.hud) .widok[data-tab="mordepedia"] .mordekran{background:linear-gradient(180deg,rgba(24,34,29,.7),rgba(7,14,10,.94)),url("../obrazki/ui-civic-ledger.webp") center/cover;border-color:rgba(196,154,75,.42)}
+
+@media(max-width:900px){
+  body:has(.hud) .widok[data-tab="partie"] .pzap{padding:13px 10px}
+  body:has(.hud) .widok[data-tab="partie"] .benchgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
