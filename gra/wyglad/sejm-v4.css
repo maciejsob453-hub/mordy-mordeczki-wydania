@@ -2105,6 +2105,14 @@ body:has(.hud) .widok[data-tab="lider"] .act:hover:not([disabled]){
   body:has(.hud) .sejm-partietabela .t .crest.s{width:20px;height:20px;flex:none}
 }
 
+/* 1.1.144: kondycja partii ma wlasna tablice pomiarowa. Wygrawerowany krag
+   jest tylko faktura w tle; realne dane nadal czyta sie z paskow i liczb. */
+body:has(.hud) .sidebar .card.kond{
+  background:linear-gradient(155deg,rgba(17,31,24,.84),rgba(5,12,9,.96)),url("../obrazki/ui-party-condition.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--game-accent,var(--atlas-brass))) 42%,rgba(196,154,75,.34));
+  box-shadow:0 18px 40px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.05)
+}
+
 /* 1.1.138: wybor trybu ma wlasny stol wejscia do gry. Stare tlo Sejmu bylo
    mylace zanim powstal hud; spokojne centrum zostawia kartom miejsce na tekst. */
 body:not(:has(.mg)) .wrap:has(.modepick){

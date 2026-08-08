@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.144':{data:'8 sierpnia 2026',zmiany:[
+  'Kondycja partii dostaje wlasna tablice pomiarowa z subtelna faktura.',
+  'Wygrawerowany krag jest dekoracja, a wskazniki pozostaja pierwszym planem.',
+ ]},
  '1.1.143':{data:'8 sierpnia 2026',zmiany:[
   'Wczytaj gre z menu dziala bez aktywnej rozgrywki.',
   'Okno zapisu pokazuje kopiowanie tylko wtedy, gdy ma prawdziwy kod do skopiowania.',
