@@ -2013,3 +2013,23 @@ body:has(.hud) .widok[data-tab="akcje"]>.card:has(.actgrid){
   box-shadow:0 20px 48px rgba(0,0,0,.36),inset 0 1px rgba(255,255,255,.055)
 }
 body:has(.hud) .widok[data-tab="akcje"] .actgrid{background:rgba(3,9,6,.26);border:1px solid rgba(196,154,75,.12);padding:10px;border-radius:3px}
+
+/* 1.1.116: boczny pulpit jest jedna teczka, nie siedem przypadkowych kart.
+   Faktura zostaje pod spodem i jest przygaszona; hierarchia nadal wynika z
+   kolejnosci kart i kolorowych krawedzi, ale calosc ma jeden material. */
+body:not(:has(.mg)) .sidebar{position:relative;isolation:isolate}
+body:not(:has(.mg)) .sidebar::before{
+  content:"";position:absolute;inset:-10px;z-index:-1;pointer-events:none;border:1px solid rgba(196,154,75,.2);border-radius:4px;
+  background:linear-gradient(180deg,rgba(8,17,12,.24),rgba(4,10,7,.72)),url("../obrazki/ui-sidebar-dossier.webp") center/cover;
+  box-shadow:0 18px 42px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.035)
+}
+body:has(.hud) .sidebar>.card.lead,
+body:has(.hud) .sidebar>.card.kond{
+  background:linear-gradient(150deg,rgba(26,43,33,.84),rgba(8,17,12,.94)),url("../obrazki/ui-sidebar-dossier.webp") center/cover!important;
+  background-blend-mode:normal,soft-light!important
+}
+body:has(.hud) .sidebar>.card.kronika,
+body:has(.hud) .sidebar>.card.skl{
+  background:linear-gradient(150deg,rgba(25,40,32,.76),rgba(8,16,12,.95)),url("../obrazki/ui-sidebar-dossier.webp") 48% 55%/cover!important;
+  background-blend-mode:normal,soft-light!important
+}

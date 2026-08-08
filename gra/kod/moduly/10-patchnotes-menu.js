@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.116':{data:'8 sierpnia 2026', zmiany:[
+  'Boczny pulpit jest teraz jedna teczka: przewodnictwo, kondycja, kronika i sklad partii maja wspolny material archiwum.','Tekstura jest przygaszona pod trescia, wiec czytelnosc i zwijanie kart zostaja bez zmian.',
+ ]},
  '1.1.115':{data:'8 sierpnia 2026', zmiany:[
   'Decyzje tygodnia dostaly wlasne biurko robocze z papierami, mosiadzem i spokojna przestrzenia pod karty.','Faktura jest widoczna na ekranie, ale nie zabiera kontrastu tekstom i przyciskom.',
  ]},
