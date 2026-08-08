@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.121':{data:'8 sierpnia 2026', zmiany:[
+  'Karty decyzji i zdolnosci lidera dziedzicza teraz barwe prowadzonej partii, mieszajac ja z kolorem konkretnego skutku.','Zielone, fioletowe i niebieskie partie nie wracaja juz na swoich kartach do tego samego zlota.',
+ ]},
  '1.1.120':{data:'8 sierpnia 2026', zmiany:[
   'Gabinet premiera i palac prezydenta zaczynaja sie teraz w jednej linii; stare marginesy nie przesuwaja drugiej karty ani ustaw.','Uklad jest krotszy i rowniejszy bez zmiany zawartosci ani kolejnosci.',
  ]},

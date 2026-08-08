@@ -2069,3 +2069,15 @@ body:has(.hud) .campbar.runoff .btn{background:linear-gradient(180deg,#e6c26b,#b
    krawedz: druga karta oraz ustawy zaczynaly sie o 14 px nizej. */
 body:has(.hud) .widok[data-tab="premier"]>.card,
 body:has(.hud) .widok[data-tab="prezydent"]>.card{margin-top:0!important}
+
+/* 1.1.121: decyzja moze miec wlasny kolor skutku, ale nigdy nie gubi barwy
+   prowadzonej partii. Wczesniejszy fallback bral od razu mosiadz i dlatego
+   aktywna karta wygladala tak samo dla PPP, FD i reszty sceny. */
+body:has(.hud) .widok[data-tab="akcje"] .act,
+body:has(.hud) .widok[data-tab="lider"] .act{
+  border-left-color:color-mix(in srgb,var(--ac,var(--game-accent)) 56%,var(--game-accent) 44%)!important
+}
+body:has(.hud) .widok[data-tab="akcje"] .act:hover:not([disabled]),
+body:has(.hud) .widok[data-tab="lider"] .act:hover:not([disabled]){
+  border-left-color:var(--game-accent)!important
+}
