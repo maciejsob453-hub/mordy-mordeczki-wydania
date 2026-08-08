@@ -24,6 +24,8 @@ function apBase(){
 function applyGoals(){
   if(!G)return;
   if(!G.goals)G.goals={};
+  /* Cele narodowe biegną po kalendarzu gry, nie po kliknięciach w zakładkę. */
+  if(typeof nationalGoalTick==='function')nationalGoalTick();
   if(G.goals.republika){const p=G.p[G.me];if(p.fame<70)p.fame=70}
   if(hasLib2(G.me)){const p=G.p[G.me];if(p.fame<50)p.fame=50}
   // Centrum stoi jednością, hegemon sławą — obie podłogi są celowo niższe
@@ -57,6 +59,7 @@ function goalDrift(k){
     alive().forEach(x=>{if(x!==k&&G.rel[x])G.rel[x][k]=cl(G.rel[x][k]-.7,-100,100)})}
   if(p.perMode){p.cred=cl(Math.max(55,p.cred+1.4));p.ctr=cl(p.ctr+.8);
     alive().forEach(x=>{if(x!==k&&G.rel[k])G.rel[k][x]=cl(G.rel[k][x]+1,-100,100)})}
+  if(p.azMode){p.cred=cl(p.cred+.6);p.act=cl(p.act+.8);p.uni=cl(p.uni+.35)}
 }
 const GOALS={
  /* DPD nie skacze prosto do Republikańskiej — najpierw musi przejść przez Centrum.
@@ -440,6 +443,7 @@ const IDENT_BRAND={
  rom12Mode:{n:'Polska 1612',ab:'1612',c:'#8c3b2a',logo:'P1612'},
  cenMode:{n:'Partia Centrum',ab:'PC',c:'#1f7f86',logo:'CEN'},
  hegMode:{n:'Hegemonia Perspektywiczna',ab:'HP',c:'#c8952b',logo:'HEG'},
+ azMode:{n:'Alternatywa Żydowska',ab:'AŻ',c:'#d46b9a',logo:'ALT'},
 };
 const myIdentities=()=>{const p=G&&G.p[G.me];return p?Object.keys(IDENT_BRAND).filter(m=>p[m]):[]};
 function switchIdentity(mode){
@@ -447,6 +451,109 @@ function switchIdentity(mode){
   p.n=b.n;p.ab=b.ab;p.c=b.c;p.logo=b.logo;
   say(`<b>Zmiana szyldu.</b> Partia znowu występuje jako ${b.n}.`,'roy');render();
 }
+/* ---- cele narodowe ----
+   Ten tor jest osobnym dziennikiem. Nie korzysta z G.goals, bo stare zapisy
+   muszą zachować wykonane cele partyjne, a Concordia dostaje nową, czasową
+   ścieżkę bez kasowania historii. */
+const NATIONAL_GOALS={
+ nplr_liberal:{n:'Liber? Libro? Liberalizm!',days:35,prev:null,logo:'LIB',
+  what:'Pierwszy krok Concordii: liberalizm przestaje być żartem z nazwy i staje się programem, który da się prowadzić przez kilka kadencji.',
+  accessText:'Dostępne od początku rozgrywki.',
+  cons:['Sława +6, wiarygodność +7 i aktywność +5.','Partia dostaje znacznik pierwszego liberalnego przełomu.'],
+  access:()=>true,
+  run(){const p=me();p.nplrLiberal=1;p.fame=cl(p.fame+6);p.cred=cl(p.cred+7);p.act=cl(p.act+5);M(p,5)}},
+ nplr_hotdog:{n:'Rozkwit wedle gorących psów',days:70,prev:'nplr_liberal',logo:'LIB',avatar:'obrazki/16ca0d3b9eeb.webp',
+  what:'Pan Hod_Dog zostaje twarzą rozkwitu: jego obecność ma przełożyć się na widoczność partii, a nie tylko na ozdobę w składzie.',
+  accessText:'W partii musi być Pan Hod_Dog.',
+  cons:['Aktywność +8 i obecność +10.','Sława +4 oraz dodatkowy kapitał partii.'],
+  access:()=>!!(G&&G.p[G.me]&&roster(G.p[G.me]).includes('Pan Hod_Dog')),
+  run(){const p=me();p.nplrHotdog=1;p.act=cl(p.act+8);p.uni=cl(p.uni+4);p.fame=cl(p.fame+4);p.pres&&REG.forEach(r=>{p.pres[r.id]=cl(p.pres[r.id]+10)});M(p,7)}},
+ nplr_rose:{n:'Róża spadająca na słońce',days:70,prev:'nplr_hotdog',logo:'LIB',
+  what:'Concordia dojrzewa do własnego szyldu. Róża nie jest już obietnicą — staje się Partią Liberalną.',
+  accessText:'Poprzedni cel narodowy musi być ukończony.',
+  cons:['Powstaje Partia Liberalna z żółtą różą.','Sława +4, wiarygodność +3 i mały zastrzyk kapitału.'],
+  access:()=>true,
+  run(){const p=me();libBecome(G.me);p.nplrRose=1;p.fame=cl(p.fame+4);p.cred=cl(p.cred+3);p.uni=cl(p.uni+3);M(p,6)}},
+ nplr_king:{n:'Mordeczko, pomóż nam!',days:70,prev:'nplr_rose',logo:'HAND',avatar:'obrazki/0051a52917ef.webp',
+  what:'Dwór ma dostać powód, żeby naprawdę sprzyjać tej partii. Nie przez darmowy bonus, tylko przez relację budowaną w czasie.',
+  accessText:'Przychylność Króla musi wynosić co najmniej 50.',
+  cons:['Przychylność Króla +8.','Wiarygodność +4 i autorytet partii +3.'],
+  access:()=>!!(G&&typeof kingFav==='function'&&kingFav(G.me)>=50),
+  run(){const p=me();kingRel(8,'Narodowy cel Concordii przekonał dwór, że warto dać jej szansę.');p.cred=cl(p.cred+4);p.fame=cl(p.fame+3);p.uni=cl(p.uni+3)}},
+ nplr_jewish:{n:'Żydowskie pretraktacje',days:70,prev:'nplr_king',logo:'LIB',
+  what:'Rozmowy z PKD przestają być jednorazowym ruchem pod głosowanie. Concordia buduje kanał relacji, który zostaje po zakończeniu celu.',
+  accessText:'Poprzedni cel narodowy musi być ukończony.',
+  cons:['Relacja z PKD rośnie o 24 w obie strony.','Wiarygodność +6 i aktywność +3.'],
+  access:()=>true,
+  run(){const p=me(),a=G.rel&&G.rel[G.me],b=G.rel&&G.rel.PKD;if(a){a.PKD=cl((a.PKD||0)+24,-100,100)}if(b){b[G.me]=cl((b[G.me]||0)+24,-100,100)}p.cred=cl(p.cred+6);p.act=cl(p.act+3)}},
+ nplr_star:{n:'Nie tylko na słońce, ale również na gwiazdę',days:35,prev:'nplr_jewish',logo:'ALT',
+  what:'Ostatni przełom tworzy Alternatywę Żydowską: mały, wyspecjalizowany szyld z własnym miejscem na scenie.',
+  accessText:'Relacja z PKD musi wynosić co najmniej +50.',
+  cons:['Powstaje Alternatywa Żydowska (AŻ).','Wiarygodność +5, aktywność +4 i jedność +3.'],
+  access:()=>!!(G&&G.rel&&G.rel[G.me]&&G.rel[G.me].PKD>=50),
+  run(){const p=me();p.n='Alternatywa Żydowska';p.ab='AŻ';p.c='#d46b9a';p.logo='ALT';p.azMode=1;p.cred=cl(p.cred+5);p.act=cl(p.act+4);p.uni=cl(p.uni+3);M(p,8)}}
+};
+const NATIONAL_ORDER=Object.keys(NATIONAL_GOALS);
+function nationalState(){
+  if(!G)return null;
+  if(!G.nationalGoals)G.nationalGoals={};
+  if(!G.nationalGoals.concordia||typeof G.nationalGoals.concordia!=='object')G.nationalGoals.concordia={active:null,started:{},done:{},completedAt:{}};
+  const s=G.nationalGoals.concordia;
+  s.started=s.started&&typeof s.started==='object'?s.started:{};
+  s.done=s.done&&typeof s.done==='object'?s.done:{};
+  s.completedAt=s.completedAt&&typeof s.completedAt==='object'?s.completedAt:{};
+  if(s.active===undefined)s.active=null;
+  return s;
+}
+function nationalDayIndex(){
+  if(!G)return 0;
+  const tyg=Math.max(1,Number(G.weeks)||12),term=Math.max(1,Number(G.term)||1),week=Math.max(1,Number(G.week)||1),day=Math.max(1,Number(G.dzienTygodnia)||1);
+  return (term-1)*tyg*7+(week-1)*7+(day-1);
+}
+function myNationalGoals(){return G&&G.me==='PLR'?NATIONAL_ORDER.slice():[]}
+function nationalGoalAccess(id){
+  const g=NATIONAL_GOALS[id];if(!g||!G)return false;
+  try{return !g.access||!!g.access()}catch(e){return false}
+}
+function nationalGoalDone(id){const s=nationalState();return !!(s&&s.done[id])}
+function nationalGoalProgress(id){
+  const g=NATIONAL_GOALS[id],s=nationalState();if(!g||!s)return {done:false,active:false,elapsed:0,pct:0,started:false};
+  const started=s.started[id],done=!!s.done[id],elapsed=done?g.days:(started?Math.max(0,nationalDayIndex()-Number(started.day||0)):0);
+  return {done,active:s.active===id,started:!!started,elapsed:Math.min(g.days,elapsed),pct:done?100:Math.round(Math.min(1,elapsed/Math.max(1,g.days))*100)};
+}
+function nationalGoalReason(id){
+  const g=NATIONAL_GOALS[id],s=nationalState();if(!g||!s)return '';
+  if(g.prev&&!s.done[g.prev])return 'Najpierw ukończ: '+NATIONAL_GOALS[g.prev].n+'.';
+  if(!nationalGoalAccess(id))return g.accessText||'Warunek dostępu nie jest jeszcze spełniony.';
+  return '';
+}
+function nationalComplete(id){
+  const s=nationalState(),g=NATIONAL_GOALS[id];if(!s||!g||s.done[id])return;
+  s.done[id]=1;s.completedAt[id]=nationalDayIndex();s.active=null;
+  if(typeof g.run==='function')g.run();
+  G.prest=(G.prest||0)+8;if(typeof XP==='function')XP(20);
+  say(`<b>Cel narodowy ukończony.</b> ${g.n} otwiera kolejny etap Concordii.`,'roy');
+  if(typeof SFX!=='undefined'&&SFX.goal)SFX.goal();
+}
+function nationalGoalTick(){
+  if(!G||PROBA||G.me!=='PLR')return;
+  const s=nationalState(),today=nationalDayIndex();
+  for(const id of NATIONAL_ORDER){
+    const g=NATIONAL_GOALS[id];if(s.done[id])continue;
+    if(s.active&&s.active!==id)return;
+    if(s.active===id){
+      const st=s.started[id];
+      if(st&&today-Number(st.day||0)>=g.days)nationalComplete(id);
+      return;
+    }
+    if(g.prev&&!s.done[g.prev])return;
+    if(!nationalGoalAccess(id)){s.waiting=id;return;}
+    s.active=id;s.waiting=null;s.started[id]={day:today,term:G.term,week:G.week};
+    say(`<b>Nowy cel narodowy.</b> ${g.n} rozpoczyna odliczanie: ${g.days} dni.`,'roy');
+    return;
+  }
+}
+
 function myGoals(){if(!G)return [];
   return Object.keys(GOALS).filter(id=>{const g=GOALS[id];
     if(g.avail)return !!g.avail();                       // własny warunek dostępu jest rozstrzygający
@@ -457,10 +564,22 @@ function myGoals(){if(!G)return [];
   })}
 const reqOf=id=>(GOALS[id]?GOALS[id].req:[]).filter(r=>!(r.gone&&r.gone()));
 function goalOk(id){const g=GOALS[id];const r=reqOf(id);return !!g&&r.length>0&&r.every(x=>x.ok())}
-function goalReady(){return myGoals().some(id=>!goalDone(id)&&goalOk(id))}
+function myPartyGoals(){
+  if(!G)return [];
+  /* Concordia ma od tej wersji własny tor narodowy. Genericzne cele nie tworzą
+     już pustej zakładki u partii, które nie mają własnej przemiany. */
+  if(G.me==='PLR')return [];
+  return myGoals().filter(id=>!GENERIC_GOALS.includes(id));
+}
+function nationalGoalReady(){
+  if(!G||G.me!=='PLR')return false;
+  nationalGoalTick();
+  const s=nationalState();return !!(s&&s.active);
+}
+function goalReady(){return myPartyGoals().some(id=>!goalDone(id)&&goalOk(id))}
 function doGoal(id){
   if(!G.goals)G.goals={};
-  if(!GOALS[id]||G.goals[id]||!myGoals().includes(id)||!goalOk(id))return;
+  if(!GOALS[id]||G.goals[id]||!myPartyGoals().includes(id)||!goalOk(id))return;
   const nameBefore=me().n;
   G.goals[id]=1;GOALS[id].run();G.prest+=14;XP(30);applyGoals();
   const p=me(),g=GOALS[id],renamed=p.n!==nameBefore;
@@ -537,7 +656,7 @@ function goalCard(id){
     <div class="dzpostep"><div class="trk"><i style="width:${proc}%"></i></div>
       <b>${done?'✓':proc+'%'}</b></div>
     <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px">
-      <img src="${LOGOS[g.logo]||''}" alt="" style="width:92px;height:92px;object-fit:contain;background:#f4f1ea;border-radius:var(--r2);padding:6px;flex:none;border:1px solid rgba(0,0,0,.3)">
+      <img src="${g.avatar||LOGOS[g.logo]||''}" alt="" style="width:92px;height:92px;object-fit:contain;background:#f4f1ea;border-radius:var(--r2);padding:6px;flex:none;border:1px solid rgba(0,0,0,.3)">
       <div style="flex:1;min-width:220px">
         <p style="color:var(--dim);margin-bottom:8px">${g.what}</p>
         ${done?'<span class="pill pos">cel wypełniony</span>':all?'<span class="pill acc">wszystkie warunki spełnione</span>':'<span class="pill">warunki niespełnione</span>'}
@@ -550,6 +669,22 @@ function goalCard(id){
     ${g.cons.map(c=>`<div style="padding:6px 0;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--dim)">${c}</div>`).join('')}
     ${done?'':`<button class="btn" style="margin-top:16px" ${all?'':'disabled'} onclick="doGoal('${id}')">${all?'Wypełniam cel →':'Warunki jeszcze nie spełnione'}</button>`}
   </div></div>`;
+}
+function nationalGoalCard(id){
+  const g=NATIONAL_GOALS[id],p=nationalGoalProgress(id),reason=nationalGoalReason(id),src=g.avatar||LOGOS[g.logo]||'';
+  const status=p.done?'ukończony':p.active?'w toku':reason?'zablokowany':'czeka na start';
+  const tone=p.done?'done':p.active?'active':reason?'locked':'ready';
+  return `<article class="card national-goal ${tone}" style="margin-bottom:14px;--goal-color:var(--party-theme,var(--acc))">
+    <div class="h"><h3>${g.n}</h3><span class="n">${p.done?'✓ ukończony':p.active?`dzień ${p.elapsed} / ${g.days}`:status}</span></div>
+    <div class="b">
+      <div class="national-goal-head"><img class="national-goal-logo" src="${src}" alt=""><div><p class="national-goal-what">${g.what}</p>
+        <span class="pill ${p.done?'pos':p.active?'acc':''}">${p.done?'przełom osiągnięty':p.active?'aktywny cel narodowy':reason||'gotowy do uruchomienia'}</span></div></div>
+      <div class="national-goal-timeline"><div class="trk"><i style="width:${p.pct}%"></i></div><b>${p.pct}%</b></div>
+      <div class="national-goal-meta"><span>${p.active?'Odliczanie trwa według kalendarza gry.':p.done?'Ukończono w dniu '+(nationalState().completedAt[id]??'—')+'.':reason||'Cel rozpocznie się automatycznie.'}</span><span>${g.days} dni</span></div>
+      <h4>Warunek dostępu</h4><div class="national-goal-access">${g.accessText||'Poprzedni cel musi być ukończony.'}</div>
+      <h4>Konsekwencje</h4>${g.cons.map(c=>`<div class="national-goal-consequence">${c}</div>`).join('')}
+    </div>
+  </article>`;
 }
 const GENERIC_GOALS=['kanal','reka'];
 function identSwitcher(){
@@ -565,7 +700,7 @@ function identSwitcher(){
         <b>${on?'✓ ':''}${b.n}</b><span>${b.ab}</span></button>`}).join('')}
     </div></div></div>`;
 }
-function goalTab(){
+function oldGoalTab(){
   const ids=myGoals();
   if(!ids.length)return identSwitcher()+`<div class="card"><div class="h"><h3>Cele partyjne</h3></div><div class="b"><p class="dim">Twoja partia nie ma wytyczonego celu. Własne cele mają PPP, KK, PLR, PKD, DPD i Front Demokratyczny.</p></div></div>`;
   const transform=ids.filter(id=>!GENERIC_GOALS.includes(id));
@@ -1098,3 +1233,15 @@ function showEvent(e){
   const T=typeof e.t==='function'?e.t():e.t, X=typeof e.x==='function'?e.x():e.x;
   modal(e.k,T,`<p>${X}</p>`,e.o.map(o=>({l:o.l,s:o.s,f:()=>{
     const r=o.f(me());if(r)say(`<b>${T}.</b> ${r}`);checkDeath();close();render()}})))}
+
+/* Nowy ekran celów: narodowe są osobnym dziennikiem, partyjne zostają tylko
+   tam, gdzie dana partia ma własną ścieżkę. */
+function goalTab(){
+  nationalGoalTick();
+  const party=myPartyGoals(),national=myNationalGoals();
+  let out=identSwitcher();
+  if(national.length)out+=`<section class="national-goals-panel"><div class="goals-section-head"><div><span class="eyebrow">CONCORDIA · DZIENNIK PRZEŁOMÓW</span><h2>Cele narodowe</h2><p>Łańcuch celów uruchamia się po spełnieniu warunków i odlicza dni w kalendarzu gry.</p></div><span class="goals-section-count">${national.filter(nationalGoalDone).length} / ${national.length}</span></div>${national.map(nationalGoalCard).join('')}</section>`;
+  if(party.length)out+=`<section class="party-goals-panel"><div class="goals-section-head"><div><span class="eyebrow">PROGRAM PARTII</span><h2>Cele partyjne</h2><p>Jednorazowe przemiany zostają dostępne dla partii, które naprawdę je mają.</p></div><span class="goals-section-count">${party.filter(goalDone).length} / ${party.length}</span></div>${party.map(goalCard).join('')}</section>`;
+  if(!national.length&&!party.length)out+=`<div class="card"><div class="h"><h3>Brak celów</h3></div><div class="b"><p class="dim">Ta partia nie ma obecnie osobnego dziennika celów.</p></div></div>`;
+  return out;
+}

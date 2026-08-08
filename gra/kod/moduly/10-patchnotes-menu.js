@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.177':{data:'9 sierpnia 2026',zmiany:[
+  'Concordia dostaje osobne cele narodowe z logo, warunkami dostepu i odliczaniem dni.',
+  'Cele partyjne zostaja dla partii, ktore maja wlasne sciezki, a puste zakladki znikaja.'
+ ]},
  '1.1.176':{data:'9 sierpnia 2026',zmiany:[
   'Zablokowano wejscie do rady ministrow i przejecie premiera z zamknietych kanalow.',
   'Weto nie odblokowuje juz Mediow, Sadu ani Pedii, a kryzys koalicyjny nie wyskakuje poza rzadem.',
@@ -1183,8 +1187,9 @@ function game(){
       const nazwa=(k,n)=>n+(wazne.has(k)?'<span class="badge">!</span>':'');
       const nv=[['mapa',nazwa('mapa','Mapa okręgów')],['akcje',nazwa('akcje','Decyzje')+(G.ap?`<span class="badge">${G.ap}</span>`:'')],
        ['lider','Lider'+(leads(G.p[G.me]).some(n=>xpOs(n)>=35)?'<span class="badge">!</span>':'')],['krol','Król'+(kingFav(G.me)<0?'<span class="badge">!</span>':'')],['partie','Partie'],['sondaz','Sondaż']];
-      const mg=myGoals();
-      if(mg.length)nv.push(['cele',nazwa('cele',mg.length>1?'Cele partyjne':'Cel partyjny')]);
+      const mg=typeof myPartyGoals==='function'?myPartyGoals():myGoals();
+      const ng=typeof myNationalGoals==='function'?myNationalGoals():[];
+      if(mg.length||ng.length)nv.push(['cele',nazwa('cele',ng.length&&!mg.length?'Cele narodowe':mg.length>1?'Cele partyjne':'Cel partyjny')+(ng.length&&typeof nationalGoalReady==='function'&&nationalGoalReady()?'<span class="badge">!</span>':'')]);
       // urzędy mają własne działy zamiast kategorii schowanych w decyzjach
       if(isPM())nv.push(['premier',nazwa('premier','Premier')]);
       if(hasPrez())nv.push(['prezydent',nazwa('prezydent','Prezydent')]);

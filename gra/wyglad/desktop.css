@@ -263,3 +263,37 @@ body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"]>.card,
 body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"] .royalhero{
   background:linear-gradient(150deg,rgba(28,20,34,.88),rgba(6,12,10,.97)),url("../obrazki/ui-royal-court.webp") center/cover!important;
 }
+
+/* Cele narodowe mają własną oś czasu. Karta jest spokojniejsza od decyzji,
+   ale logo i kolor partii pokazują, że to długofalowy przełom, nie kolejny klik. */
+body:not(:has(.mg)):has(.hud) .national-goals-panel{
+  display:flex;flex-direction:column;gap:12px
+}
+body:not(:has(.mg)):has(.hud) .goals-section-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:18px;
+  padding:18px 20px;margin-bottom:2px;border:1px solid color-mix(in srgb,var(--party-theme,var(--acc)) 38%,var(--line));
+  border-radius:14px;background:linear-gradient(135deg,rgba(20,18,25,.96),rgba(7,13,12,.96));
+}
+body:not(:has(.mg)):has(.hud) .goals-section-head h2{margin:3px 0 2px;font-size:25px}
+body:not(:has(.mg)):has(.hud) .goals-section-head p{margin:0;color:var(--dim);max-width:700px}
+body:not(:has(.mg)):has(.hud) .goals-section-count{
+  flex:none;padding:8px 12px;border:1px solid var(--line);border-radius:999px;color:var(--acc);font-weight:700
+}
+body:not(:has(.mg)):has(.hud) .national-goal{border-left:3px solid var(--goal-color);overflow:hidden}
+body:not(:has(.mg)):has(.hud) .national-goal.locked{opacity:.78}
+body:not(:has(.mg)):has(.hud) .national-goal.done{border-left-color:var(--pos)}
+body:not(:has(.mg)):has(.hud) .national-goal-head{display:flex;gap:18px;align-items:center;margin-bottom:16px}
+body:not(:has(.mg)):has(.hud) .national-goal-logo{
+  width:82px;height:82px;object-fit:contain;flex:none;padding:8px;border-radius:50%;
+  border:2px solid color-mix(in srgb,var(--goal-color) 72%,#fff 8%);
+  background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.18),rgba(9,8,14,.9) 68%);
+  box-shadow:0 0 0 5px color-mix(in srgb,var(--goal-color) 16%,transparent),0 0 24px color-mix(in srgb,var(--goal-color) 22%,transparent)
+}
+body:not(:has(.mg)):has(.hud) .national-goal-what{margin:0 0 10px;color:var(--dim);line-height:1.5}
+body:not(:has(.mg)):has(.hud) .national-goal-timeline{display:flex;align-items:center;gap:12px;margin:10px 0 5px}
+body:not(:has(.mg)):has(.hud) .national-goal-timeline .trk{height:9px;flex:1;background:rgba(0,0,0,.6);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+body:not(:has(.mg)):has(.hud) .national-goal-timeline i{display:block;height:100%;background:linear-gradient(90deg,var(--goal-color),color-mix(in srgb,var(--goal-color) 55%,#fff));border-radius:999px;transition:width .35s ease}
+body:not(:has(.mg)):has(.hud) .national-goal-timeline b{min-width:48px;text-align:right;color:var(--goal-color)}
+body:not(:has(.mg)):has(.hud) .national-goal-meta{display:flex;justify-content:space-between;gap:14px;color:var(--dim2);font-size:12px;margin-bottom:14px}
+body:not(:has(.mg)):has(.hud) .national-goal-access,.national-goal-consequence{padding:9px 11px;margin:6px 0;border:1px solid var(--line);border-radius:8px;background:rgba(0,0,0,.16);color:var(--dim)}
+body:not(:has(.mg)):has(.hud) .national-goal h4{margin:14px 0 6px;color:var(--acc);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
