@@ -1076,3 +1076,182 @@ body:not(:has(.mg)) .scenv3 .pickmain{
 .mordekran .mordehero{
   background:linear-gradient(110deg,rgba(6,13,10,.74),rgba(15,22,16,.5));
 }
+
+/* ========================================================================
+   ATLAS REDESIGN 1.1.96
+   Wspolny jezyk calej gry: gabinet polityczny, mapa i papierowy atlas.
+   Ta warstwa jest celowo na koncu arkusza: nie zmienia HTML ani zszywania,
+   tylko porzadkuje proporcje i kasuje przypadkowe, zbyt swiecace kasetony.
+   ======================================================================== */
+:root{
+  --atlas-ink:#0b1110;
+  --atlas-ink2:#111a17;
+  --atlas-paper:#1a2520;
+  --atlas-paper2:#202d27;
+  --atlas-brass:#c49a4b;
+  --atlas-brass-hi:#e0bc70;
+  --atlas-rule:rgba(197,154,75,.38);
+  --atlas-muted:#aeb9ae;
+  --atlas-shadow:0 12px 28px rgba(0,0,0,.28);
+  --atlas-radius:4px;
+}
+
+/* Cala rozgrywka dostaje jedna scenografie, ale karta nadal ma pierwszenstwo
+   nad mapa, zeby tekst i liczby byly czytelne. Menu glowne zostaje nietkniete. */
+body:has(.hud){
+  background:
+    linear-gradient(180deg,rgba(5,10,9,.28),rgba(5,10,9,.78)),
+    url("../obrazki/ui-atlas-surface.webp") center top/cover fixed no-repeat,
+    var(--atlas-ink);
+  color:#e8eee6;
+}
+body:has(.hud) .wrap{max-width:1600px;padding:0 24px 42px}
+
+/* Gorny pasek: trzy wyrazne strefy zamiast jednego scisnietego szeregu. */
+body:has(.hud) .hud{
+  margin:0 -24px;
+  padding:12px 24px 11px;
+  display:grid;
+  grid-template-columns:minmax(210px,1.05fr) minmax(430px,1.7fr) auto;
+  gap:18px;
+  align-items:center;
+  background:
+    linear-gradient(180deg,rgba(20,31,26,.97),rgba(8,15,12,.98)),
+    url("../obrazki/ui-atlas-surface.webp") center/cover;
+  border-bottom:1px solid var(--atlas-rule);
+  box-shadow:0 2px 0 rgba(235,197,116,.12) inset,0 15px 35px rgba(0,0,0,.3);
+}
+body:has(.hud) .hud .id{flex:none;min-width:0}
+body:has(.hud) .hud .id h2{font-family:var(--fd);font-size:20px;letter-spacing:.01em}
+body:has(.hud) .hud .id .sub{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8c9b91}
+body:has(.hud) .hudcenter{display:flex;align-items:center;justify-content:center;gap:10px;min-width:0}
+body:has(.hud) .hudcenter .rgroup{flex:1;min-width:0;max-width:none}
+body:has(.hud) .rgroup{padding:3px;background:rgba(8,14,11,.5);border:1px solid color-mix(in srgb,var(--partia) 52%,var(--atlas-rule));border-radius:var(--atlas-radius);box-shadow:none}
+body:has(.hud) .rgroup .rs{min-width:86px;padding:6px 12px}
+body:has(.hud) .rgroup .rs+.rs{border-left:1px solid rgba(196,154,75,.19)}
+body:has(.hud) .rs b{font-size:17px;background:linear-gradient(180deg,#f0d993,#c89342);-webkit-background-clip:text;background-clip:text}
+body:has(.hud) .hudend{gap:8px;justify-content:flex-end}
+body:has(.hud) .datechip{padding-left:14px;border-left:1px solid rgba(196,154,75,.35);min-width:170px}
+body:has(.hud) .datechip b{font-family:var(--fd)!important;font-size:17px!important;color:#e6dcc1;letter-spacing:.02em}
+body:has(.hud) .datechip span{font-size:9px;letter-spacing:.08em;color:#87958b}
+body:has(.hud) .hud .tura{min-width:184px;padding:10px 17px;border-radius:3px;background:var(--atlas-brass);box-shadow:inset 0 1px rgba(255,255,255,.3),0 4px 11px rgba(0,0,0,.18);font-family:var(--m);font-size:12px;letter-spacing:.02em}
+
+/* Nawigacja ma wyglad zakladek kartoteki. Aktywny kanal bierze barwe partii. */
+body:has(.hud) .nav{
+  margin:0 -24px 24px;padding:0 24px;
+  gap:0;border-bottom:1px solid rgba(196,154,75,.26);
+  background:rgba(8,14,11,.88);backdrop-filter:blur(14px);
+}
+body:has(.hud) .nav button{position:relative;padding:13px 14px 12px;border:0;border-right:1px solid rgba(196,154,75,.11);font-family:var(--m);font-size:11px;letter-spacing:.045em;color:#94a197;text-transform:uppercase}
+body:has(.hud) .nav button:hover{color:#ecdfbb;background:rgba(196,154,75,.08)}
+body:has(.hud) .nav button.on{color:#f1d287;background:rgba(196,154,75,.13);box-shadow:inset 0 -3px 0 var(--partia,var(--atlas-brass))}
+body:has(.hud) .nav button.on:before{content:'';position:absolute;left:10px;right:10px;top:0;height:2px;background:var(--partia,var(--atlas-brass))}
+body:has(.hud) .nav .badge{border-radius:2px;padding:2px 5px;background:#ad5143;font-size:9px}
+
+/* Dwa rytmy kolumn: boczne panele sa spokojne, srodek jest scena. */
+body:has(.hud) .layout{grid-template-columns:minmax(294px,330px) minmax(0,1fr);gap:26px}
+body:has(.hud) .sidebar{gap:16px!important}
+body:has(.hud) .widok{min-width:0;padding:2px 0 20px}
+body:has(.hud) .sidebar>.card,
+body:has(.hud) .sidebar>.card.kond,
+body:has(.hud) .sidebar>.card.lead,
+body:has(.hud) .sidebar>.card.skl,
+body:has(.hud) .sidebar>.card.rel{background:linear-gradient(180deg,rgba(27,40,33,.96),rgba(12,19,16,.97));border-color:rgba(196,154,75,.27);border-radius:var(--atlas-radius);box-shadow:var(--atlas-shadow),inset 0 1px rgba(255,255,255,.04)}
+
+/* Karty: plaska rama i duzo oddechu zamiast gradientowej kapsuly. */
+body:has(.hud) .card,
+body:has(.hud) .act,
+body:has(.hud) .panel,
+body:has(.hud) .pollhero,
+body:has(.hud) .royalhero,
+body:has(.hud) .sadhero,
+body:has(.hud) .mordehero{
+  border-radius:var(--atlas-radius);
+  border-color:rgba(196,154,75,.29);
+  background:
+    linear-gradient(180deg,rgba(30,43,36,.95),rgba(13,21,17,.98)),
+    url("../obrazki/ui-atlas-surface.webp") center/cover;
+  box-shadow:var(--atlas-shadow),inset 0 1px rgba(255,255,255,.04);
+}
+body:has(.hud) .card::before,body:has(.hud) .card::after{opacity:.7;border-radius:0}
+body:has(.hud) .card>.h{padding:14px 17px 12px;background:linear-gradient(90deg,rgba(196,154,75,.12),transparent 68%);border-bottom:1px solid rgba(196,154,75,.28)}
+body:has(.hud) .card>.h h3{font-family:var(--fd);font-size:17px;letter-spacing:.04em;text-transform:none;color:#e8dbb4}
+body:has(.hud) .card>.h h3::before{height:18px;width:2px;border-radius:0;background:var(--kolor,var(--atlas-brass));box-shadow:none}
+body:has(.hud) .card>.h .n{border-radius:2px;background:rgba(5,10,8,.48);border-color:rgba(196,154,75,.21);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#b3aa8f}
+body:has(.hud) .card>.b{padding:18px}
+
+/* Przyciski: zloto zostaje tylko dla akcji nadrzednej. Reszta ma tlo i role. */
+body:has(.hud) .btn{border-radius:3px;padding:9px 16px;border:1px solid rgba(224,188,112,.55);background:linear-gradient(180deg,#d7ae59,#ac7d31);color:#161008;box-shadow:inset 0 1px rgba(255,255,255,.24),0 3px 9px rgba(0,0,0,.16);font-family:var(--m);font-size:12px;letter-spacing:.02em}
+body:has(.hud) .btn:hover{background:linear-gradient(180deg,#ebc978,#c3913d);border-color:#edcf86}
+body:has(.hud) .btn.g{border-color:rgba(170,184,172,.29);background:rgba(18,29,23,.95);color:#d6dfd5;box-shadow:inset 0 1px rgba(255,255,255,.045)}
+body:has(.hud) .btn.g:hover{background:rgba(50,69,56,.96);border-color:var(--atlas-brass)}
+body:has(.hud) .btn.r{background:#853e39;border-color:#bb665b;color:#fff0eb}
+body:has(.hud) .btn.sm{padding:7px 12px;font-size:11px}
+body:has(.hud) .act{border-left:3px solid var(--ac,var(--atlas-brass));background:linear-gradient(180deg,rgba(31,44,36,.96),rgba(13,21,17,.98));transition:transform .16s,border-color .16s,box-shadow .16s}
+body:has(.hud) .act:hover:not(:disabled){transform:translateY(-2px);border-color:color-mix(in srgb,var(--ac,var(--atlas-brass)) 72%,#e5d4a3);box-shadow:0 9px 18px rgba(0,0,0,.24)}
+body:has(.hud) .act::after{display:none}
+body:has(.hud) .act h4{font-family:var(--fd);font-size:18px;line-height:1.16;letter-spacing:.01em}
+body:has(.hud) .act .dd{font-size:13px;line-height:1.55;color:#aebbb0}
+body:has(.hud) .act .c{background:rgba(7,13,10,.26);border-top-color:rgba(196,154,75,.18)}
+body:has(.hud) .act .cst{font-size:11px}
+
+/* Sidebarowe sekcje sa zakladkami akt. Dlugie opisy nie rozbijaja siatki. */
+body:has(.hud) .sidebar .leadbox,
+body:has(.hud) .sidebar .kronika,
+body:has(.hud) .sidebar .zaplecze,
+body:has(.hud) .sidebar .serwerfold,
+body:has(.hud) .sidebar .rel{border-radius:var(--atlas-radius);border-color:rgba(196,154,75,.27);background:linear-gradient(180deg,rgba(28,42,34,.94),rgba(11,18,15,.98));box-shadow:var(--atlas-shadow)}
+body:has(.hud) .sidebar .leadbox h3,
+body:has(.hud) .sidebar .kronika h3,
+body:has(.hud) .sidebar .zaplecze h3,
+body:has(.hud) .sidebar .serwerfold h3,
+body:has(.hud) .sidebar .rel h3{font-family:var(--fd);font-size:16px;letter-spacing:.03em;color:#eadcb6}
+body:has(.hud) .sidebar .dim{color:#9eaba1}
+body:has(.hud) .sidebar .tipbox{border-radius:3px;background:#14211a;border-color:var(--atlas-brass);box-shadow:0 12px 32px rgba(0,0,0,.4)}
+
+/* Widoki analityczne: jeden naglowek sceny, pod nim rytmiczne statystyki. */
+body:has(.hud) .pollhero,body:has(.hud) .royalhero{padding:24px 26px;border-left:3px solid var(--party-theme,var(--atlas-brass));background:linear-gradient(110deg,rgba(25,39,31,.96),rgba(11,20,16,.94))}
+body:has(.hud) .pollhero h2,body:has(.hud) .royalhero h2{font-family:var(--fd);font-size:29px;letter-spacing:.01em;color:#f0e4c5}
+body:has(.hud) .pollhero p,body:has(.hud) .royalhero p{max-width:680px;color:#aeb9ae;line-height:1.55}
+body:has(.hud) .pollheroStats{gap:0;border:1px solid rgba(196,154,75,.25);background:rgba(5,11,8,.35);border-radius:3px;overflow:hidden}
+body:has(.hud) .pollheroStats>div{padding:14px 18px;border-right:1px solid rgba(196,154,75,.18)}
+body:has(.hud) .pollheroStats b{font-family:var(--fd);font-size:27px;color:#e0bd72}
+body:has(.hud) .royalbadge{border-radius:3px;background:rgba(5,11,8,.38);border-color:rgba(196,154,75,.4)}
+
+/* Mapy i Sejm: wykres jest scena, nie karta wcieta miedzy karty. */
+body:has(.hud) .mapwrap,body:has(.hud) .sejm-sala{border-radius:4px;border-color:rgba(196,154,75,.38);box-shadow:0 16px 36px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.035)}
+body:has(.hud) .sejm-sala{background:linear-gradient(180deg,rgba(10,18,14,.2),rgba(8,14,11,.58)),url("../obrazki/tlo-sejm-ai.png") center/cover no-repeat}
+body:has(.hud) .hemi-filtry{margin:14px auto 18px;gap:6px}
+body:has(.hud) .hemi-filtry button{border-radius:2px;background:rgba(17,27,22,.9);border:1px solid rgba(196,154,75,.3);color:#aeb9ae;font-family:var(--m);font-size:11px}
+body:has(.hud) .hemi-filtry button.on{background:var(--atlas-brass);border-color:#e1bf74;color:#171108}
+body:has(.hud) .hemipod{font-size:12px;padding:12px 16px;background:rgba(5,11,8,.54);border-top:1px solid rgba(196,154,75,.2)}
+
+/* Zamkniete dzialy, kreator i noce wyborcze korzystaja z tej samej kartoteki. */
+body:has(.hud) .sadekran,body:has(.hud) .mediaekran,body:has(.hud) .mordekran,body:has(.hud) .kreekran,body:has(.hud) .nocekran,body:has(.hud) .wynik{border-radius:4px;border-color:rgba(196,154,75,.32);box-shadow:0 18px 42px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.035)}
+body:has(.hud) .sadhero h2,body:has(.hud) .mordehero h2,body:has(.hud) .krehead h1{font-family:var(--fd);letter-spacing:.02em;color:#efe0b7}
+body:has(.hud) .kreekran{background:linear-gradient(145deg,rgba(15,24,19,.95),rgba(7,13,10,.98)),url("../obrazki/ui-atlas-surface.webp") center/cover}
+body:has(.hud) .krepanel{border-radius:4px;border-color:rgba(196,154,75,.27);background:rgba(16,26,21,.93);box-shadow:var(--atlas-shadow)}
+body:has(.hud) .kreform input,body:has(.hud) .kreform textarea,body:has(.hud) .kreform select,body:has(.hud) .inp{border-radius:2px;background:#0b1511;border-color:rgba(196,154,75,.24);color:#e5ece4}
+body:has(.hud) .kreform input:focus,body:has(.hud) .kreform textarea:focus,body:has(.hud) .kreform select:focus,body:has(.hud) .inp:focus{border-color:var(--atlas-brass);box-shadow:0 0 0 2px rgba(196,154,75,.12)}
+body:has(.hud) .nocekran h1,body:has(.hud) .wynik h1{font-family:var(--fd);font-size:34px;color:#f1e4c2}
+
+/* Responsywnosc: na malym ekranie zwijamy tylko strefy, nie zmniejszamy tekstu. */
+@media(max-width:1180px){
+  body:has(.hud) .hud{grid-template-columns:1fr;gap:10px}
+  body:has(.hud) .hudcenter{justify-content:flex-start;overflow-x:auto}
+  body:has(.hud) .hudend{justify-content:flex-start;margin-left:0;flex-wrap:wrap}
+  body:has(.hud) .layout{grid-template-columns:minmax(260px,300px) minmax(0,1fr);gap:18px}
+}
+@media(max-width:860px){
+  body:has(.hud) .wrap{padding:0 12px 28px}
+  body:has(.hud) .hud,body:has(.hud) .nav{margin-left:-12px;margin-right:-12px;padding-left:12px;padding-right:12px}
+  body:has(.hud) .layout{grid-template-columns:1fr}
+  body:has(.hud) .sidebar{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px!important}
+  body:has(.hud) .sidebar>.card{min-width:0}
+}
+@media(max-width:560px){
+  body:has(.hud) .sidebar{grid-template-columns:1fr}
+  body:has(.hud) .pollhero,body:has(.hud) .royalhero{padding:18px}
+  body:has(.hud) .pollheroStats{grid-template-columns:1fr}
+  body:has(.hud) .pollheroStats>div{border-right:0;border-bottom:1px solid rgba(196,154,75,.18)}
+}

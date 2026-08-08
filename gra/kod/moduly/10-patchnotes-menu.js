@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.96':{data:'8 sierpnia 2026', zmiany:[
+  'Pelny redesign interfejsu gry: wspolny atlas polityczny, plaskie panele i czytelniejsza hierarchia informacji.',
+  'Nowa generowana scenografia UI spina ekran kampanii, Sejm, sad, media, sondaz, Krola, Pedia i kreator.',
+  'Przyciski, zakladki, zasoby i karty decyzji maja jedna role wizualna; zloto zostaje tylko dla akcji nadrzednych.',
+ ]},
  '1.1.95':{data:'8 sierpnia 2026', zmiany:[
   'PELNA SCENOGRAFIA GRY. Kampania, wybor partii, sondaż, Krol, noc wyborcza i Mordepedia dostaja wlasne, lekkie tla zamiast jednego gradientu.',
   'GRAFIKI SA SKOMPRESOWANE DO WEBP. Nowe tła nie obciazaja aktualizacji bardziej, niz musza, a interfejs nadal zostaje czytelny na wierzchu.',
