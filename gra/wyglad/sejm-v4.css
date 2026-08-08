@@ -1730,6 +1730,16 @@ body:has(.hud) .mapwrap .hexsvg{background:radial-gradient(circle at 50% 42%,rgb
 body:has(.hud) .mapwrap .legend{background:rgba(4,11,7,.42);border-top-color:rgba(196,154,75,.22)}
 body:has(.hud) .mapwrap .okr>.h{background:linear-gradient(90deg,rgba(196,154,75,.14),transparent 76%)}
 
+/* 1.1.158: przy szerokim pulpicie plansza i wybrany okreg sa jednym widokiem.
+   Wczesniej breakpoint traktowal sredni monitor jak telefon i karta szczegolow
+   spadala pod cala mape, przez co najwazniejsza interakcja robila sie ogromnym
+   przewijanym stosem. Na waskim ekranie zostaje bezpieczny uklad pionowy. */
+@media(min-width:1040px){
+  body:has(.hud) .mapwrap{grid-template-columns:minmax(0,1fr) minmax(320px,360px)!important;align-items:start}
+  body:has(.hud) .mapwrap>.card.okr{grid-column:2!important;grid-row:1!important;position:sticky!important;top:14px!important;max-height:calc(100vh - 28px);overflow:auto}
+  body:has(.hud) .mapwrap>.card:first-child{grid-column:1!important;grid-row:1!important}
+}
+
 /* kolejność bocznego rejestru jest częścią informacji, nie kosmetyką */
 body:has(.hud) .sidebar>.lead{order:-100!important}
 body:has(.hud) .sidebar>.kond{order:-90!important}

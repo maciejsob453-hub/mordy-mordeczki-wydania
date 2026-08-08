@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.158':{data:'8 sierpnia 2026',zmiany:[
+  'Mapa okregow wraca do ukladu plansza plus karta szczegolow na szerokim ekranie.',
+  'Karta wybranego okregu nie spycha juz mapy pod siebie, a telefon zachowuje uklad pionowy.',
+ ]},
  '1.1.157':{data:'8 sierpnia 2026',zmiany:[
   'Pasek koncowki kampanii ma teraz wlasny blat roboczy z oprawy decyzji.',
   'Tryb runoff zachowuje osobny zloty sygnal, zeby urny pozostaly czytelne.',
