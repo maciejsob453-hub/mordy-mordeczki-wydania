@@ -18,7 +18,7 @@ body:not(:has(.mg)){
   --v4-line:rgba(214,170,88,.27);
   --v4-green:#8fc36d;
   --v4-red:#dc756c;
-  background:#09100e url("../obrazki/sejm-atlas-tlo-v4.png") center top / cover fixed;
+  background:#09100e url("../obrazki/ui-atlas-surface.webp") center top / cover fixed;
   color:var(--v4-ink);
 }
 

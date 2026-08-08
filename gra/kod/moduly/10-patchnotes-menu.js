@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.153':{data:'8 sierpnia 2026',zmiany:[
+  'Ekran wyboru trybu korzysta teraz z tej samej wygenerowanej powierzchni atlasu co reszta gry.',
+  'Znika ostatnie stare bazowe tlo z przeplywu przed rozpoczeciem rozgrywki.',
+ ]},
  '1.1.152':{data:'8 sierpnia 2026',zmiany:[
   'Gabinet, Rada ministrów i Ustawy korzystaja z jednej wygenerowanej sali gabinetowej.',
   'Kontrakt tek jest przewijanym rejestrem, wiec szczegoly nie rozpychaja calego ekranu.',
