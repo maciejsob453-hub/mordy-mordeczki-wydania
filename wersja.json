@@ -1,10 +1,10 @@
 {
- "wersja": "1.1.103",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/7e1d8730f8347a5ea10864c27736a2965b456ebf",
+ "wersja": "1.1.104",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "994ff342e395f6bfcd1de5c56b89a4f7152677770276963a054ce101a383b3ca",
+   "sha": "dcc30da81d08937cf597c459a76088c153998d43da78dd4f39d79dd6a8d469dd",
    "bajtow": 1979
   },
   {
@@ -14,7 +14,7 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "2e3b15c0294392c0b38a38bd1fc2c0d04ded9757fd92559000cf93f84982bdc4",
+   "sha": "59559163b4ce3decf32b636c5d5e10126279a158bb0106d5e3955fd0acb50c89",
    "bajtow": 531
   },
   {
@@ -69,8 +69,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "4c05787bfbf207513ab4c11699d5f586fec861c2582b966c7c3674839cc45356",
-   "bajtow": 91664
+   "sha": "82c21ba9a23c52d340574f538b29f0a7874746f83346937140be148f73942cf0",
+   "bajtow": 91946
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
@@ -733,6 +733,11 @@
    "bajtow": 23650
   },
   {
+   "sciezka": "gra/obrazki/ui-parliament-chamber.webp",
+   "sha": "ed7832fb2631919ceda8b08ab7f05b35847a59a9e12aeb12a0fead2a94b140cb",
+   "bajtow": 92794
+  },
+  {
    "sciezka": "gra/wyglad/desktop.css",
    "sha": "ef66a39d540f17b6ea0ff5c13d1c60987c56a665e89e09c352363664d9d8efd5",
    "bajtow": 12469
@@ -744,8 +749,8 @@
   },
   {
    "sciezka": "gra/wyglad/sejm-v4.css",
-   "sha": "35d2ea4df8f82cb526863ad734e04a89450cc3a22570b7bc5b3e651a3c1170ce",
-   "bajtow": 138194
+   "sha": "6ad0c09dbf1a6f320831a55be4395b23db5ce1663560a7022bdd7209427fbc8f",
+   "bajtow": 139445
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -770,6 +775,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "7e1d8730f8347a5ea10864c27736a2965b456ebf"
+ }
 }

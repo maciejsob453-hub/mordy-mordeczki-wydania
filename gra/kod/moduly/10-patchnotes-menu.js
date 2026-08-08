@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.104':{data:'8 sierpnia 2026', zmiany:[
+  'Sejm, kancelaria premiera i palac prezydencki dostaly osobna fakture sali parlamentarnej zamiast wspolnego tla mapy.',
+  'Najwazniejsze karty wladzy maja teraz mocniejszy rytm instytucji, ale nadal zostaja czytelne i spokojne.',
+ ]},
  '1.1.103':{data:'8 sierpnia 2026', zmiany:[
   'Kreator scenariuszy dostal wlasna pracownie z faktura archiwum, wyraznym naglowkiem i czytelniejszym paskiem dziewieciu etapow.',
   'Lista scenariuszy korzysta z tego samego rejestru, a karty wybranego scenariusza maja mocniejszy akcent i hierarchie.',
