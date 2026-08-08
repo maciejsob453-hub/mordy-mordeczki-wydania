@@ -69,6 +69,11 @@ const BAL={
   // energia: ile jej wraca co tydzień i jak drogie są decyzje
   energiaBaza:         2.0,
   energiaMnoznik:      .96,
+  /* Dobę liczymy wewnątrz tygodnia. To nie kasuje limitu akcji — pokazuje
+     tylko, że wiec, ustawa i zwykły post nie zajmują tyle samo czasu. */
+  dniTygodnia:         7,
+  czasAkcjiMin:        1,
+  czasAkcjiMax:        6,
 
   // ile ludzi co kadencj\u0119 sypi\u0105 ustawy: autorowi, a ile reszcie sceny
   // głosowanie nad ustawą: od czego zależy, czy poseł podniesie rękę
@@ -452,7 +457,7 @@ const KING='Mordeczka';
 const MIES=['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
 function gameDate(){
   const d=new Date(2026,7,1);
-  d.setDate(d.getDate()+((G.term-1)*12+(G.week-1))*7);
+  d.setDate(d.getDate()+((G.term-1)*12+(G.week-1))*7+Math.max(0,(G&&G.dzienTygodnia||1)-1));
   return d;
 }
 const dateStr=d=>d.getDate()+' '+MIES[d.getMonth()]+' '+d.getFullYear();
@@ -468,11 +473,11 @@ function runDateAnim(){
   if(!document||!document.querySelector)return;
   const el=document.querySelector('.datechip b');if(!el)return;
   if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-  const d=new Date(a.from);let i=0;
+  const d=new Date(a.from);let i=0,total=Math.max(1,Math.round((new Date(a.to)-new Date(a.from))/86400000));
   el.classList.add('ticking');el.textContent=dateStr(d);
   const iv=setInterval(()=>{
     i++;d.setDate(d.getDate()+1);el.textContent=dateStr(d);
-    if(i>=7){clearInterval(iv);el.textContent=dateStr(a.to);
+    if(i>=total){clearInterval(iv);el.textContent=dateStr(a.to);
       el.classList.remove('ticking');el.classList.add('landed');
       setTimeout(()=>el&&el.classList.remove('landed'),430)}
   },95);
@@ -603,6 +608,9 @@ function newGame(id){
      turnout:.85,lup:{},recCd:0,xp:0,xpOs:{},traits:[],ptraits:{},tut:null,tutSeen:{},streak:0,noise:{},useTerm:{},catUsed:{},lastAct:null,
      king:{rel:52,paid:0}, sejmPrez:null, mar:null, goals:{}, agents:{}, agentWeek:null, sits:[], polls:[], scen:null,
      rng:RNG_STATE,aiMemory:{},aiLedger:[],
+     /* Simulowany kalendarz: decyzje przesuwają dzień, a luka tygodnia nadal
+        pozostaje cotygodniowym limitem akcji i rozliczeń. */
+     dzienTygodnia:1,czasTygodnia:0,harmonogram:[],pkbCiosy:[],
      /* Parametr jest wyłącznie dla automatycznego podglądu. Normalna gra startuje
         z dźwiękiem, a test nie budzi człowieka przy komputerze. */
      mute:typeof location!=='undefined'&&new URLSearchParams(location.search).has('mute'), night:null,

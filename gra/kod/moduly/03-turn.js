@@ -74,6 +74,8 @@ function endWeek(){
   else if(!isEraNiestab()&&G.eraNiestab===1){G.eraNiestab=2;
     say('<b>Era niestabilności się kończy.</b> Werbunek wraca do normy.','roy');}
   if(G.gov){govTick();govKontraktTick();}
+  if(typeof pkbCios==='function'&&G.gov&&G.gov.appr<38)
+    pkbCios('rząd',Math.min(4,(38-G.gov.appr)/5),'Niskie poparcie rządu zatrzymało inwestycje',3);
   if(G.gov&&G.pmOk){
     G.gov.parties.forEach(k=>{const q=G.p[k];
       const w=resortyPartii(k)/Math.max(1,RESORTY.length);
@@ -101,12 +103,16 @@ function endWeek(){
     else if(t===3)say('<b>Trzeci tydzień bez rządu.</b> Aktywność i jedność lecą we wszystkich partiach, kasa wycieka szybciej.','bad');
     else if(t>=5&&ch(.5))say(`<b>Paraliż władzy: ${t} tydzień bez gabinetu.</b> Serwer przestaje traktować sejm poważnie.`,'bad');
     else if(ch(.35))say('<b>Serwer bez rządu.</b> Kanały cichną, ludzie odpływają, nikt nic nie ustala.','bad');
+    if(typeof pkbCios==='function')pkbCios('paraliz',Math.min(5,1+t*.55),'Brak rządu zamroził decyzje i pieniądze',2);
   }
   /* Dwunasty tydzień jest ostatnim. Po jego rozegraniu idziemy prosto do kampanii
      finałowej i do urn — wcześniej licznik szedł do trzynastu i gra pokazywała
      „13 z 12”, czyli tydzień, którego w kadencji nie ma. */
   const tydzienPrzed=G.week, ostatniTydzien=G.week>=G.weeks;
   if(!ostatniTydzien)G.week++;
+  /* Nowy tydzień zaczyna się od pierwszego dnia, ale historia czasu zostaje
+     w zapisie, żeby gracz widział rytm decyzji zamiast teleportu bez śladu. */
+  G.dzienTygodnia=1;G.czasTygodnia=0;
   dateAnim={from:dateFrom,to:gameDate()};
   G.apMax=apBase();G.ap=G.apMax;
   G.sztab=G.sztabMax=5+Math.floor(p.mem/22);

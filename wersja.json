@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.89",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/ad49bf7ab386917716de7d4afbcbf7c21dc881b8",
+ "wersja": "1.1.90",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,13 +14,13 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "998b67117816a0352db0a70e2d03aa6bf2443e3b5cb3713db1ad4832c98e4f50",
+   "sha": "3e4b8ce38d93c376322412c08e728d7b9c08434accbb6baea561c16ae3e9329b",
    "bajtow": 530
   },
   {
    "sciezka": "gra/kod/moduly/00-data.js",
-   "sha": "9a16ab323aca6af33cda67d8ef8d7809617863de13dc7ea2f9694ca9f2ef03ec",
-   "bajtow": 48624
+   "sha": "166855c03666c4ad5a2adf0ced00d27f87b8e7b867619d4622829fcfdce9d246",
+   "bajtow": 49180
   },
   {
    "sciezka": "gra/kod/moduly/01-election-sejm.js",
@@ -29,13 +29,13 @@
   },
   {
    "sciezka": "gra/kod/moduly/02-actions-events.js",
-   "sha": "d19bac5ab3a96b6fdba0e785600d4f5aaa56fb5a6ff3666ecc8bbb7c1fd36617",
-   "bajtow": 51031
+   "sha": "05dd93a6cc1b683b9e9afed380f398a3a2511bc36f21efdc2621982f4cb47717",
+   "bajtow": 52450
   },
   {
    "sciezka": "gra/kod/moduly/03-turn.js",
-   "sha": "e69a4d98ab66d0f3f51e09536b7ada3a99a09798db7c8dc2bec603ac7c6d3721",
-   "bajtow": 17263
+   "sha": "8713c7cf63fedf76b96e265e1b91bb3a5929a456bda7a75202cf697d1a4a09e7",
+   "bajtow": 17743
   },
   {
    "sciezka": "gra/kod/moduly/04-ai.js",
@@ -59,28 +59,28 @@
   },
   {
    "sciezka": "gra/kod/moduly/08-scenarios.js",
-   "sha": "cfd9166b35f4501ae005b697b81cb26e659b0a51dba0915cd98df5f42c2a983b",
-   "bajtow": 41212
+   "sha": "b89c392a1b173762eb656dccfc0fb66a6474e51c7b31d2f5b8155e88e43d8adf",
+   "bajtow": 41386
   },
   {
    "sciezka": "gra/kod/moduly/09-screens.js",
-   "sha": "94cfad9a0ccf7cbb0293336f49ee9b0d21b22a4f9840ff76742ebb58d62bb236",
-   "bajtow": 125597
+   "sha": "a9f643c64303ee50999f7ff4d7fa17e0056fb516bf80e9f34471ac083edd9615",
+   "bajtow": 128382
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "79aad6353559f2d6eaa6ac38ad0000176b2ef93e0aebb357ca5388926555aae9",
-   "bajtow": 86131
+   "sha": "11a42acd4a59ce258912cad24ff5dd26e9c466da33a5a8821c6158589886f72e",
+   "bajtow": 86872
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
-   "sha": "60d4308e1fee644f17625c780af779896aa800c13545e780937a65ed08aabaee",
-   "bajtow": 30601
+   "sha": "2fb04b647ab6d9aadb5cee8d58ff8e6945cd680e652a276ec753a58e9661266a",
+   "bajtow": 31863
   },
   {
    "sciezka": "gra/kod/moduly/12-media.js",
-   "sha": "9e7cde24970d4db8c1a0373530fdf48c483f1c09af8b3cd216ab7b93142d2f5b",
-   "bajtow": 19143
+   "sha": "9e351f7d9dc5044129d50cf6b2d1c4770ac6fe59562533382688073dfcf7c739",
+   "bajtow": 20119
   },
   {
    "sciezka": "gra/kod/moduly/13-court.js",
@@ -89,8 +89,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/14-ui-gameplay.js",
-   "sha": "b2277f97e254f8b93ab07b583b7f1b16588353761a46664bb84aaa0e5ade3014",
-   "bajtow": 89105
+   "sha": "e158e5565b088ec4eede5cdbc42f9e447693dcf27bbfcee8ff03cd489f36671b",
+   "bajtow": 91461
   },
   {
    "sciezka": "gra/kod/moduly/15-governance.js",
@@ -109,8 +109,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/18-bootstrap.js",
-   "sha": "60a5981a6f6697e87ef384382ef3006d564761d08ff42449fef1b7bb984ae824",
-   "bajtow": 17034
+   "sha": "42327185bba7d174df24f13034e948b80d77e18cabebb96657af7fb98621fe49",
+   "bajtow": 17155
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -669,8 +669,8 @@
   },
   {
    "sciezka": "gra/wyglad/desktop.css",
-   "sha": "812e344760f8d5360d44e33656a315bf82ebc534d332ec55a6741514418451dc",
-   "bajtow": 11646
+   "sha": "ef66a39d540f17b6ea0ff5c13d1c60987c56a665e89e09c352363664d9d8efd5",
+   "bajtow": 12469
   },
   {
    "sciezka": "gra/wyglad/redesign.css",
@@ -705,6 +705,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "ad49bf7ab386917716de7d4afbcbf7c21dc881b8"
+ }
 }

@@ -168,7 +168,8 @@ function modEfekty(ef){
       if(pm&&team.length){
         const suma=team.reduce((a,k)=>a+G.p[k].seats,0);
         setGov(team,pm,60);G.gov.minority=suma<MAJ?1:0;G.pmOk=true;
-        G.gov.pmLead=pmOsoba(pm)||G.p[pm].lead;G.bloc=null;
+        const wsk=String(ef.rzad.pmOsoba||'');
+        G.gov.pmLead=wsk&&roster(G.p[pm]).includes(wsk)?wsk:(pmOsoba(pm)||G.p[pm].lead);G.bloc=null;
       }
     }
   }
@@ -177,7 +178,8 @@ function modEfekty(ef){
     if(ef.prezydent.tryb==='brak')G.prez=null;
     else if(ef.prezydent.tryb==='partia'&&G.p[ef.prezydent.party]){
       const k=ef.prezydent.party;
-      G.prez={party:k,lead:G.p[k].lead,until:G.term+1};
+      const wsk=String(ef.prezydent.osoba||'');
+      G.prez={party:k,lead:wsk&&roster(G.p[k]).includes(wsk)?wsk:G.p[k].lead,until:G.term+1};
     }
   }
 }

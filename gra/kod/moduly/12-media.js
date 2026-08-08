@@ -15,7 +15,7 @@ const MEDIA_TYP={
   tv:{n:'Wydawnictwo telewizyjne',koszt:10e6,e:'📺',
     d:'Studio z anteną. Nagrywasz odcinki i sam wybierasz, o czym mówisz — filozoficznie, politycznie albo śmieciowo. Ile z tego wyjdzie, zależy od widowni, a widownię trzeba sobie wyrobić.'},
   kino:{n:'Wydawnictwo kinowe',koszt:20e6,e:'🎬',
-    d:'Najdroższa zabawka na serwerze. Kręcisz filmy, a na seanse przychodzą ludzie — tym tłumniej, im głośniej o twojej partii.'},
+    d:'Najdroższa sala na serwerze. Rejestrujesz i emitujesz seanse istniejących filmów — widownia rośnie, gdy partia ma o czym mówić.'},
 };
 const mediaInit=()=>{if(!G.media)G.media=[]};
 /* ── zasięg ──
@@ -37,6 +37,10 @@ function zasiegMediow(k){
 const mediaJest=()=>lawDone('media');
 const mediaMoje=()=>{mediaInit();return G.media};
 const mediaBilans=()=>mediaMoje().reduce((a,m)=>a+m.bilans,0);
+const mediaBilansPasek=m=>{
+  const v=Math.max(-1,Math.min(1,(m&&m.bilans||0)/Math.max(1,MEDIA_TYP[m.typ]?.koszt||1)));
+  return `<span class="medbilans" title="Bilans szyldu"><i style="width:${Math.round(Math.abs(v)*50)}%;${v<0?'margin-left:50%;background:var(--neg)':'margin-left:'+(50-(Math.abs(v)*50))+'%;background:var(--pos)'}"></i></span>`;
+};
 
 /* Serduszka gazety chodzą za sławą partii i kompetencją redaktora. */
 /* Serduszka to nie popularność, tylko zaufanie: gazetę czyta się wtedy, gdy
@@ -48,12 +52,16 @@ function serduszka(m){
   // świeży szyld nie ma jeszcze czego lajkować — serduszka liczą się od numerów
   if(!m.numery)return 0;
   const p=me(), ld=L(m.szef)||{komp:50};
-  return Math.max(0,Math.round(p.cred*.46+ld.komp*.22+(m.staz||0)*.5+p.fame*.08-14));
+  /* Czytelnik musi dostać powód, redakcja ma ograniczoną przepustowość, a
+     sufit rośnie powoli z rozmiarem partii. Sława sama nie drukuje serc. */
+  const sufit=6+Math.sqrt(Math.max(1,p.mem))*3.2;
+  return Math.round(cl(p.cred*.30+ld.komp*.14+(m.staz||0)*.35+p.fame*.03-18,0,sufit));
 }
 /* Ile serduszek zbierze NASTĘPNY numer — to jest prognoza, a nie stan konta. */
 function serduszkaProg(m){
   const p=me(), ld=L(m.szef)||{komp:50};
-  return Math.max(0,Math.round(p.cred*.46+ld.komp*.22+(m.staz||0)*.5+p.fame*.08-14));
+  const sufit=6+Math.sqrt(Math.max(1,p.mem))*3.2;
+  return Math.round(cl(p.cred*.30+ld.komp*.14+(m.staz||0)*.35+p.fame*.03-18,0,sufit));
 }
 /* Ile tygodni musi minąć między wydaniami. Gazeta wychodzi co dwa tygodnie,
    antena i ekran co tydzień — inaczej dałoby się klikać w kółko bez końca. */
@@ -243,8 +251,9 @@ const KINO_FILM=[
 ];
 function mediaFilm(i){
   const m=mediaMoje()[i]; if(!m||m.typ!=='kino'||!mediaGotowe(m))return;
-  modal('Kino','Co kręcisz',
-    `<p>Na seanse przychodzi tym więcej ludzi, im głośniej o twojej partii.
+  modal('Kino','Co dziś emitujesz',
+    `<p>Nie produkujesz filmu. Rejestrujesz seans i wypuszczasz go pod swoim szyldem.
+     Na widownię przychodzi tym więcej ludzi, im głośniej o twojej partii.
      Twoja sława: <b>${Math.round(me().fame)}</b>.</p>`,
     KINO_FILM.map(f=>({l:f.n,s:f.d,f:()=>{close();mediaFilmGraj(i,f)}}))
       .concat([{l:'Nie kręcę',f:close}]),close);
@@ -265,17 +274,19 @@ function mediaFilmGraj(i,f){
        <div><b>${kasaSkrot(zysk)}</b><span>wpływ</span></div>
        <div><b>${kasaSkrot(m.bilans)}</b><span>bilans wydawnictwa</span></div>
      </div>
-     <p>Na „${f.n}” przyszło ${widz} osób — tyle, ile dziś warta jest twoja sława.</p>`,
+      <p>Na zarejestrowany seans „${f.n}” przyszło ${widz} osób — tyle, ile dziś warta jest twoja sława.</p>`,
     [{l:'Dobrze',f:()=>{close();render()}}]);
 }
 function mediaTab(){
   const p=me(), szef=p.lead, maj=kapPryw(szef);
   if(!mediaJest())return `
-    <div class="card"><div class="h"><h3>Media</h3><span class="n">zamknięte</span></div><div class="b">
-      <p style="margin-top:0">Na serwerze nie wolno niczego wydawać, dopóki sejm nie uchwali
-      <b>ustawy o mediach</b>. Bez niej nie ma gazet, telewizji ani kina.</p>
-      <div class="note" style="margin:12px 0 0">Ustawę zgłasza premier albo minister
-      <b>Kultury i Rozrywki</b>. Dopiero po niej ten dział się otwiera.</div>
+    <div class="card sadzamkniety mediazamkniete"><div class="h"><h3>Media</h3><span class="n">nie istnieją</span></div><div class="b">
+      <div class="sadhero"><span>OPINIA PUBLICZNA</span><h2>Najpierw potrzebna jest ustawa</h2>
+        <p>Gazety, telewizja i kino nie są dekoracją. Ustawa o mediach otworzy listy wydawnictw,
+        ich bilanse, widownię i wpływ na sondaże.</p></div>
+      <div class="note" style="margin:12px 0 0">Projekt zgłasza premier albo minister
+      <b>Kultury i Rozrywki</b>. Po uchwaleniu dział odblokuje się sam.</div>
+      <button class="btn" onclick="setTab('premier')">Idę do Kancelarii premiera</button>
     </div></div>`;
   const lista=mediaMoje();
   const rynek=alive().filter(k=>k!==G.me).flatMap(k=>((G.aiMedia&&G.aiMedia[k])||[]).map(m=>({k,m})))
@@ -295,7 +306,7 @@ function mediaTab(){
         .map(({m,i})=>{const t=MEDIA_TYP[m.typ];
         const gotowe=mediaGotowe(m), za=mediaZa(m);
         const akcja={gazeta:['mediaNumer','Wydaj numer'],tv:['mediaOdcinek','Nagraj odcinek'],
-                     kino:['mediaFilm','Nakręć film']}[m.typ];
+                     kino:['mediaFilm','Zarejestruj seans']}[m.typ];
         return `<div class="ekos medw">
           <span class="mede">${t.e}</span>
           <span class="ekon">${esc(m.nazwa)}<em class="ekotag">${t.n} · ${esc(m.szef)}${
@@ -307,6 +318,7 @@ function mediaTab(){
             :`<span class="medserca">${m.widz?m.widz+' widzów':'brak wydań'}</span>`}
           <b class="ekow ${m.bilans>=0?'plus':'minus'}">${mordedolar(12)} ${
             m.bilans<0?'−':'+'}${kasaSkrot(Math.abs(m.bilans))}</b>
+          ${mediaBilansPasek(m)}
           <span class="medakcje">
             <button class="btn ${gotowe?'':'g'} sm" ${gotowe?'':'disabled'}
               onclick="${akcja[0]}(${i})">${gotowe?akcja[1]:`za ${za} ${pl(za,'tydzień','tygodnie','tygodni')}`}</button>
@@ -342,4 +354,3 @@ function mediaTab(){
     </div></div>
   </div>`;
 }
-

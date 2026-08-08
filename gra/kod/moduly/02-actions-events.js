@@ -11,6 +11,27 @@ function sizeF(p){ // im większa partia, tym drożej się nią rusza: decyzja t
   if(p.mem>46)return {kp,fame:.80,en:1.22,lab:'inercja dużej partii'};
   return {kp,fame:1,en:1,lab:''};
 }
+/* Czas decyzji jest osobnym kosztem. Nie zabiera akcji z limitu tygodnia —
+   pozwala tylko odczuć, że szybki komunikat i wielka ustawa nie dzieją się w
+   tej samej chwili. Własne scenariusze mogą podać a.dni, reszta ma bezpieczny
+   czas zależny od siły decyzji. */
+const RT_DNI={wiec:2,kanwas:2,spot:3,debata:4,memy:1,manifest:4,rekr:3,trening:3,szkol:2,statut:4,czyst:5,zjazd:6,
+  wywiad:2,kulisy:2,werb:3,przekw:2,kampania_prm:4,luz:1,konsult:2,przepr:2,podkup:3,admin:5,
+  chlodzenie:2,depret:1,ustawa:5,oredzie:3,dymisja:3,zmianaMin:3,rozwiaz:5,wotum:4,oredzieP:3,sabotaz:4,odp:1};
+function czasAkcji(a){
+  if(!a)return 1;
+  const dom=RT_DNI[a.id]||Math.max(1,Math.ceil((a.ap||1)*1.35));
+  return cl(Math.round(+a.dni||dom),BAL.czasAkcjiMin,BAL.czasAkcjiMax);
+}
+function przesunCzas(dni,a){
+  if(!G||PROBA)return;
+  const d=cl(Math.round(+dni||1),1,BAL.czasAkcjiMax);
+  const start=G.dzienTygodnia||1,koniec=Math.min(BAL.dniTygodnia,start+d);
+  G.czasTygodnia=(G.czasTygodnia||0)+d;G.dzienTygodnia=koniec;
+  if(!Array.isArray(G.harmonogram))G.harmonogram=[];
+  G.harmonogram.unshift({id:a&&a.id||'',n:a&&a.n||'Decyzja',od:start,do:koniec,dni:d,tydzien:G.term+'-'+G.week});
+  if(G.harmonogram.length>24)G.harmonogram.pop();
+}
 const A=[
 /* --- kampania --- */
 {id:'wiec',cat:'kam',n:'Wiec w kanale',ap:1,kp:6,en:8,reg:1,tem:1,
@@ -37,7 +58,7 @@ const A=[
  d:'Emitowany wyłącznie w #kanał_eventowy, tam trafia zawsze i mocno. Do pozostałych okręgów przenika tylko czasem i słabiej. Wymaga wiarygodności, inaczej wyjdzie cringe.',
  f:(p,f)=>{if(ch(cl(.55-p.cred/160,.06,.5))){p.fame=cl(p.fame+2);p.ctr=cl(p.ctr+9);p.cred=cl(p.cred-4);
    return `Spot uznano za <b>cringe</b>. Krąży, ale jako mem.`}
-  const g=R(8,14)*f;M(p,9);p.fame=cl(p.fame+g);p.cred=cl(p.cred+2);p.uni=cl(p.uni+4);
+  const g=R(8,14)*f;M(p,9);p.fame=cl(p.fame+g);p.cred=cl(p.cred+2+(pend&&pend.miniBonus>0?2:0));p.uni=cl(p.uni+4);
   p.pres.event=cl(p.pres.event+34*f);
   let ile=0;
   REG.filter(r=>r.id!=='event').forEach(r=>{if(ch(.45)){p.pres[r.id]=cl(p.pres[r.id]+R(5,11)*f);ile++}});
@@ -47,7 +68,7 @@ const A=[
  f:(p,f,t)=>{const o=G.p[t],a=lead(G.me),b=lead(t);
   const dbBoost=n=>n==='loof'?(goalDone('demokraci')?0:20):n==='Aryati'?12:n==='Śledzik'?-14:0;
   const dbBoost2=q=>leads(q).reduce((a,n)=>a+dbBoost(n),0);
-  const x=p.cred*.2+p.uni*.1+a.komp*.45+a.char*.25+R(-22,22)+dbBoost2(p);
+  const x=p.cred*.2+p.uni*.1+a.komp*.45+a.char*.25+R(-22,22)+dbBoost2(p)+(pend&&pend.miniBonus||0);
   const y=o.cred*.2+o.uni*.1+b.komp*.45+b.char*.25+R(-22,22)+dbBoost2(o);
   G.rel[G.me][t]=cl(G.rel[G.me][t]-9,-100,100);
   if(x>y){M(p,11);M(o,-7);XP(14);const zysk=ch(.6);if(zysk)gainAutor(p.lead,RI(1,2));
@@ -214,6 +235,7 @@ const A=[
    if(G.gov)APPR(+RI(2,6));p.cred=cl(p.cred+4);
    return `Ustawa „${tm.n}” <b>przeszła</b> ${v.yes}:${v.no}.`}
   p.cred=cl(p.cred-5);if(G.gov)APPR(-5);
+  if(typeof pkbCios==='function')pkbCios('ustawa',3,`Przegrana ustawa „${tm.n}” podważyła zaufanie do rządu`,3);
   return `Ustawa „${tm.n}” <b>odrzucona</b> ${v.yes}:${v.no}. Kompromitacja.`}},
 /* --- premier: reszta jego narzędzi siedzi w dziale Premiera, nie w decyzjach --- */
 {id:'oredzie',cat:'prem',n:'Orędzie premiera',ap:1,kp:8,en:9,pm:1,tem:1,term1:1,

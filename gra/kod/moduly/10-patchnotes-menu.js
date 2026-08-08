@@ -4,6 +4,13 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.90':{data:'8 sierpnia 2026', zmiany:[
+  'DECYZJE MAJA CZAS TRWANIA. Zwykly ruch zajmuje dzien lub dwa, ustawa i debata kilka dni, a luka tygodnia nadal odnawia limity co siedem dni.',
+  'PKB MOZE SPADAC PRZEZ KONKRETNE BLEDY. Przegrane ustawy, brak rzadu i zle decyzje zostawiaja czasowy cios w obrocie zamiast losowego pecha.',
+  'MEDIA MAJA KARTA BLOKADY JAK SAD, LISTE SZYLDOW I PASEK BILANSU. Kino rejestruje seanse zamiast udawac fabryke filmow, a serduszka rosna znacznie wolniej.',
+  'KREATOR POZWALA DODAWAC ZAPLECZE I WSKAZAC KONKRETNA OSOBE NA FOTELU PREMIERA LUB PREZYDENTA.',
+  'DEBATA I SPOT DOSTALY TRZYRUNDOWE MINIGRY. Wynik zalezy od decyzji gracza, nie tylko od jednego rzutu.',
+ ]},
  '1.1.89':{data:'8 sierpnia 2026', zmiany:[
   'SONDAZ MA MALEJACE ZWROTY Z DUZEGO ZASIEGU. PPP NIE MA JUZ PODWOJNEGO BONUSU, A PARTIE Z TYLU MOGA REALNIE DOGANIAC LIDERA.',
   'SERYJNY ZWYCIEZCA PLACI ZA PRZEWAGE. Kolejne wygrane oddaja czesc niezdecydowanych konkurencji zamiast betonowac sejm.',
@@ -815,7 +822,7 @@ function game(){
     </div>
     <div class="hudend">
       <button class="sndbtn" onclick="toggleMute()" title="${G.mute?'Włącz dźwięk':'Wycisz'}">${G.mute?'♪̸':'♪'}</button>
-      <div class="datechip" key="${G.term}-${G.week}"><b>${dateStr(gameDate())}</b><span>K${G.term} · tydzień ${G.week} z ${G.weeks}</span></div>
+      <div class="datechip" key="${G.term}-${G.week}"><b>${dateStr(gameDate())}</b><span>K${G.term} · tydzień ${G.week} z ${G.weeks} · dzień ${G.dzienTygodnia||1}/7</span></div>
       <button class="btn g sm" onclick="openSave()" title="Zapis i wczytanie">Zapis</button>
       <!-- wyjście do menu siedziało wcześniej dopiero w oknie zapisu i nikt go tam nie szukał -->
       <button class="btn g sm" onclick="doLobby()" title="Wyjście do menu głównego">Menu</button>

@@ -218,3 +218,13 @@ body.licze .hemi .seat, body.licze .runoff, body.licze .campbar { animation: non
 .govcontract span{white-space:nowrap}
 .govcontract span.done{color:var(--pos)}
 .govcontract span.warn{color:var(--neg)}
+/* Media korzysta z tej samej karty blokady co Sąd; pasek bilansu pozwala
+   od razu zobaczyć, który szyld zarabia, a który jest ciężarem. */
+.mediazamkniete .sadhero{margin-bottom:14px}
+.medbilans{display:block;position:relative;width:74px;height:4px;border-radius:4px;background:rgba(0,0,0,.45);overflow:hidden;margin:3px 0 0 auto}
+.medbilans i{display:block;height:100%;border-radius:4px;position:relative}
+.cst.rt{color:var(--info,#7fb7d9)}
+.stolczas{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px;color:var(--dim2);font:11px var(--m)}
+.stolczas>span{color:var(--acc);letter-spacing:.08em;text-transform:uppercase}
+.stolczas b{padding:3px 6px;border:1px solid var(--line);border-radius:4px;color:var(--tx);background:rgba(255,255,255,.035)}
+.stolczas em{font-style:normal;margin-right:5px}

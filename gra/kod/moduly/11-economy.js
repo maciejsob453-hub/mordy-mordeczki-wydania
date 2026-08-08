@@ -140,6 +140,11 @@ function pkbCzynniki(){
      Wcześniej obie siedziały na 45, czyli mniej więcej tam, gdzie serwer stoi
      sam z siebie, i wszystko było na plusie bez żadnego wysiłku. */
   const stab=40, inw=50;
+  /* Gospodarka nie spada od losowego „pecha”. Ten ujemny czynnik pochodzi
+     wyłącznie z konkretnych złych ruchów: przegranej ustawy, paraliżu rządu,
+     ostrej afery albo nieudanej decyzji. Każdy cios wygasa po kilku tygodniach. */
+  const ciosy=(G.pkbCiosy||[]).filter(x=>x&&(+x.do||0)>=absWeek());
+  const karaCiosow=ciosy.reduce((a,x)=>a+Math.max(0,+x.sila||0),0);
   return [
    {n:'Minister finansów', v:(kompMF-55)*.20, o:mf?`${mf}, kompetencja ${kompMF}`:'wakat na resorcie'},
    {n:'Premier',           v:(kompPM-55)*.14, o:pm?`${pm}, kompetencja ${kompPM}`:'brak rządu'},
@@ -149,7 +154,18 @@ function pkbCzynniki(){
    {n:'Zadowolenie ludzi', v:9-st*2.4, o:st?`podatek ${st}%`:'podatku od majątku nie ma'},
    {n:'Poparcie rządu',    v:G.gov?(G.gov.appr-50)*.22:-7,
     o:G.gov?`rząd ma ${Math.round(G.gov.appr)} poparcia`:'nie ma rządu, nie ma zaufania'},
+   {n:'Skutki złych decyzji',v:-karaCiosow,
+    o:ciosy.length?ciosy.map(x=>x.opis||'błędna decyzja').join(', '):'brak aktywnych szkód'},
   ];
+}
+/* Jedno wejście dla wszystkich działań, które psują obrót. Waga 1 to lekki
+   zgrzyt, 6 to kryzys widoczny w PKB przez kilka tygodni. */
+function pkbCios(typ,sila,opis,tygodnie=3){
+  if(PROBA||!G)return;
+  if(!Array.isArray(G.pkbCiosy))G.pkbCiosy=[];
+  const x={typ:String(typ||'blad').slice(0,24),sila:cl(+sila||1,0,18),do:absWeek()+Math.max(1,Math.round(+tygodnie||3)),opis:String(opis||'błędne decyzje').slice(0,120)};
+  G.pkbCiosy.push(x);if(G.pkbCiosy.length>24)G.pkbCiosy=G.pkbCiosy.slice(-24);
+  say(`<b>Gospodarka odczuwa skutki.</b> ${esc(x.opis)} (−${x.sila} do mnożnika przez ${Math.max(1,x.do-absWeek())} tyg.).`,'bad');
 }
 const pkbMnoznik=()=>{
   const suma=pkbCzynniki().reduce((a,x)=>a+x.v,0);
@@ -299,6 +315,7 @@ function pkbTydzien(){
   dlugTydzien();                     // kto wszedł pod kreskę, ten zaczyna tonąć
   sprawdzRangi();                    // kto przekroczył próg, ten awansuje i płaci wpisowe
   pkbZapiszOdczyt();
+  if(Array.isArray(G.pkbCiosy))G.pkbCiosy=G.pkbCiosy.filter(x=>x&&(+x.do||0)>absWeek());
 }
 /* ── absolutorium ──
    Na koniec kadencji premier odpowiada za gospodarkę. Jeśli PKB przez kadencję

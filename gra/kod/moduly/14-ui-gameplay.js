@@ -230,6 +230,7 @@ function stolTygodnia(){
   const miejsca=[];
   zagrane.forEach(x=>{for(let i=0;i<x.ap;i++)miejsca.push(i===0?x:{ciag:x})});
   for(let i=0;i<wolne;i++)miejsca.push(null);
+  const plan=(G.harmonogram||[]).filter(x=>x&&x.tydzien===klucz).slice().reverse();
   return `<div class="stol">
     <div class="stolh">
       <h3>Twój tydzień</h3>
@@ -251,6 +252,7 @@ function stolTygodnia(){
           <div class="skut">${zm||'<span class="p">wykonano</span>'}</div>
         </div>`}).join('')}
     </div>
+    ${plan.length?`<div class="stolczas"><span>Oś czasu</span>${plan.map(x=>`<b>D${x.od}–${x.do}</b><em>${esc(x.n)}</em>`).join('')}</div>`:''}
   </div>`;
 }
 
@@ -324,6 +326,7 @@ function actCards(list,fx){
         ${a.kp?`<span class="cst ${G.kp<kpC?'no':''}"><em>${ikona('kapital','mini')}kapitał</em>${kpC}</span>`:''}
         <span class="cst ${a.en>0?(G.en<a.en?'no':''):'yes'}"><em>${ikona('energia','mini')}energia</em>${a.en>0?'−'+Math.round(a.en*.82*sizeF(me()).en):'+'+(-a.en)}</span>
         ${f<.9?`<span class="cst ft"><em>zmęczenie</em>×${f.toFixed(2)}</span>`:''}
+        <span class="cst rt"><em>czas</em>${czasAkcji(a)} ${pl(czasAkcji(a),'dzień','dni','dni')}</span>
         ${cb?`<span class="cst ${cb.m>1?'yes':'no'}"><em>${cb.n}</em>×${cb.m.toFixed(2)}</span>`:''}
         ${wym.length?`<span class="cst dimx"><em>wybierasz</em>${wym.join(' + ')}</span>`:''}
         ${fx?`<span class="cst dimx"><em>kategoria</em>${katN}</span>`:''}
@@ -740,7 +743,25 @@ function step(){
   if(a.tem&&!pend.tem)return chooseTem();
   if(a.tgt&&!pend.t)return chooseTgt();
   if(a.seg&&!pend.s)return chooseSeg();
+  if(a.id==='debata'&&!pend.miniDone)return miniGra('debata');
+  if(a.id==='spot'&&!pend.miniDone)return miniGra('spot');
   fire(a,pend.t,pend.r,pend.s,pend.tem);
+}
+/* Debata i spot nie są już jednym rzutem kostką. Trzy krótkie decyzje tworzą
+   wynik, ale zwykła decyzja nadal pobiera tylko jeden slot kategorii. */
+function miniGra(typ){
+  if(PROBA){pend.miniDone=1;pend.miniBonus=0;return step()}
+  if(!pend.mini)pend.mini={r:0,score:0};
+  const m=pend.mini, deb=typ==='debata',nr=m.r+1;
+  const q=deb?['Otwarcie: jak zaczynasz?','Kontra na zarzut rywala','Ostatnie zdanie do widowni'][m.r]
+    :['Pierwsze trzy sekundy spotu','Główna obietnica','Wezwanie do działania'][m.r];
+  const op=deb?[
+    ['Atakuję argument',3,'Ryzyko rośnie, ale rywal traci oddech.'],['Podaję konkretny fakt',2,'Spokojna odpowiedź buduje wiarygodność.'],['Gram empatią',1,'Mniej ostro, za to bliżej ludzi.']]:[
+    ['Mocny hak',3,'Zatrzymujesz przewijanie.'],['Twój program',2,'Widz wie, o co chodzi.'],['Żart i dystans',1,'Lekko, ale mniej treści.']];
+  modal(deb?`Debata · runda ${nr}`:`Spot · ujęcie ${nr}`,pend.a.n,
+    `<p>${q}</p><div class="note">Wybór nie jest automatyczny. Wynik trzech ruchów wpłynie na końcowy efekt.</div>`,
+    op.map(x=>({l:x[0],s:x[2],f:()=>{m.score+=x[1];m.r++;close();if(m.r<3)miniGra(typ);else{pend.miniBonus=m.score-6;pend.miniDone=1;step()}}})),
+    ()=>{pend=null;close();render()});
 }
 function fire(a,t,r,s,tm){
   const p0=me(),f0=p0.fame,m0=p0.mem,c0=p0.ctr,pr0=p0.pret,rel0=t?G.rel[G.me][t]:null;
@@ -800,9 +821,18 @@ function fire(a,t,r,s,tm){
   if(p.robMode)REG.forEach(x=>{const d=p.pres[x.id]-prs0[x.id];if(d>0)p.pres[x.id]=cl(prs0[x.id]+d*1.15)});
   applyGoals();
   G.lastAct=a.id;
+  /* Ruch wszedł do rozliczenia: od tej chwili widać, ile dni zajęła ta
+     decyzja. Limit kategorii i akcje nadal są tygodniowe, więc nie da się
+     obejść zasad przez szybkie klikanie. */
+  const dni=czasAkcji(a);przesunCzas(dni,a);
   G.catUsed[a.cat]=(G.catUsed[a.cat]||0)+1;
-  if(msg)say(`<b>${a.n}.</b> ${msg}`);
+  if(msg)say(`<b>${a.n}.</b> ${msg} <span class="dim">Czas: ${dni} ${pl(dni,'dzień','dni','dni')}.</span>`);
+  else if(!PROBA)say(`<b>${a.n}.</b> Decyzja rozpoczęta. Potrwa około ${dni} ${pl(dni,'dzień','dni','dni')}.`,'roy');
   const decyzjaZla=p.fame<f0-4||p.ctr>c0+10;
+  if(decyzjaZla&&typeof pkbCios==='function'){
+    const sila=Math.min(5,1+Math.max(0,p.ctr-c0)/8+Math.max(0,f0-p.fame)/7);
+    pkbCios(a.id,sila,`${a.n} pogorszyła zaufanie do obrotu`);
+  }
   if(decyzjaZla)shake();
   SFX.action(a.cat,decyzjaZla);
   {  // skutki na ekran, żeby było widać, co ta decyzja zrobiła
