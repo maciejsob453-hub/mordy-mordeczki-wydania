@@ -2053,3 +2053,13 @@ body:not(:has(.mg)) .veil .mdl{
   box-shadow:0 30px 90px rgba(0,0,0,.68),inset 0 1px rgba(255,255,255,.08)
 }
 body:not(:has(.mg)) .veil .mdl>.h{background:linear-gradient(90deg,rgba(4,12,8,.72),rgba(4,12,8,.28)),url("../obrazki/ui-ledger-header.webp") center/cover}
+
+/* 1.1.119: ostatni tydzien kampanii jest progiem do urn, wiec campbar dostaje
+   ten sam material protokolu co noc wyborcza, zamiast wygladac jak przypadkowy
+   zielony alert wklejony nad mapa. */
+body:has(.hud) .campbar.runoff{
+  background:linear-gradient(110deg,rgba(8,18,13,.82),rgba(5,11,8,.94)),url("../obrazki/ui-election-protocol.webp") center/cover!important;
+  border-color:rgba(196,154,75,.48);box-shadow:0 14px 32px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.05)
+}
+body:has(.hud) .campbar.runoff .pill{border-color:rgba(224,188,112,.44);background:rgba(5,12,8,.58);color:#e4c57b}
+body:has(.hud) .campbar.runoff .btn{background:linear-gradient(180deg,#e6c26b,#b7802e)!important;color:#1c170a!important;border-color:#f0d58b!important}
