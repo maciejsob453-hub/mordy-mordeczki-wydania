@@ -2654,3 +2654,13 @@ body:has(.hud) .widok[data-tab="sondaz"]>.card{
 body:has(.hud) .widok[data-tab="sondaz"] .pollheroStats{
   background:rgba(3,10,9,.62)!important;border-color:rgba(196,154,75,.25)!important
 }
+
+/* 1.1.168: topografia mapy wychodzi spod SVG, ale nie zmienia ani jednego
+   okregu. Ciemny welon utrzymuje kontrast herbow, liczb i podpisow. */
+body:has(.hud) .mapwrap .hexsvg{
+  background:
+    linear-gradient(180deg,rgba(3,10,7,.42),rgba(3,10,7,.72)),
+    url("../obrazki/ui-institution-map.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 32%,rgba(196,154,75,.22))!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.035),0 10px 22px rgba(0,0,0,.18)
+}
