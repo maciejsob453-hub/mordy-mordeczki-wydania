@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.125':{data:'8 sierpnia 2026', zmiany:[
+  'Przewodnictwo, zaplecza i cele dostaja osobna teczke partyjna zamiast wspolnego tla ekonomii.','Nowa faktura prowadzi wzrok do kart i zostawia spokojny srodek na liczby oraz opisy.',
+ ]},
  '1.1.124':{data:'8 sierpnia 2026', zmiany:[
   'Gorny pasek gry dostal wlasna scenografie command rail: skora, mosiadz i spokojny srodek dla zasobow.','HUD zachowuje responsywne trzy pasy na telefonie i czytelne liczby na desktopie.',
  ]},
