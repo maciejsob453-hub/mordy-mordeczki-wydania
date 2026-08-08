@@ -2137,6 +2137,20 @@ body:not(:has(.mg)) .veil .mdl>.h{
   border-bottom-color:color-mix(in srgb,var(--game-accent,var(--atlas-brass)) 58%,rgba(196,154,75,.4))
 }
 
+/* 1.1.141: wybieranie partii ma byc uroczystym wyborem teczki, nie lista na
+   wspolnym tle. Dwa boczne pulpity obrazu zostawiaja centrum dla karty FIF-y,
+   herbu i strzalek. */
+body:not(:has(.mg)):has(.partyselect) .partyselect.fifa{
+  background:linear-gradient(180deg,rgba(5,10,8,.12),rgba(5,10,8,.72)),url("../obrazki/ui-party-selection.webp") center/cover!important;
+  border-color:rgba(196,154,75,.44);
+  box-shadow:0 26px 64px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.05)
+}
+body:not(:has(.mg)):has(.partyselect) .partyselect.fifa>.pickmain{
+  background:linear-gradient(155deg,rgba(12,22,16,.9),rgba(3,9,7,.97)),url("../obrazki/ui-party-selection.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 54%,rgba(196,154,75,.4));
+  box-shadow:0 18px 42px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.05)
+}
+
 /* 1.1.123: dziewiec krokow kreatora nie jest juz poziomym paskiem na 320 px.
    Siatka 3x3 pokazuje cala sciezke od razu; opisy sa ukryte, ale numer i nazwa
    etapu zostaja, wiec nie trzeba zgadywac, gdzie jest final. */
