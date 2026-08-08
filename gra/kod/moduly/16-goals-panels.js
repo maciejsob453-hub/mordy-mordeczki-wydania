@@ -793,7 +793,7 @@ function sejmTab(){
     ${radaPodglad()}
     ${ustawyPodglad()}
     </div>
-    <table class="t"><thead><tr><th>Partia</th><th>Lider</th><th class="r">Mandaty</th><th>Status</th><th class="r">Relacja</th></tr></thead><tbody>
+    <details class="sejm-partietabela"><summary><span>Rozpiska klubów</span><em>${alive().length} partii · szczegóły</em></summary><div class="sejm-partieb"><table class="t"><thead><tr><th>Partia</th><th>Lider</th><th class="r">Mandaty</th><th>Status</th><th class="r">Relacja</th></tr></thead><tbody>
     ${alive().sort((a,b)=>G.p[b].seats-G.p[a].seats).map(k=>{const v=k===G.me?null:Math.round(G.rel[G.me][k]);
       return `<tr class="${k===G.me?'me':''}"><td><div class="nm">${crest(k,'s')}<span>${G.p[k].n}</span></div></td>
       <td><div class="nm">${leadAva(k,24)}<span class="dim">${leadName(k)}</span></div></td>
@@ -803,7 +803,7 @@ function sejmTab(){
         ${G.prez&&G.prez.party===k?'<span class="pill roy">prezydent</span>':''}
         ${k!==G.me&&G.p[k].plan?`<small class="aiintent">Cel: ${PLAN_OPIS[G.p[k].plan]||G.p[k].plan}</small>`:''}</td>
       <td class="r m" style="color:${v===null?'var(--dim2)':v<0?'var(--neg)':v>30?'var(--pos)':'var(--dim)'}">${v===null?',':(v>0?'+':'')+v}</td></tr>`}).join('')}
-    </tbody></table></div></div>`;
+    </tbody></table></div></details></div></div>`;
 }
 function feed(n){
   /* Kronika ma dawać ostatni puls kadencji, a nie drugi, ciasny ekran z własnym

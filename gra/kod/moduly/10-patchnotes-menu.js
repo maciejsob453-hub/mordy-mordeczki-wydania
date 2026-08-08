@@ -4,6 +4,13 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.92':{data:'8 sierpnia 2026', zmiany:[
+  'GRA MA ZEGAR. Decyzje przesuwaja dzien i godzine, a odnowa wraca po realnym czasie zamiast tylko po przerysowaniu ekranu.',
+  'COFNIETE OKNO COFA CZAS I OS CZASU. Pusty ruch nie zapelnia juz tygodnia ani harmonogramu.',
+  'DEBATY I SPOTY MAJA LOSOWE PYTANIA. Odpowiedzi korzystaja ze slawy, wiarygodnosci, kompetencji i jednosci.',
+  'PKB NIE DOSTAJE JUZ DARMOWEGO BONUSU ZA ZADOWOLENIE. Absolutorium ma mocna nagrode za wzrost i krytyczne straty za gleboki spadek.',
+  'KAPITAL ZAPLECZA JEST NIZEJ NIZ FORTUNY SERWERA, A ROZPISKA KLUBOW W SEJMIE JEST ZWIJANA.',
+ ]},
  '1.1.91':{data:'8 sierpnia 2026', zmiany:[
   'SEJM I WLADZA SA ZWARTE. Gabinet, rada i ustawy nie rozlewaja sie juz po pustej karcie, a sala ma mniejsze, rowno rozmieszczone miejsca.',
   'SKRAJNE KULKI SEJMU NIE SA OBCINANE. Luk dostal bezpieczny margines wewnatrz obrazu.',
@@ -828,7 +835,7 @@ function game(){
     </div>
     <div class="hudend">
       <button class="sndbtn" onclick="toggleMute()" title="${G.mute?'Włącz dźwięk':'Wycisz'}">${G.mute?'♪̸':'♪'}</button>
-      <div class="datechip" key="${G.term}-${G.week}"><b>${dateStr(gameDate())}</b><span>K${G.term} · tydzień ${G.week} z ${G.weeks} · dzień ${G.dzienTygodnia||1}/7</span></div>
+      <div class="datechip" key="${G.term}-${G.week}"><b>${dateStr(gameDate())}</b><span>K${G.term} · tydzień ${G.week} z ${G.weeks} · dzień ${G.dzienTygodnia||1}/7 · godz. ${String(G.godzina??8).padStart(2,'0')}:00</span></div>
       <button class="btn g sm" onclick="openSave()" title="Zapis i wczytanie">Zapis</button>
       <!-- wyjście do menu siedziało wcześniej dopiero w oknie zapisu i nikt go tam nie szukał -->
       <button class="btn g sm" onclick="doLobby()" title="Wyjście do menu głównego">Menu</button>
@@ -868,7 +875,7 @@ function game(){
       // zamknięte, żeby gracz od razu wiedział, co może odblokować w Sejmie.
       nv.push(['media','Media'+(mediaJest()?'':'<span class="badge wip">zamk.</span>')]);
       nv.push(['sad','Sąd'+(lawDone('sady')?'':'<span class="badge wip">zamk.</span>')]);
-      nv.push(['mordepedia','Mordepedia'+(lawDone('mordepedia')?'':'<span class="badge wip">zamk.</span>')]);
+      nv.push(['mordepedia','<span title="Mordepedia">Pedia</span>'+(lawDone('mordepedia')?'':'<span class="badge wip">zamk.</span>')]);
       return nv.map(([k,n])=>`<button class="${G.tab===k?'on':''}" onclick="setTab('${k}')">${n}</button>`).join('')})()}
   </div>
   <div class="layout">

@@ -59,13 +59,14 @@ const kasaSkrot=v=>{v=Math.abs(v||0);
 const KAP_OSOBY={
   // trzy fortuny, które same robią ponad połowę majątku serwera
   'Bartek':230e6, 'Tortex':185e6, 'loof':150e6,
-  // zaplecze, które ma więcej niż niejeden lider
-  'kenzo':96e6, 'Supernes':54e6, 'Mnem':38e6, 'Aryati':44e6,
+  // Zaplecze ma wpływ, ale nie przebija serwerowych fortun. Najbogatsi są
+  // wyjątkiem; osoby z drugiego szeregu pozostają wyraźnie niżej.
+  'kenzo':24e6, 'Supernes':14e6, 'Mnem':9e6, 'Aryati':16e6,
   // liderzy bez fortuny — kilkanaście milionów i tyle
   'Kromka':7.4e6, 'Vengeance':11e6, 'Maciek':9.2e6, 'impir':6.8e6, 'inwid':6.1e6,
   'Fazmiś':13e6, 'Kaziu':4.9e6, 'Sulejman':3.6e6, 'Peterdeus':12e6, 'Lager':10.5e6,
 };
-const KAP_POLKA={lider:14e6, glowny:2.2e6, zaplecze:52e3, wolny:2600};
+const KAP_POLKA={lider:14e6, glowny:1.5e6, zaplecze:30e3, wolny:2600};
 function rolaOsoby(n){
   if(!G||!G.p)return 'wolny';
   for(const k of alive()){
@@ -151,7 +152,9 @@ function pkbCzynniki(){
    {n:'Stabilność',        v:(stab-ktr)*.34+(G.gov&&G.pmOk?4:-9),
     o:`kontrowersja ${Math.round(ktr)} z ${stab} progu${G.gov&&G.pmOk?', rząd stoi':', rządu nie ma'}`},
    {n:'Inwestycje',        v:(akt-inw)*.30, o:`aktywność ${Math.round(akt)} z ${inw} progu`},
-   {n:'Zadowolenie ludzi', v:9-st*2.4, o:st?`podatek ${st}%`:'podatku od majątku nie ma'},
+   /* Zadowolenie jest ważne dla frekwencji i sondażu, ale nie jest już
+      darmowym mnożnikiem PKB. Sama ustawa podatkowa nie może dawać +9 do
+      obrotu tylko dlatego, że ktoś nazwał ją „zadowoleniem”. */
    {n:'Poparcie rządu',    v:G.gov?(G.gov.appr-50)*.22:-7,
     o:G.gov?`rząd ma ${Math.round(G.gov.appr)} poparcia`:'nie ma rządu, nie ma zaufania'},
    {n:'Skutki złych decyzji',v:-karaCiosow,
@@ -332,25 +335,33 @@ function absolutorium(){
   const zm=(koniec-start)/start*100;
   const pmK=G.gov.pm, pmP=G.p[pmK]; if(!pmP||pmP.dead)return;
   const szef=G.gov.pmLead||pmP.lead;
-  const udzielone=zm>=0;
+  const udzielone=zm>=0, mocne=zm>=12, krytyczne=zm<=-10;
   const zmiany=[];
   if(udzielone){
-    pmP.cred=cl(pmP.cred+4);pmP.fame=cl(pmP.fame+2);
-    zmiany.push(['Wiarygodność',4],['Sława',2]);
+    const cred=mocne?8:4,fame=mocne?5:2;
+    pmP.cred=cl(pmP.cred+cred);pmP.fame=cl(pmP.fame+fame);
+    zmiany.push(['Wiarygodność',cred],['Sława',fame]);
+    if(mocne){pmP.uni=cl(pmP.uni+3);G.prest=(G.prest||0)+8;if(pmK===G.me)G.kp+=12;zmiany.push(['Jedność',3],['Prestiż',8],['Kapitał partii',12])}
   }else{
     // spadek: wszystko w dół, ale proporcjonalnie do tego, jak głęboko
-    const s=Math.min(3.2,Math.abs(zm)/6);
+    const s=Math.min(6,Math.abs(zm)/4);
     const d=[['Wiarygodność',-(3+s*2.4),'cred'],['Sława',-(2+s*1.6),'fame'],
              ['Jedność',-(2+s*2.0),'uni'],['Aktywność',-(1+s*1.4),'act'],
              ['Kontrowersja',(3+s*2.8),'ctr']];
     d.forEach(([n,v,k])=>{const w=Math.round(v);pmP[k]=cl(pmP[k]+w);zmiany.push([n,w])});
     G.gov.appr=cl(G.gov.appr-Math.round(4+s*3));
     zmiany.push(['Poparcie rządu',-Math.round(4+s*3)]);
+    if(krytyczne){
+      const odpływ=Math.min(8,Math.max(2,Math.ceil(Math.abs(zm)/5)));
+      const q=typeof giveBackCap==='function'?giveBackCap(pmP,Math.max(1,Math.round(pmP.mem*odpływ/100))):{eli:0,int:0,ser:0};
+      const l=q.eli+q.int+q.ser;G.prest=Math.max(0,(G.prest||0)-10);G.kp=Math.max(0,G.kp-15);
+      if(l)zmiany.push(['Odpływ z partii',-l]);zmiany.push(['Prestiż',-10],['Kapitał partii',-15]);
+    }
   }
   G.absolutorium={term:G.term,zm,udzielone,pm:pmK,szef,start,koniec,zmiany};
   say(pmK===G.me
-    ?(udzielone?`<b>Sejm udzielił absolutorium.</b> PKB przez kadencję ${G.term} urosło o ${zm.toFixed(1)}%.`
-              :`<b>Sejm odmówił absolutorium.</b> PKB spadło o ${Math.abs(zm).toFixed(1)}%, ${szef} obrywa za gospodarkę.`)
+    ?(udzielone?`<b>Sejm udzielił absolutorium.</b> PKB przez kadencję ${G.term} urosło o ${zm.toFixed(1)}%. ${mocne?'To mocny mandat zaufania — nagrody są pełne.':''}`
+              :`<b>Sejm odmówił absolutorium.</b> PKB spadło o ${Math.abs(zm).toFixed(1)}%, ${szef} obrywa za gospodarkę. ${krytyczne?'Straty są krytyczne: odpływ ludzi, prestiżu i kapitału.':''}`)
     :`<b>${G.p[pmK].ab}: ${udzielone?'absolutorium udzielone':'absolutorium odmówione'}.</b> PKB ${zm>=0?'urosło':'spadło'} o ${Math.abs(zm).toFixed(1)}%.`,
     udzielone?'good':'bad');
   if(typeof document!=='undefined')setTimeout(oknoAbsolutorium,60);
@@ -375,9 +386,9 @@ function oknoAbsolutorium(){
      </table>
      <div class="absnag">Co z tego wynika dla premiera</div>
      <table class="abstab">${a.zmiany.map(wiersz).join('')}</table>
-     <p class="dim" style="font-size:12.5px;margin-top:12px">${a.udzielone
-       ? 'Gospodarka urosła, więc sejm nie ma się do czego przyczepić.'
-       : 'To nie jest wotum nieufności — rząd stoi dalej. Ale zostaje na papierze i widać to na wszystkim.'}</p>`,
+       <p class="dim" style="font-size:12.5px;margin-top:12px">${a.udzielone
+       ? (a.zm>=12?'Mocny wzrost gospodarczy daje pełne premie i zapisuje premiera jako budowniczego kadencji.':'Gospodarka urosła, więc sejm zatwierdza rozliczenie.')
+       : (a.zm<=-10?'Krytyczny spadek uruchamia odpływ ludzi i ciężar polityczny na następną kadencję.':'To nie jest wotum nieufności — rząd stoi dalej, ale wynik zostaje w kronice.')}</p>`,
     [{l:'Przyjmuję do wiadomości',f:()=>{close();render()}}]);
 }
 

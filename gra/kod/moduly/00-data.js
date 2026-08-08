@@ -72,6 +72,7 @@ const BAL={
   /* Dobę liczymy wewnątrz tygodnia. To nie kasuje limitu akcji — pokazuje
      tylko, że wiec, ustawa i zwykły post nie zajmują tyle samo czasu. */
   dniTygodnia:         7,
+  godzinTygodnia:      168,
   czasAkcjiMin:        1,
   czasAkcjiMax:        6,
 
@@ -610,7 +611,7 @@ function newGame(id){
      rng:RNG_STATE,aiMemory:{},aiLedger:[],
      /* Simulowany kalendarz: decyzje przesuwają dzień, a luka tygodnia nadal
         pozostaje cotygodniowym limitem akcji i rozliczeń. */
-     dzienTygodnia:1,czasTygodnia:0,harmonogram:[],pkbCiosy:[],
+     dzienTygodnia:1,czasTygodnia:0,czasGodzTygodnia:0,godzina:8,harmonogram:[],odnowy:{},pkbCiosy:[],
      /* Parametr jest wyłącznie dla automatycznego podglądu. Normalna gra startuje
         z dźwiękiem, a test nie budzi człowieka przy komputerze. */
      mute:typeof location!=='undefined'&&new URLSearchParams(location.search).has('mute'), night:null,

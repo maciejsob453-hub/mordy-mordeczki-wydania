@@ -228,11 +228,18 @@ function stolTygodnia(){
   const klucz=G.term+'-'+G.week;
   /* Stare zapisy mogły zawierać puste wpisy utworzone przez samo otwarcie okna.
      Nie pokazujemy ich jako wykonanych ruchów. Nowe wpisy mają znacznik ok. */
-  const zagrane=(G.stolTyg===klucz&&G.stol?G.stol:[]).filter(x=>
+  const surowe=(G.stolTyg===klucz&&G.stol?G.stol:[]).filter(x=>
     x&&x.ap>0&&(x.ok||Object.keys(x.zm||{}).length));
+  /* Stare zapisy potrafiły mieć ten sam ruch dwa razy po cofnięciu okna.
+     Stół nie może przez taki duplikat zapełnić całego tygodnia — token jest
+     jedynym źródłem prawdy, a całość tniemy do realnego limitu AP. */
+  const widziane=new Set(),zagrane=surowe.filter(x=>{
+    const k=x.token||`${x.id}|${x.n}`;if(widziane.has(k))return false;widziane.add(k);return true;
+  });
   const wolne=Math.max(0,Math.min(G.apMax,G.ap));
   const miejsca=[];
   zagrane.forEach(x=>{for(let i=0;i<x.ap;i++)miejsca.push(i===0?x:{ciag:x})});
+  miejsca.splice(G.apMax);
   for(let i=0;i<wolne;i++)miejsca.push(null);
   const plan=(G.harmonogram||[]).filter(x=>x&&x.tydzien===klucz).slice().reverse();
   return `<div class="stol">
@@ -304,10 +311,11 @@ function actCards(list,fx){
     const usedT=(a.term1&&G.useTerm[a.id]);
     const noShame=a.shame&&!(G.shame&&G.shame>G.week);
     const catFull=a.cat!=='spe'&&(G.catUsed[a.cat]||0)>=1;
+    const cdDo=(G.odnowy&&G.odnowy[a.id])||0, cd=cdDo>czasGlobalny();
     // decyzje z limitem tygodniowym (regeneracja): dwa razy i koniec
     const limT=!!a.tydz2&&((G.used2&&G.used2[a.id])||0)>=2;
     const kpC=Math.round(a.kp*sizeF(me()).kp*inflacja());   // cena z uwzględnieniem inflacji
-    const ok=G.ap>=a.ap&&G.kp>=kpC&&(a.en<0||G.en>=a.en)&&!done&&!usedT&&!limT&&!catFull&&!noShame&&!(a.id==='rekr'&&G.recCd>0);
+    const ok=G.ap>=a.ap&&G.kp>=kpC&&(a.en<0||G.en>=a.en)&&!done&&!usedT&&!limT&&!catFull&&!noShame&&!cd&&!(a.id==='rekr'&&G.recCd>0);
     const col=CATCOL[a.cat]||'var(--line2)';
     const cb=G.lastAct&&COMBO.find(c=>c.a===G.lastAct&&c.b===a.id);
     const katN=(CATS.find(x=>x[0]===a.cat)||['',''])[1]||'Ta kategoria';
@@ -315,6 +323,7 @@ function actCards(list,fx){
       // blokuje kategoria, nie ta jedna decyzja — bez tego wygląda to na zepsuty przycisk
       :limT?'wykorzystane dwa razy w tym tygodniu'
       :catFull?`nie ta decyzja — cała kategoria ${katN} zamknięta do przyszłego tygodnia`
+      :cd?`odnowa za ${Math.max(1,Math.ceil((cdDo-czasGlobalny())/24))} ${pl(Math.max(1,Math.ceil((cdDo-czasGlobalny())/24)),'dzień','dni','dni')}`
       :noShame?'dostępne tylko tuż po wpadce':(a.id==='rekr'&&G.recCd>0)?`nabór wraca za ${G.recCd} ${pl(G.recCd,'tydzień','tygodnie','tygodni')}`
       :G.ap<a.ap?'za mało akcji':G.kp<kpC?'za mało kapitału':(a.en>0&&G.en<a.en)?'za mało energii':'';
     const wym=[a.reg?'okręg':'',a.tem?'temat':'',a.tgt?'cel':'',a.seg?'grupa':''].filter(Boolean);
@@ -330,7 +339,7 @@ function actCards(list,fx){
         ${a.kp?`<span class="cst ${G.kp<kpC?'no':''}"><em>${ikona('kapital','mini')}kapitał</em>${kpC}</span>`:''}
         <span class="cst ${a.en>0?(G.en<a.en?'no':''):'yes'}"><em>${ikona('energia','mini')}energia</em>${a.en>0?'−'+Math.round(a.en*.82*sizeF(me()).en):'+'+(-a.en)}</span>
         ${f<.9?`<span class="cst ft"><em>zmęczenie</em>×${f.toFixed(2)}</span>`:''}
-        <span class="cst rt"><em>czas</em>${czasAkcji(a)} ${pl(czasAkcji(a),'dzień','dni','dni')}</span>
+        <span class="cst rt"><em>odnowa</em>${czasOdnowy(a)?Math.ceil(czasOdnowy(a)/24)+' '+pl(Math.ceil(czasOdnowy(a)/24),'dzień','dni','dni'):'natychmiast'}</span>
         ${cb?`<span class="cst ${cb.m>1?'yes':'no'}"><em>${cb.n}</em>×${cb.m.toFixed(2)}</span>`:''}
         ${wym.length?`<span class="cst dimx"><em>wybierasz</em>${wym.join(' + ')}</span>`:''}
         ${fx?`<span class="cst dimx"><em>kategoria</em>${katN}</span>`:''}
@@ -727,7 +736,7 @@ function agentBox(){
 let pend=null;
 function doAct(id){
   const a=A.find(x=>x.id===id);
-  if(G.ap<a.ap||G.kp<a.kp||(a.en>0&&G.en<a.en))return;
+  if(G.ap<a.ap||G.kp<a.kp||(a.en>0&&G.en<a.en)||((G.odnowy&&G.odnowy[id]||0)>czasGlobalny()))return;
   pend={a,t:null,r:null,s:null,tem:null};
   if(me().ctr>=70&&actFx(a.id).includes('ctr')&&!G.noWarn){
     return modal('Ostrożnie','Ta decyzja podbije kontrowersję',
@@ -751,20 +760,36 @@ function step(){
   if(a.id==='spot'&&!pend.miniDone)return miniGra('spot');
   fire(a,pend.t,pend.r,pend.s,pend.tem);
 }
-/* Debata i spot nie są już jednym rzutem kostką. Trzy krótkie decyzje tworzą
-   wynik, ale zwykła decyzja nadal pobiera tylko jeden slot kategorii. */
+/* Debata i spot są małymi scenkami, nie trzema zawsze takimi samymi guzikami.
+   Pytania losują się z puli, a odpowiedź liczy się przez cechy partii i lidera.
+   Dzięki temu kompetencja, wiarygodność i sława mają znaczenie w rozmowie, a
+   nie tylko w opisie karty decyzji. */
+const MINI_PYTANIA={
+  debata:[
+    {q:'Mordeczka pyta: „Skąd weźmiecie pieniądze na ten plan?”',o:[['Pokazuję liczby','Konkretny plan buduje zaufanie.',2,[['cred',.55],['komp',.45]]],['Odwracam temat','Widownia słyszy unik.',0,[['char',.35],['cred',-.35]]],['Atakuję rywala','Ostra kontra może odbić się rykoszetem.',1,[['char',.55],['ctr',-.25]]]]},
+    {q:'Rywal wyciąga starą aferę z twojej kroniki. Co robisz?',o:[['Przyznaję błąd','Szczerość kosztuje, ale odzyskuje wiarygodność.',2,[['cred',.6],['uni',.2]]],['To spisek','Twardy elektorat klaszcze, reszta patrzy krzywo.',1,[['char',.45],['ctr',-.5]]],['Pytam o jego afery','Zmieniasz temat, ale tracisz klasę.',0,[['char',.25],['cred',-.45]]]]},
+    {q:'Kanał pyta, czy po wyborach wejdziesz z rywalem do rządu.',o:[['Stawiam warunki','Nie obiecujesz za dużo i zostawiasz sobie ruch.',2,[['komp',.45],['cred',.35]]],['Nigdy z nimi','Twardość mobilizuje swoich, pali mosty.',1,[['uni',.45],['rel',-.2]]],['Zobaczymy','Elastyczność brzmi jak brak planu.',0,[['cred',-.3],['char',.25]]]]},
+    {q:'Ostatnie zdanie ma zostać jako nagłówek poranka.',o:[['„To dopiero początek”','Krótko i nośnie.',2,[['char',.55],['fame',.25]]],['Czytam program','Merytorycznie, ale bez iskry.',1,[['komp',.55],['fame',.1]]],['Wbijam szpilę','Może pójść viralowo albo boleśnie.',0,[['char',.35],['ctr',-.6]]]]},
+    {q:'Mordeczka prosi o jedną rzecz, której nie zrobisz jako premier.',o:[['Nie będę kłamać','Wysokie ryzyko, ale jasna granica.',2,[['cred',.6],['komp',.25]]],['Nie będę miękki','Podoba się radykałom.',1,[['uni',.35],['char',.3]]],['Nie odpowiem','Unikasz odpowiedzialności.',0,[['cred',-.55],['char',.2]]]]}
+  ],
+  spot:[
+    {q:'Pierwsze trzy sekundy spotu. Co widzi widz?',o:[['Tłum i emocje','Obraz zatrzymuje przewijanie.',2,[['fame',.55],['act',.3]]],['Dokument i liczby','Spokojny start dla cierpliwych.',1,[['cred',.5],['komp',.25]]],['Żart z rywala','Może zostać memem, może cringem.',0,[['char',.4],['ctr',-.45]]]]},
+    {q:'W środku spotu pada pytanie: „Co zmieni się jutro?”',o:[['Jedna konkretna rzecz','Obietnica ma kształt i cenę.',2,[['cred',.5],['komp',.45]]],['Wielka wizja','Dobrze brzmi, ale jest pusta.',1,[['fame',.35],['char',.25]]],['Wina poprzedników','Negatyw mobilizuje tylko część widowni.',0,[['ctr',-.5],['fame',.2]]]]},
+    {q:'Komentarze pod spotem zaczynają żyć własnym życiem.',o:[['Odpowiadam spokojnie','Moderacja i dialog ratują przekaz.',2,[['cred',.45],['uni',.3]]],['Dolewam oliwy','Zasięg rośnie, reputacja płonie.',1,[['fame',.45],['ctr',-.55]]],['Wyłączam komentarze','Porządek kosztem wiarygodności.',0,[['cred',-.35],['act',.2]]]]},
+    {q:'Ostatnie ujęcie ma pokazać lidera.',o:[['Wśród ludzi','Kontakt jest ważniejszy niż pomnik.',2,[['char',.45],['fame',.35]]],['Przy biurku','Kompetencja i urząd.',1,[['komp',.5],['cred',.25]]],['Na tle logo','Marka partii zostaje, człowiek znika.',0,[['fame',.25],['char',-.3]]]]}
+  ]
+};
+function miniWartosc(o){
+  const p=me(),ld=lead(G.me),wart=k=>k==='komp'||k==='char'||k==='wytrz'||k==='autor'?ld[k]||0:p[k]||0;
+  return Math.round((o[2]||0)+((o[3]||[]).reduce((s,[k,w])=>s+wart(k)*w/100,0))+R(-.35,.35));
+}
 function miniGra(typ){
   if(PROBA){pend.miniDone=1;pend.miniBonus=0;return step()}
-  if(!pend.mini)pend.mini={r:0,score:0};
-  const m=pend.mini, deb=typ==='debata',nr=m.r+1;
-  const q=deb?['Otwarcie: jak zaczynasz?','Kontra na zarzut rywala','Ostatnie zdanie do widowni'][m.r]
-    :['Pierwsze trzy sekundy spotu','Główna obietnica','Wezwanie do działania'][m.r];
-  const op=deb?[
-    ['Atakuję argument',3,'Ryzyko rośnie, ale rywal traci oddech.'],['Podaję konkretny fakt',2,'Spokojna odpowiedź buduje wiarygodność.'],['Gram empatią',1,'Mniej ostro, za to bliżej ludzi.']]:[
-    ['Mocny hak',3,'Zatrzymujesz przewijanie.'],['Twój program',2,'Widz wie, o co chodzi.'],['Żart i dystans',1,'Lekko, ale mniej treści.']];
-  modal(deb?`Debata · runda ${nr}`:`Spot · ujęcie ${nr}`,pend.a.n,
-    `<p>${q}</p><div class="note">Wybór nie jest automatyczny. Wynik trzech ruchów wpłynie na końcowy efekt.</div>`,
-    op.map(x=>({l:x[0],s:x[2],f:()=>{m.score+=x[1];m.r++;close();if(m.r<3)miniGra(typ);else{pend.miniBonus=m.score-6;pend.miniDone=1;step()}}})),
+  if(!pend.mini){const pula=(MINI_PYTANIA[typ]||[]).slice().sort(()=>rnd()-.5);pend.mini={r:0,score:0,pytania:pula.slice(0,3)};}
+  const m=pend.mini,deb=typ==='debata',nr=m.r+1,q=m.pytania[m.r]||MINI_PYTANIA[typ][0];
+  modal(deb?`Debata · runda ${nr}`:`Spot · decyzja ${nr}`,pend.a.n,
+    `<p>${q.q}</p><div class="note">Odpowiedź ma wagę zależną od twoich cech. Nie ma jednej zawsze dobrej opcji.</div>`,
+    q.o.map(o=>({l:o[0],s:o[1],f:()=>{m.score+=miniWartosc(o);m.r++;close();if(m.r<3)miniGra(typ);else{pend.miniBonus=Math.round(m.score-6);pend.miniDone=1;step()}}})),
     ()=>{pend=null;close();render()});
 }
 function fire(a,t,r,s,tm){
@@ -785,7 +810,10 @@ function fire(a,t,r,s,tm){
   // limity zapisujemy razem z kosztem, żeby rezygnacja w oknie cofnęła jedno i drugie
   G.stolSeq=(G.stolSeq||0)+1;
   const stolToken=G.stolSeq;
+  const czasPrzed={dzien:G.dzienTygodnia||1,czas:G.czasTygodnia||0,godz:G.czasGodzTygodnia||0,h:G.godzina||8,
+    odnowa:G.odnowy&&G.odnowy[a.id]||0};
   G.lastCharge={ap:a.ap,kp:Math.round(a.kp*kpMul),en:(a.en>0?a.en*enMul:a.en),id:a.id,cat:a.cat,token:stolToken,
+                czasPrzed,
                 term1:limitStad,once:razStad,
                 /* Cofnięcie musi przywrócić nie tylko walutę. Te trzy pola
                    sterują karą za pusty tydzień, kombinacją i limitem dwa razy
@@ -828,7 +856,10 @@ function fire(a,t,r,s,tm){
   /* Ruch wszedł do rozliczenia: od tej chwili widać, ile dni zajęła ta
      decyzja. Limit kategorii i akcje nadal są tygodniowe, więc nie da się
      obejść zasad przez szybkie klikanie. */
-  const dni=czasAkcji(a);przesunCzas(dni,a);
+  const dni=czasAkcji(a),wpisCzas=przesunCzas(dni,a);
+  if(!G.odnowy)G.odnowy={};
+  G.odnowy[a.id]=czasGlobalny()+czasOdnowy(a);
+  if(G.lastCharge)G.lastCharge.czasSeq=wpisCzas&&wpisCzas.seq;
   G.catUsed[a.cat]=(G.catUsed[a.cat]||0)+1;
   if(msg)say(`<b>${a.n}.</b> ${msg} <span class="dim">Czas: ${dni} ${pl(dni,'dzień','dni','dni')}.</span>`);
   else if(!PROBA)say(`<b>${a.n}.</b> Decyzja rozpoczęta. Potrwa około ${dni} ${pl(dni,'dzień','dni','dni')}.`,'roy');
@@ -914,6 +945,8 @@ function oddajOplate(){
   if(c.once)delete G.once[c.id];
   if(G.lastAct===c.id)G.lastAct=c.lastActPrzed||null;
   if(G.actedWeek===G.term+'-'+G.week)G.actedWeek=c.actedWeekPrzed||null;
+  if(c.czasPrzed){G.dzienTygodnia=c.czasPrzed.dzien;G.czasTygodnia=c.czasPrzed.czas;G.czasGodzTygodnia=c.czasPrzed.godz;G.godzina=c.czasPrzed.h;if(Array.isArray(G.harmonogram)&&c.czasSeq)G.harmonogram=G.harmonogram.filter(x=>x.seq!==c.czasSeq)}
+  if(!G.odnowy)G.odnowy={};if(c.czasPrzed)G.odnowy[c.id]=c.czasPrzed.odnowa;else delete G.odnowy[c.id];
   G.lastCharge=null;
 }
 function actBack(){   // rezygnacja w oknie decyzji oddaje to, co pobrała sama decyzja

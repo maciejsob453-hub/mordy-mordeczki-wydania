@@ -604,6 +604,14 @@ body:not(:has(.mg)) .wazwiecej{align-self:center;color:var(--dim2);font:10px var
 .sejmgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 @media(max-width:1260px){.wladza{grid-template-columns:repeat(2,minmax(0,1fr))!important}.sejmgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:760px){.wladza,.sejmgrid{grid-template-columns:1fr!important}}
+
+/* Rozpiska wszystkich klubów jest referencją, nie głównym ekranem. Domyślnie
+   pokazujemy tylko jej nagłówek; rozwinięcie nie zmienia kolejności węzłów. */
+.sejm-partietabela{margin-top:11px;border:1px solid var(--line);border-radius:9px;background:rgba(0,0,0,.13);overflow:hidden}
+.sejm-partietabela>summary{display:flex;align-items:center;gap:9px;padding:11px 14px;cursor:pointer;list-style:none;color:var(--tx)}
+.sejm-partietabela>summary::-webkit-details-marker{display:none}.sejm-partietabela>summary:before{content:'+';display:grid;place-items:center;width:20px;height:20px;border:1px solid var(--line2);border-radius:50%;color:var(--game-accent);font:700 14px var(--m)}
+.sejm-partietabela[open]>summary:before{content:'−'}.sejm-partietabela>summary span{font:600 15px var(--ser,Georgia,serif)}.sejm-partietabela>summary em{margin-left:auto;color:var(--dim2);font:10px var(--m);font-style:normal;letter-spacing:.08em}.sejm-partieb{padding:0 12px 10px;overflow:auto}
+.sejm-partietabela .t{margin:0}.sejm-partietabela .t td,.sejm-partietabela .t th{padding:7px 8px;font-size:11.5px}
 body:not(:has(.mg)) .pick.v3.scenv3 .scenrow{min-height:128px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr auto;align-content:start;text-align:left}
 body:not(:has(.mg)) .scenv3 .scenrow .pcname{grid-column:1;grid-row:1;font-family:var(--fd);font-size:19px;color:#f0ead8}
 body:not(:has(.mg)) .scenv3 .scenrow .scenopis{grid-column:1/-1;grid-row:2;margin-top:8px;color:#aeb9ae;font-size:11.5px;line-height:1.42;font-family:var(--f);letter-spacing:0;font-weight:400}

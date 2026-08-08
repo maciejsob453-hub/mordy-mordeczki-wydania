@@ -112,7 +112,7 @@ function endWeek(){
   if(!ostatniTydzien)G.week++;
   /* Nowy tydzień zaczyna się od pierwszego dnia, ale historia czasu zostaje
      w zapisie, żeby gracz widział rytm decyzji zamiast teleportu bez śladu. */
-  G.dzienTygodnia=1;G.czasTygodnia=0;
+  G.dzienTygodnia=1;G.czasTygodnia=0;G.czasGodzTygodnia=0;G.godzina=8;
   dateAnim={from:dateFrom,to:gameDate()};
   G.apMax=apBase();G.ap=G.apMax;
   G.sztab=G.sztabMax=5+Math.floor(p.mem/22);

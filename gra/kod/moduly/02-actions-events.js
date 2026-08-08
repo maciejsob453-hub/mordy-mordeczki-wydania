@@ -18,6 +18,16 @@ function sizeF(p){ // im większa partia, tym drożej się nią rusza: decyzja t
 const RT_DNI={wiec:2,kanwas:2,spot:3,debata:4,memy:1,manifest:4,rekr:3,trening:3,szkol:2,statut:4,czyst:5,zjazd:6,
   wywiad:2,kulisy:2,werb:3,przekw:2,kampania_prm:4,luz:1,konsult:2,przepr:2,podkup:3,admin:5,
   chlodzenie:2,depret:1,ustawa:5,oredzie:3,dymisja:3,zmianaMin:3,rozwiaz:5,wotum:4,oredzieP:3,sabotaz:4,odp:1};
+/* Odnowa jest osobnym zegarem. Akcja może zużyć slot tygodnia, ale jej
+   następne użycie wraca dopiero po realnym czasie, a nie po samym renderze. */
+const ODNOWA_GODZ={wiec:30,kanwas:24,spot:48,debata:96,memy:18,manifest:96,rekr:120,
+  trening:72,szkol:48,statut:96,czyst:120,zjazd:168,wywiad:36,kulisy:36,werb:48,
+  przekw:48,kampania_prm:96,luz:18,konsult:48,przepr:36,podkup:72,admin:120,
+  chlodzenie:36,depret:36,ustawa:120,oredzie:72,dymisja:72,zmianaMin:72,rozwiaz:120,
+  wotum:96,oredzieP:72,sabotaz:96,odp:24};
+const czasGlobalny=()=>G?((G.term||1)*1000+(G.week||1))*168+(G.czasGodzTygodnia||0):0;
+const czasOdnowy=a=>Math.max(0,Math.round(+((a||{}).odnowa||ODNOWA_GODZ[(a||{}).id]||0)));
+const odnowaPozostala=a=>Math.max(0,Math.ceil((((G.odnowy&&G.odnowy[a.id])||0)-czasGlobalny())/24));
 function czasAkcji(a){
   if(!a)return 1;
   const dom=RT_DNI[a.id]||Math.max(1,Math.ceil((a.ap||1)*1.35));
@@ -27,10 +37,14 @@ function przesunCzas(dni,a){
   if(!G||PROBA)return;
   const d=cl(Math.round(+dni||1),1,BAL.czasAkcjiMax);
   const start=G.dzienTygodnia||1,koniec=Math.min(BAL.dniTygodnia,start+d);
-  G.czasTygodnia=(G.czasTygodnia||0)+d;G.dzienTygodnia=koniec;
+  G.czasTygodnia=(G.czasTygodnia||0)+d;G.czasGodzTygodnia=(G.czasGodzTygodnia||0)+d*24;
+  G.dzienTygodnia=koniec;G.godzina=(8+(G.czasGodzTygodnia%24))%24;
   if(!Array.isArray(G.harmonogram))G.harmonogram=[];
-  G.harmonogram.unshift({id:a&&a.id||'',n:a&&a.n||'Decyzja',od:start,do:koniec,dni:d,tydzien:G.term+'-'+G.week});
+  G.czasSeq=(G.czasSeq||0)+1;
+  const wpis={seq:G.czasSeq,id:a&&a.id||'',n:a&&a.n||'Decyzja',od:start,do:koniec,dni:d,tydzien:G.term+'-'+G.week};
+  G.harmonogram.unshift(wpis);
   if(G.harmonogram.length>24)G.harmonogram.pop();
+  return wpis;
 }
 const A=[
 /* --- kampania --- */
