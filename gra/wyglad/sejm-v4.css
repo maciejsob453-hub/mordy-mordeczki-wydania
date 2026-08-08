@@ -2664,3 +2664,12 @@ body:has(.hud) .mapwrap .hexsvg{
   border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 32%,rgba(196,154,75,.22))!important;
   box-shadow:inset 0 1px rgba(255,255,255,.035),0 10px 22px rgba(0,0,0,.18)
 }
+
+/* 1.1.169: zamkniete pokoje maja na telefonie naglowek zawijany na dwie
+   linie. Wiekszy oddech linii zapobiega ucieciu dolu liter przez winiete. */
+@media(max-width:420px){
+  body:has(.hud) .sadzamkniety .sadhero h2,
+  body:has(.hud) .mediazamkniete .sadhero h2{
+    line-height:1.18!important;margin-bottom:7px!important
+  }
+}
