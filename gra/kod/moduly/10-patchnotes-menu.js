@@ -4,6 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.113':{data:'8 sierpnia 2026', zmiany:[
+  'Naprawiony konflikt stylow HUD-u na telefonach: zasoby sa faktycznie widoczne, a nie tylko zadeklarowane w CSS.',
+ ]},
+ '1.1.112':{data:'8 sierpnia 2026', zmiany:[
+  'Na malych ekranach HUD pokazuje teraz kapitał, energie, sondaz i mandaty w kompaktowym przewijanym rejestrze zamiast je chowac.',
+ ]},
  '1.1.111':{data:'8 sierpnia 2026', zmiany:[
   'Naglowki Sondazu i Krola korzystaja teraz z wlasnych scenografii zamiast zmieniac material na mapowy.',
  ]},

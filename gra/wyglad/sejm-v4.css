@@ -1956,3 +1956,20 @@ body:has(.hud) .widok[data-tab="krol"]>.card:last-child>.b>.minrow{min-width:0;b
   body:has(.hud) .widok[data-tab="partie"] .benchgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
   body:has(.hud) .widok[data-tab="krol"]>.card:last-child>.b{grid-template-columns:minmax(0,1fr);min-width:0;overflow:hidden}
 }
+
+/* Na telefonie nie chowamy zasobow. HUD sklada sie w trzy krotkie pasy, a
+   same odczyty przewijaja sie wewnatrz srodkowego pasa zamiast znikac. */
+@media(max-width:720px){
+  body:not(:has(.mg)) .hud{display:grid!important;grid-template-columns:1fr!important;gap:6px;align-items:stretch;padding:7px 9px;min-height:0}
+  body:not(:has(.mg)) .hud .id{width:auto;max-width:none;padding:2px 0 6px;border-right:0;border-bottom:1px solid rgba(196,154,75,.24)}
+  body:not(:has(.mg)) .hud .id .crest{width:34px;height:34px}
+  body:not(:has(.mg)) .hudcenter{width:auto;min-width:0;grid-template-columns:1fr!important;gap:2px;overflow:hidden;padding:3px}
+  body:not(:has(.mg)) .hudcenter .rgroup{display:flex!important;min-width:0;overflow-x:auto;scrollbar-width:none}
+  body:not(:has(.mg)) .hudcenter .rgroup::-webkit-scrollbar{height:0}
+  body:not(:has(.mg)) .hudcenter .rgroup+.rgroup{border-left:0;border-top:1px solid rgba(196,154,75,.2);padding:4px 2px 0}
+  body:not(:has(.mg)) .hudcenter .rgroup .rs{flex:none;min-width:96px;padding:5px 8px}
+  body:not(:has(.mg)) .hudend{width:auto;min-width:0;margin:0;padding:0;justify-content:flex-start;flex-wrap:wrap;gap:5px}
+  body:not(:has(.mg)) .hudend .datechip{order:-1;flex:1 1 180px;min-width:0}
+  body:not(:has(.mg)) .hudend .datechip span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body:not(:has(.mg)) .hudend>.btn.tura{flex:1 1 150px;min-width:0}
+}
