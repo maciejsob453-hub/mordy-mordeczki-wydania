@@ -2704,3 +2704,16 @@ body:has(.kreekran) *::-webkit-scrollbar-thumb:hover{
     flex-wrap:nowrap!important;white-space:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important
   }
 }
+
+/* 1.1.172: dymek zasobu nie moze kurczyc sie do szerokosci slowa, gdy
+   rodzic jest poziomym rejestrem. Na telefonie grupy mieszcza sie bez
+   przewijania, wiec pozwalamy dymkowi wyjsc nad nimi i dajemy mu bezpieczna
+   szerokosc wzgledem viewportu. */
+@media(max-width:720px){
+  body:has(.hud) .hudcenter .rgroup{overflow:visible!important}
+  body:has(.hud) .hud .tipbox{
+    width:min(330px,calc(100vw - 20px))!important;
+    max-width:calc(100vw - 20px)!important;box-sizing:border-box!important;
+    white-space:normal!important
+  }
+}
