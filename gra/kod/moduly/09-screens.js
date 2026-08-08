@@ -816,6 +816,8 @@ function waznePozycje(){
   });
   if(goalReady())
     w.push({i:'★',n:'Cel partyjny gotowy',d:'Warunki spełnione — możesz go odebrać.',t:'cele',pilne:1});
+  if(typeof nationalGoalReady==='function'&&nationalGoalReady())
+    w.push({i:'◆',n:'Cel narodowy w toku',d:'Dziennik przełomów odlicza dni. Otwórz zakładkę Celów, żeby zobaczyć warunek i postęp.',t:'cele'});
   if(leads(G.p[G.me]).some(n=>xpOs(n)>=35))
     w.push({i:'▲',n:'Doświadczenie do wydania',d:'Przewodniczący może podnieść cechę albo kupić nową.',t:'lider'});
   if(kingFav(G.me)<0)
