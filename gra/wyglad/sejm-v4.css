@@ -2033,3 +2033,14 @@ body:has(.hud) .sidebar>.card.skl{
   background:linear-gradient(150deg,rgba(25,40,32,.76),rgba(8,16,12,.95)),url("../obrazki/ui-sidebar-dossier.webp") 48% 55%/cover!important;
   background-blend-mode:normal,soft-light!important
 }
+
+/* 1.1.117: noc wyborcza i raport wyniku wychodza ze starej czerwonej tapety.
+   Nowa sala protokolow zostawia srodek pusty dla list i liczb, a komisje,
+   lampy i zapieczetowane koperty siedza tylko na obrzezach. */
+body:has(.nocekran),body:has(.wynik){
+  background:linear-gradient(180deg,rgba(4,9,7,.3),rgba(3,8,6,.82)),url("../obrazki/ui-election-protocol.webp") center top/cover fixed no-repeat!important
+}
+body:has(.nocekran) .nocekran,body:has(.wynik) .wynik{
+  background:linear-gradient(180deg,rgba(5,12,8,.42),rgba(4,10,7,.8)),url("../obrazki/ui-election-protocol.webp") center/cover!important;
+  border-color:rgba(196,154,75,.46);box-shadow:0 24px 56px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.05)
+}
