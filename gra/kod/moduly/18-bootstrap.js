@@ -90,21 +90,23 @@ function doLobby(){
 }
 function openSave(){
   close();
-  const code=saveCode();
+  const active=!!G;
+  const code=active?saveCode():'';
+  const saveInfo=active?`Długość: ${code.length} znaków · kadencja ${G.term}, tydzień ${G.week}, ${me().ab}`:'Brak aktywnej rozgrywki. Wklej kod poniżej, aby ją wczytać.';
   const v=document.createElement('div');v.className='veil';v.id='veil';
   v.innerHTML=`<div class="mdl"><button class="mdlx" type="button" aria-label="Zamknij">×</button>
     <div class="h"><div class="k">Zapis gry</div><h2>Kod zapisu</h2></div>
     <div class="bd">
       <p>Skopiuj kod i schowaj gdziekolwiek. Wklejenie go w polu niżej przywróci grę dokładnie w tym miejscu ,
       kadencję, skład partii, relacje, ustawy, okręgi i wszystko inne.</p>
-      <textarea class="ta" id="sc" style="min-height:110px;font-family:var(--m);font-size:11px" readonly>${code}</textarea>
-      <div style="font-size:12px;color:var(--dim2);margin:4px 0 14px">Długość: ${code.length} znaków · kadencja ${G.term}, tydzień ${G.week}, ${me().ab}</div>
+      <textarea class="ta" id="sc" style="min-height:110px;font-family:var(--m);font-size:11px" readonly>${active?code:'(Kod pojawi się po rozpoczęciu gry.)'}</textarea>
+      <div style="font-size:12px;color:var(--dim2);margin:4px 0 14px">${saveInfo}</div>
       <div style="font-family:var(--m);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:7px">Wczytaj zapis</div>
       <textarea class="ta" id="lc" style="min-height:80px;font-family:var(--m);font-size:11px" placeholder="Wklej kod zaczynający się od MM..."></textarea>
       <div id="lerr" style="font-size:12.5px;color:var(--neg);margin-top:6px"></div>
     </div>
     <div class="op">
-      <button class="opt" id="cp"><b>Kopiuję kod</b><span>Zaznacza całość, żeby wcisnąć Ctrl+C</span></button>
+      <button class="opt" id="cp" ${active?'':'disabled'}><b>Kopiuję kod</b><span>${active?'Zaznacza całość, żeby wcisnąć Ctrl+C':'Najpierw rozpocznij rozgrywkę'}</span></button>
       <button class="opt" id="ld"><b>Wczytuję wklejony zapis</b><span>Podmienia bieżącą rozgrywkę</span></button>
       <button class="opt" id="lob"><b>Wychodzę do menu</b><span>Rozgrywka przepadnie, jeśli nie masz kodu</span></button>
       <button class="opt" id="cl"><b>Wracam do gry</b><span></span></button></div></div>`;
