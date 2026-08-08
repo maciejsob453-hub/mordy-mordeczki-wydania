@@ -3,7 +3,7 @@
    Te same liczby, inne nawyki. Awanturnicy biją, dyplomaci budują relacje,
    spokojni rozbudowują partię. Bez tego wszystkie czternaście gra identycznie. */
 const CHAR={
- PPP :{agr:.85,bud:.55},  KK  :{agr:.25,bud:.75},  FD  :{agr:.55,bud:.70},
+ PPP :{agr:.68,bud:.60},  KK  :{agr:.25,bud:.75},  FD  :{agr:.55,bud:.70},
  PLR :{agr:.40,bud:.80},  NP  :{agr:.35,bud:.85},  PKD :{agr:.30,bud:.70},
  ROM :{agr:.60,bud:.60},  PP  :{agr:.50,bud:.75},  POJ :{agr:.78,bud:.50},
  NBR :{agr:.45,bud:.65},  ZHM :{agr:.35,bud:.65},  DPD :{agr:.35,bud:.72},

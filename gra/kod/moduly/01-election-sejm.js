@@ -34,7 +34,10 @@ function wyborczeZnuzenie(k){
     if(lider!==k)break;
     seria++;
   }
-  return cl(1-seria*.065,.72,1);
+  /* Seria byÅ‚a zbyt Å‚agodna: PPP potrafiÅ‚o wygrywaÄ‡ prawie kaÅ¼de wybory,
+     mimo Å¼e reszta sceny miaÅ‚a juÅ¼ ludzi i urzÄ™dy. Po drugim zwyciÄ™stwie
+     zmÄ™czenie ma byÄ‡ widoczne, ale nigdy nie kasuje dobrze prowadzonej partii. */
+  return cl(1-seria*.085,.65,1);
 }
 function score(k,r,s){
   const p=G.p[k]; if(p.dead)return 0;
