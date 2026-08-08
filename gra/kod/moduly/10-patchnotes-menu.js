@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.129':{data:'8 sierpnia 2026', zmiany:[
+  'Sad dostaje wlasna sale akt: lawa, kodeksy, waga i pieczecie buduja powage zamknietego dzialu.','Sprawy, glosowania i wyroki maja teraz spokojne centrum zamiast wspolnego tla rejestru.',
+ ]},
  '1.1.128':{data:'8 sierpnia 2026', zmiany:[
   'Mordepedia staje sie prawdziwym archiwum serwera: ksiegi, teczki i lampy prowadza wzrok do kronik.','Zamkniety dzial ma teraz wlasne tlo i nie korzysta juz ze starej tapety scenariuszowej.',
  ]},
