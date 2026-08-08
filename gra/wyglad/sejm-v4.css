@@ -34,6 +34,7 @@ body:has(.hud) .sidebar>.card.kronika .log{
   background:linear-gradient(90deg,rgba(4,10,8,.46),rgba(4,10,8,.12));
   border-left:1px solid rgba(196,154,75,.3);padding-left:12px
 }
+
 body:not(:has(.mg))::before{
   content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:linear-gradient(90deg,rgba(2,7,5,.9),transparent 23%,transparent 77%,rgba(2,7,5,.9)),
@@ -2412,4 +2413,18 @@ body:has(.hud) .sidebar>.card.kronika{
 body:has(.hud) .sidebar>.card.kronika .log{
   background:linear-gradient(90deg,rgba(4,10,8,.46),rgba(4,10,8,.12));
   border-left:1px solid rgba(196,154,75,.3);padding-left:12px
+}
+
+/* 1.1.150: przewodnictwo jest gabinetem lidera, nie kolejnym ogolnym
+   dossier. Portrety i decyzje zostaja czytelne, a dekoracja siedzi na brzegach. */
+body:has(.hud) .sidebar>.card.lead,
+body:has(.hud) .widok[data-tab="lider"]>.card{
+  background:linear-gradient(155deg,rgba(23,29,23,.84),rgba(6,12,9,.97)),url("../obrazki/ui-leadership-cabinet.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--game-accent,var(--atlas-brass))) 54%,rgba(196,154,75,.34));
+  box-shadow:0 20px 46px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.055)
+}
+body:has(.hud) .widok[data-tab="lider"] .leadhero,
+body:has(.hud) .sidebar>.card.lead .leadbox{
+  background:linear-gradient(90deg,rgba(5,12,8,.72),rgba(5,12,8,.18));
+  border-color:rgba(196,154,75,.26)
 }
