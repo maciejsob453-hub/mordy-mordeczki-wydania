@@ -2104,3 +2104,15 @@ body:has(.hud) .widok[data-tab="lider"] .act:hover:not([disabled]){
   body:has(.hud) .sejm-partietabela .t .nm span{min-width:0;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   body:has(.hud) .sejm-partietabela .t .crest.s{width:20px;height:20px;flex:none}
 }
+
+/* 1.1.123: dziewiec krokow kreatora nie jest juz poziomym paskiem na 320 px.
+   Siatka 3x3 pokazuje cala sciezke od razu; opisy sa ukryte, ale numer i nazwa
+   etapu zostaja, wiec nie trzeba zgadywac, gdzie jest final. */
+@media(max-width:420px){
+  body:not(:has(.mg)) .kresteps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;overflow:visible;padding:5px}
+  body:not(:has(.mg)) .kresteps .krestep{min-width:0;min-height:34px;height:34px;padding:4px 5px;gap:4px;justify-content:flex-start}
+  body:not(:has(.mg)) .kresteps .krestep i{width:17px;height:17px;flex:none;font-size:9px}
+  body:not(:has(.mg)) .kresteps .krestep span{min-width:0;display:block}
+  body:not(:has(.mg)) .kresteps .krestep b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;letter-spacing:.02em}
+  body:not(:has(.mg)) .kresteps .krestep small{display:none}
+}

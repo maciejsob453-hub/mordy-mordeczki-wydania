@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.123':{data:'8 sierpnia 2026', zmiany:[
+  'Kreator scenariuszy na telefonie pokazuje teraz dziewiec etapow w siatce 3x3 zamiast chowac je w poziomym pasku.','Numery i nazwy zostaja widoczne, a dluzsze opisy wracaja na szerokim ekranie.',
+ ]},
  '1.1.122':{data:'8 sierpnia 2026', zmiany:[
   'Tabela klubow w Sejmie miesci sie teraz na telefonie bez poziomego przewijania.','Na waskim ekranie zostaja partia, mandaty, status i relacja, a lider ma osobna zakladke.',
  ]},
