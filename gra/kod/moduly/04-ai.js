@@ -9,6 +9,15 @@ const CHAR={
  NBR :{agr:.45,bud:.65},  ZHM :{agr:.35,bud:.65},  DPD :{agr:.35,bud:.72},
  SS  :{agr:.35,bud:.90},
 };
+/* Tematy są tożsamością partii. Dzięki nim AI nie tylko „rozwija się” albo
+   „atakuje”, ale ma powód, żeby poprzeć konkretną ustawę. */
+const AI_AGENDA={
+ PPP:['media','event','zagadki'],POJ:['media','event','podatki'],
+ KK:['konst','sady','kodeks'],PLR:['konst','ordyn','mordepedia'],
+ FD:['ekon','podatki','man'],NP:['ekon','man','mordepedia'],DPD:['sady','man','ordyn'],
+ PKD:['podatki','ekon','ordyn'],PP:['media','cytaty','zagadki'],SS:['media','mordepedia'],
+ NBR:['konst','sady','podatki'],ZHM:['sady','kodeks','konst'],ROM:['ordyn','konst','event']
+};
 const AI_STYLE={
  domyslny:{n:'Charakter historyczny',agr:.5,bud:.7,media:.55,prawo:.55,koalicje:.55,ryzyko:.5},
  agresor:{n:'Agresor',agr:.95,bud:.38,media:.55,prawo:.28,koalicje:.18,ryzyko:.9},
@@ -21,12 +30,23 @@ const AI_STYLE={
 function aiProfil(k){
   const cfg=G&&G.aiProfile&&G.aiProfile[k],hist=CHAR[k]||{agr:.5,bud:.7},typ=cfg&&AI_STYLE[cfg.typ]?cfg.typ:'domyslny';
   const p=Object.assign({},AI_STYLE[typ]);if(typ==='domyslny')Object.assign(p,hist);
-  [['agresja','agr'],['rozwoj','bud'],['media','media'],['prawo','prawo'],['koalicje','koalicje'],['ryzyko','ryzyko']].forEach(([a,b])=>{if(cfg&&isFinite(+cfg[a])&&+cfg[a]>=0)p[b]=cl(+cfg[a]/100,0,1)});p.typ=typ;return p;
+  [['agresja','agr'],['rozwoj','bud'],['media','media'],['prawo','prawo'],['koalicje','koalicje'],['ryzyko','ryzyko']].forEach(([a,b])=>{if(cfg&&isFinite(+cfg[a])&&+cfg[a]>=0)p[b]=cl(+cfg[a]/100,0,1)});
+  p.typ=typ;p.agenda=cfg&&Array.isArray(cfg.agenda)?cfg.agenda.slice():((AI_AGENDA[k]||['ekon','media','sady']).slice());return p;
 }
 const charOf=k=>aiProfil(k);
+const aiAgenda=k=>aiProfil(k).agenda||[];
 function aiPamiec(k){
-  if(!G.aiMemory)G.aiMemory={};const m=G.aiMemory[k]||(G.aiMemory[k]={wrog:null,sojusznik:null,zdrady:{}}),inni=alive().filter(x=>x!==k);
+  if(!G.aiMemory)G.aiMemory={};const m=G.aiMemory[k]||(G.aiMemory[k]={wrog:null,sojusznik:null,zdrady:{},wpisy:[]}),inni=alive().filter(x=>x!==k);
+  m.wpisy=Array.isArray(m.wpisy)?m.wpisy:[];
   if(inni.length){m.wrog=inni.slice().sort((a,b)=>(G.rel[k][a]||0)-(G.rel[k][b]||0))[0];m.sojusznik=inni.slice().sort((a,b)=>(G.rel[k][b]||0)-(G.rel[k][a]||0))[0]}return m;
+}
+/* Relacja ma mieć pamięć zdarzeń, nie tylko bieżącą liczbę. */
+function aiPamietaj(k,typ,dane){
+  const m=aiPamiec(k);m.wpisy.push({t:absWeek(),typ,dane:dane||{}});
+  if(m.wpisy.length>18)m.wpisy.splice(0,m.wpisy.length-18);
+  if(!Array.isArray(G.aiLedger))G.aiLedger=[];
+  G.aiLedger.push({t:absWeek(),k,typ,dane:dane||{}});
+  if(G.aiLedger.length>80)G.aiLedger.splice(0,G.aiLedger.length-80);
 }
 
 /* Na co partia stawia w danym tygodniu. Na początku kadencji buduje zaplecze,
@@ -58,7 +78,7 @@ function aiWagi(k,p){
 }
 function aiLos(wagi){
   const suma=wagi.reduce((a,x)=>a+Math.max(0,x[1]),0)||1;
-  let x=Math.random()*suma;
+  let x=rnd()*suma;
   for(const [n,w] of wagi){x-=Math.max(0,w);if(x<=0)return n}
   return wagi[0][0];
 }
@@ -71,7 +91,7 @@ function aiOkreg(k,p){
     let rywal=0;alive().forEach(x=>{if(x!==k)rywal=Math.max(rywal,G.p[x].pres[r.id])});
     const luka=rywal-moja;
     const szansa=luka<=0?1.15:luka<26?1.7:.45;      // blisko lidera albo już na czele
-    const w=r.seats*szansa*(moja<10?.55:1)*(.85+Math.random()*.3);
+    const w=r.seats*szansa*(moja<10?.55:1)*(.85+rnd()*.3);
     if(w>najW){najW=w;naj=r}
   });
   return naj||pick(REG);
@@ -83,19 +103,50 @@ function aiCel(k,prog){
   // gdy formalnie nic do niego nie mają — dlatego hegemon łapie się na cel mimo dobrych relacji.
   const kand=alive().filter(x=>x!==k&&(G.rel[k][x]<prog||x===heg));
   if(!kand.length)return null;
-  return kand.map(x=>({x,w:(G.p[x].seats*2.2+G.p[x].fame/3+(G.p[x].mom||0))*(x===heg?2.4:1)*(x===pam.wrog?1.65:1)*(1+Math.min(1.2,(pam.zdrady[x]||0)*.28))*(.8+Math.random()*.4)}))
+  return kand.map(x=>({x,w:(G.p[x].seats*2.2+G.p[x].fame/3+(G.p[x].mom||0))*(x===heg?2.4:1)*(x===pam.wrog?1.65:1)*(1+Math.min(1.2,(pam.zdrady[x]||0)*.28))*(.8+rnd()*.4)}))
     .sort((a,b)=>b.w-a.w)[0].x;
+}
+
+/* Sąd też ma być częścią polityki, a nie ekranem, który otwiera wyłącznie
+   gracz. Bot może wnieść sprawę wtedy, gdy ma realny trop i odwagę, ale robi to
+   najwyżej raz w tygodniu. Tryb cichy omija zasoby gracza i pokazuje skutek
+   dopiero w kronice albo komunikacie, jeśli sprawa dotyczy jego partii. */
+function aiSad(k){
+  if(typeof sadWnies!=='function'||typeof sadSklad!=='function'||!lawDone('sady'))return;
+  if(sadSklad().length<2)return;
+  G.aiCourtWeek=G.aiCourtWeek||{};
+  if(G.aiCourtWeek[k]===absWeek()||!ch(.012+aiProfil(k).ryzyko*.028))return;
+  const cel=aiCel(k,10);if(!cel||cel===k||!G.p[cel]||G.p[cel].dead)return;
+  const nick=G.p[cel].lead;
+  const typ=['urzad','korupcja','procedura'][RI(0,2)];
+  const wynik=sadWnies(nick,typ,true);G.aiCourtWeek[k]=absWeek();
+  if(!wynik)return;
+  aiPamietaj(k,'pozew',{cel,zarzut:typ,wyrok:wynik.wyrok,wygrana:wynik.win});
+  aiPamietaj(cel,'pozew_otrzymany',{sprawca:k,zarzut:typ,wyrok:wynik.wyrok});
+  if(cel===G.me)say(`<b>${G.p[k].ab} kieruje sprawę do sądu.</b> ${wynik.win?'Zapadł wyrok: '+wynik.wyrok+'.':'Sędziowie oddalili ich zarzut.'}` ,wynik.win?'bad':'good');
 }
 
 function ai(){
   alive().forEach(k=>{
     if(k===G.me)return;const p=G.p[k],ld=lead(k);
+    /* Plan nie jest już wyrokiem na całą kadencję. Gdy partia straci rząd,
+       mandaty albo zjedzie pod próg, zmienia priorytet i pamięta dlaczego. */
+    if(p.planTerm===G.term&&p.plan){
+      const nowy=aiPlan(k);
+      if(nowy!==p.plan&&((p.plan==='wladza'&&!(G.gov&&G.gov.parties.includes(k)))||(p.plan==='premier'&&p.seats<3)||(p.plan==='rozbudowa'&&p.mem<8))){
+        const stary=p.plan;p.plan=nowy;aiPamietaj(k,'zmiana_planu',{z:stary,na:nowy});
+        say(`<b>${p.ab}</b> zmienia cel: ${PLAN_OPIS[nowy]||nowy}.`,'');
+      }
+    }
+    /* Bot ma ten sam tygodniowy limit ruchow co gracz. */
+    p.aiAp=Math.max(2,Math.min(4,3+(p.uni>=78?1:0)));
     aiZrzutka(k);          // po prywatne pieniądze sięga tylko partia pod kreską
     aiMedia(k);            // boty prowadzą własne wydawnictwa i też mają z nich zasięg
-    const n=Math.max(1, 1+Math.round(p.act/34)+Math.round((p.uni-46)/26));   // rozsypana partia działa wolniej
     const wagi=aiWagi(k,p);
-    for(let i=0;i<n;i++){
+    while(p.aiAp>0){
       const ruch=aiLos(wagi);
+      p.aiAp--;
+      aiPamietaj(k,'ruch',{typ:ruch,pozostalo:p.aiAp});
       if(ruch==='slawa'){const d=Math.max(.15,1-Math.pow(cl(p.fame/Math.max(p.pot,1),0,1.4),2.4));
         p.fame=cl(p.fame+R(1.8,4.4)*(.6+p.pot/150)*d*(.8+ld.char/250))}
       else if(ruch==='kondycja'){p.cred=cl(p.cred+R(1,2.8));p.uni=cl(p.uni+R(1,2.6))}
@@ -110,7 +161,10 @@ function ai(){
           if(!(t2===G.me&&me().pact[k]>G.week)){
             if(ch(.62)){const o=G.p[t2];o.fame=cl(o.fame-R(5,10));o.act=cl(o.act-R(6,12));
               REG.forEach(r2=>o.pres[r2.id]=cl(o.pres[r2.id]*.82));M(o,-6);
+              if(typeof sadTrop==='function')sadTrop(k,18+p.ctr*.12);
               const pm=aiPamiec(t2);pm.zdrady[k]=(pm.zdrady[k]||0)+1;
+              aiPamietaj(k,'sabotaz',{cel:t2,udany:true});
+              aiPamietaj(t2,'sabotaz',{sprawca:k,udany:true});
               G.rel[k][t2]=cl(G.rel[k][t2]-18,-100,100);G.rel[t2][k]=cl(G.rel[t2][k]-18,-100,100);
               if(t2===G.me)say(`<b>${p.ab} zorganizował sabotaż</b> na twoich kanałach, obecność i aktywność w dół.`,'bad')}
             else {p.cred=cl(p.cred-9);p.ctr=cl(p.ctr+14);p.fame=cl(p.fame-6);
@@ -121,12 +175,16 @@ function ai(){
         if(tg.length){const t=tg[0];
           if(t===G.me&&me().pact[k]>G.week)continue;
           if(ch(.62)){const o=G.p[t];o.fame=cl(o.fame-R(1.5,4));o.cred=cl(o.cred-R(1,3.5));p.ctr=cl(p.ctr+4);
+            if(typeof sadTrop==='function')sadTrop(k,10+p.ctr*.08);
             const pm=aiPamiec(t);pm.zdrady[k]=(pm.zdrady[k]||0)+1;
+            aiPamietaj(k,'atak',{cel:t,udany:true});
+            aiPamietaj(t,'atak',{sprawca:k,udany:true});
             G.rel[k][t]=cl(G.rel[k][t]-14,-100,100);G.rel[t][k]=cl(G.rel[t][k]-14,-100,100);
             if(t===G.me)say(`<b>${p.lead} (${p.ab})</b> uderzył w ciebie publicznie.`,'bad')}
           else p.cred=cl(p.cred-4)}}
       else p.act=cl(p.act+R(2,6));
     }
+    aiSad(k);
     // AI wymienia słabych liderów
     if(p.bench.length&&ch(.015+aiProfil(k).ryzyko*.035)){
       const best=p.bench.map(L).sort((a,b)=>b.avg-a.avg)[0];
@@ -204,7 +262,13 @@ function aiObsadzRade(){
   puste.forEach(res=>{
     const zajeci=Object.values(G.rada);
     const wolniZ=k=>roster(G.p[k]).filter(n=>!zajeci.includes(n)&&!isPrezPerson(n)&&!isMarPerson(n));
-    const bezTeki=g.parties.filter(k=>k!==pm&&resortyPartii(k)===0&&wolniZ(k).length);
+    const bezTeki=g.parties.filter(k=>k!==pm&&wolniZ(k).length)
+      .sort((a,b)=>{
+        const da=g.kontrakt&&g.kontrakt.demands&&g.kontrakt.demands[a];
+        const db=g.kontrakt&&g.kontrakt.demands&&g.kontrakt.demands[b];
+        const na=(da?da.resorty:1)-resortyPartii(a), nb=(db?db.resorty:1)-resortyPartii(b);
+        return nb-na||G.p[b].seats-G.p[a].seats;
+      });
     const swojeDosc=resortyPartii(pm)>=Math.ceil(RESORTY.length/2);
     const zrodlo=(swojeDosc&&bezTeki.length)?bezTeki[0]:(wolniZ(pm).length?pm:(bezTeki[0]||null));
     if(!zrodlo)return;
@@ -278,11 +342,13 @@ function aiTransfery(){
       if(wolni.length){
         const a=pick(wolni), koszt=agentCost(a.n,1);
         if(p.bank===undefined)p.bank=0;
-        if(p.mem>=6&&ch(cl(.30+p.fame/220,0,.75))){
+        if(p.mem>=6&&p.bank>=koszt&&ch(cl(.30+p.fame/220,0,.75))){
           if(!G.agents)G.agents={};
+          p.bank-=koszt;
           G.agents[a.n]=k;p.comp[a.seg]++;p.mem++;
           if(!p.bench.includes(a.n))p.bench.push(a.n);
-          say(`<b>${p.ab}</b> podpisuje transfer: <b>${a.n}</b> (${sn(a.seg)}).`);
+          aiPamietaj(k,'transfer',{osoba:a.n,koszt});
+          say(`<b>${p.ab}</b> podpisuje transfer: <b>${a.n}</b> za ${koszt} kapitału (${sn(a.seg)}).`);
         }
       }
     }
@@ -294,13 +360,14 @@ function aiTransfery(){
       const cele=alive().filter(x=>x!==k&&G.p[x].mem>4&&wolniZ(x).length);
       if(!cele.length)return;
       // najchętniej tam, gdzie jest z czego wybierać, a relacje nie są wrogie
-      const cel=cele.map(x=>({x,w:wolniZ(x).length*1.4+G.rel[k][x]/22+Math.random()*3}))
+      const cel=cele.map(x=>({x,w:wolniZ(x).length*1.4+G.rel[k][x]/22+rnd()*3}))
         .sort((a,b)=>b.w-a.w)[0].x;
       const o=G.p[cel];
       const pula=wolniZ(cel);
       const kto=pick(pula);
       const szansa=cl(.18+G.rel[cel][k]/260+(p.fame-o.fame)/300-o.uni/380,.06,.5);
       if(!ch(szansa)){
+        aiPamietaj(k,'transfer_odrzucony',{cel:cel,osoba:kto});
         G.rel[k][cel]=cl(G.rel[k][cel]-6,-100,100);G.rel[cel][k]=cl(G.rel[cel][k]-6,-100,100);
         if(cel===G.me)say(`<b>${p.ab}</b> próbował ściągnąć <b>${kto}</b> z twojej partii. Odmówił.`,'good');
         return;
@@ -309,6 +376,8 @@ function aiTransfery(){
       if(o.mem>1){o.comp[seg]>0?o.comp[seg]--:(o.comp.int>0?o.comp.int--:o.comp.ser--);o.mem--}
       o.main=o.main.filter(x=>x!==kto);o.bench=o.bench.filter(x=>x!==kto);
       p.comp[seg]++;p.mem++;if(!p.bench.includes(kto))p.bench.push(kto);
+      aiPamietaj(k,'transfer',{cel:cel,osoba:kto});
+      aiPamietaj(cel,'odebrany_transfer',{sprawca:k,osoba:kto});
       G.rel[k][cel]=cl(G.rel[k][cel]-16,-100,100);G.rel[cel][k]=cl(G.rel[cel][k]-16,-100,100);
       o.uni=cl(o.uni-4);
       if(cel===G.me)say(`<b>${p.ab} podebrał ci ${kto}.</b> Przeszedł do nich z całym dorobkiem.`,'bad');
@@ -391,4 +460,3 @@ function govLeave(c){
   if(s<MAJ){collapseGov(`${G.p[c].n} opuściło koalicję, rząd stracił większość.`);return}
   say(`<b>${G.p[c].ab} wychodzi z rządu.</b> Koalicja utrzymuje większość ${s}/${TOTAL_SEATS}.`,'bad');
 }
-

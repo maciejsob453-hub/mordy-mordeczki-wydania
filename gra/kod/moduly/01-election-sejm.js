@@ -10,14 +10,37 @@ function doganianie(k){
   if(zywe.length<3)return 1;
   const naj=Math.max(...zywe.map(x=>G.p[x].seats));
   if(naj<5)return 1;                       // przy rozdrobnionym sejmie nie ma kogo doganiać
+  const lider=zywe.find(x=>G.p[x].seats===naj);
+  if(k===lider){
+    const drugi=Math.max(...zywe.filter(x=>x!==lider).map(x=>G.p[x].seats),0);
+    const przewaga=(naj-drugi)/Math.max(1,naj);
+    return 1-cl(przewaga*.40,0,.30);        // wygrany płaci za zbyt dużą przewagę
+  }
   const luka=cl((naj-G.p[k].seats)/naj,0,1);
   return 1+luka*BAL.doganianieSila;
+}
+/* Serwer szybko przyzwyczaja się do jednego zwycięzcy. To nie jest kara za
+   bycie dużą partią, tylko miękki hamulec na serię: po każdym kolejnym
+   zwycięstwie tej samej partii część niezdecydowanych szuka kogoś nowego.
+   Liczymy wyłącznie pełne, zakończone wybory z historii, więc podgląd i
+   pierwsza kadencja nie dostają sztucznego minusa. */
+function wyborczeZnuzenie(k){
+  const h=G&&G.hist||[];let seria=0;
+  for(let i=h.length-1;i>=0;i--){
+    const s=h[i]&&h[i].seats;if(!s)break;
+    const zywe=Object.keys(s).filter(x=>G.p[x]&&!G.p[x].dead);
+    if(!zywe.length)break;
+    const lider=zywe.sort((a,b)=>(s[b]||0)-(s[a]||0))[0];
+    if(lider!==k)break;
+    seria++;
+  }
+  return cl(1-seria*.065,.72,1);
 }
 function score(k,r,s){
   const p=G.p[k]; if(p.dead)return 0;
   const a=p.aff[s.id]; if(a<=.05)return .0006;
   const ld=lead(k);
-  let v=Math.pow(a,1.32)*p.pull;
+  let v=Math.pow(a,1.32)*Math.pow(Math.max(.1,p.pull),BAL.pullWykladnik);
   v*=(0.44+p.fame/135);
   v*=(0.64+p.cred/200);
   /* Jedność liczy się, ale przestaje być najważniejsza. Wcześniej rozpięta była
@@ -47,6 +70,7 @@ function score(k,r,s){
   if(p.ctr>=96)v*=.68;  // twardy paraliż dopiero przy skrajnym skandalu
   v*=(1-znuzenie(k)/BAL.znuzenieSilaSondaz);   // zmęczenie władzą
   v*=doganianie(k);                            // głos protestu idzie do słabszych
+  v*=wyborczeZnuzenie(k);                     // seria zwycięstw nie może zabetonować sejmu
   if(G.gov){const g=G.gov.parties.includes(k);
     v*= g?(1+(G.gov.appr-50)/150):(1-(G.gov.appr-50)/300)}
   if(G.prez&&G.prez.party===k)v*=BAL.prezydentSondaz;

@@ -62,7 +62,9 @@ const BAL={
   prezydentSondaz:     1.12,
 
   // doganianie: ile poparcia dostaje partia wyraźnie mniejsza od czołówki
-  doganianieSila:      .30,
+  doganianieSila:      .42,
+  // duży zasięg daje więcej, ale nie liniowo; inaczej jedna partia zjada cały sondaż
+  pullWykladnik:       .62,
 
   // energia: ile jej wraca co tydzień i jak drogie są decyzje
   energiaBaza:         2.0,
@@ -80,9 +82,22 @@ const BAL={
   ustawyReszta:        .7,
 };
 
-const R=(a,b)=>a+Math.random()*(b-a), RI=(a,b)=>Math.floor(R(a,b+1));
+/* Losowość ma pamiętać stan razem z zapisem. Bez tego nie da się odtworzyć
+   błędu ani sprawdzić, czy AI naprawdę podjęło inną decyzję po poprawce. */
+let RNG_STATE=0x6d2b79f5;
+function rngSeed(seed){
+  const n=Number(seed);
+  RNG_STATE=(Number.isFinite(n)?Math.floor(n):0x6d2b79f5)>>>0;
+  if(!RNG_STATE)RNG_STATE=0x6d2b79f5;
+}
+function rnd(){
+  RNG_STATE=(Math.imul(RNG_STATE,1664525)+1013904223)>>>0;
+  if(G&&typeof G==='object')G.rng=RNG_STATE;
+  return RNG_STATE/4294967296;
+}
+const R=(a,b)=>a+rnd()*(b-a), RI=(a,b)=>Math.floor(R(a,b+1));
 const cl=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
-const ch=p=>Math.random()<p, pick=a=>a[Math.floor(Math.random()*a.length)];
+const ch=p=>rnd()<p, pick=a=>a.length?a[Math.floor(rnd()*a.length)]:undefined;
 const fmt=n=>n.toFixed(1).replace('.',',');
 const pl=(n,a,b,c)=>n===1?a:(n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?b:c);
 const esc=s=>String(s).replace(/'/g,"\\'");
@@ -234,12 +249,13 @@ function aiAgents(){
     p.bank=Math.min(260,(p.bank||0)+income(k).total);   // boty też nie zbierają w nieskończoność
     if(!ch(.18))return;
     const wolni=AGENTS.filter(a=>agentFree(a.n)).sort((a,b)=>b.kp-a.kp);
-    const a=wolni.find(x=>p.bank>=x.kp*2.2);
+    const a=wolni.find(x=>p.bank>=agentCost(x.n,1));
     if(!a)return;
-    p.bank-=a.kp*2.2;G.agents[a.n]=k;
+    const koszt=agentCost(a.n,1);
+    p.bank-=koszt;G.agents[a.n]=k;
     p.comp[a.seg]++;p.mem++;
     if(!p.bench.includes(a.n)&&p.bench.length<10)p.bench.push(a.n);
-    say(`<b>${p.ab} pozyskuje ${a.n}</b> (${sn(a.seg)}). Bezpartyjnych ubywa.`,'');
+    say(`<b>${p.ab} pozyskuje ${a.n}</b> za ${koszt} kapitału (${sn(a.seg)}). Bezpartyjnych ubywa.`,'');
   });
 }
 const LP={
@@ -337,7 +353,10 @@ const thrFor=n=>n<=1?THR.base:n<=2?THR.base+3:THR.base+8;
 
 /* ══════════ PARTIE ══════════ */
 const BASE={
- PPP :{n:'Partia Polskich Patriotów',ab:'PPP',c:'#237a3a',founded:'25.04.2025',pull:15.115,
+ /* PPP ma największy skład i startowe mandaty, więc nie potrzebuje drugiej,
+    ukrytej przewagi w mnożniku odbioru. Niższy pull zostawia jej charakter
+    lidera, ale pozwala kampanii i obecności innych partii realnie ją dogonić. */
+ PPP :{n:'Partia Polskich Patriotów',ab:'PPP',c:'#237a3a',founded:'25.04.2025',pull:10.800,
    fame:78,cred:50,uni:40,act:35,ctr:35,pret:30,mem:39,pot:74,diff:1,
    aff:{eli:1,int:4,ser:31}, comp0:[1,7,31],
    blurb:'Największa partia serwera. 39 osób, cztery mandaty i lider, który nie odpisuje na DM.',
@@ -555,6 +574,10 @@ const isPM=()=>!!(G.gov&&G.gov.pm===G.me&&G.pmOk);
 const hasPrez=()=>!!(G.prez&&G.prez.party===G.me);
 
 function newGame(id){
+  /* Nowa gra ma własny seed, a późniejsze rzuty zapisują się w G.rng. Dzięki
+     temu nowy start nadal jest różny, ale konkretny zapis jest powtarzalny. */
+  const seed=(Date.now()^String(id||'').split('').reduce((a,c)=>((a*33)^c.charCodeAt(0))>>>0,0))>>>0;
+  rngSeed(seed);
   const p={};
   PID.forEach(k=>{
     p[k]=Object.assign({},BASE[k]);
@@ -579,6 +602,7 @@ function newGame(id){
      gov:null,pmOk:false,pmProc:null,queue:[],phase:'camp',prest:0,hist:[],prev:null,
      turnout:.85,lup:{},recCd:0,xp:0,xpOs:{},traits:[],ptraits:{},tut:null,tutSeen:{},streak:0,noise:{},useTerm:{},catUsed:{},lastAct:null,
      king:{rel:52,paid:0}, sejmPrez:null, mar:null, goals:{}, agents:{}, agentWeek:null, sits:[], polls:[], scen:null,
+     rng:RNG_STATE,aiMemory:{},aiLedger:[],
      /* Parametr jest wyłącznie dla automatycznego podglądu. Normalna gra startuje
         z dźwiękiem, a test nie budzi człowieka przy komputerze. */
      mute:typeof location!=='undefined'&&new URLSearchParams(location.search).has('mute'), night:null,

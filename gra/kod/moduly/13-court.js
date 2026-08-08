@@ -18,6 +18,12 @@ function sadInit(){
   s.sedziowie=s.sedziowie.filter(x=>x&&x.n&&partiaOsoby(x.n));
   return s;
 }
+/* Każda brudna akcja dokłada ślad konkretnej partii. Dzięki temu sąd może
+   reagować także na działania AI, a nie tylko na decyzje gracza. */
+function sadTrop(k,ile){
+  if(!k||!lawDone('sady'))return;
+  const s=sadInit();s.tropy[k]=cl((s.tropy[k]||0)+Math.max(0,ile||0),0,60);
+}
 const sadNastawy=()=>lawDone('sady')?lawParams('sady'):{sklad:3,niezaleznosc:60,surowosc:50};
 function sadKandydaci(){
   const s=sadInit(), zajeci=new Set(s.sedziowie.map(x=>x.n));
@@ -378,8 +384,9 @@ function sidebar(p,q){
   </div></details>
   <details class="card sidefold rel" ${sideAttr('rel')}><summary><h3>Relacje</h3><span class="n">${alive().length-1} partii</span></summary><div class="b">
     ${alive().filter(k=>k!==G.me).sort((a,b2)=>G.rel[b2][G.me]-G.rel[a][G.me]).map(k=>{
-      const v=Math.round(G.rel[G.me][k]);
-      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12.5px">
+      const v=Math.round(G.rel[G.me][k]),am=G.aiMemory&&G.aiMemory[k],ostatni=am&&am.wpisy&&am.wpisy.length?am.wpisy[am.wpisy.length-1]:null;
+      const opis=ostatni?`${ostatni.typ} · tydzień ${ostatni.t%12||12}`:'brak ostatniej akcji';
+      return `<div class="relrow" title="Plan AI: ${G.p[k].plan?PLAN_OPIS[G.p[k].plan]||G.p[k].plan:'nieznany'} · Ostatnio: ${opis}" style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12.5px">
         ${crest(k,'s')}<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${G.p[k].ab} <span class="dim">${G.p[k].lead}</span></span>
         <b class="m" style="color:${v<0?'var(--neg)':v>30?'var(--pos)':'var(--dim)'}">${v>0?'+':''}${v}</b></div>`}).join('')}
   </div></details>`;

@@ -14,7 +14,7 @@ function buildEvents(){
   const n=ch(.14)?2:ch(.62)?1:0,q=[];
   for(let i=0;i<n;i++){
     const t=pool.reduce((a,x)=>a+x.w,0);if(!t)break;
-    let r=Math.random()*t,s=null;
+    let r=rnd()*t,s=null;
     for(const x of pool){r-=x.w;if(r<=0){s=x;break}}
     if(!s)break;pool.splice(pool.indexOf(s),1);
     if(s.e.dyn){let b=null;try{b=s.e.build()}catch(err){b=null} if(!b)continue;q.push(Object.assign({},s.e,b))}
@@ -73,7 +73,7 @@ function endWeek(){
     say('<b>Era niestabilności.</b> Grudniowo-styczniowy chaos na serwerze ułatwia podbieranie ludzi z innych partii, i tobie, i botom. Potrwa do końca stycznia.','roy');}
   else if(!isEraNiestab()&&G.eraNiestab===1){G.eraNiestab=2;
     say('<b>Era niestabilności się kończy.</b> Werbunek wraca do normy.','roy');}
-  if(G.gov)govTick();
+  if(G.gov){govTick();govKontraktTick();}
   if(G.gov&&G.pmOk){
     G.gov.parties.forEach(k=>{const q=G.p[k];
       const w=resortyPartii(k)/Math.max(1,RESORTY.length);

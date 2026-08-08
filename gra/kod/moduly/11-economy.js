@@ -294,7 +294,7 @@ function pkbTydzien(){
   G.pkbPop=G.pkb||pkbLicz();
   G.pkb=pkbLicz();
   G.pkbTempo=G.pkbPop?(G.pkb-G.pkbPop)/G.pkbPop:0;
-  radykalowieTydzien();              // radykałowie szkodzą, lojaliści trzymają
+  radykalowieWszystkim();             // każda partia płaci za własny rozjazd
   mediaTydzien();                    // wydawnictwa naliczają swoje koszty stałe
   dlugTydzien();                     // kto wszedł pod kreskę, ten zaczyna tonąć
   sprawdzRangi();                    // kto przekroczył próg, ten awansuje i płaci wpisowe
@@ -582,4 +582,3 @@ function kapitalTab(){
       tym mocniej, im grubszy portfel wydoisz. Przewodniczącego nie ruszysz.</div>
     </div></div>`;
 }
-

@@ -31,6 +31,10 @@ function loadCode(code){
   scenPartieAktywuj((s.G&&s.G.scen)||'zapis',s.SCEN_PARTIES||[],s.SCEN_GOALS||[],s.SCEN_EDITS||{});
   if(s.CUSTOM&&s.CUSTOM.id)registerCustom(s.CUSTOM);
   G=s.G;
+  /* Starsze zapisy nie mają RNG. Dostają stabilny seed z pozycji gry, a nowe
+     zapisują bieżący stan generatora, więc błąd można odtworzyć. */
+  rngSeed(G.rng||((G.term*1009+G.week*9176+String(G.me||'').length*37)>>>0));
+  G.rng=RNG_STATE;
   // partie dodane po powstaniu zapisu dolaczaja z wartosciami startowymi
   PID.forEach(k=>{if(!G.p[k]){
     const b=BASE[k],p2=Object.assign({},b);
@@ -46,6 +50,7 @@ function loadCode(code){
   }});
   PID.forEach(a=>{G.rel[a]=G.rel[a]||{};PID.forEach(b2=>{if(a!==b2&&G.rel[a][b2]===undefined)G.rel[a][b2]=RI(-8,26)})});
   G.goals=G.goals||{};G.agents=G.agents||{};G.tutSeen=G.tutSeen||{};G.sits=G.sits||[];G.polls=G.polls||[];
+  G.aiMemory=G.aiMemory||{};G.aiLedger=Array.isArray(G.aiLedger)?G.aiLedger:[];
   /* Zapis ze starszego wydania nie zna pól, które doszły później. Bez tego gra
      wywracała się przy pierwszym kliknięciu na „G.useTerm.stery” — a to znaczy,
      że gracz tracił rozgrywkę tylko dlatego, że wyszła nowa wersja. */
@@ -53,6 +58,12 @@ function loadCode(code){
   G.lup=G.lup||{};G.xpOs=G.xpOs||{};G.znuz=G.znuz||{};G.znuzKad=G.znuzKad||{};
   G.rada=G.rada||{};G.radaOd=G.radaOd||{};G.lawTerm=G.lawTerm||{};G.law=G.law||{};
   G.coal=G.coal||{};G.free=G.free||{eli:0,int:0,ser:0};G.king=G.king||{rel:52,paid:0};
+  if(G.gov&&!G.gov.kontrakt){
+    const tot=G.gov.parties.reduce((a,k)=>a+(G.p[k]?G.p[k].seats:0),0)||1,demands={};
+    G.gov.parties.forEach(k=>{const q=G.p[k],ud=q&&q.comp?Object.keys(q.comp).sort((a,b)=>q.comp[b]-q.comp[a])[0]:'ser';
+      demands[k]={resorty:k===G.gov.pm?Math.max(1,Math.round(RESORTY.length*.55)):Math.max(1,Math.round(RESORTY.length*(q?q.seats:0)/tot*.9)),temat:ud};});
+    G.gov.kontrakt={od:0,demands,obietnice:[]};
+  }
   if(typeof G.bezRzadu!=='number')G.bezRzadu=0;
   if(typeof G.xp!=='number')G.xp=0;
   if(typeof G.prest!=='number')G.prest=0;
@@ -133,11 +144,11 @@ function dead(){
   ${ekstopka('koniec tej rozgrywki','<button class="btn" onclick="newRun()">Od nowa</button>')}`)}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{radykalowie,iskra,waznePozycje,waznePasek,modyfikatory,podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{radykalowie,radykalowieWszystkim,iskra,waznePozycje,waznePasek,modyfikatory,podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,sideToggle,
-  openResort,startLaw,signLaw,premierTab,prezydentTab,
+  openResort,renegocjujKontrakt,startLaw,signLaw,premierTab,prezydentTab,
   closeFinalCamp,runFinalCamp,openEdycja,edytSet,edytOk,
   /* _we to jednorazowa flaga animacji wejścia. Ekran przerysowuje się po każdej
      decyzji, więc gdyby karty wjeżdżały za każdym razem, gra migałaby przy każdym
@@ -152,25 +163,26 @@ Object.assign(window,{radykalowie,iskra,waznePozycje,waznePasek,modyfikatory,pod
   RANGI,ranga,rangaNr,nastepnaRanga,mnoznikRangi,rangiStart,sprawdzRangi,absolutorium,
   rangaKoszt,rangaWymog,oknoAbsolutorium,sadTab,sadSklad,sadInit,sadZglos,sadWybierz,
   sadOpenSprawa,sadWnies,sadDowody,sadWymagaObslugi,sadTydzien,nagranieStart,liveLap,DANINA_ZA_PUNKT,NAGR_TRYBY,
-  mediaTab,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,mediaTydzien,mediaBilans,
+  mediaTab,mediaTydzien,mediaBilans,
   zasiegMediow,aiMedia,dlugTydzien,kieszenSzefa,MEDIA_ZASIEG,MEDIA_UTRZYMANIE,absWeek,tally,
-  mediaOdcinekGraj,mediaFilmGraj,serduszka,MEDIA_TYP,nagranieMAN,mediaNumer,mediaGotowe,mediaZa,mediaJest,
+  mediaOdcinekGraj,mediaFilmGraj,serduszka,MEDIA_TYP,nagranieMAN,mediaGotowe,mediaZa,mediaJest,
   setSel:s=>{G.sel=s;render()}, newRun:()=>{G=null;MODE=null;SCENSEL=null;MENU=true;render()}, nightStep,nightSkip,nightEnd,startNight,prezNightSkip,prezNightEnd,raport,kurier,toggleMute,pickScen,scenScreen,SCEN,openKreator,kreSet,kreEf,krePartia,krePole,kreWyczysc,KRE_PARTIA,kreatorZapisz,openMody,modUsun,burst,shake,histChart,histPush,SFX,graj,stopMuzyka,coGra,MUZYKA,fxFlush,statTip,streakMul,sitTick,sitBanner,sitActive,SITS,sitKraniecChoice,sitROMChoice,pickMode,backToMode,tutNext,tutSkip,startTutorial,tutBox});
 window.pickPartyKrok=pickPartyKrok;
 window.premierRozmowa=premierRozmowa;
 Object.assign(window,{kreMandat,kreResetMandaty,krePreset,kreRzadTryb,kreRzadTog,krePremier,
-  krePrezydentTryb,krePrezydent,kreRelacje,kreKrok,kreDalej,kreatorDoPliku,kreatorProbuj,
+  krePrezydentTryb,krePrezydent,kreRelacje,kreKrok,kreDalej,kreatorProbuj,
   kreNowaPartia,kreUsunPartie,kreNowaPole,kreNowaLogo,kreCelDodaj,kreCelUsun,kreCelWybierz,kreCelPole,
   kreMetaPole,kreMetaReset,kreMetaLogo,kreAiPole,kreRelUstaw,kreRelUsun,kreSwiatPole,kreObecnosc,
   kreWydDodaj,kreWydSzablon,kreWydDuplikuj,kreWydWybierz,kreWydUsun,kreWydPole,kreWydOpcjaDodaj,kreWydOpcjaUsun,kreWydOpcjaPole,
   kreatorDraftZapisz,kreatorDraftWczytaj,kreatorEksportJSON,kreatorImportJSON,kreatorPodglad,kreatorSymulator});
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
+  get rng(){return G&&G.rng},get aiLedger(){return G&&G.aiLedger||[]},
   get KRE(){return KRE}, SCEN, kreatorDane,
   myGoals,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,
   openDym,pusteResorty,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
   zawiedzeniKoalicjanci,demografiaSerwera,SERVER,SERVER_MAX,AGENTS,mogeZglosic,rozwiazChance,radaKto,RESORTY,pmOsoba,pmOsoby,leads,roster,
-  aiTransfery,aiOpozycja,aiObsadzRade,aiRekonstrukcja,znuzenie,hegemon,resortyPartii,leadWybrany,aiPlan,ustawPlany,
-  rozliczenieKadencji,sprawdzZapis,doganianie,repChetni,BAL,saveCode,loadCode,
+  aiTransfery,aiOpozycja,aiObsadzRade,aiRekonstrukcja,aiSad,znuzenie,hegemon,resortyPartii,leadWybrany,aiPlan,ustawPlany,aiPamiec,aiPamietaj,aiAgenda,govKontraktTick,
+  rozliczenieKadencji,sprawdzZapis,doganianie,wyborczeZnuzenie,repChetni,BAL,saveCode,loadCode,
   PATCHNOTE,patchDoPokazania,pokazPatch,ustawWersje,get WERSJA(){return WERSJA},
   naborOcena,panelGlosowania,KLOCKI,
   openWywiad,wywiadOdp,wywiadOczekiwany,WYWIAD_PYT,
@@ -180,7 +192,7 @@ window.__game={przewidz,podglad,get PROBA(){return PROBA},
   giveBackCap,prezRound1,prezRound2,runRunoff,memberFlow,prezWait,prezPush,openPush,crownPrez,hemi,pmBlocked,rotateBench,AVA,TEM,INNATE,conflictOf,buyTrait,buyStat,inflacja,inflacjaProc,INFLACJA_PROG,traitsOf,xpOs,xpPula,COMBO,ostatniWynik,hasCen,hasHeg,LOGOS,applyGoals,checkDeath,isPMperson,isPrezPerson,income,EV,wotumChance,prezGo,A,fire,me,topSeg,sejmVote,setGov,PID,REG,SEG,SID,BASE,COAL,LP,LEAD,THR,
   TOPUP,DIST_SEATS,TOTAL_SEATS,MAJ,accepts,thrFor,
   feed,runDateAnim,gameDate,dateStr,mapTab,actTab,pollTab,partieTab,sejmTab,leadTab,kingTab,sidebar,setup,pmScreen,prezScreen,marScreen,startMar,marContinue,marDeclare,isMar,isWice,isMarPerson,ownPool,bestRep,runRace,raceScore,results,TRAITS,sizeF,shown,enGain,pickMain,kingScore,kingFactors,kingFav,allBlocs,rebalanceSeats,isLead,lead,L,innAll,GOALS,openStery,sterySet,steryTog,steryOk,creditsBox,AUTORZY,TESTERZY,WERSJA,
-  LAWS,lawVote,proposeLaw,signLaw,odrzucenieWeta,PROG_WETO,applyLaw,lawDone,lawIntake,lawsPending,lawsToSign,startLaw,
+  LAWS,lawVote,proposeLaw,signLaw,odrzucenieWeta,PROG_WETO,applyLaw,lawDone,lawIntake,lawsPending,lawsToSign,startLaw,sadTrop,
   LAWPAR,lawEdytowalna,lawParams,radykalnosc,aiProposeLaw,openEdycja,rozstrzygnijUstawe,
   nastrojSejmu,bylWBloku,doLobby,rysujOkno,
   CHAR,AI_STYLE,charOf,aiProfil,aiWagi,aiLos,aiOkreg,aiCel,ai,POSTERS,aiCoal,aiGoals,aiAgents,campInit,aiPrzemiana,obsadz,openResort,premierRozmowa,partiaOsoby,premierTab,prezydentTab,TOTAL_SEATS_LIVE,

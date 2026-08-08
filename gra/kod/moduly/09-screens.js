@@ -818,7 +818,7 @@ function waznePozycje(){
 function waznePasek(){
   const w=waznePozycje(); if(!w.length)return '';
   return `<div class="wazne">
-    <span class="wazneet">Czeka na ciebie</span>
+    <span class="wazneet" title="Ważne rzeczy do zrobienia">!</span>
     <div class="waznelista">${w.map(x=>
       `<button class="waz ${x.pilne?'pilne':''}" onclick="setTab('${x.t}')" title="${esc(x.d)}">
         <i>${x.i}</i><span>${esc(x.n)}</span></button>`).join('')}</div>
@@ -882,14 +882,15 @@ function radykalowie(k){
   const loj=Math.round(p.mem*cl(p.cred/100*.42+p.uni/100*.30-p.ctr/100*.25,0,.7));
   return {rad:Math.max(0,rad),loj:Math.max(0,loj)};
 }
-function radykalowieTydzien(){
-  const p=me(), r=radykalowie(G.me);
+function radykalowieTydzien(k){
+  const who=k||G.me,p=G.p[who],r=radykalowie(who);
+  if(!p||p.dead)return;
   if(r.rad>0){
     // radykałowie sami z siebie podbijają kontrowersję i czasem wychodzą
     p.ctr=cl(p.ctr+Math.min(3.2,r.rad*.16));
     if(r.rad>=4&&ch(.18)){
       const g=giveBackCap(p,1),n=g.eli+g.int+g.ser;
-      if(n)say(`<b>Radykałowie odchodzą.</b> ${r.rad} ${pl(r.rad,'osoba jest','osoby są','osób jest')} `
+      if(n&&who===G.me)say(`<b>Radykałowie odchodzą.</b> ${r.rad} ${pl(r.rad,'osoba jest','osoby są','osób jest')} `
         +`nie do utrzymania przy tej kontrowersji — jedna właśnie trzasnęła drzwiami.`,'bad');
     }
   }
@@ -1031,6 +1032,12 @@ function sitKraniecEnd(){
   } else {
     q.uni=cl(q.uni+6);say('<b>Kraniec PPP rozstrzygnięty.</b> Nikt się nie zgłosił, Lager zostaje i partia dogorywa dalej.','bad');
   }
+}
+
+/* Każda partia przechodzi przez ten sam wewnętrzny rozjazd. Wcześniej tick
+   dotyczył tylko gracza, więc radykałowie AI byli dekoracją bez kosztu. */
+function radykalowieWszystkim(){
+  alive().forEach(k=>radykalowieTydzien(k));
 }
 function sitKraniecChoice(){
   const q=me(),kandydaci=[...new Set(q.bench.concat(q.main))].filter(n=>n!==q.lead);

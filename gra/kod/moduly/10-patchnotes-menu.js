@@ -4,12 +4,19 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.89':{data:'8 sierpnia 2026', zmiany:[
+  'SONDAZ MA MALEJACE ZWROTY Z DUZEGO ZASIEGU. PPP NIE MA JUZ PODWOJNEGO BONUSU, A PARTIE Z TYLU MOGA REALNIE DOGANIAC LIDERA.',
+  'SERYJNY ZWYCIEZCA PLACI ZA PRZEWAGE. Kolejne wygrane oddaja czesc niezdecydowanych konkurencji zamiast betonowac sejm.',
+  'AUDYTY NIE ZGLASZAJA JUZ FALSZYWYCH BRAKOW EKSPORTOW. Test balansu obsluguje tez wakaty rady, sad i okna decyzji.',
+ ]},
  '1.1.88':{data:'7 sierpnia 2026', zmiany:[
   'WYBOR PARTII DOSTAL KARUZELE JAK W FIFIE. Logo, nazwa i pelny profil sa na jednej karcie, a partie zmieniasz strzalkami.',
   'KOALICJANT MOZE ROZMAWIAC Z PREMIEREM O MINISTERSTWIE. Relacja i kompetencja zaplecza zmieniaja szanse zgody.',
   'SEDZIOW NIE MA JUZ Z AUTOMATU. Ustawe o sadzie trzeba domknac prawdziwymi glosowaniami, a sprawa bez dowodu nie ruszy.',
   'USTAWY MAJA OSOBNY PROCES, KONTROWERSJA PARALIZUJE DOPIERO PRZY 96, A SONDAZ I KROL DOSTALY NOWE NAGLOWKI. Bluetes i Pablo sa teraz w NP z mandatami.',
- ]},
+  'SONDAZ NIE JEST JUZ LINIOWY. Duzy zasieg ma malejace zwroty, seryjny zwyciezca placi za przewage, a partie z tylu dostaja szanse dogonienia.',
+  'PODGLAD DECYZJI NIE ZJADA LOSOWOSCI PRAWDZIWEJ GRY. Wynik proby jest powtarzalny, a prawdziwa decyzja zachowuje swoj wlasny rzut.',
+]},
  '1.1.87':{data:'7 sierpnia 2026', zmiany:[
   'KREATOR MA SYMULATOR TYGODNI. Sprawdzisz warunki, lancuchy i skutki wydarzen bez ruszania prawdziwej gry.',
   'WALIDATOR WYKRYWA PETLE, NIEOSIAGALNE WYDARZENIA, SPRZECZNE WARUNKI I BRAK PUNKTU STARTOWEGO.',

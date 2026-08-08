@@ -450,8 +450,8 @@ function burst(kolor,ile,mocno){
   const P=[];
   for(let i=0;i<(ile||90);i++)P.push({
     x:cv.width/2+R(-cv.width*.28,cv.width*.28), y:cv.height*.28+R(-40,40),
-    vx:R(-4,4), vy:R(-11,-3)*(mocno?1.3:1), g:.28+Math.random()*.12,
-    s:R(4,10), r:Math.random()*6.28, vr:R(-.25,.25), c:kol[RI(0,kol.length-1)], a:1});
+    vx:R(-4,4), vy:R(-11,-3)*(mocno?1.3:1), g:.28+rnd()*.12,
+    s:R(4,10), r:rnd()*6.28, vr:R(-.25,.25), c:kol[RI(0,kol.length-1)], a:1});
   let t=0;
   const rys=()=>{
     t++;ctx.clearRect(0,0,cv.width,cv.height);

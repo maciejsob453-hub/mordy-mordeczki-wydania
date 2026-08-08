@@ -94,7 +94,16 @@ function setGov(team,pm,appr){
   /* Sprawczość: czy ten rząd cokolwiek dowozi. Rośnie z każdą przegłosowaną ustawą,
      spada z każdą przegraną. Nie decyduje o wszystkim, ale premier, który przegrywa
      głosowanie za głosowaniem, przestaje być traktowany poważnie. */
-  G.gov={parties:team,pm,appr,minority:tot<MAJ?1:0,spraw:50,wygrane:0,przegrane:0};
+  /* Rząd dostaje kontrakt, nie tylko tablicę partii. Koalicjant ma od początku
+     zapisane, ile resortów powinien dostać i jaki temat będzie dla niego ważny. */
+  const demand={};
+  team.forEach(k=>{
+    const q=G.p[k],ud=q.mem?Object.keys(q.comp).sort((a,b)=>q.comp[b]-q.comp[a])[0]:'ser';
+    demand[k]={resorty:k===pm?Math.max(1,Math.round(RESORTY.length*.55)):
+      Math.max(1,Math.round(RESORTY.length*q.seats/Math.max(1,tot)*.9)),temat:ud};
+  });
+  G.gov={parties:team,pm,appr,minority:tot<MAJ?1:0,spraw:50,wygrane:0,przegrane:0,
+    kontrakt:{od:typeof absWeek==='function'?absWeek():0,demands:demand,obietnice:[]}};
   G.rada={};                                  // nowy rząd zaczyna od pustych krzeseł
   G.radaOd={};
   G.bezRzadu=0;                               // kryzys rządowy się skończył, licznik kar wraca do zera
@@ -103,6 +112,64 @@ function setGov(team,pm,appr){
 function resortyPartii(k){
   radaInit();
   return RESORTY.filter(r=>{const n=radaKto(r.id);return n&&partiaOsoby(n)===k}).length;
+}
+/* Kontrakt gabinetu żyje przez całą kadencję. Samo wejście do rządu nie
+   wystarcza: koalicjant sprawdza, czy dostał swoje krzesła i czy ktoś dowiózł
+   jego temat. Niespełnione ustalenia obniżają relację dopiero co kilka tygodni,
+   żeby nie zamienić gry w karę naliczaną co klatkę. */
+function govKontraktTick(){
+  const g=G.gov;if(!g||!g.kontrakt||!G.pmOk)return;
+  const TEMAT={eli:['ekon','podatki','konst'],int:['mordepedia','man'],ser:['media','zagadki','cytaty','event']};
+  g.parties.filter(k=>k!==g.pm&&G.p[k]&&!G.p[k].dead).forEach(k=>{
+    const d=g.kontrakt.demands&&g.kontrakt.demands[k];if(!d)return;
+    const ma=resortyPartii(k), temat=(TEMAT[d.temat]||[]).some(id=>G.lawBy&&G.lawBy[id]===k);
+    d.przydzielone=ma;d.tematDone=temat?1:0;
+    const poTerminie=G.week>=4, problem=ma<d.resorty||(poTerminie&&!temat);
+    if(!problem){d.status='spelniony';return}
+    d.status='zagrozony';
+    if(absWeek()<(d.ostatniaKara||-99)+2)return;
+    d.ostatniaKara=absWeek();
+    /* Kontrakt ma granicę. Gdy relacja spadnie poniżej -45, koalicjant nie
+       marudzi już w panelu, tylko formalnie wychodzi z rządu. Dzięki temu
+       zaniedbany temat może wywołać prawdziwy kryzys większości. */
+    const relPo=(G.rel[k]&&G.rel[k][g.pm])||0;
+    if(relPo<=-45&&typeof govLeave==='function'){
+      if(g.pm===G.me)say(`<b>${G.p[k].ab} wypowiada umowę.</b> Koalicjant opuszcza rząd, bo obietnice zostały złamane.`,'bad');
+      govLeave(k);
+      return;
+    }
+    const kara=ma<d.resorty?4:2;
+    G.rel[k][g.pm]=cl(G.rel[k][g.pm]-kara,-100,100);
+    G.rel[g.pm][k]=cl(G.rel[g.pm][k]-Math.round(kara*.55),-100,100);
+    G.p[k].mom=cl((G.p[k].mom||0)-1,-35,42);
+    if(g.parties.includes(G.me))say(`<b>${G.p[k].ab} rozlicza kontrakt.</b> Brakuje ${Math.max(0,d.resorty-ma)} resortów${!temat&&poTerminie?' i nie ruszył ich temat':''}. Relacje spadają.`,'bad');
+  });
+}
+
+/* Premier może raz na tydzień przestawić warunki umowy, zamiast czekać aż
+   koalicjant pęknie bez żadnej możliwości rozmowy. To nie daje darmowej
+   większości: kosztuje akcję polityczną, relację albo kapitał i zostawia ślad
+   w kontrakcie na resztę kadencji. */
+function renegocjujKontrakt(k){
+  /* Rozmowa nie zużywa jednego z trzech kafli akcji; blokada tygodniowa i koszt
+     relacji/kapitału pilnują, żeby nie dało się spamować jej w jednej turze. */
+  const g=G.gov,d=g&&g.kontrakt,q=d&&d.demands&&d.demands[k];
+  if(!g||g.pm!==G.me||k===G.me||!q||!G.p[k]||G.p[k].dead)return;
+  if(q.ostatniaRenegocjacja===absWeek())return modal('Kontrakt gabinetu','Rozmowa juĹĽ byĹ‚a',
+    `<p>Z ${G.p[k].ab} renegocjowaĹ‚eĹ› warunki w tym tygodniu. NastÄ™pna rozmowa bÄ™dzie moĹĽliwa po zmianie tygodnia.</p>`,[{l:'Rozumiem',f:close}],close);
+  const tematy=['ekon','podatki','konst','mordepedia','man','media','zagadki','cytaty'];
+  const nowy=tematy.find(id=>!(G.lawBy&&G.lawBy[id]===k))||q.temat;
+  const ab=G.p[k].ab;
+  const wykonaj=(typ,fn)=>{close();fn();q.ostatniaRenegocjacja=absWeek();
+    G.gov.spraw=cl((G.gov.spraw||50)-1);if(typeof aiPamietaj==='function')aiPamietaj(k,'renegocjacja',{typ});render()};
+  const opcje=[];
+  if(q.resorty>1)opcje.push({l:'Odpuść jedno ministerstwo',s:`Wymóg spada do ${q.resorty-1}. Relacja +4, sprawczość rządu -1.`,f:()=>wykonaj('resort',()=>{q.resorty--;G.rel[G.me][k]=cl(G.rel[G.me][k]+4,-100,100);G.rel[k][G.me]=cl(G.rel[k][G.me]+4,-100,100)})});
+  opcje.push({l:`Przestaw temat na ${sn(nowy)}`,s:'Nowa obietnica trafia do kontraktu i musi zostać dowieziona ustawą.',f:()=>wykonaj('temat',()=>{q.temat=nowy;q.tematDone=0;G.rel[G.me][k]=cl(G.rel[G.me][k]+3,-100,100);G.rel[k][G.me]=cl(G.rel[k][G.me]+3,-100,100)})});
+  if(G.kp>=20)opcje.push({l:'Dorzucam 20 kapitału',s:'Koalicjant dostaje polityczny budżet. Relacja +8.',f:()=>wykonaj('kapital',()=>{G.kp-=20;G.rel[G.me][k]=cl(G.rel[G.me][k]+8,-100,100);G.rel[k][G.me]=cl(G.rel[k][G.me]+8,-100,100)})});
+  opcje.push({l:'Jeszcze nie',s:'Nie zmieniasz umowy.',f:close});
+  modal('Kontrakt gabinetu',`Renegocjacja z ${ab}`,
+    `<p>${ab} ma zapisane <b>${q.resorty}</b> resorty i temat <b>${sn(q.temat)}</b>. Obecnie przydzielono <b>${q.przydzielone||resortyPartii(k)}</b>.</p>
+     <p class="dim">Każda zmiana zabiera ten tydzień rozmów. Umowa działa dopiero wtedy, gdy jej warunki są czytelne i rozliczalne.</p>`,opcje,close);
 }
 
 /* ══════════ PROCEDURA PREMIERA ══════════ */
@@ -525,4 +592,3 @@ function applyTheme(){
   R.setProperty('--glowa',`rgba(${rgb[0]},${rgb[1]},${rgb[2]},.16)`);
   R.setProperty('--glowb',`rgba(${rgb[0]},${rgb[1]},${rgb[2]},.07)`);
 }
-

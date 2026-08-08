@@ -128,7 +128,7 @@ function campInit(){
       ['atak',   .3+c.agr*1.9-(q.ctr>70?.8:0)],
     ];
     const suma=wagi.reduce((a,x)=>a+Math.max(0,x[1]),0);
-    let los=Math.random()*suma, wybor='ludzie';
+    let los=rnd()*suma, wybor='ludzie';
     for(const [id,w] of wagi){los-=Math.max(0,w);if(los<=0){wybor=id;break}}
     // malejące zwroty: dwa razy większy budżet nie daje dwa razy większej kampanii
     const ps=POSTERS.find(x=>x.id===wybor)||POSTERS[2], scale=Math.sqrt(amt/50);
@@ -802,7 +802,7 @@ function memberFlow(){
       const tot={eli:0,int:0,ser:0};let g=0;
       for(let i=0;i<n;i++){
         const w=from.map(r=>p.pres[r.id]+6);const sw=w.reduce((a,b)=>a+b,0);
-        let x=Math.random()*sw,pickR=from[0];
+        let x=rnd()*sw,pickR=from[0];
         for(let j=0;j<from.length;j++){x-=w[j];if(x<=0){pickR=from[j];break}}
         const got=drawFrom(pickR.id,1);
         tot.eli+=got.eli;tot.int+=got.int;tot.ser+=got.ser;
@@ -1000,7 +1000,7 @@ function prezStartNight(list){
   G.prezNight={rows:(list||[]).slice(),i:0,frames:13,done:false,total:Math.round(SERVER*turnout)};
 }
 function prezJitter(rows,t){
-  const noise=rows.map(()=>Math.random()+.15);
+  const noise=rows.map(()=>rnd()+.15);
   const ns=noise.reduce((a,b)=>a+b,0)||1;
   const spread=Math.max(0,1-t);
   return rows.map((x,i)=>({...x,pct:x.pct*(1-spread)+(noise[i]/ns*100)*spread}));

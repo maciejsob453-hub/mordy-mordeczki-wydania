@@ -230,7 +230,7 @@ function scenEventWybierz(e,k,opcja){
   say(`<b>${esc(e.nazwa)}.</b> ${esc(G.p[k].ab)}: ${esc(opcja.nazwa)}.`,opcja.klasa||'roy');
 }
 function scenEventAiOpcja(e,k){
-  const pr=aiProfil(k);return (e.opcje||[]).map((o,i)=>{const t=o.ai||{},ef=o.efekty||{};let s=1+Math.random()*1.2;
+  const pr=aiProfil(k);return (e.opcje||[]).map((o,i)=>{const t=o.ai||{},ef=o.efekty||{};let s=1+rnd()*1.2;
     s+=(+t.agresja||0)*pr.agr+(+t.media||0)*pr.media+(+t.prawo||0)*pr.prawo+(+t.koalicje||0)*pr.koalicje+(+t.rozwoj||0)*pr.bud+(+t.ryzyko||0)*pr.ryzyko;
     s+=(+ef.fame||0)*.025+(+ef.cred||0)*.02+(+ef.uni||0)*.02+(+ef.mem||0)*.04-(+ef.ctr||0)*.012;return {o,i,s}}).sort((a,b)=>b.s-a.s)[0]?.o||e.opcje[0];
 }

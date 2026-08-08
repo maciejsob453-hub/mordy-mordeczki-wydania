@@ -752,6 +752,7 @@ function sejmTab(){
       <div class="gauge" style="margin-bottom:13px"><i style="width:${G.gov.appr}%;background:linear-gradient(90deg,${
         G.gov.appr>58?'#5f8a4c,var(--pos)':G.gov.appr<42?'#8f3830,var(--neg)':'#a37f2c,var(--acc)'})"></i>
         <span>poparcie rządu ${Math.round(G.gov.appr)} / 100</span></div>
+      ${G.gov.kontrakt?`<div class="govcontract"><b>Kontrakt gabinetu</b>${G.gov.parties.map(k=>{const d=G.gov.kontrakt.demands&&G.gov.kontrakt.demands[k];const got=d&&d.przydzielone!==undefined?d.przydzielone:resortyPartii(k);return d?`<span class="${d.status==='spelniony'?'done':d.status==='zagrozony'?'warn':''}">${G.p[k].ab}: ${got}/${d.resorty} tek · temat ${sn(d.temat)}${d.tematDone?' ✓':''}${G.gov.pm===G.me&&k!==G.me?` <button class="btn g sm" onclick="renegocjujKontrakt('${k}')">Renegocjuj</button>`:''}</span>`:''}).join('')}</div>`:''}
       ${G.gov.parties.map(k=>`<div class="minrow" ${k===G.me?'style="background:rgba(209,161,58,.08);margin:0 -6px;padding:7px 6px"':''}>
         ${crest(k,'s')}${leadAva(k,24)}
         <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
@@ -770,7 +771,8 @@ function sejmTab(){
       <td class="r m"><b>${G.p[k].seats}</b></td>
       <td>${g&&g.parties.includes(k)?`<span class="pill pos">${g.pm===k?'premier':'koalicja'}</span>`
         :G.p[k].seats?'<span class="pill">opozycja</span>':'<span class="pill neg">poza sejmem</span>'}
-        ${G.prez&&G.prez.party===k?'<span class="pill roy">prezydent</span>':''}</td>
+        ${G.prez&&G.prez.party===k?'<span class="pill roy">prezydent</span>':''}
+        ${k!==G.me&&G.p[k].plan?`<small class="aiintent">Cel: ${PLAN_OPIS[G.p[k].plan]||G.p[k].plan}</small>`:''}</td>
       <td class="r m" style="color:${v===null?'var(--dim2)':v<0?'var(--neg)':v>30?'var(--pos)':'var(--dim)'}">${v===null?',':(v>0?'+':'')+v}</td></tr>`}).join('')}
     </tbody></table></div></div>`;
 }

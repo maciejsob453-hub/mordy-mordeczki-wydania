@@ -27,7 +27,7 @@ function hemi(order,w,mode){
   // Podpisy przeniosły się pod wykres, więc samo SVG nie potrzebuje już zapasu na dole.
   const H=Math.round(Rmax*yScale+rad+26), cy=Math.round(Rmax*yScale+rad+18);
   const colOf=k=>{if(mode==='bloc'){const b=blocOf(k);if(b)return b.color}return G.p[k].c};
-  const uid='h'+Math.random().toString(36).slice(2,7);
+  const uid='h'+Math.floor(rnd()*0x1000000).toString(36).padStart(5,'0');
 
   // ile mandatów ma rząd i gdzie kończy się próg większości
   const rzad=G.gov?G.gov.parties:[];
@@ -579,7 +579,7 @@ function przewidz(id){
   const klucz=id+'|'+G.term+'-'+G.week+'|'+Math.round(me().fame)+'|'+(G.used[id]||0);
   if(podgladCache[klucz])return podgladCache[klucz];
 
-  const kopiaG=JSON.stringify(G), prawdziwe=G;
+  const kopiaG=JSON.stringify(G), prawdziwe=G, rngPrawdziwe=RNG_STATE;
   const wynik={};
   PROBA=1;
   try{
@@ -602,6 +602,7 @@ function przewidz(id){
     }
   } finally {
     G=prawdziwe;          // stan wraca zawsze, nawet gdy decyzja rzuci wyjątkiem
+    RNG_STATE=rngPrawdziwe;G.rng=RNG_STATE; // podgląd nie może zużyć losowości prawdziwej gry
     PROBA=0;
   }
   Object.keys(wynik).forEach(k=>{
@@ -782,8 +783,7 @@ function fire(a,t,r,s,tm){
   /* Sąd nie daje autorowi ustawy immunitetu. Brudna zagrywka zostawia za to
      materiał procesowy, który przez kilka tygodni podbija szansę skazania. */
   if(a.cat==='bru'&&lawDone('sady')){
-    const s=sadInit();
-    s.tropy[G.me]=cl((s.tropy[G.me]||0)+12+Math.max(0,p.ctr-c0)*.7+Math.max(0,p.pret-pr0)*.5,0,60);
+    sadTrop(G.me,12+Math.max(0,p.ctr-c0)*.7+Math.max(0,p.pret-pr0)*.5);
   }
   // kolejność ma znaczenie: powiązane decyzje wzmacniają się, sprzeczne kasują
   if(cb){
@@ -923,7 +923,7 @@ function drawFrom(reg,n){
   if(G&&G.p&&G.p[G.me]&&G.p[G.me].robMode&&n>0)n=Math.round(n*1.25);   // struktury robotnicze
   const mx=REG.find(r=>r.id===reg).mix, out={eli:0,int:0,ser:0};
   for(let i=0;i<n;i++){
-    const order=SID.slice().sort((a,b)=>(mx[b]*Math.random())-(mx[a]*Math.random()));
+    const order=SID.slice().sort((a,b)=>(mx[b]*rnd())-(mx[a]*rnd()));
     const pick2=order.find(g=>mx[g]>0&&G.free[g]>0);
     if(!pick2)break; out[pick2]++;G.free[pick2]--;
   }
@@ -1461,7 +1461,7 @@ function naborPublikuj(){
     // z ogłoszenia przychodzą prawie wyłącznie serwerowicze
     const got={eli:0,int:0,ser:0};let taken=0;
     for(let i=0;i<g;i++){
-      const roll=Math.random();
+      const roll=rnd();
       let gr = roll<.90?'ser' : roll<.99?'int' : 'eli';
       if(G.free[gr]<1)gr=G.free.ser>0?'ser':G.free.int>0?'int':G.free.eli>0?'eli':null;
       if(!gr)break;

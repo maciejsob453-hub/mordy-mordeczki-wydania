@@ -776,7 +776,8 @@ function lawVote(id,opcje,wnioskodawca,mojGlos){
       return;
     }
     const wRzadzie=!!(G.gov&&G.gov.parties.includes(k));
-    const rel=G.rel[k][przez];
+    const agenda=typeof aiAgenda==='function'&&aiAgenda(k).includes(id);
+    const rel=G.rel[k][przez]+(agenda?24:0);
     /* Umowa koalicyjna to nie sondaż. Rząd firmuje swoje ustawy — inaczej
        zgłaszasz projekt jako premier i patrzysz, jak twoi właśni koalicjanci
        wstrzymują się albo głosują przeciw, mimo że dogadałeś się z nimi tydzień
@@ -798,6 +799,7 @@ function lawVote(id,opcje,wnioskodawca,mojGlos){
        głosowali za co trzecim projektem i wszystko przechodziło samo — teraz ustawa
        potrzebuje realnego zaplecza w sejmie albo dogadania się z kimś z zewnątrz. */
     const opozycja=!!(G.gov&&!G.gov.parties.includes(k)&&przez!==k);
+    const ag=agenda;
     const szansa=cl(BAL.ustawaBaza+rel/165+(wRzadzie?BAL.ustawaKoalicja:0)+(maResort?.12:0)
       -(opozycja?BAL.ustawaOpozycja:0)       // rywalowi nie robi się prezentów
       +(law.kat==='rozrywka'?.18:0)          // przy rozrywce nikt się nie kłóci
@@ -808,7 +810,15 @@ function lawVote(id,opcje,wnioskodawca,mojGlos){
     else if(ch(.22)){wstrzym+=s;by[k]='wstrzymał się'}
     else{przeciw+=s;by[k]='przeciw'}
   });
-  const oddane=za+przeciw;
+    /* Głosowanie zostaje w pamięci partii. Dzięki temu AI nie jest bezmyślnym
+       rzutem monetą: kolejne negocjacje i wojny wyborcze mają ślad tego, kto
+       faktycznie poparł albo zablokował projekt. */
+    if(!PROBA&&typeof aiPamietaj==='function'){
+      Object.keys(by).forEach(k=>{
+        if(k!==G.me)aiPamietaj(k,'glosowanie',{id,glos:by[k],wnioskodawca:przez,agenda:typeof aiAgenda==='function'&&aiAgenda(k).includes(id)});
+      });
+    }
+    const oddane=za+przeciw;
   const potrzeba=Math.ceil((law.prog>.6?(za+przeciw+wstrzym):oddane)*law.prog);
   return {za,przeciw,wstrzym,by,potrzeba,rad,ok:za>=potrzeba&&za>0};
 }
@@ -974,14 +984,23 @@ function aiProposeLaw(){
   // Składa to, co jemu się opłaca: partia serwerowicka ciśnie rozrywkę,
   // elitarna ekonomię, a ktoś ledwo nad progiem próbuje ruszyć ordynację.
   const q=G.p[pm], udzial=g=>q.mem?q.comp[g]/q.mem:0;
+  /* Agenda partii: sklad i styl AI prowadza do konkretnego tematu, zamiast
+     losowac ustawe tylko po kategorii. */
   const law=mozliwe.map(l=>{
     let w=1;
+    const styl=aiProfil(pm);
+    if(typeof aiAgenda==='function'&&aiAgenda(pm).includes(l.id))w+=3.4+styl.prawo;
+    const udz={eli:udzial('eli'),int:udzial('int'),ser:udzial('ser')};
+    if(l.id==='ekon'||l.id==='podatki')w+=udz.eli*2.2+styl.bud*.8;
+    if(l.id==='media'||l.id==='cytaty'||l.id==='zagadki'||l.id==='event')w+=udz.ser*1.8+styl.media*1.2;
+    if(l.id==='mordepedia'||l.id==='man')w+=udz.int*1.6+styl.prawo*.6;
+    if(l.id==='sady'||l.id==='kodeks'||l.id==='konst'||l.id==='ordyn')w+=styl.prawo*1.8+styl.koalicje*.35;
     if(l.kat==='rozrywka')w+=udzial('ser')*2.6;
     if(l.id==='ekon')w+=udzial('eli')*3.2+udzial('int')*1.1;
     if(l.id==='konst')w+=udzial('eli')*2.4;
     if(l.id==='kodeks')w+=udzial('ser')*1.5+udzial('int')*1.2;
     if(l.id==='ordyn')w+=q.seats<=3?2.2:.4;
-    return {l,w:w*(.8+Math.random()*.5)};
+    return {l,w:w*(.8+rnd()*.5)};
   }).sort((a,b)=>b.w-a.w)[0].l;
 
   // bot nastawia pokrętła zachowawczo — sam nie chce przegrać głosowania
@@ -991,11 +1010,12 @@ function aiProposeLaw(){
     const teraz=lawParams(law.id);
     Object.keys(P.baza).forEach(k=>{
       const z=P.zakres[k];
-      const delta=(Math.random()-.4)*(z[1]-z[0])*.16;
+      const delta=(rnd()-.4)*(z[1]-z[0])*.16;
       opcje[k]=Math.round(cl(teraz[k]+delta,z[0],z[1])*100)/100;
     });
   }
   G.lawTerm[law.id]=1;
+  if(typeof aiPamietaj==='function')aiPamietaj(pm,'projekt_ustawy',{id:law.id});
   say(`<b>${G.p[pm].ab} składa projekt:</b> ${law.n}.`,'roy');
   if(me().seats>0)openGlosowanie(law,opcje,pm);   // masz mandaty, więc masz głos
   else rozstrzygnijUstawe(law.id,opcje,pm,undefined);

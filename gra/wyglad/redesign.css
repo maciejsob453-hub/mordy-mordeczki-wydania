@@ -2468,8 +2468,10 @@ button[disabled],.act[disabled],.opt[disabled]{
   padding:8px var(--o4);border-radius:var(--v3-r);border:1px solid #4a3b1c;
   background:linear-gradient(180deg,rgba(247,227,170,.05),rgba(0,0,0,.28));
   box-shadow:inset 0 1px 0 rgba(247,227,170,.10)}
-.wazneet{font-family:var(--m);font-size:9px;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--dim2);font-weight:700;flex:none}
+.wazneet{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;
+  font-family:var(--m);font-size:14px;line-height:1;color:var(--acc);font-weight:800;flex:none;
+  border:1px solid rgba(211,169,74,.65);background:rgba(211,169,74,.10);
+  box-shadow:0 0 0 3px rgba(211,169,74,.04)}
 .waznelista{display:flex;gap:5px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
 .waznelista::-webkit-scrollbar{height:0}
 .waz{display:inline-flex;align-items:center;gap:7px;flex:none;cursor:pointer;

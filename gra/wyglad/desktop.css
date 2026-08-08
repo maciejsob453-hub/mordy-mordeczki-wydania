@@ -205,3 +205,16 @@ body.licze .hemi .seat, body.licze .runoff, body.licze .campbar { animation: non
   font-weight: 500;
 }
 #dtResume button:hover { filter: brightness(1.07); }
+.sidebar > .lead{order:1}
+.sidebar > .kond{order:2}
+.sidebar > .kronika{order:3}
+.sidebar > .skl{order:4}
+.sidebar > .zaplecze{order:5}
+.sidebar > .serwerfold{order:6}
+.sidebar > .rel{order:7}
+.aiintent{display:block;margin-top:4px;color:var(--dim2);font:10px var(--m);letter-spacing:.02em}
+.govcontract{display:flex;flex-wrap:wrap;gap:6px 10px;margin:0 0 10px;padding:9px 10px;border:1px solid var(--line);border-left:2px solid var(--party-theme,var(--acc));border-radius:6px;background:rgba(255,255,255,.025);font:11px var(--m);color:var(--dim)}
+.govcontract b{width:100%;color:var(--tx);font:12px var(--m)}
+.govcontract span{white-space:nowrap}
+.govcontract span.done{color:var(--pos)}
+.govcontract span.warn{color:var(--neg)}
