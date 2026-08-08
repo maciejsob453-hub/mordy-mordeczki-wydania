@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.115':{data:'8 sierpnia 2026', zmiany:[
+  'Decyzje tygodnia dostaly wlasne biurko robocze z papierami, mosiadzem i spokojna przestrzenia pod karty.','Faktura jest widoczna na ekranie, ale nie zabiera kontrastu tekstom i przyciskom.',
+ ]},
  '1.1.114':{data:'8 sierpnia 2026', zmiany:[
   'Na laptopach i telefonach zakladki gry sa teraz jednym poziomym paskiem; nie zabieraja juz calej wysokosci ekranu.','Nawigacja przewija sie poziomo, a widok gry zaczyna sie od razu pod HUD-em.',
  ]},
