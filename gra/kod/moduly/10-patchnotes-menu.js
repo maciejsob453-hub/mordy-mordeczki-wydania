@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.164':{data:'8 sierpnia 2026',zmiany:[
+  'Karta Kondycji partii nie dostaje juz przypadkowego wewnetrznego suwaka na waskim ekranie.',
+  'Wskazniki rozwijaja karte do pelnej wysokosci, wiec nic nie jest schowane pod przewijaniem.',
+ ]},
  '1.1.163':{data:'8 sierpnia 2026',zmiany:[
   'Plyta PKB korzysta teraz z wygenerowanego biurka skarbowego, wiec najwazniejszy odczyt ma wlasna scene.',
   'Liczby zostaja na przygaszonym srodku, a faktura i akcent partii pracuja na obrzezach.',

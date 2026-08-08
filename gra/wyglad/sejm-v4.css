@@ -1750,6 +1750,10 @@ body:has(.hud) .sidebar>.serwerfold{order:-50!important}
 body:has(.hud) .sidebar>.rel{order:-40!important}
 body:has(.hud) .sidebar>.kond{border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 52%,rgba(196,154,75,.26));box-shadow:0 13px 28px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.05)}
 body:has(.hud) .sidebar>.kond>.h{background:linear-gradient(90deg,color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 19%,transparent),transparent 78%)}
+/* 1.1.164: mobilna reguła tabel włączała overflow na każdym .card>.b.
+   Kondycja nie jest tabelą: jej wskaźniki mają rosnąć razem z kartą, zamiast
+   dostawać przypadkowy wewnętrzny suwak przy wąskim oknie. */
+body:has(.hud) .sidebar>.kond>.b{overflow:visible!important;min-width:0}
 
 @media(max-width:900px){
   body:has(.hud) .kurier{grid-template-columns:1fr;gap:7px}
