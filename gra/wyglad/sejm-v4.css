@@ -1512,3 +1512,81 @@ body:not(:has(.mg)) .wrap:has(>.nav)>.hud{
   body:has(.hud) .hudcenter .rgroup+.rgroup{border-left:0;border-top:1px solid rgba(196,154,75,.21);padding:5px 3px 0}
   body:has(.hud) .nav{top:220px}
 }
+
+/* ------------------------------------------------------------------------
+   NOC WYBORCZA: SALA PROTOKOŁÓW
+   Ekran liczenia był ostatnim miejscem, gdzie zostawała fioletowo-czerwona
+   scenografia. Teraz korzysta z tej samej tekstury kancelarii co HUD: nagłówek
+   jest mosiężną belką, a listy są wierszami protokołu. Dzięki temu noc, wynik
+   i wejście do kolejnej kadencji wyglądają jak jeden ciąg, nie trzy skórki.
+   ------------------------------------------------------------------------ */
+body:has(.nocekran),body:has(.wynik){
+  background:
+    linear-gradient(180deg,rgba(5,10,8,.28),rgba(4,9,7,.88)),
+    url("../obrazki/ui-atlas-surface.webp") center top/cover fixed no-repeat,
+    var(--atlas-ink);
+}
+body:has(.nocekran) .wrap,body:has(.wynik) .wrap{max-width:1540px;padding:22px 30px 54px 176px}
+body:has(.nocekran) .nocekran{max-width:1440px;margin:0 auto;padding:0 0 30px}
+body:has(.nocekran) .nocsz,
+body:has(.wynik) .wynik{
+  border-radius:3px;border:1px solid rgba(196,154,75,.46);
+  background:
+    linear-gradient(180deg,rgba(24,41,31,.92),rgba(8,16,12,.97)),
+    url("../obrazki/ui-ledger-header.webp") center/cover;
+  box-shadow:inset 0 1px rgba(255,255,255,.06),0 18px 40px rgba(0,0,0,.28);
+}
+body:has(.nocekran) .nocsz{padding:24px 26px 18px}
+body:has(.nocekran) .nocsz .kick,
+body:has(.wynik) .wynik>.kick{font:10px var(--m);letter-spacing:.16em;text-transform:uppercase;color:#d5b36b}
+body:has(.nocekran) .nocsz h1,
+body:has(.wynik) .wynik h1{font-family:var(--fd);font-size:clamp(31px,3.3vw,48px);letter-spacing:.01em;color:#f0e1bd;margin:8px 0 7px}
+body:has(.nocekran) .nocsz>p{max-width:68ch;color:#b6c1b6;line-height:1.55}
+body:has(.nocekran) .nocsz .tabliczki,
+body:has(.wynik) .wynik .tabliczki{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:18px 0 15px;border:1px solid rgba(196,154,75,.28);border-radius:2px;overflow:hidden;background:rgba(4,11,7,.48)}
+body:has(.nocekran) .nocsz .tabliczki>div,
+body:has(.wynik) .wynik .tabliczki>div{min-width:0;padding:12px 15px;background:rgba(20,35,26,.66);border-right:1px solid rgba(196,154,75,.18)}
+body:has(.nocekran) .nocsz .tabliczki>div:last-child,
+body:has(.wynik) .wynik .tabliczki>div:last-child{border-right:0}
+body:has(.nocekran) .nocsz .tabliczki b,
+body:has(.wynik) .wynik .tabliczki b{font:700 24px var(--m);color:#e4c57b}
+body:has(.nocekran) .nocsz .tabliczki span,
+body:has(.wynik) .wynik .tabliczki span{display:block;margin-top:4px;font:9px var(--m);letter-spacing:.1em;text-transform:uppercase;color:#8d9c90}
+body:has(.nocekran) .nockom{padding:10px 0 0;border-top:1px solid rgba(196,154,75,.2)}
+body:has(.nocekran) .nockomt{gap:7px}
+body:has(.nocekran) .nockomt i{width:10px;height:10px;border-radius:1px;background:#1b3024;border-color:rgba(196,154,75,.25)}
+body:has(.nocekran) .nockomt i.on{transform:none;box-shadow:0 0 0 1px rgba(224,188,112,.28),0 0 10px -3px var(--pc,var(--atlas-brass))}
+body:has(.nocekran) .noccokol{margin:14px 0;border-radius:3px;border-color:rgba(196,154,75,.28);background:linear-gradient(115deg,rgba(21,38,29,.92),rgba(7,15,11,.95));box-shadow:inset 0 1px rgba(255,255,255,.04),0 12px 24px rgba(0,0,0,.2)}
+body:has(.nocekran) .noccokol.jest{border-color:var(--acc,#d5aa55);background:linear-gradient(115deg,rgba(49,63,35,.95),rgba(10,20,14,.96));box-shadow:inset 0 1px rgba(255,255,255,.06),0 0 28px -12px var(--acc,#d5aa55)}
+body:has(.nocekran) .nocplyta{border-radius:3px;border-color:rgba(196,154,75,.32);padding:12px;background:rgba(7,15,11,.74);box-shadow:inset 0 1px rgba(255,255,255,.035),0 18px 35px rgba(0,0,0,.22)}
+body:has(.nocekran) .nrow{border-radius:2px;border-color:rgba(196,154,75,.2);background:linear-gradient(90deg,rgba(22,39,29,.9),rgba(9,18,13,.96));box-shadow:inset 0 1px rgba(255,255,255,.04)}
+body:has(.nocekran) .nrow.me{border-color:var(--acc,#d5aa55);background:linear-gradient(90deg,rgba(56,65,35,.4),rgba(10,20,14,.96))}
+body:has(.nocekran) .nrow::before{width:4px;border-radius:0;background:var(--pc,var(--atlas-brass))}
+body:has(.nocekran) .nrow .ntrk{height:12px;background:#06100a;box-shadow:inset 0 2px 4px rgba(0,0,0,.65),0 0 0 1px rgba(196,154,75,.12)}
+body:has(.nocekran) .nrow .nseat b{font-size:22px;color:#e4c57b;-webkit-text-fill-color:#e4c57b;background:none}
+body:has(.nocekran) .ekstopka{border-radius:2px;border-color:rgba(196,154,75,.34);background:rgba(8,17,12,.92)}
+body:has(.nocekran) .ekstopka .btn{border-radius:2px;background:#172a20;border-color:rgba(196,154,75,.46);color:#ecd9a8}
+body:has(.nocekran) .ekstopka .btn:hover{background:rgba(196,154,75,.18);border-color:#e0bc70}
+body:has(.nocekran) .racebox .lane{border-radius:2px;border-color:rgba(196,154,75,.2);background:linear-gradient(90deg,rgba(22,39,29,.9),rgba(9,18,13,.96))}
+body:has(.nocekran) .racebox .lane.me{border-color:var(--acc,#d5aa55)}
+body:has(.nocekran) .racebox .ltrack{height:20px;background:#06100a}
+body:has(.wynik) .wynik{max-width:1440px;margin:0 auto 14px;padding:24px 28px 20px}
+body:has(.wynik) .wynik .wynczolo{margin-top:14px}
+body:has(.wynik) .wynik .big{font:700 clamp(48px,5vw,78px) var(--m);color:#e4c57b;-webkit-text-fill-color:#e4c57b;filter:none}
+body:has(.wynik) .wynik .seatchart{padding:22px 18px 6px;border:1px solid rgba(196,154,75,.25);border-radius:2px;background:rgba(7,15,11,.44)}
+body:has(.wynik) .wynik .stube{background:#06100a;box-shadow:inset 0 2px 5px rgba(0,0,0,.65),inset 0 0 0 1px rgba(196,154,75,.13)}
+body:has(.wynik) .wynik .majline{border-top:1px solid rgba(196,154,75,.2);padding-top:10px;color:#aeb9ae}
+
+@media(max-width:1120px){
+  body:has(.nocekran) .wrap,body:has(.wynik) .wrap{padding-left:24px}
+  body:has(.nocekran) .nocekran,body:has(.wynik) .wynik{max-width:none}
+}
+@media(max-width:720px){
+  body:has(.nocekran) .wrap,body:has(.wynik) .wrap{padding:10px 10px 34px}
+  body:has(.nocekran) .nocsz{padding:19px 16px 15px}
+  body:has(.nocekran) .nocsz .tabliczki,body:has(.wynik) .wynik .tabliczki{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body:has(.nocekran) .nocsz .tabliczki>div:nth-child(2),body:has(.wynik) .wynik .tabliczki>div:nth-child(2){border-right:0}
+  body:has(.nocekran) .nocsz .tabliczki>div:nth-child(-n+2),body:has(.wynik) .wynik .tabliczki>div:nth-child(-n+2){border-bottom:1px solid rgba(196,154,75,.18)}
+  body:has(.nocekran) .nrow{padding:10px 11px}
+  body:has(.wynik) .wynik{padding:19px 16px 15px}
+}
