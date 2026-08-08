@@ -2717,3 +2717,103 @@ body:has(.kreekran) *::-webkit-scrollbar-thumb:hover{
     white-space:normal!important
   }
 }
+
+/* 1.1.173: cala rozgrywka dostaje wspolny pokoj odpraw. Wczesniej kazdy
+   ekran mial osobna fakture i po przejsciu z decyzji do wyborow zmienial sie
+   nie tylko temat, ale tez rytm kart. Nowe tlo jest ciche w centrum, a
+   dokumenty i swiatlo zostaja na obrzezach, wiec tekst nadal ma pierwszenstwo. */
+body:not(:has(.mg)):has(.hud) .widok[data-tab="partie"],
+body:not(:has(.mg)):has(.hud) .widok[data-tab="cele"],
+body:not(:has(.mg)):has(.hud) .widok[data-tab="lider"],
+body:not(:has(.mg)):has(.hud) .widok[data-tab="ekonomia"],
+body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"],
+body:not(:has(.mg)):has(.hud) .widok[data-tab="mordepedia"]{
+  background-image:
+    linear-gradient(180deg,rgba(4,10,7,.22),rgba(4,10,7,.92)),
+    url("../obrazki/ui-briefing-room.webp")!important;
+  background-position:center top!important;background-size:cover!important;background-attachment:local!important
+}
+body:not(:has(.mg)):has(.hud) .widok[data-tab="partie"]>.card,
+body:not(:has(.mg)):has(.hud) .widok[data-tab="cele"]>.card,
+body:not(:has(.mg)):has(.hud) .widok[data-tab="lider"]>.card,
+body:not(:has(.mg)):has(.hud) .widok[data-tab="ekonomia"] .ekoblok>.card,
+body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"]>.card,
+body:not(:has(.mg)):has(.hud) .widok[data-tab="mordepedia"] .mordekran{
+  background:
+    linear-gradient(180deg,rgba(10,22,15,.88),rgba(4,11,8,.97)),
+    url("../obrazki/ui-briefing-room.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 42%,rgba(196,154,75,.3))!important;
+  box-shadow:0 17px 36px rgba(0,0,0,.31),inset 0 1px rgba(255,255,255,.045)!important
+}
+
+/* 1.1.173: karty maja jedna hierarchie. Naglowek jest pasem dokumentu,
+   tresc ma oddech, a akcja jest na dole karty zamiast wisiec w srodku. */
+body:not(:has(.mg)):has(.hud) .widok>.card>.h,
+body:not(:has(.mg)):has(.hud) .widok>.card>.head,
+body:not(:has(.mg)):has(.hud) .widok>.card>.title{
+  min-height:42px;box-sizing:border-box;display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 32%,rgba(196,154,75,.18));
+  background:linear-gradient(90deg,color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 13%,transparent),transparent 74%)
+}
+body:not(:has(.mg)):has(.hud) .widok>.card>.b{padding:15px 16px 17px}
+body:not(:has(.mg)):has(.hud) .widok>.card p{max-width:75ch;line-height:1.48}
+body:not(:has(.mg)):has(.hud) .widok>.card .btn,
+body:not(:has(.mg)):has(.hud) .widok>.card button.btn{
+  min-height:34px;border-radius:3px!important;letter-spacing:.01em
+}
+body:not(:has(.mg)):has(.hud) .widok>.card .btn:not(.g):not(.r):not(.red):not(.tura){
+  background:linear-gradient(180deg,rgba(24,40,29,.96),rgba(9,18,13,.98))!important;
+  border-color:rgba(169,184,172,.33)!important;color:#dde8dc!important
+}
+body:not(:has(.mg)):has(.hud) .widok>.card .btn:not(.g):not(.r):not(.red):not(.tura):hover:not(:disabled){
+  border-color:color-mix(in srgb,var(--party-theme,var(--game-accent,var(--atlas-brass))) 70%,rgba(169,184,172,.3))!important;
+  background:linear-gradient(180deg,rgba(42,65,48,.98),rgba(14,28,20,.98))!important
+}
+
+/* 1.1.173: wydarzenia i noc wyborcza maja ten sam blat co pozostale pokoje,
+   dzieki czemu przejscie miedzy ekranem gry a wynikiem nie wyglada jak zmiana
+   aplikacji. */
+body:not(:has(.mg)):has(.nocekran),
+body:not(:has(.mg)):has(.wynik){
+  background:
+    linear-gradient(180deg,rgba(4,10,7,.2),rgba(4,10,7,.94)),
+    url("../obrazki/ui-briefing-room.webp") center top/cover fixed no-repeat,var(--atlas-ink)!important
+}
+body:not(:has(.mg)):has(.nocekran) .nocekran,
+body:not(:has(.mg)):has(.wynik) .wynik{
+  border-color:rgba(196,154,75,.38)!important;
+  background:linear-gradient(180deg,rgba(9,21,14,.86),rgba(4,11,8,.96)),url("../obrazki/ui-briefing-room.webp") center/cover!important;
+  box-shadow:0 24px 58px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.05)!important
+}
+body:not(:has(.mg)):has(.nocekran) .nocsz,
+body:not(:has(.mg)):has(.wynik) .wynczolo{
+  background:linear-gradient(90deg,rgba(196,154,75,.12),transparent 72%);border-bottom-color:rgba(196,154,75,.28)
+}
+
+/* 1.1.173: modale i decyzje sa arkuszami do podpisu, nie czarnymi
+   prostokatami. Kolor sygnalu nadal bierze sie z --ac/--party-theme. */
+body:not(:has(.mg)):has(.hud) .veil .mdl,
+body:not(:has(.mg)):has(.hud) .sitmdl{
+  background:linear-gradient(165deg,rgba(20,34,25,.96),rgba(5,12,9,.99)),url("../obrazki/ui-briefing-room.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 48%,rgba(196,154,75,.34))!important;
+  box-shadow:0 28px 74px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.06)!important
+}
+body:not(:has(.mg)):has(.hud) .veil .mdl .opt,
+body:not(:has(.mg)):has(.hud) .veil .mdl .choice,
+body:not(:has(.mg)):has(.hud) .veil .mdl .actopt{
+  background:rgba(5,13,9,.68);border-color:rgba(196,154,75,.23);border-radius:3px
+}
+body:not(:has(.mg)):has(.hud) .veil .mdl .opt:hover,
+body:not(:has(.mg)):has(.hud) .veil .mdl .choice:hover,
+body:not(:has(.mg)):has(.hud) .veil .mdl .actopt:hover{
+  background:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 13%,rgba(5,13,9,.75));border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 62%,rgba(196,154,75,.24))
+}
+
+@media(max-width:720px){
+  body:not(:has(.mg)):has(.hud) .widok>.card>.h,
+  body:not(:has(.mg)):has(.hud) .widok>.card>.head,
+  body:not(:has(.mg)):has(.hud) .widok>.card>.title{min-height:38px}
+  body:not(:has(.mg)):has(.hud) .widok>.card>.b{padding:12px 12px 14px}
+  body:not(:has(.mg)):has(.nocekran) .nocekran,
+  body:not(:has(.mg)):has(.wynik) .wynik{border-radius:3px!important}
+}
