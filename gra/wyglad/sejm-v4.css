@@ -1987,6 +1987,22 @@ body:has(.hud) .widok[data-tab="sejm"] .sejmleg{
   body:has(.hud) .sidebar{grid-template-columns:minmax(0,1fr)!important;gap:10px!important}
 }
 
+/* 1.1.161: dwor nie jest juz czterema kartami w jednej kolumnie. Hero i karta
+   kandydata pozostaja scena, a trzy panele decyzji tworza czytelny pulpit.
+   Breakpoint jest celowo wysoki: opisy czynnikow potrzebuja oddechu, nie
+   kolejnego mikrofontu. */
+@media(min-width:1180px){
+  body:has(.hud) .widok[data-tab="krol"]{
+    display:grid;
+    grid-template-columns:minmax(240px,.82fr) minmax(0,1.22fr) minmax(250px,.96fr);
+    gap:14px;
+    align-items:start
+  }
+  body:has(.hud) .widok[data-tab="krol"]>.royalhero,
+  body:has(.hud) .widok[data-tab="krol"]>.card.kroyal{grid-column:1/-1}
+  body:has(.hud) .widok[data-tab="krol"]>.card{min-width:0;margin-top:0!important}
+}
+
 /* Sondaz: historia jest dziennikiem odczytow, a tabela ma rytm rejestru. */
 body:has(.hud) .widok[data-tab="sondaz"]>.card:nth-child(2){background:linear-gradient(110deg,rgba(19,36,27,.92),rgba(7,15,11,.97)),url("../obrazki/ui-ledger-header.webp") center/cover;border-left:3px solid rgba(110,169,226,.7)}
 body:has(.hud) .widok[data-tab="sondaz"]>.card:nth-child(3){background:linear-gradient(180deg,rgba(20,35,26,.92),rgba(7,15,11,.98)),url("../obrazki/ui-civic-ledger.webp") center/cover;border-left:3px solid color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 80%,rgba(196,154,75,.3))}

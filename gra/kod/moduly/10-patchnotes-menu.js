@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.161':{data:'8 sierpnia 2026',zmiany:[
+  'Dwor Mordeczki ma teraz uklad pulpitu: skarbiec, czynniki i ranking sa widoczne obok siebie.',
+  'Na mniejszych ekranach karty nadal ukladaja sie pionowo, bez sciskania tresci.',
+ ]},
  '1.1.160':{data:'8 sierpnia 2026',zmiany:[
   'Na telefonie boczny pulpit nie sciska juz kart w dwie kolumny.',
   'Kondycja, kronika i sklad czyta sie teraz pionowo, bez lamania naglowkow i opisow.',
