@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.156':{data:'8 sierpnia 2026',zmiany:[
+  'Pola kreatora, mediow i paneli korzystaja z jednej wygenerowanej karty formularza.',
+  'Focus jest wyrazniejszy, ale wpisywany tekst nadal ma spokojne, ciemne tlo.',
+ ]},
  '1.1.155':{data:'8 sierpnia 2026',zmiany:[
   'Podpowiedzi zasobow i kart maja wlasna papierowa oprawe archiwum.',
   'Dymki zachowuja bezpieczna szerokosc na telefonie, ale wygladaja jak czesc tego samego UI.',

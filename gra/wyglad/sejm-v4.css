@@ -2477,3 +2477,19 @@ body:not(:has(.mg)):has(.hud) #app .tipbox::before{
 }
 body:not(:has(.mg)):has(.hud) #app .tipbox .l b,
 body:not(:has(.mg)):has(.hud) #app .tipbox .tot{color:#f0e3bf}
+
+/* 1.1.156: pola formularzy maja wspolny papier urzedowy. Obramowanie jest
+   dekoracja, a przygaszony srodek chroni czytelnosc wpisywanego tekstu. */
+body:not(:has(.mg)) #app .kreform input,
+body:not(:has(.mg)) #app .kreform textarea,
+body:not(:has(.mg)) #app .kreform select,
+body:not(:has(.mg)) #app .inp{
+  background:linear-gradient(180deg,rgba(9,20,14,.9),rgba(5,12,9,.97)),url("../obrazki/ui-form-paper.webp") center/cover!important;
+  border-color:rgba(196,154,75,.34)!important;color:#e9eee7!important;box-shadow:inset 0 1px rgba(255,255,255,.035)
+}
+body:not(:has(.mg)) #app .kreform input:focus,
+body:not(:has(.mg)) #app .kreform textarea:focus,
+body:not(:has(.mg)) #app .kreform select:focus,
+body:not(:has(.mg)) #app .inp:focus{
+  border-color:var(--game-accent,var(--atlas-brass))!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--game-accent,var(--atlas-brass)) 28%,transparent),inset 0 1px rgba(255,255,255,.06)!important;outline:0
+}
