@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.165':{data:'8 sierpnia 2026',zmiany:[
+  'Sejm, gabinet premiera i prezydentura dostaly osobne tlo wygenerowanego gabinetu archiwalnego.',
+  'Sala mandatow zostaje plansza, a karty wladzy maja teraz material akt i drewna zamiast wspolnej mapy.',
+ ]},
  '1.1.164':{data:'8 sierpnia 2026',zmiany:[
   'Karta Kondycji partii nie dostaje juz przypadkowego wewnetrznego suwaka na waskim ekranie.',
   'Wskazniki rozwijaja karte do pelnej wysokosci, wiec nic nie jest schowane pod przewijaniem.',

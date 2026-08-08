@@ -1755,6 +1755,22 @@ body:has(.hud) .sidebar>.kond>.h{background:linear-gradient(90deg,color-mix(in s
    dostawać przypadkowy wewnętrzny suwak przy wąskim oknie. */
 body:has(.hud) .sidebar>.kond>.b{overflow:visible!important;min-width:0}
 
+/* 1.1.165: centrum wladzy dostaje osobny, wygenerowany gabinet archiwalny.
+   Sala Sejmu zostaje plansza do mandatow, ale otoczenie gabinetu, ustaw i
+   prezydentury nie udaje juz tej samej mapy — brzegi niosa drewno i akta,
+   a przygaszony srodek zostawia miejsce na tresc. */
+body:has(.hud) .widok[data-tab="sejm"],
+body:has(.hud) .widok[data-tab="premier"],
+body:has(.hud) .widok[data-tab="prezydent"]{
+  background-image:linear-gradient(180deg,rgba(4,10,7,.2),rgba(4,10,7,.92)),url("../obrazki/ui-power-cabinet.webp");
+  background-position:center top;background-size:cover;background-attachment:local
+}
+body:has(.hud) .widok[data-tab="premier"]>.card.urzad.prem:first-child,
+body:has(.hud) .widok[data-tab="prezydent"]>.card.urzad.prez:first-child{
+  background:linear-gradient(110deg,rgba(12,25,18,.88),rgba(5,12,9,.96)),url("../obrazki/ui-power-cabinet.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 55%,rgba(196,154,75,.38));
+}
+
 @media(max-width:900px){
   body:has(.hud) .kurier{grid-template-columns:1fr;gap:7px}
   body:has(.hud) .kurier .kglowa span{margin-left:auto}
@@ -2594,3 +2610,17 @@ body:not(:has(.mg)):has(.hud) #app .campbar:not(.runoff){
   border-color:rgba(196,154,75,.34)!important;box-shadow:0 15px 34px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.05)!important
 }
 body:not(:has(.mg)):has(.hud) #app .campbar:not(.runoff) .pill{background:rgba(5,12,8,.56);border-color:rgba(196,154,75,.28)}
+
+/* 1.1.165 final cascade: gabinet archiwalny musi wygrac ze starsza warstwa
+   sali parlamentarnej, ktora definiuje te trzy widoki wczesniej w arkuszu. */
+body:has(.hud) .widok[data-tab="sejm"],
+body:has(.hud) .widok[data-tab="premier"],
+body:has(.hud) .widok[data-tab="prezydent"]{
+  background-image:linear-gradient(180deg,rgba(4,10,7,.2),rgba(4,10,7,.92)),url("../obrazki/ui-power-cabinet.webp")!important;
+  background-position:center top!important;background-size:cover!important;background-attachment:local!important
+}
+body:has(.hud) .widok[data-tab="premier"]>.card.urzad.prem:first-child,
+body:has(.hud) .widok[data-tab="prezydent"]>.card.urzad.prez:first-child{
+  background:linear-gradient(110deg,rgba(12,25,18,.88),rgba(5,12,9,.96)),url("../obrazki/ui-power-cabinet.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 55%,rgba(196,154,75,.38))!important
+}
