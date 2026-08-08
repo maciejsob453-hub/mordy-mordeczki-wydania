@@ -2220,6 +2220,14 @@ body:has(.hud) .sidebar>.card.rel{
   box-shadow:0 14px 32px rgba(0,0,0,.26),inset 0 1px rgba(255,255,255,.035)
 }
 
+/* 1.1.136: zakladki sa przedluzeniem gornego pulpitu, ale faktura jest
+   mocniej przygaszona, zeby tekst kanalow pozostawal pierwszym planem. */
+body:has(.hud) .wrap>.nav{
+  background:linear-gradient(90deg,rgba(5,12,9,.94),rgba(8,16,12,.9)),url("../obrazki/ui-command-rail.webp") center/cover!important;
+  border-bottom-color:color-mix(in srgb,var(--game-accent,var(--atlas-brass)) 32%,rgba(196,154,75,.24));
+  box-shadow:0 12px 28px rgba(0,0,0,.26),inset 0 1px rgba(255,255,255,.04)
+}
+
 /* 1.1.128: Mordepedia jest archiwum pamieci serwera, wiec ksiegi i lampy
    buduja ramy, a srodek pozostaje pusty dla wpisow i list kadencji. */
 body:has(.hud) .widok[data-tab="mordepedia"]{

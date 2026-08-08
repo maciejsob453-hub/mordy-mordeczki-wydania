@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.136':{data:'8 sierpnia 2026', zmiany:[
+  'Nawigacja kanalow dostaje przygaszona fakture command rail i laczy sie teraz z gornym HUD-em w jeden pulpit.','Zakladki zachowuja poziomy pasek i czytelnosc na telefonie.',
+ ]},
  '1.1.135':{data:'8 sierpnia 2026', zmiany:[
   'Serwer, Zaplecze i Relacje dolaczaja do wspolnej teczki dossier w bocznym rejestrze.','Kazda karta ma teraz ten sam material i rytm, ale zachowuje swoj kolor akcentu.',
  ]},
