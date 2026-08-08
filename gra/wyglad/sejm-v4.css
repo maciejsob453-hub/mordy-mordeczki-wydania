@@ -1855,3 +1855,19 @@ body:has(.hud) .lawprocess .lkat{border-radius:2px;padding:2px 5px;background:rg
   body:has(.hud) .lawprocess .lawgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:560px){body:has(.hud) .lawprocess .lawgrid{grid-template-columns:1fr}}
+
+/* Kampania: osobny stol decyzji i osobny rejestr transferow. */
+body:has(.hud) .widok[data-tab="akcje"]>.card:has(.actgrid){
+  background:linear-gradient(180deg,rgba(20,35,26,.94),rgba(7,15,11,.98)),url("../obrazki/tlo-kampania-ai.webp") center top/cover;
+  border-color:rgba(196,154,75,.46);box-shadow:0 18px 38px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.05)
+}
+body:has(.hud) .widok[data-tab="akcje"] .actgrid{gap:9px}
+body:has(.hud) .widok[data-tab="akcje"] .act{border-left:3px solid color-mix(in srgb,var(--ac,var(--atlas-brass)) 75%,rgba(196,154,75,.3));padding-left:13px}
+body:has(.hud) .widok[data-tab="akcje"] .act:hover:not([disabled]){border-left-color:var(--ac,var(--atlas-brass));box-shadow:0 12px 24px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.05)}
+body:has(.hud) .widok[data-tab="akcje"]>.card:has(.agrid){
+  background:linear-gradient(180deg,rgba(19,34,25,.94),rgba(7,15,11,.98)),url("../obrazki/ui-ledger-header.webp") center/cover;
+  border-color:rgba(196,154,75,.38);box-shadow:0 18px 38px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.05)
+}
+body:has(.hud) .widok[data-tab="akcje"] .agent{border-left:3px solid color-mix(in srgb,var(--ac,var(--atlas-brass)) 70%,rgba(196,154,75,.25));background:rgba(7,17,12,.78)}
+body:has(.hud) .widok[data-tab="akcje"] .agent:hover{border-left-color:var(--ac,var(--atlas-brass));background:rgba(196,154,75,.09)}
+body:has(.hud) .widok[data-tab="akcje"] .agent .btn{margin-top:8px}
