@@ -2113,6 +2113,17 @@ body:not(:has(.mg)) .wrap:has(.modepick){
 body:not(:has(.mg)) .wrap:has(.modepick) .modepick,
 body:not(:has(.mg)) .wrap:has(.modepick) .modes{background:transparent}
 
+/* 1.1.139: na waskim ekranie dymek zasobu nie moze byc wycentrowany poza
+   viewportem. Przyklejam go do lewej krawedzi i zostawiam bezpieczny margines,
+   zeby cala tresc podpowiedzi byla czytelna bez poziomego przesuwania. */
+@media(max-width:520px){
+  body:has(.hud) .hud .tipbox{
+    left:0!important;right:auto!important;transform:none!important;
+    width:auto!important;max-width:calc(100vw - 16px)!important;
+  }
+  body:has(.hud) .hud .tipbox::before{left:18px!important;right:auto!important}
+}
+
 /* 1.1.123: dziewiec krokow kreatora nie jest juz poziomym paskiem na 320 px.
    Siatka 3x3 pokazuje cala sciezke od razu; opisy sa ukryte, ale numer i nazwa
    etapu zostaja, wiec nie trzeba zgadywac, gdzie jest final. */

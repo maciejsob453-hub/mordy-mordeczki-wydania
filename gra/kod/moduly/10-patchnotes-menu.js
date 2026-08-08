@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.139':{data:'8 sierpnia 2026',zmiany:[
+  'Podpowiedzi zasobow na telefonie nie wychodza juz poza ekran.',
+  'Dymki trzymaja bezpieczny margines i pozostaja czytelne bez poziomego przesuwania.',
+ ]},
  '1.1.138':{data:'8 sierpnia 2026',zmiany:[
   'Ekran wyboru trybu dostaje wlasny stol wyboru zamiast starego tla Sejmu.',
   'Karty trybow zostaja czytelne, a wejscie do gry ma ten sam material co reszta atlasu.',
