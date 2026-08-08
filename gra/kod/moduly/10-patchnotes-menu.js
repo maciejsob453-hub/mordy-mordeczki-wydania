@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.160':{data:'8 sierpnia 2026',zmiany:[
+  'Na telefonie boczny pulpit nie sciska juz kart w dwie kolumny.',
+  'Kondycja, kronika i sklad czyta sie teraz pionowo, bez lamania naglowkow i opisow.',
+ ]},
  '1.1.159':{data:'8 sierpnia 2026',zmiany:[
   'Sala Sejmu ma teraz nowe, wygenerowane tlo z prawdziwa przestrzenia na polkole.',
   'Kropki, legenda i statystyki siedza na przygaszonej planszy, a karty wladzy zachowuja czytelny kontrast.',

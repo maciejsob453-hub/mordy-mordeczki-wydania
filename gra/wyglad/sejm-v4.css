@@ -1981,6 +1981,12 @@ body:has(.hud) .widok[data-tab="sejm"] .sejmleg{
   background:rgba(3,9,6,.3)
 }
 
+/* 1.1.160: ta reguła musi byc po pozniejszym breakpointcie 900 px, bo tamta
+   warstwa ponownie wciskala boczne karty w dwie kolumny nawet na telefonie. */
+@media(max-width:560px){
+  body:has(.hud) .sidebar{grid-template-columns:minmax(0,1fr)!important;gap:10px!important}
+}
+
 /* Sondaz: historia jest dziennikiem odczytow, a tabela ma rytm rejestru. */
 body:has(.hud) .widok[data-tab="sondaz"]>.card:nth-child(2){background:linear-gradient(110deg,rgba(19,36,27,.92),rgba(7,15,11,.97)),url("../obrazki/ui-ledger-header.webp") center/cover;border-left:3px solid rgba(110,169,226,.7)}
 body:has(.hud) .widok[data-tab="sondaz"]>.card:nth-child(3){background:linear-gradient(180deg,rgba(20,35,26,.92),rgba(7,15,11,.98)),url("../obrazki/ui-civic-ledger.webp") center/cover;border-left:3px solid color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 80%,rgba(196,154,75,.3))}
