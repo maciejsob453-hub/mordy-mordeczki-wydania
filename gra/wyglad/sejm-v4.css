@@ -2131,6 +2131,8 @@ body:not(:has(.mg)) .wrap:has(.modepick) .modes{background:transparent}
   }
   body:has(.hud) .hud .tipbox::before{left:18px!important;right:auto!important}
   body:has(.hud) .hud{margin-left:-10px!important;margin-right:-10px!important}
+  body:has(.hud) .sidebar{display:flex!important;flex-direction:column!important;gap:10px!important}
+  body:has(.hud) .sidebar>.card{width:100%!important;grid-column:1/-1!important}
 }
 
 /* 1.1.140: modal decyzji jest osobna teczka sprawy, a nie kolejna karta z
