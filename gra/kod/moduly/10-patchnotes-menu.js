@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.102':{data:'8 sierpnia 2026', zmiany:[
+  'Serwerowy Kurier i mapa okregow korzystaja teraz z tej samej ciemnej scenografii atlasu co reszta gry.',
+  'Panel boczny ma przywrocona hierarchie: przewodnictwo, kondycja, kronika, sklad, zaplecze, serwer i relacje.',
+ ]},
  '1.1.101':{data:'8 sierpnia 2026', zmiany:[
   'Naprawiony glowny uklad gry: szeroka scena wraca do mapy, Sejmu, mediow i ustaw, a panel boczny ma stala szerokosc.',
   'Sejm, Sad, Media, Ekonomia, Krol i Pedia dostaly wspolna kompozycje instytucji oraz nowa generowana teksture atlasu.',

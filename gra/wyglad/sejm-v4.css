@@ -1688,3 +1688,46 @@ body:has(.hud) .mordehero{padding:25px 28px;border-radius:3px;background:linear-
   body:has(.hud) .medsklep{grid-template-columns:1fr}
   body:has(.hud) .sadparam{grid-template-columns:1fr}
 }
+
+/* ------------------------------------------------------------------------
+   KURIER I REJESTR BOCZNY
+   Kurier był jedynym jasnym, gazetowym prostokątem w środku ciemnej gry.
+   Boczne karty z kolei miały poprawne nazwy, ale stara warstwa CSS wygrywała
+   kolejność. Oba elementy dostają teraz ten sam rytm co reszta kancelarii.
+   ------------------------------------------------------------------------ */
+body:has(.hud) .kurier{
+  position:relative;overflow:hidden;display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 18px;
+  min-height:112px;margin:0 0 14px;padding:18px 22px 17px;border:1px solid rgba(196,154,75,.42);border-radius:3px;
+  background:
+    linear-gradient(105deg,rgba(19,37,28,.94),rgba(7,15,11,.96)),
+    url("../obrazki/ui-ledger-header.webp") center/cover;
+  box-shadow:0 14px 30px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.055);
+}
+body:has(.hud) .kurier::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--party-theme,var(--atlas-brass));box-shadow:0 0 14px color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 55%,transparent)}
+body:has(.hud) .kurier .kglowa{grid-column:1/-1;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(196,154,75,.2);padding-bottom:8px;color:#e3c47b}
+body:has(.hud) .kurier .kglowa b{font:600 19px var(--fd);letter-spacing:.02em}
+body:has(.hud) .kurier .kglowa span{margin-left:auto;font:9px var(--m);letter-spacing:.12em;text-transform:uppercase;color:#94a398}
+body:has(.hud) .kurier h3{align-self:center;margin:0;font:700 20px var(--fd);letter-spacing:.015em;color:#f0e1bd}
+body:has(.hud) .kurier p{align-self:center;margin:0;color:#aebbb0;font-size:13px;line-height:1.5}
+body:has(.hud) .mapwrap{gap:14px;border-radius:3px;border-color:rgba(196,154,75,.38);background:linear-gradient(180deg,rgba(7,15,11,.58),rgba(5,11,8,.86)),url("../obrazki/ui-institution-map.webp") center/cover;box-shadow:0 16px 34px rgba(0,0,0,.29),inset 0 1px rgba(255,255,255,.04)}
+body:has(.hud) .mapwrap>.card:first-child{border-color:rgba(196,154,75,.34);background:rgba(8,17,12,.72)}
+body:has(.hud) .mapwrap>.card.okr{border-color:rgba(196,154,75,.42);background:linear-gradient(160deg,rgba(20,39,29,.95),rgba(7,15,11,.98)),url("../obrazki/ui-ledger-header.webp") center/cover}
+body:has(.hud) .mapwrap .hexsvg{background:radial-gradient(circle at 50% 42%,rgba(196,154,75,.14),transparent 59%),rgba(3,10,7,.45);border:1px solid rgba(196,154,75,.16)}
+body:has(.hud) .mapwrap .legend{background:rgba(4,11,7,.42);border-top-color:rgba(196,154,75,.22)}
+body:has(.hud) .mapwrap .okr>.h{background:linear-gradient(90deg,rgba(196,154,75,.14),transparent 76%)}
+
+/* kolejność bocznego rejestru jest częścią informacji, nie kosmetyką */
+body:has(.hud) .sidebar>.lead{order:-100!important}
+body:has(.hud) .sidebar>.kond{order:-90!important}
+body:has(.hud) .sidebar>.kronika{order:-80!important}
+body:has(.hud) .sidebar>.skl{order:-70!important}
+body:has(.hud) .sidebar>.zaplecze{order:-60!important}
+body:has(.hud) .sidebar>.serwerfold{order:-50!important}
+body:has(.hud) .sidebar>.rel{order:-40!important}
+body:has(.hud) .sidebar>.kond{border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 52%,rgba(196,154,75,.26));box-shadow:0 13px 28px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.05)}
+body:has(.hud) .sidebar>.kond>.h{background:linear-gradient(90deg,color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 19%,transparent),transparent 78%)}
+
+@media(max-width:900px){
+  body:has(.hud) .kurier{grid-template-columns:1fr;gap:7px}
+  body:has(.hud) .kurier .kglowa span{margin-left:auto}
+}
