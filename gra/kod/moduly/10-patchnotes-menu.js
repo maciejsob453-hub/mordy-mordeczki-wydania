@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.127':{data:'8 sierpnia 2026', zmiany:[
+  'Dwor Mordeczek dostaje wlasny gabinet koronny z korona, pieczeciami i spokojnym miejscem na ranking.','Stara tapeta znika z ekranu krola, a karty zachowuja kontrast dla portretow i decyzji.',
+ ]},
  '1.1.126':{data:'8 sierpnia 2026', zmiany:[
   'Ekonomia dostaje osobny pulpit rachunkowy z wykresami i dokumentami na obrzezach.','PKB, kapital prywatny i mnoznik obrotu maja teraz scenografie skarbca zamiast ogolnego rejestru.',
  ]},
