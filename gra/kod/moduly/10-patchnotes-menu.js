@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.124':{data:'8 sierpnia 2026', zmiany:[
+  'Gorny pasek gry dostal wlasna scenografie command rail: skora, mosiadz i spokojny srodek dla zasobow.','HUD zachowuje responsywne trzy pasy na telefonie i czytelne liczby na desktopie.',
+ ]},
  '1.1.123':{data:'8 sierpnia 2026', zmiany:[
   'Kreator scenariuszy na telefonie pokazuje teraz dziewiec etapow w siatce 3x3 zamiast chowac je w poziomym pasku.','Numery i nazwy zostaja widoczne, a dluzsze opisy wracaja na szerokim ekranie.',
  ]},
