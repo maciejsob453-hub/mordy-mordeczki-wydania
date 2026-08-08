@@ -2063,3 +2063,9 @@ body:has(.hud) .campbar.runoff{
 }
 body:has(.hud) .campbar.runoff .pill{border-color:rgba(224,188,112,.44);background:rgba(5,12,8,.58);color:#e4c57b}
 body:has(.hud) .campbar.runoff .btn{background:linear-gradient(180deg,#e6c26b,#b7802e)!important;color:#1c170a!important;border-color:#f0d58b!important}
+
+/* 1.1.120: gabinet i palac maja wspolna linie startu. Stare marginesy kart
+   pochodzily z ukladu jednokolumnowego i w gridzie robily nierowna, zlamana
+   krawedz: druga karta oraz ustawy zaczynaly sie o 14 px nizej. */
+body:has(.hud) .widok[data-tab="premier"]>.card,
+body:has(.hud) .widok[data-tab="prezydent"]>.card{margin-top:0!important}
