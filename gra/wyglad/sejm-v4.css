@@ -21,6 +21,19 @@ body:not(:has(.mg)){
   background:#09100e url("../obrazki/sejm-atlas-tlo-v4.png") center top / cover fixed;
   color:var(--v4-ink);
 }
+
+/* 1.1.148: Kronika jest osobnym dziennikiem partii, z wlasna faktura i osia
+   czasu. Nie zmieniamy tresci wpisow — material ma tylko odsunac je od
+   kondycji i skladu, zeby boczny pulpit nie wygladal jak jedna zlana karta. */
+body:has(.hud) .sidebar>.card.kronika{
+  background:linear-gradient(155deg,rgba(17,31,24,.84),rgba(5,12,9,.96)),url("../obrazki/ui-party-chronicle.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--game-accent,var(--atlas-brass))) 42%,rgba(196,154,75,.34));
+  box-shadow:0 18px 40px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.05)
+}
+body:has(.hud) .sidebar>.card.kronika .log{
+  background:linear-gradient(90deg,rgba(4,10,8,.46),rgba(4,10,8,.12));
+  border-left:1px solid rgba(196,154,75,.3);padding-left:12px
+}
 body:not(:has(.mg))::before{
   content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:linear-gradient(90deg,rgba(2,7,5,.9),transparent 23%,transparent 77%,rgba(2,7,5,.9)),
