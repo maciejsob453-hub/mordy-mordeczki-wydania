@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.145':{data:'8 sierpnia 2026',zmiany:[
+  'HUD na telefonie trzyma sie teraz dokladnie krawedzi ekranu.',
+  'Znika drobne uciekanie cienia poza viewport przy przewijaniu.',
+ ]},
  '1.1.144':{data:'8 sierpnia 2026',zmiany:[
   'Kondycja partii dostaje wlasna tablice pomiarowa z subtelna faktura.',
   'Wygrawerowany krag jest dekoracja, a wskazniki pozostaja pierwszym planem.',

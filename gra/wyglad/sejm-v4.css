@@ -2130,6 +2130,7 @@ body:not(:has(.mg)) .wrap:has(.modepick) .modes{background:transparent}
     width:auto!important;max-width:calc(100vw - 16px)!important;
   }
   body:has(.hud) .hud .tipbox::before{left:18px!important;right:auto!important}
+  body:has(.hud) .hud{margin-left:-10px!important;margin-right:-10px!important}
 }
 
 /* 1.1.140: modal decyzji jest osobna teczka sprawy, a nie kolejna karta z
