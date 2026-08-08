@@ -2117,6 +2117,18 @@ body:has(.hud) .widok[data-tab="lider"] .act:hover:not([disabled]){
   body:not(:has(.mg)) .kresteps .krestep small{display:none}
 }
 
+/* 1.1.132: przy 600 px poziomy pasek krokow wystawal poza panel i chowal
+   etapy 6-9. Maly laptop dostaje te sama siatke 3x3 co telefon, tylko z
+   wiekszymi polami na nazwy. */
+@media(min-width:421px) and (max-width:720px){
+  body:not(:has(.mg)) .kresteps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;overflow:visible;padding:7px}
+  body:not(:has(.mg)) .kresteps .krestep{min-width:0;min-height:42px;height:42px;padding:6px 8px;gap:6px;justify-content:flex-start}
+  body:not(:has(.mg)) .kresteps .krestep i{width:21px;height:21px;flex:none;font-size:10px}
+  body:not(:has(.mg)) .kresteps .krestep span{min-width:0;display:block}
+  body:not(:has(.mg)) .kresteps .krestep b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;letter-spacing:.02em}
+  body:not(:has(.mg)) .kresteps .krestep small{display:none}
+}
+
 /* 1.1.124: staly HUD jest teraz dowodczym pulpitem, a nie przypadkowa belka.
    Detale siedza przy krawedziach, srodek zostaje spokojny dla liczb i przyciskow. */
 body:not(:has(.mg)) .wrap:has(>.nav)>.hud{
