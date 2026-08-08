@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.99':{data:'8 sierpnia 2026', zmiany:[
+  'Nowy kokpit gry: tozsamosc, zasoby i sterowanie sa zebrane w jednej urzedowej belce.',
+  'Naglowki kart korzystaja z lekkiej tekstury rejestru, a pasek nawigacji i data nie nachodza na tresc.',
+ ]},
  '1.1.98':{data:'8 sierpnia 2026', zmiany:[
   'Ujednolicone listy osob, rzadow, ekonomii i sadu: mniej kapsulek, wiecej czytelnych wierszy i ramek.',
   'Paski, statystyki i karty koalicyjne maja wspolny rytm, odstepy oraz kolory statusu.',

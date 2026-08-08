@@ -1,10 +1,10 @@
 {
- "wersja": "1.1.98",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/c87b7c8e15b2b042b918dbaa2d01d57bbecfc1a3",
+ "wersja": "1.1.99",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "52e95f82d0dbea18a18db9ce290c97f60480d5a9297e891d16abfe0826baf343",
+   "sha": "fac65e705c79804fdb861983d055e13c2c3759d5d6be49a420b7122dd6608300",
    "bajtow": 1954
   },
   {
@@ -14,7 +14,7 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "f36967012fec70124c5c3b07088a2ea95e13de693ddf9e737e7e632fe8560aa9",
+   "sha": "a5c5bb1e5880bcda13f6b5a8e0401016b53d311f8731a52526cb383b8d25e21e",
    "bajtow": 530
   },
   {
@@ -69,8 +69,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "fa810a07e524514034145b1dec93f6005e3c7189ed21376f7c64412cd09c6c95",
-   "bajtow": 90242
+   "sha": "047b67bf25621a785bfc32977cd27a8a9be9d47aae44c78f60cda769fa92a26b",
+   "bajtow": 90488
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
@@ -718,6 +718,11 @@
    "bajtow": 121104
   },
   {
+   "sciezka": "gra/obrazki/ui-ledger-header.webp",
+   "sha": "083b9b4db665ca0a6afc552895ae96d4b4be23bd7d76020ce1a8e12dc4268d40",
+   "bajtow": 23650
+  },
+  {
    "sciezka": "gra/wyglad/desktop.css",
    "sha": "ef66a39d540f17b6ea0ff5c13d1c60987c56a665e89e09c352363664d9d8efd5",
    "bajtow": 12469
@@ -729,8 +734,8 @@
   },
   {
    "sciezka": "gra/wyglad/sejm-v4.css",
-   "sha": "3b97945857a057b49a34349fd9ec2d2557f30d71bbe5942e9231a15d4541899b",
-   "bajtow": 111290
+   "sha": "1343003d768e05c36b5c6f9ca17edf59fa4344ff227137c84f0862220d206dca",
+   "bajtow": 114948
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -755,6 +760,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "c87b7c8e15b2b042b918dbaa2d01d57bbecfc1a3"
+ }
 }
