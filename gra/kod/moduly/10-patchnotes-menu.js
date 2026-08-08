@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.171':{data:'8 sierpnia 2026',zmiany:[
+  'Nawigacja na waskim ekranie nie chowa juz zakladek w drugim i trzecim rzedzie.',
+  'Wszystkie kanaly siedza w jednym poziomym grzbiecie i przewijaja sie lewo-prawo.',
+ ]},
  '1.1.170':{data:'8 sierpnia 2026',zmiany:[
   'Przewijane mapy, tabele i kroki kreatora maja teraz wspolny ciemny scrollbar.',
   'Akcent partii steruje jego kolorem, wiec systemowy jasny pasek nie wybija juz z atlasu.',

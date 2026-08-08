@@ -2695,3 +2695,12 @@ body:has(.hud) *::-webkit-scrollbar-thumb:hover,
 body:has(.kreekran) *::-webkit-scrollbar-thumb:hover{
   background:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 84%,#d9bb76)
 }
+
+/* 1.1.171: nav nie moze zawijac zakladek pod spod, bo druga i trzecia linia
+   byly potem obcinane przez overflow-y:hidden. Jeden grzbiet przewija sie
+   poziomo i zawsze pokazuje komplet kanalow. */
+@media(max-width:1120px){
+  body:not(:has(.mg)) .wrap>.nav{
+    flex-wrap:nowrap!important;white-space:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important
+  }
+}
