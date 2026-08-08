@@ -4,6 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.110':{data:'8 sierpnia 2026', zmiany:[
+  'Ranking dworski na malym ekranie nie ma juz ukrytej szerokosci; kolumna bierze dokladnie tyle miejsca, ile widzi gracz.',
+ ]},
+ '1.1.109':{data:'8 sierpnia 2026', zmiany:[
+  'Sejm ma osobna scenografie sali obrad, sondaż dostał rytm rejestru, a ranking dworski nie jest juz jedna dluga kolumna.',
+ ]},
  '1.1.108':{data:'8 sierpnia 2026', zmiany:[
   'Zaplecza obcych partii sa teraz rejestrem dwoch kolumn, wiec zakladka nie ciagnie sie bez konca na szerokim ekranie.',
  ]},
