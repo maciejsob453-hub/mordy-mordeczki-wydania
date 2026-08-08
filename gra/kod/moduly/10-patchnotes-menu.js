@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.182':{data:'9 sierpnia 2026',zmiany:[
+  'Zegar ma teraz czytelna date bez dodatkowych opisow dnia, tygodnia i technicznych komunikatow.',
+  'Naprawiono klikalnosc nawigacji po wejscu w Cele oraz wymiarowanie selektora partii i Sadu.'
+ ]},
  '1.1.181':{data:'9 sierpnia 2026',zmiany:[
   'Cele partyjne dostaja ekran centrum dowodzenia z drzewem celow, inspektorem warunkow i alertami.',
   'Panel celow pokazuje teraz partie, postep, date symulacji i sterowanie czasem bez otwierania wielu stron.'
@@ -1175,13 +1179,13 @@ function game(){
         </select>
       </div>
       <button class="sndbtn" onclick="toggleMute()" title="${G.mute?'Włącz dźwięk':'Wycisz'}">${G.mute?'♪̸':'♪'}</button>
-      <div class="datechip" key="${G.term}-${G.week}"><b>${dateStr(gameDate())}</b><span>K${G.term} · tydzień ${G.week} z ${G.weeks} · dzień ${G.dzienTygodnia||1}/7 · godz. ${String(G.godzina??8).padStart(2,'0')}:00</span></div>
+      <div class="datechip" key="${G.term}-${G.week}"><b>${dateStr(gameDate())}</b></div>
       <button class="btn g sm" onclick="openSave()" title="Zapis i wczytanie">Zapis</button>
       <!-- wyjście do menu siedziało wcześniej dopiero w oknie zapisu i nikt go tam nie szukał -->
       <button class="btn g sm" onclick="doLobby()" title="Wyjście do menu głównego">Menu</button>
       ${G.phase==='finalcamp'
         ? `<button class="btn tura" onclick="closeFinalCamp()">Otwieram urny →</button>`
-        : `<span class="simflow"><b>ŚWIAT PŁYNIE</b><span>ticki, wydarzenia i gospodarka działają bez tur</span></span>`}
+        : ''}
     </div>
   </div>
   ${G.phase==='finalcamp'?campBar():''}

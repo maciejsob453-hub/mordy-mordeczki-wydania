@@ -426,3 +426,35 @@ body:not(:has(.mg)):has(.hud) .goals-command-empty p{margin:0;font-size:12px}
 @media(max-width:1250px){body:not(:has(.mg)):has(.hud) .goals-command-layout{grid-template-columns:150px minmax(0,1fr) 285px}body:not(:has(.mg)):has(.hud) .goal-tree-row{grid-auto-columns:minmax(160px,1fr)}}
 @media(max-width:1020px){body:not(:has(.mg)):has(.hud) .goals-command-layout{grid-template-columns:145px minmax(0,1fr)}body:not(:has(.mg)):has(.hud) .goals-inspector{grid-column:1/-1;border-left:0;border-top:1px solid var(--gc-line);max-height:none}body:not(:has(.mg)):has(.hud) .goals-inspector:not(.empty){display:grid;grid-template-columns:1fr 1fr;gap:0 14px}body:not(:has(.mg)):has(.hud) .goals-inspector>.goal-inspector-top,body:not(:has(.mg)):has(.hud) .goals-inspector>.goal-inspector-title,body:not(:has(.mg)):has(.hud) .goals-inspector>.goal-inspector-progress,body:not(:has(.mg)):has(.hud) .goals-inspector>h4,body:not(:has(.mg)):has(.hud) .goals-inspector>.goal-condition-list,body:not(:has(.mg)):has(.hud) .goals-inspector>.goal-effect-list,body:not(:has(.mg)):has(.hud) .goals-inspector>.goals-action,body:not(:has(.mg)):has(.hud) .goals-inspector>.goals-complete-stamp{grid-column:1/-1}}
 @media(max-width:720px){body:not(:has(.mg)):has(.hud) .goals-command-header{padding:12px;flex-direction:column}body:not(:has(.mg)):has(.hud) .goals-command-readout{align-items:flex-start;padding:8px 0 0;border-left:0;border-top:1px solid var(--gc-line);text-align:left}body:not(:has(.mg)):has(.hud) .goals-command-layout{display:flex;flex-direction:column}body:not(:has(.mg)):has(.hud) .goals-rail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:8px;border-right:0;border-bottom:1px solid var(--gc-line)}body:not(:has(.mg)):has(.hud) .goals-rail-divider,body:not(:has(.mg)):has(.hud) .goals-rail-label:nth-of-type(2),body:not(:has(.mg)):has(.hud) .goals-rail-stat,body:not(:has(.mg)):has(.hud) .goals-rail-legend{display:none}body:not(:has(.mg)):has(.hud) .goals-command-main{padding:11px 9px}body:not(:has(.mg)):has(.hud) .goals-branch-alert{align-items:flex-start;flex-wrap:wrap}body:not(:has(.mg)):has(.hud) .goals-branch-actions{width:100%;margin-left:0}body:not(:has(.mg)):has(.hud) .goals-branch-actions .goals-action{flex:1}body:not(:has(.mg)):has(.hud) .goals-command-footer{align-items:flex-start;flex-wrap:wrap}body:not(:has(.mg)):has(.hud) .goals-clock-dock{margin-left:0!important}body:not(:has(.mg)):has(.hud) .goals-footer-note{max-width:100%;width:100%}}
+/* Korekty czytelnoĹ›ci HUD-u i wymiarowania ekranĂłw. */
+body:not(:has(.mg)):has(.hud) .nav{position:relative;z-index:30;pointer-events:auto}
+body:not(:has(.mg)):has(.hud) .nav button{position:relative;z-index:31;pointer-events:auto}
+body:not(:has(.mg)):has(.hud) .hud .rtclock{display:flex;align-items:center;gap:6px;padding:3px;border:1px solid #6b552a;border-radius:6px;background:rgba(5,11,8,.92)}
+body:not(:has(.mg)):has(.hud) .hud .rtclock .btn{min-width:72px;border:0;border-right:1px solid #594a2b;border-radius:3px;background:rgba(217,171,69,.12);color:#efd58d;font:10px var(--m);letter-spacing:.08em}
+body:not(:has(.mg)):has(.hud) .hud .rtclock select{height:27px;min-width:47px;border:0;border-radius:3px;background:#101b13;color:var(--tx);font:11px var(--m);text-align:center}
+body:not(:has(.mg)):has(.hud) .hud .datechip{display:flex;align-items:center;justify-content:center;min-width:156px;padding:8px 14px;border:1px solid #8a6b2e;border-radius:6px;background:linear-gradient(180deg,rgba(53,43,20,.86),rgba(16,20,12,.96));box-shadow:inset 0 1px rgba(255,255,255,.1),0 0 18px -12px #d9ab45}
+body:not(:has(.mg)):has(.hud) .hud .datechip b{font:600 15px var(--fd);letter-spacing:.04em;color:#f1d88b;white-space:nowrap}
+body:not(:has(.mg)):has(.hud) .hud .datechip span{display:none}
+body:not(:has(.mg)):has(.hud) .simflow{display:none!important}
+#veil:has(.patchmdl){pointer-events:none!important}
+#veil:has(.patchmdl) .patchmdl{pointer-events:auto}
+
+/* Selektor partii: panel jest kwadratem zaleĹĽnym od szerokoĹ›ci, ale roĹ›nie przy dĹ‚ugim opisie bez obcinania treĹ›ci. */
+body:not(:has(.mg)) .partyselect.fifa .fifaparty{min-height:0!important;height:auto!important;aspect-ratio:1/1;align-self:start}
+body:not(:has(.mg)) .partyselect.fifa .pickmain{height:auto!important;min-height:0!important;overflow:visible!important;box-sizing:border-box}
+body:not(:has(.mg)) .partyselect.fifa .partyherohead{min-width:0;align-items:center}
+body:not(:has(.mg)) .partyselect.fifa .partyherohead h2{max-width:100%;margin:0;overflow-wrap:anywhere;line-height:1.08;font-size:clamp(22px,2.4vw,32px)}
+body:not(:has(.mg)) .partyselect.fifa .partyblurb{max-width:72ch;overflow-wrap:anywhere}
+body:not(:has(.mg)) .partyselect.fifa .partystats{min-width:0}
+body:not(:has(.mg)) .partyselect.fifa .partyfacts{min-width:0;overflow-wrap:anywhere}
+body:not(:has(.mg)) .intro h1{white-space:nowrap;overflow:visible;line-height:1.05}
+@media(max-width:600px){body:not(:has(.mg)) .intro h1{font-size:36px!important;white-space:normal}body:not(:has(.mg)) .partyselect.fifa .fifaparty{aspect-ratio:auto}}
+
+/* SÄ…d: wysokoĹ›Ä‡ ma wynikaÄ‡ z zawartoĹ›ci, ale gĹ‚Ăłwna rama nie moĹĽe zapadaÄ‡ siÄ™ do krĂłtkiego paska. */
+body:has(.hud) .widok[data-tab="sad"]{height:auto!important;min-height:calc(100vh - 165px);overflow:visible!important}
+body:has(.hud) .widok[data-tab="sad"] .sadekran{height:auto!important;min-height:calc(100vh - 185px);max-height:none!important;align-content:start}
+body:has(.hud) .widok[data-tab="sad"] .sadekran>.sadhero{height:auto!important;min-height:190px;box-sizing:border-box}
+body:has(.hud) .widok[data-tab="sad"] .sadkolumny>.card{height:auto!important;min-height:300px;align-self:stretch}
+body:has(.hud) .widok[data-tab="sad"] .sadekran>.card:last-child{height:auto!important;min-height:220px}
+body:has(.hud) .widok[data-tab="sad"] .sadzamkniety{height:auto!important;min-height:calc(100vh - 165px);box-sizing:border-box}
+@media(max-width:1280px){body:has(.hud) .widok[data-tab="sad"] .sadkolumny>.card{min-height:0}}
