@@ -297,3 +297,16 @@ body:not(:has(.mg)):has(.hud) .national-goal-timeline b{min-width:48px;text-alig
 body:not(:has(.mg)):has(.hud) .national-goal-meta{display:flex;justify-content:space-between;gap:14px;color:var(--dim2);font-size:12px;margin-bottom:14px}
 body:not(:has(.mg)):has(.hud) .national-goal-access,.national-goal-consequence{padding:9px 11px;margin:6px 0;border:1px solid var(--line);border-radius:8px;background:rgba(0,0,0,.16);color:var(--dim)}
 body:not(:has(.mg)):has(.hud) .national-goal h4{margin:14px 0 6px;color:var(--acc);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+body:not(:has(.mg)):has(.hud) .branch-grid,.council-primary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+body:not(:has(.mg)):has(.hud) .branch-grid .opt,.council-primary-grid .opt{text-align:left;min-height:86px}
+body:not(:has(.mg)):has(.hud) .council-callout{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;padding:12px;border:1px solid color-mix(in srgb,var(--goal-color) 44%,var(--line));border-radius:10px;background:rgba(0,0,0,.2)}
+body:not(:has(.mg)):has(.hud) .council-callout b{color:var(--acc)}
+body:not(:has(.mg)):has(.hud) .council-callout span{flex:1;min-width:220px;color:var(--dim);font-size:12px}
+body:not(:has(.mg)):has(.hud) .council-pick-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+body:not(:has(.mg)):has(.hud) .council-pick-list label{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+body:not(:has(.mg)):has(.hud) .council-pick-list label:has(input:checked){border-color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,transparent)}
+body:not(:has(.mg)):has(.hud) .council-pick-list span{display:flex;align-items:center;gap:8px}
+body:not(:has(.mg)):has(.hud) .council-count{margin-top:10px;color:var(--acc);font-weight:700}
+body:not(:has(.mg)):has(.hud) .council-primary-grid .opt small{display:block;color:var(--dim);margin-top:3px}
+body:not(:has(.mg)):has(.hud) .simflow{display:flex;flex-direction:column;justify-content:center;min-width:178px;padding:7px 12px;border:1px solid color-mix(in srgb,var(--party-theme,var(--acc)) 48%,var(--line));border-radius:8px;background:color-mix(in srgb,var(--party-theme,var(--acc)) 10%,transparent);color:var(--party-theme,var(--acc));font-size:10px;letter-spacing:.12em;text-align:center}
+body:not(:has(.mg)):has(.hud) .simflow span{margin-top:3px;color:var(--dim);font-size:9px;letter-spacing:.04em;text-transform:none}

@@ -607,7 +607,7 @@ function newGame(id){
      sztab:5,sztabMax:5,log:[],used:{},once:{},tab:'mapa',cat:'kam',sel:'ogolny',
      gov:null,pmOk:false,pmProc:null,queue:[],phase:'camp',prest:0,hist:[],prev:null,
      turnout:.85,lup:{},recCd:0,xp:0,xpOs:{},traits:[],ptraits:{},tut:null,tutSeen:{},streak:0,noise:{},useTerm:{},catUsed:{},lastAct:null,
-     king:{rel:52,paid:0}, sejmPrez:null, mar:null, goals:{}, nationalGoals:{}, agents:{}, agentWeek:null, sits:[], polls:[], scen:null,
+     king:{rel:52,paid:0}, sejmPrez:null, mar:null, goals:{}, nationalGoals:{}, partyCouncil:null, agents:{}, agentWeek:null, sits:[], polls:[], scen:null,
      rng:RNG_STATE,aiMemory:{},aiLedger:[],
      /* Simulowany kalendarz: decyzje przesuwają dzień, a luka tygodnia nadal
         pozostaje cotygodniowym limitem akcji i rozliczeń. */

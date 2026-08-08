@@ -482,14 +482,18 @@ const isPMperson=n=>!!(G.gov&&G.pmOk&&G.gov.pmLead&&G.gov.pmLead===n);
 const isPrezPerson=n=>!!(G.prez&&G.prez.lead===n);
 function prezPool(k){
   // kandydować może każdy, także urzędujący prezydent po reelekcję, poza urzędującym premierem i marszałkiem
-  return [...new Set(G.p[k].main.concat(G.p[k].bench,[G.p[k].lead]))]
+  const council=G.partyCouncil&&G.partyCouncil.party===k&&Array.isArray(G.partyCouncil.members)&&G.partyCouncil.members.length===5;
+  const source=council?(G.partyCouncil.primary&&G.partyCouncil.primaryTerm===G.term?[G.partyCouncil.primary]:G.partyCouncil.members):G.p[k].main.concat(G.p[k].bench,[G.p[k].lead]);
+  return [...new Set(source)]
     .filter(n=>!isPMperson(n)&&!isMarPerson(n));
 }
 /* Premierem zostaje ktoś ze sterów partii, ale nie ten, kto siedzi już w Pałacu
    albo na fotelu marszałka. Przy dwu- i trzyliderstwie wystarczy jeden wolny
    człowiek: partia z prezydentem na czele nadal może wystawić współprzewodniczącego. */
 function pmOsoby(k){
-  return leads(G.p[k]).filter(n=>!isPrezPerson(n)&&!isMarPerson(n));
+  const council=G.partyCouncil&&G.partyCouncil.party===k&&Array.isArray(G.partyCouncil.members)&&G.partyCouncil.members.length===5;
+  const source=council?(G.partyCouncil.pm&&G.partyCouncil.pmParty===k?[G.partyCouncil.pm]:G.partyCouncil.members):leads(G.p[k]);
+  return source.filter(n=>!isPrezPerson(n)&&!isMarPerson(n));
 }
 function pmOsoba(k){
   const wolni=pmOsoby(k);

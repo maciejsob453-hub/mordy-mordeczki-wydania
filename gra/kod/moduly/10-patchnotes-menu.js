@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.178':{data:'9 sierpnia 2026',zmiany:[
+  'Alternatywa Zydowska dostaje dwa rozwidlenia narodowe: droge republikanow i Aurea Libertas.',
+  'Rada Partyjna pozwala wybrac pieciu czlonkow i uruchamia prawybory prezydenckie.',
+  'Zegar gry plynie automatycznie bez przycisku konca tury, z pauza i tempem x0.5, x1, x2 oraz x4.'
+ ]},
  '1.1.177':{data:'9 sierpnia 2026',zmiany:[
   'Concordia dostaje osobne cele narodowe z logo, warunkami dostepu i odliczaniem dni.',
   'Cele partyjne zostaja dla partii, ktore maja wlasne sciezki, a puste zakladki znikaja.'
@@ -889,8 +894,8 @@ function creditsBox(){
 }
 const TUT=[
  {t:'Prowadzisz Stronnictwo Reisei',
-  d:'Dwie osoby, jeden mandat, ogromny sufit potencjału. U góry masz akcje na ten tydzień, kapitał, energię, sondaż i datę. '
-   +'Kadencja to dwanaście tygodni, potem wybory. Panel z prawej mówi, co robić dalej, i odblokowuje się dopiero, gdy to zrobisz.',
+  d:'Dwie osoby, jeden mandat, ogromny sufit potencjału. U góry masz akcje, kapitał, energię, sondaż i prawdziwy zegar. '
+   +'Czas płynie sam, a kadencja ma dwanaście tygodni. Możesz zatrzymać świat albo zmienić tempo.',
   ok:()=>true},
  {t:'Zadanie: otwórz Mapę okręgów',tab:'mapa',
   d:'Sześciokąty to kanały serwera, w każdym rozdaje się mandaty. Obecność w kanale mnoży twój wynik od ×0,34 do ×2,7, '
@@ -900,9 +905,9 @@ const TUT=[
   d:'Zakładka Decyzje, kategoria Kampania, decyzja <b>Kanwasing</b> w kanale <b>#ogólny</b>. Najtańszy sposób na obecność. '
    +'Z każdej kategorii możesz w tygodniu wykonać tylko jedną decyzję, więc plan na tydzień układa się sam.',
   ok:()=>(G.used.kanwas||0)>0},
- {t:'Zadanie: zakończ tydzień',
-  d:'Kliknij <b>Kolejny tydzień</b> u góry. Data przeskoczy o siedem dni, wrócą akcje i energia, a serwer w tym czasie też coś zrobi. '
-   +'Zdarzenia losowe rozwiążesz w oknie, które się pojawi.',
+ {t:'Zadanie: puść czas',
+  d:'Włącz zegar u góry i obserwuj, jak data przesuwa się sama. Po tygodniu wrócą limity i energia, ale nie ma już przycisku końca tury. '
+   +'Zdarzenia losowe pojawiają się w trakcie płynięcia świata.',
   ok:()=>G.week>=2},
  {t:'Zadanie: wiec, czyli kombinacja',tab:'akcje',
   d:'Zrób <b>Wiec w kanale</b> w tym samym <b>#ogólnym</b>. Kanwasing przed wiecem to kombinacja <b>×1,55</b>: '
@@ -1154,7 +1159,7 @@ function game(){
       <div class="rtclock" title="Opcjonalny zegar czasu rzeczywistego">
         <button class="btn g sm" onclick="realClockToggle()">${G.realPaused?'▶ Czas':'⏸ Pauza'}</button>
         <select onchange="realClockSpeed(this.value)" aria-label="Tempo czasu rzeczywistego">
-          ${[1,4,12,24].map(v=>`<option value="${v}" ${G.realSpeed===v?'selected':''}>x${v}</option>`).join('')}
+          ${[.5,1,2,4].map(v=>`<option value="${v}" ${G.realSpeed===v?'selected':''}>x${v}</option>`).join('')}
         </select>
       </div>
       <button class="sndbtn" onclick="toggleMute()" title="${G.mute?'Włącz dźwięk':'Wycisz'}">${G.mute?'♪̸':'♪'}</button>
@@ -1164,7 +1169,7 @@ function game(){
       <button class="btn g sm" onclick="doLobby()" title="Wyjście do menu głównego">Menu</button>
       ${G.phase==='finalcamp'
         ? `<button class="btn tura" onclick="closeFinalCamp()">Otwieram urny →</button>`
-        : `<button class="btn tura" onclick="endWeek()">${G.week>=G.weeks?'Do wyborów →':'Kolejny tydzień →'}</button>`}
+        : `<span class="simflow"><b>ŚWIAT PŁYNIE</b><span>ticki, wydarzenia i gospodarka działają bez tur</span></span>`}
     </div>
   </div>
   ${G.phase==='finalcamp'?campBar():''}

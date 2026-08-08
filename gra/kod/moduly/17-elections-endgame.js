@@ -1082,8 +1082,21 @@ function liczenie(wlacz){
 }
 function prezNightSkip(){if(G.prezNight){G.prezNight.i=G.prezNight.frames;render()}}
 function prezNightEnd(){if(G.prezNight)G.prezNight.done=true;render()}
+function partyCouncilNeedsPrimary(){
+  return !!(G&&me()&&me().councilMode&&G.partyCouncil&&G.partyCouncil.party===G.me&&Array.isArray(G.partyCouncil.members)&&G.partyCouncil.members.length===5&&G.partyCouncil.primaryTerm!==G.term);
+}
+function partyCouncilPrimaryScreen(){
+  const members=G.partyCouncil.members;
+  app.innerHTML=ekran(`<div class="card"><div class="h"><div class="k">RADA PARTYJNA · PRAWYBORY</div><h2>Wybierz kandydata na prezydenta</h2></div><div class="b"><p>Rada Partyjna wystawia jedną osobę. Dopiero potem zaczyna się właściwa kampania i wybory całego serwera.</p><div class="council-primary-grid">${members.map(n=>{const x=L(n);return `<button class="opt" onclick="partyCouncilChoosePrimary('${esc(n)}')"><div style="display:flex;align-items:center;gap:10px">${ava(n,me().c,42)}<span><b>${n}</b><small>charyzma ${x.char} · kompetencja ${x.komp}</small></span></div></button>`}).join('')}</div></div></div>`);
+}
+function partyCouncilChoosePrimary(n){
+  if(!partyCouncilNeedsPrimary()||!G.partyCouncil.members.includes(n))return;
+  G.partyCouncil.primary=n;G.partyCouncil.primaryTerm=G.term;G.prezWho=n;
+  say(`<b>Prawybory Rady Partyjnej.</b> ${n} otrzymuje nominację na prezydenta.`,'roy');render();
+}
 function prezScreen(){
   if(G.prezNight&&!G.prezNight.done)return prezNightScreen();
+  if(partyCouncilNeedsPrimary())return partyCouncilPrimaryScreen();
   const st=G.prezState;
   if(!st){
     const pool=prezPool(G.me);

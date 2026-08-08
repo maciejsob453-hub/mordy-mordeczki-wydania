@@ -444,6 +444,7 @@ const IDENT_BRAND={
  cenMode:{n:'Partia Centrum',ab:'PC',c:'#1f7f86',logo:'CEN'},
  hegMode:{n:'Hegemonia Perspektywiczna',ab:'HP',c:'#c8952b',logo:'HEG'},
  azMode:{n:'Alternatywa Żydowska',ab:'AŻ',c:'#d46b9a',logo:'ALT'},
+ aureaMode:{n:'Aurea Libertas',ab:'AL',c:'#d9b34a',logo:'ALT'},
 };
 const myIdentities=()=>{const p=G&&G.p[G.me];return p?Object.keys(IDENT_BRAND).filter(m=>p[m]):[]};
 function switchIdentity(mode){
@@ -491,18 +492,70 @@ const NATIONAL_GOALS={
   accessText:'Relacja z PKD musi wynosić co najmniej +50.',
   cons:['Powstaje Alternatywa Żydowska (AŻ).','Wiarygodność +5, aktywność +4 i jedność +3.'],
   access:()=>!!(G&&G.rel&&G.rel[G.me]&&G.rel[G.me].PKD>=50),
-  run(){const p=me();p.n='Alternatywa Żydowska';p.ab='AŻ';p.c='#d46b9a';p.logo='ALT';p.azMode=1;p.cred=cl(p.cred+5);p.act=cl(p.act+4);p.uni=cl(p.uni+3);M(p,8)}}
+  run(){const p=me();p.n='Alternatywa Żydowska';p.ab='AŻ';p.c='#d46b9a';p.logo='ALT';p.azMode=1;p.cred=cl(p.cred+5);p.act=cl(p.act+4);p.uni=cl(p.uni+3);M(p,8)}},
+ nplr_blue:{n:'Niebieski blask na oczach mych',days:70,prev:'nplr_star',branch:'republican',logo:'REP',
+  what:'Alternatywa Żydowska zbiera ludzi, którzy pamiętają dawny niebieski szyld i chcą go odbudować bez skrótu na samą nazwę.',
+  accessText:'W partii muszą być Kaziu, Europejczyk, Eniki, Tako i Ponczus.',
+  cons:['Sława +10, wiarygodność +8 i aktywność +6.','Otwiera drogę do dyplomatycznego odtworzenia Republikanów.'],
+  access:()=>!!(G&&G.p[G.me]&&['Kaziu','Europejczyk','Eniki','Tako','Ponczus'].every(n=>roster(G.p[G.me]).includes(n))),
+  run(){const p=me();p.nplrBlue=1;p.fame=cl(p.fame+10);p.cred=cl(p.cred+8);p.act=cl(p.act+6);M(p,10)}},
+ nplr_diplomacy:{n:'Ciągłość dyplomatyczna',days:35,prev:'nplr_blue',branch:'republican',logo:'REP',
+  what:'Nie wystarczy znać dawnych ludzi. Trzeba jeszcze sprawić, żeby republikański blok chciał z tobą usiąść przy jednym stole.',
+  accessText:'Poprzedni cel narodowy musi być ukończony.',
+  cons:['Relacje z partiami republikańskimi rosną o 18.','Koalicje z partiami republikańskimi wymagają niższej relacji.'],
+  access:()=>true,
+  run(){const p=me();const rep=GOALS.republika.for.filter(k=>k!==G.me&&G.p[k]&&!G.p[k].dead);rep.forEach(k=>{G.rel[G.me][k]=cl(G.rel[G.me][k]+18,-100,100);G.rel[k][G.me]=cl(G.rel[k][G.me]+18,-100,100)});p.cred=cl(p.cred+7);p.act=cl(p.act+3)}},
+ nplr_council:{n:'Rada to nasza strofa',days:70,prev:'nplr_diplomacy',branch:'republican',logo:'REP',
+  what:'Partia przestaje być jednym nazwiskiem. Zaplecze staje się Radą Partyjną, która wybiera własne twarze i prowadzi linię ugrupowania.',
+  accessText:'Poprzedni cel narodowy musi być ukończony.',
+  cons:['Powstaje Rada Partyjna z pięcioma wybranymi członkami.','Rada wybiera kandydatów na prezydenta w prawyborach.','Kandydaci na premiera są wybierani z Rady, nie z całego zaplecza.'],
+  access:()=>true,
+  run(){const p=me();p.councilMode=1;G.partyCouncil={party:G.me,members:[],chair:null,primary:null,primaryTerm:0,pm:null};p.fame=cl(p.fame+5);p.cred=cl(p.cred+5)}},
+ nplr_gloria:{n:'Gloria Reipublicanis',days:140,prev:'nplr_council',branch:'republican',logo:'REP',
+  what:'Republikanie wracają nie jako wspomnienie, tylko jako gotowa siła państwowa. Ten cel jest długi, bo ma zmieniać całą scenę.',
+  accessText:'178 osób, przychylność Króla co najmniej 50, premier albo prezydent oraz aktywność partii 80+.',
+  cons:['Powstaje Partia Republikańska z dużym, ale niebezwarunkowym wzmocnieniem.','Sława +22, wiarygodność +16, aktywność +14 i jedność +10.'],
+  access:()=>!!(G&&me()&&me().mem>=178&&kingFav(G.me)>=50&&(isPM()||hasPrez())&&me().act>=80),
+  run(){const p=me();p.n='Partia Republikańska';p.ab='PR';p.c='#1e63d0';p.logo='REP';p.repMode=1;p.fame=cl(p.fame+22);p.cred=cl(p.cred+16);p.act=cl(p.act+14);p.uni=cl(p.uni+10);M(p,22)}},
+ nplr_power:{n:'Pielęgnacja potęgi',days:70,prev:'nplr_star',branch:'freedom',logo:'ALT',
+  what:'Alternatywa nie goni za wielkim szyldem. Najpierw utrwala to, co już ma, żeby nie rozsypać się od własnego sukcesu.',
+  accessText:'Poprzedni cel narodowy musi być ukończony.',
+  cons:['Jedność +2. To celowo mały, stały efekt.','Partia dostaje odporność na jeden najbliższy spadek jedności.'],
+  access:()=>true,
+  run(){const p=me();p.aureaCare=1;p.uni=cl(p.uni+2)}},
+ nplr_friendship:{n:'Zlot wszystkich przyjaźni',days:70,prev:'nplr_power',branch:'freedom',logo:'ALT',
+  what:'Wolnościowy blok nie jest już listą luźnych znajomych. Wszyscy muszą pojawić się przy jednym stole, zanim powstanie nowy szyld.',
+  accessText:'W partii muszą być Supernes, Pan Hod_Dog, Bartek i Maciek oraz co najmniej 100 osób.',
+  cons:['Sława +12 i wiarygodność +8.','Relacje z partiami wolnościowymi rosną o 12.'],
+  access:()=>!!(G&&me()&&me().mem>=100&&['Supernes','Pan Hod_Dog','Bartek','Maciek'].every(n=>roster(me()).includes(n))),
+  run(){const p=me();p.fame=cl(p.fame+12);p.cred=cl(p.cred+8);alive().filter(k=>k!==G.me).forEach(k=>{G.rel[G.me][k]=cl(G.rel[G.me][k]+12,-100,100);G.rel[k][G.me]=cl(G.rel[k][G.me]+12,-100,100)});M(p,12)}},
+ nplr_aurea:{n:'Alternatywa całego bloku wolnościowego',days:70,prev:'nplr_friendship',branch:'freedom',logo:'ALT',
+  what:'Z przyjaźni powstaje własna marka: Aurea Libertas — mocna, złota alternatywa dla starego układu.',
+  accessText:'Poprzedni cel narodowy musi być ukończony.',
+  cons:['Powstaje Aurea Libertas z dużym, lecz mniejszym od Republikanów wzmocnieniem.','Sława +16, wiarygodność +11, aktywność +9 i jedność +5.'],
+  access:()=>true,
+  run(){const p=me();p.aureaMode=1;p.n='Aurea Libertas';p.ab='AL';p.c='#d9b34a';p.logo='ALT';p.fame=cl(p.fame+16);p.cred=cl(p.cred+11);p.act=cl(p.act+9);p.uni=cl(p.uni+5);M(p,14)}},
+ nplr_aurea_republic:{n:'Republika po złotym świcie',days:140,prev:'nplr_aurea',branch:'freedom',logo:'REP',optional:true,
+  what:'Aurea Libertas może jeszcze wrócić do republikańskiej korony. To dodatkowa, trudna droga, nie obowiązek.',
+  accessText:'178 osób, przychylność Króla 50+, premier albo prezydent oraz aktywność 80+.',
+  cons:['Aurea Libertas przechodzi w Partię Republikańską.','Duży pakiet sławy, wiarygodności, aktywności i jedności.'],
+  access:()=>!!(G&&me()&&me().mem>=178&&kingFav(G.me)>=50&&(isPM()||hasPrez())&&me().act>=80),
+  run(){const p=me();p.n='Partia Republikańska';p.ab='PR';p.c='#1e63d0';p.logo='REP';p.repMode=1;p.fame=cl(p.fame+20);p.cred=cl(p.cred+14);p.act=cl(p.act+12);p.uni=cl(p.uni+8);M(p,20)}}
 };
+const NATIONAL_BASE_ORDER=['nplr_liberal','nplr_hotdog','nplr_rose','nplr_king','nplr_jewish','nplr_star'];
+const NATIONAL_BRANCHES={republican:{name:'Rozwidlenie republikańskie',ids:['nplr_blue','nplr_diplomacy','nplr_council','nplr_gloria']},freedom:{name:'Rozwidlenie wolnościowe',ids:['nplr_power','nplr_friendship','nplr_aurea','nplr_aurea_republic']}};
 const NATIONAL_ORDER=Object.keys(NATIONAL_GOALS);
+function nationalSequence(){const s=nationalState();return NATIONAL_BASE_ORDER.concat(s&&s.branch&&NATIONAL_BRANCHES[s.branch]?NATIONAL_BRANCHES[s.branch].ids:[])}
 function nationalState(){
   if(!G)return null;
   if(!G.nationalGoals)G.nationalGoals={};
-  if(!G.nationalGoals.concordia||typeof G.nationalGoals.concordia!=='object')G.nationalGoals.concordia={active:null,started:{},done:{},completedAt:{}};
+  if(!G.nationalGoals.concordia||typeof G.nationalGoals.concordia!=='object')G.nationalGoals.concordia={active:null,started:{},done:{},completedAt:{},branch:null,waiting:null};
   const s=G.nationalGoals.concordia;
   s.started=s.started&&typeof s.started==='object'?s.started:{};
   s.done=s.done&&typeof s.done==='object'?s.done:{};
   s.completedAt=s.completedAt&&typeof s.completedAt==='object'?s.completedAt:{};
   if(s.active===undefined)s.active=null;
+  if(s.branch!==null&&!NATIONAL_BRANCHES[s.branch])s.branch=null;
   return s;
 }
 function nationalDayIndex(){
@@ -510,7 +563,14 @@ function nationalDayIndex(){
   const tyg=Math.max(1,Number(G.weeks)||12),term=Math.max(1,Number(G.term)||1),week=Math.max(1,Number(G.week)||1),day=Math.max(1,Number(G.dzienTygodnia)||1);
   return (term-1)*tyg*7+(week-1)*7+(day-1);
 }
-function myNationalGoals(){return G&&G.me==='PLR'?NATIONAL_ORDER.slice():[]}
+function myNationalGoals(){return G&&G.me==='PLR'?nationalSequence():[]}
+function chooseNationalBranch(branch){
+  if(!G||G.me!=='PLR'||!NATIONAL_BRANCHES[branch])return;
+  const s=nationalState();if(s.branch||!s.done.nplr_star)return;
+  s.branch=branch;s.waiting=null;
+  say(`<b>Rozwidlenie celu narodowego.</b> Wybrano: ${NATIONAL_BRANCHES[branch].name}.`,'roy');
+  nationalGoalTick();render();
+}
 function nationalGoalAccess(id){
   const g=NATIONAL_GOALS[id];if(!g||!G)return false;
   try{return !g.access||!!g.access()}catch(e){return false}
@@ -523,6 +583,7 @@ function nationalGoalProgress(id){
 }
 function nationalGoalReason(id){
   const g=NATIONAL_GOALS[id],s=nationalState();if(!g||!s)return '';
+  if(g.branch&&!s.branch)return 'Najpierw wybierz jedno z dwóch rozwidleń.';
   if(g.prev&&!s.done[g.prev])return 'Najpierw ukończ: '+NATIONAL_GOALS[g.prev].n+'.';
   if(!nationalGoalAccess(id))return g.accessText||'Warunek dostępu nie jest jeszcze spełniony.';
   return '';
@@ -538,7 +599,8 @@ function nationalComplete(id){
 function nationalGoalTick(){
   if(!G||PROBA||G.me!=='PLR')return;
   const s=nationalState(),today=nationalDayIndex();
-  for(const id of NATIONAL_ORDER){
+  if(s.done.nplr_star&&!s.branch){s.waiting='branch';return}
+  for(const id of nationalSequence()){
     const g=NATIONAL_GOALS[id];if(s.done[id])continue;
     if(s.active&&s.active!==id)return;
     if(s.active===id){
@@ -670,6 +732,30 @@ function goalCard(id){
     ${done?'':`<button class="btn" style="margin-top:16px" ${all?'':'disabled'} onclick="doGoal('${id}')">${all?'Wypełniam cel →':'Warunki jeszcze nie spełnione'}</button>`}
   </div></div>`;
 }
+function partyCouncilCandidates(){
+  if(!G||!G.p||!G.p[G.me])return [];
+  return roster(G.p[G.me]).filter(Boolean);
+}
+function openPartyCouncil(){
+  if(!G||!me().councilMode)return;
+  const choices=partyCouncilCandidates(),current=(G.partyCouncil&&G.partyCouncil.members)||[];
+  const v=document.createElement('div');v.className='veil';v.id='veil';
+  v.innerHTML=`<div class="mdl council-modal"><button class="mdlx" type="button" aria-label="Zamknij">×</button>
+    <div class="h"><div class="k">RADA PARTYJNA</div><h2>Wybierz pięć osób</h2></div><div class="bd">
+    <p>Rada jest twoim zapleczem. Jej członkowie mogą startować w prawyborach prezydenckich i być wskazywani na premiera.</p>
+    <div class="council-pick-list">${choices.map((n,i)=>`<label><input type="checkbox" data-i="${i}" ${current.includes(n)?'checked':''}><span>${ava(n,me().c,30)}<b>${n}</b></span></label>`).join('')}</div>
+    <div class="council-count" id="councilCount">Wybrano ${current.length} / 5</div></div>
+    <div class="op"><button class="btn" id="councilSave">Zapisz skład rady</button></div></div>`;
+  document.body.appendChild(v);
+  const count=()=>{const n=v.querySelectorAll('input:checked').length;v.querySelector('#councilCount').textContent=`Wybrano ${n} / 5`;v.querySelector('#councilSave').disabled=n!==5};
+  v.querySelectorAll('input').forEach(x=>x.onchange=count);count();
+  v.querySelector('.mdlx').onclick=()=>{close();render()};
+  v.querySelector('#councilSave').onclick=()=>{const members=[...v.querySelectorAll('input:checked')].map(x=>choices[+x.dataset.i]);if(members.length!==5)return;G.partyCouncil=G.partyCouncil||{party:G.me};G.partyCouncil.party=G.me;G.partyCouncil.members=members;G.partyCouncil.chair=members[0];G.partyCouncil.primary=null;G.partyCouncil.primaryTerm=0;say(`<b>Rada Partyjna powołana.</b> Pięć osób przejmuje wspólne zaplecze partii.`,'roy');close();render()};
+}
+function nationalBranchSelector(){
+  const s=nationalState();if(!s||!s.done.nplr_star||s.branch)return '';
+  return `<div class="national-branch-choice card"><div class="h"><h3>Wybierz dalszą drogę</h3><span class="n">rozwidlenie po Alternatywie</span></div><div class="b"><p class="dim">Alternatywa Żydowska może odbudować Republikanów albo zbudować Aurea Libertas. Wyboru nie da się cofnąć w tej kampanii.</p><div class="branch-grid"><button class="opt" onclick="chooseNationalBranch('republican')"><b>Droga republikańska</b><span>Blask, dyplomacja, Rada Partyjna i Gloria Reipublicanis.</span></button><button class="opt" onclick="chooseNationalBranch('freedom')"><b>Droga wolnościowa</b><span>Pielęgnacja potęgi, przyjaźnie i Aurea Libertas.</span></button></div></div></div>`;
+}
 function nationalGoalCard(id){
   const g=NATIONAL_GOALS[id],p=nationalGoalProgress(id),reason=nationalGoalReason(id),src=g.avatar||LOGOS[g.logo]||'';
   const status=p.done?'ukończony':p.active?'w toku':reason?'zablokowany':'czeka na start';
@@ -683,6 +769,7 @@ function nationalGoalCard(id){
       <div class="national-goal-meta"><span>${p.active?'Odliczanie trwa według kalendarza gry.':p.done?'Ukończono w dniu '+(nationalState().completedAt[id]??'—')+'.':reason||'Cel rozpocznie się automatycznie.'}</span><span>${g.days} dni</span></div>
       <h4>Warunek dostępu</h4><div class="national-goal-access">${g.accessText||'Poprzedni cel musi być ukończony.'}</div>
       <h4>Konsekwencje</h4>${g.cons.map(c=>`<div class="national-goal-consequence">${c}</div>`).join('')}
+      ${id==='nplr_council'&&p.done?`<div class="council-callout"><b>Rada Partyjna</b><span>${G.partyCouncil&&G.partyCouncil.members&&G.partyCouncil.members.length===5?'Skład zapisany · '+G.partyCouncil.members.join(', '):'Nie wybrano jeszcze pięciu członków.'}</span>${G.partyCouncil&&G.partyCouncil.members&&G.partyCouncil.members.length===5?'':'<button class="btn sm" onclick="openPartyCouncil()">Wybierz radę →</button>'}</div>`:''}
     </div>
   </article>`;
 }
@@ -1240,6 +1327,7 @@ function goalTab(){
   nationalGoalTick();
   const party=myPartyGoals(),national=myNationalGoals();
   let out=identSwitcher();
+  if(national.length)out+=nationalBranchSelector();
   if(national.length)out+=`<section class="national-goals-panel"><div class="goals-section-head"><div><span class="eyebrow">CONCORDIA · DZIENNIK PRZEŁOMÓW</span><h2>Cele narodowe</h2><p>Łańcuch celów uruchamia się po spełnieniu warunków i odlicza dni w kalendarzu gry.</p></div><span class="goals-section-count">${national.filter(nationalGoalDone).length} / ${national.length}</span></div>${national.map(nationalGoalCard).join('')}</section>`;
   if(party.length)out+=`<section class="party-goals-panel"><div class="goals-section-head"><div><span class="eyebrow">PROGRAM PARTII</span><h2>Cele partyjne</h2><p>Jednorazowe przemiany zostają dostępne dla partii, które naprawdę je mają.</p></div><span class="goals-section-count">${party.filter(goalDone).length} / ${party.length}</span></div>${party.map(goalCard).join('')}</section>`;
   if(!national.length&&!party.length)out+=`<div class="card"><div class="h"><h3>Brak celów</h3></div><div class="b"><p class="dim">Ta partia nie ma obecnie osobnego dziennika celów.</p></div></div>`;

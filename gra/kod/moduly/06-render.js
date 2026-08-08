@@ -110,7 +110,7 @@ const ava=(name,col,sz)=>{
   const s=sz||38;
   return im?`<img class="avaimg" src="${im}" alt="${name}" style="width:${s}px;height:${s}px;border-color:${col}">`
    :`<span class="ava" style="background:${col};width:${s}px;height:${s}px;font-size:${s*.38}px">${initials(name)}</span>`};
-const leadName=k=>leads(G.p[k]).join(' / ');
+const leadName=k=>G&&G.partyCouncil&&G.partyCouncil.party===k&&G.partyCouncil.members&&G.partyCouncil.members.length===5?'Rada Partyjna':leads(G.p[k]).join(' / ');
 const leadAva=(k,sz)=>{const p=G.p[k],s=sz||38,ls=leads(p);
   if(ls.length<2)return ava(p.lead,p.c,s);
   // im więcej przewodniczących, tym mocniej portrety zachodzą na siebie

@@ -25,7 +25,9 @@ const ODNOWA_GODZ={wiec:30,kanwas:24,spot:48,debata:96,memy:18,manifest:96,rekr:
   przekw:48,kampania_prm:96,luz:18,konsult:48,przepr:36,podkup:72,admin:120,
   chlodzenie:36,depret:36,ustawa:120,oredzie:72,dymisja:72,zmianaMin:72,rozwiaz:120,
   wotum:96,oredzieP:72,sabotaz:96,odp:24};
-const czasGlobalny=()=>G?((G.term||1)*1000+(G.week||1))*168+(G.czasGodzTygodnia||0):0;
+/* Jeden zegar świata dla odnowień. Kadencja i tydzień są tylko etykietą
+   kalendarza; cooldown liczy się z ciągłej liczby godzin od startu gry. */
+const czasGlobalny=()=>G?(((Math.max(1,G.term||1)-1)*(G.weeks||12)+(Math.max(1,G.week||1)-1))*168)+(G.czasGodzTygodnia||0):0;
 const czasOdnowy=a=>Math.max(0,Math.round(+((a||{}).odnowa||ODNOWA_GODZ[(a||{}).id]||0)));
 const odnowaPozostala=a=>Math.max(0,Math.ceil((((G.odnowy&&G.odnowy[a.id])||0)-czasGlobalny())/24));
 function czasAkcji(a){

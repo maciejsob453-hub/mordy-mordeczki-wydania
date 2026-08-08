@@ -4,18 +4,22 @@ let REAL_TIMER=null;
 function realClockInit(){
   if(!G)return;
   if(typeof G.realSpeed!=='number')G.realSpeed=1;
-  if(typeof G.realPaused!=='boolean')G.realPaused=true;
+  if(typeof G.realPaused!=='boolean')G.realPaused=false;
+  if(!G.realPaused&&!REAL_TIMER)REAL_TIMER=setInterval(realClockPaint,1000);
 }
 function realClockPaint(){
   if(!G||PROBA||G.realPaused)return;
-  if(typeof document!=='undefined'&&document.querySelector('.veil')){G.realPaused=true;render();return;}
-  G.czasGodzTygodnia=(G.czasGodzTygodnia||0)+Math.max(1,Math.round(G.realSpeed));
+  /* Okno decyzji nie zatrzymuje świata. Pauza jest wyłącznie świadomą akcją
+     gracza, a modal może zostać na ekranie podczas dalszego upływu czasu. */
+  G.czasGodzTygodnia=(G.czasGodzTygodnia||0)+Math.max(.5,Number(G.realSpeed)||1);
   G.czasTygodnia=Math.floor(G.czasGodzTygodnia/24);
   G.dzienTygodnia=Math.min(7,Math.floor(G.czasTygodnia)+1);
   G.godzina=(8+(G.czasGodzTygodnia%24))%24;
   if(G.czasGodzTygodnia>=168){
-    G.realPaused=true;G.czasGodzTygodnia=0;G.czasTygodnia=0;G.dzienTygodnia=1;G.godzina=8;
-    endWeek();return;
+    /* EndWeek jest teraz niewidocznym tickiem symulacji: odświeża gospodarkę,
+       AI i limity tygodniowe, ale nie czeka na kliknięcie „następny tydzień”. */
+    G.czasGodzTygodnia=168;G.czasTygodnia=7;G.dzienTygodnia=7;G.godzina=8;
+    endWeek(true);return;
   }
   render();
 }
@@ -29,7 +33,7 @@ function realClockToggle(){
   if(G.realPaused)realClockStart();else{G.realPaused=true;render()}
 }
 function realClockSpeed(v){
-  realClockInit();const n=Number(v);G.realSpeed=[1,4,12,24].includes(n)?n:1;render();
+  realClockInit();const n=Number(v);G.realSpeed=[.5,1,2,4].includes(n)?n:1;render();
 }
 function buildEvents(){
   /* Nie w trakcie wyborów. Wydarzenie wskakujące w środek liczenia głosów albo
@@ -68,9 +72,9 @@ function pusteResorty(){
     .filter(n=>!zajeci.includes(n));
   return wolni.length?puste:[];
 }
-function endWeek(){
+function endWeek(automatic=false){
   const puste=pusteResorty();
-  if(puste.length){
+  if(puste.length&&!automatic){
     G.tab='premier';
     SFX.bad();
     modal('Kancelaria premiera','Rada ministrów niekompletna',
@@ -84,7 +88,8 @@ function endWeek(){
     render();
     return;
   }
-  if(typeof sadWymagaObslugi==='function'&&sadWymagaObslugi()){
+  if(puste.length&&automatic)say('<b>Wakat w radzie ministrów.</b> Symulacja płynie dalej, a brak resortów osłabia rząd.','bad');
+  if(typeof sadWymagaObslugi==='function'&&sadWymagaObslugi()&&!automatic){
     G.tab='sad';
     modal('Sąd','Najpierw obsadź skład sądu',
       `<p>Ustawa o sądzie weszła w życie, ale nadal brakuje sędziów. Każda kandydatura musi przejść przez głosowanie sejmu.</p>
@@ -93,6 +98,7 @@ function endWeek(){
     render();
     return;
   }
+  if(typeof sadWymagaObslugi==='function'&&sadWymagaObslugi()&&automatic)say('<b>Wakat w sądzie.</b> Sprawy czekają na kandydatów, ale kalendarz nie zatrzymuje świata.','bad');
   const p=me();
   const dateFrom=gameDate();
   ustawPlany();

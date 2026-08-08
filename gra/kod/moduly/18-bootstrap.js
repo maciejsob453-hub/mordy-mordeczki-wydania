@@ -50,7 +50,7 @@ function loadCode(code){
     G.p[k]=p2;
   }});
   PID.forEach(a=>{G.rel[a]=G.rel[a]||{};PID.forEach(b2=>{if(a!==b2&&G.rel[a][b2]===undefined)G.rel[a][b2]=RI(-8,26)})});
-  G.goals=G.goals||{};G.nationalGoals=G.nationalGoals||{};G.agents=G.agents||{};G.tutSeen=G.tutSeen||{};G.sits=G.sits||[];G.polls=G.polls||[];
+  G.goals=G.goals||{};G.nationalGoals=G.nationalGoals||{};G.partyCouncil=G.partyCouncil||null;G.agents=G.agents||{};G.tutSeen=G.tutSeen||{};G.sits=G.sits||[];G.polls=G.polls||[];
   G.aiMemory=G.aiMemory||{};G.aiLedger=Array.isArray(G.aiLedger)?G.aiLedger:[];
   /* Zapis ze starszego wydania nie zna pól, które doszły później. Bez tego gra
      wywracała się przy pierwszym kliknięciu na „G.useTerm.stery” — a to znaczy,
@@ -147,12 +147,12 @@ function dead(){
   ${ekstopka('koniec tej rozgrywki','<button class="btn" onclick="newRun()">Od nowa</button>')}`)}
 
 /* ---- eksport uchwytów ---- */
-Object.assign(window,{radykalowie,radykalowieWszystkim,iskra,waznePozycje,waznePasek,modyfikatory,podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,myPartyGoals,myNationalGoals,nationalGoalReady,nationalGoalDone,nationalGoalProgress,nationalGoalTick,NATIONAL_GOALS,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
+Object.assign(window,{radykalowie,radykalowieWszystkim,iskra,waznePozycje,waznePasek,modyfikatory,podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,myPartyGoals,myNationalGoals,chooseNationalBranch,openPartyCouncil,nationalGoalReady,nationalGoalDone,nationalGoalProgress,nationalGoalTick,NATIONAL_GOALS,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
   pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,sideToggle,
   openResort,renegocjujKontrakt,startLaw,signLaw,premierTab,prezydentTab,
-  closeFinalCamp,runFinalCamp,openEdycja,edytSet,edytOk,
+  closeFinalCamp,runFinalCamp,partyCouncilNeedsPrimary,partyCouncilChoosePrimary,openEdycja,edytSet,edytOk,
   /* _we to jednorazowa flaga animacji wejścia. Ekran przerysowuje się po każdej
      decyzji, więc gdyby karty wjeżdżały za każdym razem, gra migałaby przy każdym
      kliknięciu. Animacja ma się odpalić tylko przy realnej zmianie widoku. */
@@ -181,7 +181,7 @@ Object.assign(window,{kreMandat,kreResetMandaty,krePreset,kreRzadTryb,kreRzadTog
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
   get rng(){return G&&G.rng},get aiLedger(){return G&&G.aiLedger||[]},
   get KRE(){return KRE}, SCEN, kreatorDane,
-  myGoals,myPartyGoals,myNationalGoals,nationalGoalReady,nationalGoalDone,nationalGoalProgress,nationalGoalTick,NATIONAL_GOALS,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,
+  myGoals,myPartyGoals,myNationalGoals,chooseNationalBranch,openPartyCouncil,partyCouncilCandidates,nationalGoalReady,nationalGoalDone,nationalGoalProgress,nationalGoalTick,NATIONAL_GOALS,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,
   openDym,pusteResorty,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
   zawiedzeniKoalicjanci,demografiaSerwera,SERVER,SERVER_MAX,AGENTS,mogeZglosic,rozwiazChance,radaKto,RESORTY,pmOsoba,pmOsoby,leads,roster,
   aiTransfery,aiOpozycja,aiObsadzRade,aiRekonstrukcja,aiSad,znuzenie,hegemon,resortyPartii,leadWybrany,aiPlan,ustawPlany,aiPamiec,aiPamietaj,aiAgenda,govKontraktTick,
@@ -199,7 +199,7 @@ window.__game={przewidz,podglad,get PROBA(){return PROBA},
   LAWPAR,lawEdytowalna,lawParams,radykalnosc,aiProposeLaw,openEdycja,rozstrzygnijUstawe,
   nastrojSejmu,bylWBloku,doLobby,rysujOkno,
   CHAR,AI_STYLE,charOf,aiProfil,aiWagi,aiLos,aiOkreg,aiCel,ai,POSTERS,aiCoal,aiGoals,aiAgents,campInit,aiPrzemiana,obsadz,openResort,premierRozmowa,partiaOsoby,premierTab,prezydentTab,TOTAL_SEATS_LIVE,
-  openCamp,campBar,campRank,runFinalCamp,closeFinalCamp,
+  openCamp,campBar,campRank,runFinalCamp,closeFinalCamp,partyCouncilNeedsPrimary,partyCouncilChoosePrimary,
   get G(){return G}, czasAkcji,przesunCzas, setRender(f){render=f}, setModal(f){modal=f},
   MODY:()=>MODY, ustawMody:v=>{MODY=Array.isArray(v)?v:[]}, wczytajMody, modEfekty, modyDoScen,
   scenRuntimeStart,scenWydarzeniaTydzien,scenEventWybierz};
