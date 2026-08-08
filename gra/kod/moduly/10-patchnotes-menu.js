@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.111':{data:'8 sierpnia 2026', zmiany:[
+  'Naglowki Sondazu i Krola korzystaja teraz z wlasnych scenografii zamiast zmieniac material na mapowy.',
+ ]},
  '1.1.110':{data:'8 sierpnia 2026', zmiany:[
   'Ranking dworski na malym ekranie nie ma juz ukrytej szerokosci; kolumna bierze dokladnie tyle miejsca, ile widzi gracz.',
  ]},
