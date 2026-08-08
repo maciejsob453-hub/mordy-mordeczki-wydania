@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.134':{data:'8 sierpnia 2026', zmiany:[
+  'Panel Twoj tydzien korzysta teraz z tego samego action desk co decyzje.','Licznik ruchow i naglowek nie sa juz plaskim gradientem doklejonym nad biurkiem.',
+ ]},
  '1.1.133':{data:'8 sierpnia 2026', zmiany:[
   'Wszystkie karty Dworu korzystaja teraz z jednego gabinetu krolewskiego.','Ostatnia karta nie wraca juz do ogolnej faktury atlasu i nie wybija z klimatu rankingu.',
  ]},

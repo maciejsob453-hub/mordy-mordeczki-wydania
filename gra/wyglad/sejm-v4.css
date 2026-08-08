@@ -2199,6 +2199,15 @@ body:has(.hud) .widok[data-tab="krol"]>.card{
   box-shadow:0 16px 38px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.045)
 }
 
+/* 1.1.134: licznik ruchow jest czescia tego samego biurka co decyzje, a nie
+   osobnym gradientem nad nim. Material zostaje przygaszony, zeby akcje nadal
+   mialy najwyzszy kontrast. */
+body:has(.hud) .widok[data-tab="akcje"]>.stol{
+  background:linear-gradient(145deg,rgba(8,18,13,.86),rgba(5,12,9,.96)),url("../obrazki/ui-action-desk.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 44%,rgba(196,154,75,.3));
+  box-shadow:0 16px 36px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.045)
+}
+
 /* 1.1.128: Mordepedia jest archiwum pamieci serwera, wiec ksiegi i lampy
    buduja ramy, a srodek pozostaje pusty dla wpisow i list kadencji. */
 body:has(.hud) .widok[data-tab="mordepedia"]{
