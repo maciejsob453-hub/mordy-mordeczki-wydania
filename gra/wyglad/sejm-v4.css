@@ -1386,3 +1386,59 @@ body:has(.scenv3) #app .scenv3 .btn.btn.btn:not(:disabled),body:has(.kreekran) #
   border-color:rgba(196,154,75,.34)!important;box-shadow:inset 0 1px rgba(255,255,255,.05),0 3px 9px rgba(0,0,0,.18)!important;text-shadow:none!important;
 }
 body:has(.scenv3) #app .scenv3 .btn.btn.btn:hover:not(:disabled),body:has(.kreekran) #app .kreekran .btn.btn.btn:hover:not(:disabled){background:rgba(196,154,75,.16)!important;border-color:#d8b566!important;color:#f0dfb7!important;-webkit-text-fill-color:#f0dfb7!important}
+
+/* ------------------------------------------------------------------------
+   KOMPONENTY DANYCH: LISTA, NIE KAPSUŁKI
+   Liczby i osoby występują w wielu zakładkach. Ujednolicam je tutaj, bo
+   różne stare warianty zaokrągleń robiły wrażenie kilku niespokrewnionych UI.
+   ------------------------------------------------------------------------ */
+body:has(.hud) .pill{
+  border-radius:2px;border:1px solid rgba(196,154,75,.29);
+  background:rgba(7,15,11,.62);box-shadow:none;color:#c7d0c5;
+  font:10px var(--m);letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;
+}
+body:has(.hud) .pill.pos{border-color:rgba(113,173,101,.55);color:#9bd18a;background:rgba(66,120,63,.12)}
+body:has(.hud) .pill.neg{border-color:rgba(193,89,79,.55);color:#e49d93;background:rgba(143,53,47,.12)}
+body:has(.hud) .pill.acc{border-color:rgba(214,170,88,.55);color:#e2c078;background:rgba(171,117,38,.13)}
+body:has(.hud) .pill.roy{border-color:rgba(162,135,199,.55);color:#c5a9e4;background:rgba(104,72,142,.14)}
+body:has(.hud) .bperson{
+  border-radius:2px;padding:9px 7px;background:rgba(8,17,12,.52);
+  border:1px solid rgba(196,154,75,.18);box-shadow:none;transition:background .14s,border-color .14s;
+}
+body:has(.hud) .bperson:hover{background:rgba(196,154,75,.1);border-color:rgba(196,154,75,.42)}
+body:has(.hud) .bperson.lead{border-color:color-mix(in srgb,var(--partia,var(--atlas-brass)) 58%,rgba(196,154,75,.22));background:color-mix(in srgb,var(--partia,var(--atlas-brass)) 8%,#08120d)}
+body:has(.hud) .wcard{
+  border-radius:2px;border:1px solid color-mix(in srgb,var(--wc,#c49a4b) 48%,rgba(196,154,75,.2));
+  border-left:3px solid var(--wc,#c49a4b);background:rgba(10,20,14,.82);box-shadow:0 8px 18px rgba(0,0,0,.2);overflow:hidden;
+}
+body:has(.hud) .wcard::before{opacity:.07}
+body:has(.hud) .wcard .wlab{font-size:9px;letter-spacing:.16em;color:color-mix(in srgb,var(--wc,#c49a4b) 70%,#d7dfd4);border-bottom:1px solid rgba(196,154,75,.16);padding-bottom:6px;margin-bottom:9px}
+body:has(.hud) .wcard .wbody b{font-family:var(--fd);font-size:17px;color:#e4d8b8}
+body:has(.hud) .minrow,body:has(.hud) .minrow2{
+  border-radius:2px;border-bottom:1px solid rgba(196,154,75,.14);background:rgba(7,15,11,.2);
+  padding:9px 8px;transition:background .14s,border-color .14s;
+}
+body:has(.hud) .minrow:hover,body:has(.hud) .minrow2:hover{background:rgba(196,154,75,.08);border-color:rgba(196,154,75,.32)}
+body:has(.hud) .kfrow{margin-bottom:9px;padding:8px 10px;border:1px solid rgba(196,154,75,.18);border-left:2px solid rgba(196,154,75,.42);border-radius:2px;background:rgba(7,16,11,.42)}
+body:has(.hud) .kfhead{padding-bottom:7px;border-bottom:1px solid rgba(196,154,75,.14)}
+body:has(.hud) .ekos{border-radius:2px;padding:8px 12px;background:rgba(7,16,11,.58);border-color:rgba(196,154,75,.24);box-shadow:none}
+body:has(.hud) .ekos.szef{border-color:rgba(196,154,75,.58);background:rgba(196,154,75,.1)}
+body:has(.hud) .ubox{border-radius:2px;background:rgba(6,14,10,.52);border:1px solid rgba(196,154,75,.2);box-shadow:none;padding:13px 10px}
+body:has(.hud) .ubox b{font-family:var(--fd);font-size:22px}
+body:has(.hud) .tabliczki{border:1px solid rgba(196,154,75,.24);border-radius:2px;overflow:hidden;gap:0;background:rgba(5,12,8,.45)}
+body:has(.hud) .tabliczki>div{padding:14px 16px;background:rgba(15,28,20,.72);border-right:1px solid rgba(196,154,75,.16)}
+body:has(.hud) .tabliczki>div:last-child{border-right:0}
+body:has(.hud) .note{border-radius:2px;border-color:rgba(196,154,75,.26);background:rgba(196,154,75,.07);box-shadow:none}
+body:has(.hud) .hfil{border-radius:2px;background:rgba(12,24,17,.82);border-color:rgba(196,154,75,.24);font:10px var(--m);letter-spacing:.05em;text-transform:uppercase}
+body:has(.hud) .hfil.on{background:var(--atlas-brass);border-color:#e2c078;color:#171108}
+body:has(.hud) .mordelock{border-radius:4px;border-color:rgba(196,154,75,.32);background:linear-gradient(120deg,rgba(22,37,29,.96),rgba(8,16,12,.97)),url("../obrazki/ui-atlas-surface.webp") center/cover;box-shadow:var(--atlas-shadow),inset 0 1px rgba(255,255,255,.04)}
+body:has(.hud) .mordelock h2{font-family:var(--fd);font-size:32px;color:#efe0ba}
+body:has(.hud) .mordelockfact{border-radius:2px;border-left:3px solid var(--party-theme,var(--atlas-brass));background:rgba(5,12,8,.52)}
+
+/* Tabele i belki nie mogą tworzyć kolejnej „karty w karcie”. */
+body:has(.hud) .resgrid,body:has(.hud) .benchgrid,body:has(.hud) .ekolista,body:has(.hud) .minlist{gap:6px}
+body:has(.hud) .resort,body:has(.hud) .law{border-radius:2px;background:linear-gradient(135deg,rgba(26,43,35,.94),rgba(10,20,15,.98));border-color:rgba(196,154,75,.22);box-shadow:none}
+body:has(.hud) .resort:hover,body:has(.hud) .law:hover{border-color:rgba(196,154,75,.58);transform:translateY(-1px)}
+body:has(.hud) .agent{border-radius:2px;background:linear-gradient(135deg,rgba(26,43,35,.94),rgba(10,20,15,.98));box-shadow:none}
+body:has(.hud) .agent .btn{border-radius:2px}
+body:has(.hud) .progress,.wbar,.rbar,.trk,.votebar{border-radius:2px}

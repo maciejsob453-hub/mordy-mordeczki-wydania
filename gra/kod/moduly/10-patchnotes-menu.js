@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.98':{data:'8 sierpnia 2026', zmiany:[
+  'Ujednolicone listy osob, rzadow, ekonomii i sadu: mniej kapsulek, wiecej czytelnych wierszy i ramek.',
+  'Paski, statystyki i karty koalicyjne maja wspolny rytm, odstepy oraz kolory statusu.',
+ ]},
  '1.1.97':{data:'8 sierpnia 2026', zmiany:[
   'Domkniety redesign ekranow wejscia: wybor partii, scenariusze i kreator maja ten sam jezyk atlasu co gra.',
   'Okna decyzji maja stala rame, przycisk zamkniecia w prawym rogu i czytelne opcje z wlasnym tlem.',
