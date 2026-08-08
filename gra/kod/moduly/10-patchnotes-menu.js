@@ -4,6 +4,9 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.137':{data:'8 sierpnia 2026', zmiany:[
+  'Gabinet, Rada ministrów i Ustawy korzystaja teraz z wygenerowanej sali parlamentarnej.','Kafle premiera, prezydenta i list wyborczych maja wspolny material z Sejmem, zamiast ogolnego civic ledger.',
+ ]},
  '1.1.136':{data:'8 sierpnia 2026', zmiany:[
   'Nawigacja kanalow dostaje przygaszona fakture command rail i laczy sie teraz z gornym HUD-em w jeden pulpit.','Zakladki zachowuja poziomy pasek i czytelnosc na telefonie.',
  ]},

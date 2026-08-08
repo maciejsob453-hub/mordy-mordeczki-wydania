@@ -2228,6 +2228,16 @@ body:has(.hud) .wrap>.nav{
   box-shadow:0 12px 28px rgba(0,0,0,.26),inset 0 1px rgba(255,255,255,.04)
 }
 
+/* 1.1.137: wladza i ustawy sa czescia tej samej sali co polkole. Ciemna
+   warstwa chroni tekst, a detale law i pulpitow zostaja na obrzezach kart. */
+body:has(.hud) .widok[data-tab="sejm"] .sejmgrid>.card,
+body:has(.hud) .widok[data-tab="sejm"] .wcard,
+body:has(.hud) .widok[data-tab="sejm"] .wcard-zbiorczy{
+  background:linear-gradient(150deg,rgba(11,21,16,.88),rgba(5,11,8,.97)),url("../obrazki/ui-parliament-chamber.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--c,var(--game-accent,var(--atlas-brass))) 42%,rgba(196,154,75,.28));
+  box-shadow:0 14px 32px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.04)
+}
+
 /* 1.1.128: Mordepedia jest archiwum pamieci serwera, wiec ksiegi i lampy
    buduja ramy, a srodek pozostaje pusty dla wpisow i list kadencji. */
 body:has(.hud) .widok[data-tab="mordepedia"]{
