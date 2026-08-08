@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.152':{data:'8 sierpnia 2026',zmiany:[
+  'Gabinet, Rada ministrów i Ustawy korzystaja z jednej wygenerowanej sali gabinetowej.',
+  'Kontrakt tek jest przewijanym rejestrem, wiec szczegoly nie rozpychaja calego ekranu.',
+ ]},
  '1.1.151':{data:'8 sierpnia 2026',zmiany:[
   'Zakladki gry dostaja wlasny pionowy grzbiet kartotekowy z mosiadznymi detalami.',
   'Aktywny kanal ma przygaszona szybe, wiec tekst pozostaje czytelny na fakturze.',

@@ -2440,3 +2440,16 @@ body:has(.hud) .wrap>.nav{
 body:has(.hud) .nav button{background:rgba(5,11,8,.34)}
 body:has(.hud) .nav button:hover{background:rgba(196,154,75,.12)}
 body:has(.hud) .nav button.on{background:rgba(196,154,75,.18)}
+
+/* 1.1.152: trzy karty wladzy siedza na jednym stole gabinetowym zamiast na
+   plaskim civic ledger. Kontrakt ma wlasny przewijany rejestr, wiec lista tek
+   nie rozpycha calego ekranu. */
+body:has(.hud) .widok[data-tab="sejm"] .sejmgrid>.card{
+  background:linear-gradient(155deg,rgba(19,35,25,.86),rgba(5,12,9,.97)),url("../obrazki/ui-government-table.webp") center/cover!important;
+  border-color:rgba(196,154,75,.34);box-shadow:0 18px 42px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.05)
+}
+body:has(.hud) .widok[data-tab="sejm"] .sejmgrid>.card:first-child .govcontract{
+  max-height:132px;overflow:auto;padding-right:5px;scrollbar-color:rgba(196,154,75,.55) rgba(4,10,8,.35)
+}
+body:has(.hud) .widok[data-tab="sejm"] .sejmgrid>.card:first-child .govcontract::-webkit-scrollbar{width:5px}
+body:has(.hud) .widok[data-tab="sejm"] .sejmgrid>.card:first-child .govcontract::-webkit-scrollbar-thumb{background:rgba(196,154,75,.55);border-radius:8px}
