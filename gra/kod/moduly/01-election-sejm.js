@@ -44,6 +44,10 @@ function score(k,r,s){
   const a=p.aff[s.id]; if(a<=.05)return .0006;
   const ld=lead(k);
   let v=Math.pow(a,1.32)*Math.pow(Math.max(.1,p.pull),BAL.pullWykladnik);
+  /* PPP pozostaje mocna i grywalna dla człowieka, ale komputer nie może
+     wygrywać samym dziedzictwem startowego szyldu. Hamulec dotyczy wyłącznie
+     partii sterowanej przez AI, więc wybór PPP nie jest karą dla gracza. */
+  if(k==='PPP'&&k!==G.me)v*=.65;
   v*=(0.44+p.fame/135);
   v*=(0.64+p.cred/200);
   /* Jedność liczy się, ale przestaje być najważniejsza. Wcześniej rozpięta była

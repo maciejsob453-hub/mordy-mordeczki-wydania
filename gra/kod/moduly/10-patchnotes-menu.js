@@ -5,7 +5,7 @@
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
  '1.1.93':{data:'8 sierpnia 2026', zmiany:[
-  'AUDYT BALANSU PRZYHAMOWUJE BETONOWANIE SCENY. Seryjny zwyciezca traci wiecej przewagi, a AI PPP jest mniej agresywne i ma nizszy startowy pull.',
+  'AUDYT BALANSU PRZYHAMOWUJE BETONOWANIE SCENY. Seryjny zwyciezca traci przewage, a komputerowy PPP dostaje hamulec; gracz zachowuje pelna sile tej partii.',
   'SMOKE TEST STARTUJE PRAWDZIWA PARTIE. Zapis i odczyt sa sprawdzane po uruchomieniu rozgrywki, nie tylko na ekranie trybu.',
  ]},
  '1.1.92':{data:'8 sierpnia 2026', zmiany:[

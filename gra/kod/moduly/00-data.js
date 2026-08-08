@@ -362,7 +362,7 @@ const BASE={
  /* PPP ma największy skład i startowe mandaty, więc nie potrzebuje drugiej,
     ukrytej przewagi w mnożniku odbioru. Niższy pull zostawia jej charakter
     lidera, ale pozwala kampanii i obecności innych partii realnie ją dogonić. */
- PPP :{n:'Partia Polskich Patriotów',ab:'PPP',c:'#237a3a',founded:'25.04.2025',pull:7.200,
+ PPP :{n:'Partia Polskich Patriotów',ab:'PPP',c:'#237a3a',founded:'25.04.2025',pull:10.800,
    fame:78,cred:50,uni:40,act:35,ctr:35,pret:30,mem:39,pot:74,diff:1,
    aff:{eli:1,int:4,ser:31}, comp0:[1,7,31],
    blurb:'Największa partia serwera. 39 osób, cztery mandaty i lider, który nie odpisuje na DM.',
