@@ -193,6 +193,7 @@ function sadTab(){
 }
 
 function ekonomiaTab(){
+  if(typeof budzetInit==='function')budzetInit();
   if(!G.pkb)G.pkb=pkbLicz();        // zapisy sprzed tej wersji nie mają jeszcze PKB
   pkbZapiszOdczyt();
   const d=podzialMajatku();
@@ -219,6 +220,7 @@ function ekonomiaTab(){
         <div><b>${dK>0?'+':''}${kasaSkrot(dK)}</b><span>zmiana w tygodniu</span></div>
         <div><b>${mn.toFixed(1)}×</b><span>mnożnik obrotu</span></div>
         <div><b>${kasaSkrot(G.skarb||0)}</b><span>zebrane do skarbu</span></div>
+        <div><b class="${(G.budzet||0)<0?'bad':''}">${kasaSkrot(G.budzet||0)}</b><span>budżet rządu</span></div>
       </div>
       ${pkbWykres()}
       <div class="note" style="margin-top:14px"><b>PKB liczy się z majątku.</b>

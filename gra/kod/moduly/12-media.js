@@ -286,7 +286,7 @@ function mediaTab(){
         ich bilanse, widownię i wpływ na sondaże.</p></div>
       <div class="note" style="margin:12px 0 0">Projekt zgłasza premier albo minister
       <b>Kultury i Rozrywki</b>. Po uchwaleniu dział odblokuje się sam.</div>
-      <button class="btn" onclick="setTab('premier')">Idę do Kancelarii premiera</button>
+      <button class="btn" onclick="setTab('sejm')">Sprawdzam ustawę w Sejmie</button>
     </div></div>`;
   const lista=mediaMoje();
   const rynek=alive().filter(k=>k!==G.me).flatMap(k=>((G.aiMedia&&G.aiMedia[k])||[]).map(m=>({k,m})))

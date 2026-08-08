@@ -4,6 +4,18 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.176':{data:'9 sierpnia 2026',zmiany:[
+  'Zablokowano wejscie do rady ministrow i przejecie premiera z zamknietych kanalow.',
+  'Weto nie odblokowuje juz Mediow, Sadu ani Pedii, a kryzys koalicyjny nie wyskakuje poza rzadem.',
+  'Sejm korzysta z calej szerokosci ramy, zielony luk nie ucina kulek, a podglad decyzji nie rozpycha kondycji.',
+  'Dodano budzet rzadu z wplywami z podatkow, odsetkami od deficytu i finansowaniem eventow.',
+  'Doswiadczenie potrzebne do cech charakteru kosztuje wiecej.'
+  ,'Opcjonalny zegar czasu rzeczywistego pozwala uruchomic pauze i tempo x1, x4, x12 albo x24.'
+ ]},
+ '1.1.175':{data:'8 sierpnia 2026',zmiany:[
+  'Wybor partii ma teraz stol dossier z duzym profilem i indeksami ugrupowan zamiast zwyklej listy.',
+  'Scenariusze i kreator dostaly ten sam porzadek kart, oddech i spokojne pola do pracy.',
+ ]},
  '1.1.174':{data:'8 sierpnia 2026',zmiany:[
   'Krol dostal osobna sale ceremonialna z fioletem, tronem i spokojnym miejscem na decyzje.',
   'Noc wyborcza i wynik maja teraz wlasny protokol z urna, mapami i chlodniejszym swiatlem.',
@@ -1044,6 +1056,7 @@ function tryLoadFromSetup(){
 
 function game(){
   applyGoals();
+  if(typeof realClockInit==='function')realClockInit();
   const p=me(),q=tally(),AL=allocate(q.res,q.total);
   /* Barwa partii jest własnością całej rozgrywki, nie tylko herbu w HUD-zie.
      CSS bierze ją stąd do aktywnej zakładki, nagłówków i kart decyzji. */
@@ -1134,6 +1147,12 @@ function game(){
     ${streakBox()}
     </div>
     <div class="hudend">
+      <div class="rtclock" title="Opcjonalny zegar czasu rzeczywistego">
+        <button class="btn g sm" onclick="realClockToggle()">${G.realPaused?'▶ Czas':'⏸ Pauza'}</button>
+        <select onchange="realClockSpeed(this.value)" aria-label="Tempo czasu rzeczywistego">
+          ${[1,4,12,24].map(v=>`<option value="${v}" ${G.realSpeed===v?'selected':''}>x${v}</option>`).join('')}
+        </select>
+      </div>
       <button class="sndbtn" onclick="toggleMute()" title="${G.mute?'Włącz dźwięk':'Wycisz'}">${G.mute?'♪̸':'♪'}</button>
       <div class="datechip" key="${G.term}-${G.week}"><b>${dateStr(gameDate())}</b><span>K${G.term} · tydzień ${G.week} z ${G.weeks} · dzień ${G.dzienTygodnia||1}/7 · godz. ${String(G.godzina??8).padStart(2,'0')}:00</span></div>
       <button class="btn g sm" onclick="openSave()" title="Zapis i wczytanie">Zapis</button>

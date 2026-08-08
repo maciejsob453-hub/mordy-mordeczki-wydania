@@ -80,7 +80,7 @@ function hemi(order,w,mode){
     ${luk(Rzew,0,Math.PI,'var(--line)',1,.9)}
     ${luk(Rwew,0,Math.PI,'var(--line)',1,.55)}
 
-    ${mRzad>0?luk(Rzew+7,0,kątKonca(Math.min(mRzad,n)),'var(--pos)',3.5,.85):''}
+    <!-- Rząd jest opisany pod salą; zielony łuk nie zabiera już miejsca kulkom. -->
 
     <!-- Próg większości. Kreska biegnie wyłącznie nad ławami, bo poprowadzona
          przez środek przecinała fotele i wyglądała jak rysa na wykresie. -->

@@ -148,7 +148,12 @@ function render(){if(PROBA)return;
   if(G.sitPending&&SITS[G.sitPending]&&SITS[G.sitPending].resolve){
     const id=G.sitPending;G.sitPending=null;SITS[id].resolve();
   }
-  else if(G.queue&&G.queue.length)showEvent(G.queue.shift());
+  else if(G.queue&&G.queue.length){
+    /* Kolejka mogła powstać przed wyjściem z rządu. Kryzys koalicyjny nie może
+       wtedy czekać w pamięci i wyskoczyć już w opozycji. */
+    G.queue=G.queue.filter(e=>e&&e.id!=='kryzKoal'||inGov());
+    if(G.queue.length)showEvent(G.queue.shift());
+  }
   else if(G.scenEventPending){const z=G.scenEventPending,e=(G.scenEvents||[]).find(x=>x.id===z.id);if(e)scenEventPokaz(e,z.k);else G.scenEventPending=null}
 }
 

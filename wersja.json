@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.174",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/b6cece918de426e3581d79435cc970a2c95978d9",
+ "wersja": "1.1.176",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,13 +14,13 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "a01cf4aa80320d7e9672b671c836e7cc006d10c09b93ab11a217e10f6f6216cc",
+   "sha": "56d28eccb4601081e89193d752b49c19e209b721ce419dd9f4af1d3ee7deec0a",
    "bajtow": 531
   },
   {
    "sciezka": "gra/kod/moduly/00-data.js",
-   "sha": "c5e0af6f2e745ef5bdc5dbf241638fd5bc982ae44cb27b78a7004e472879e8f1",
-   "bajtow": 49247
+   "sha": "ae1b7b4f95076bd4dc51f169fb514d8593c5d14f0df16d1d2f5efcb399a334cc",
+   "bajtow": 49280
   },
   {
    "sciezka": "gra/kod/moduly/01-election-sejm.js",
@@ -34,8 +34,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/03-turn.js",
-   "sha": "f397f744d17a8ac4a855e9cbaddf8f9c013d2b145cd784ffed9d2c021857f54b",
-   "bajtow": 17776
+   "sha": "b04a0a03d89c4093514b77178b52e50a44f7b3fcc0190a8518bd7e828c1cf7e5",
+   "bajtow": 18890
   },
   {
    "sciezka": "gra/kod/moduly/04-ai.js",
@@ -49,8 +49,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/06-render.js",
-   "sha": "3f36ac428e667364901a77620e727ee7f79443ba2338ecee3121971256b9e5db",
-   "bajtow": 11670
+   "sha": "4338f88daae9e24a2fbebd051dcf5fedfeb325cd19023dab78bf4d397bb5dfe1",
+   "bajtow": 11910
   },
   {
    "sciezka": "gra/kod/moduly/07-creator.js",
@@ -69,38 +69,38 @@
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "1a0e2e9f83dd8c84e806073140889e98117e06365391358651f4298c5145a9a5",
-   "bajtow": 107671
+   "sha": "eb956473410f1fdf4c4d077b0566da2b38859daff8309b60a773d31a858b7fef",
+   "bajtow": 108995
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
-   "sha": "576a066ea962e6224cc826370381f983803a50957df41a876466a12c651b6bb8",
-   "bajtow": 33064
+   "sha": "62aad82a7b8b75fd0ed86aa25d8d102ff3aae328bbe20f0866496a3e96bd7d58",
+   "bajtow": 34126
   },
   {
    "sciezka": "gra/kod/moduly/12-media.js",
-   "sha": "66e529b4ba343b731443c913de72c8275a412bd46ec2a3b99c8723de96326356",
-   "bajtow": 20130
+   "sha": "b087be239eef4265a246b9e8c09f12242591dac9b648d6e98f3a310f60ac1c5b",
+   "bajtow": 20126
   },
   {
    "sciezka": "gra/kod/moduly/13-court.js",
-   "sha": "05f22a9e5e199e984067bcc84a7244e6f05d93996526a95f2a394c9785f766bf",
-   "bajtow": 26698
+   "sha": "2dc78d7a0f54996aad1362bbdcdb8fc3f8af4d9869441fb24c3d8e2b283f8613",
+   "bajtow": 26863
   },
   {
    "sciezka": "gra/kod/moduly/14-ui-gameplay.js",
-   "sha": "1db6791337b257279d17c177f16aa37df4f974f1a3dd742144f66fe6afe07bc1",
-   "bajtow": 96212
+   "sha": "71904c0a251726ddc9f5e06a4b6b64485862857966cfa6549cf063c707a9c11a",
+   "bajtow": 96219
   },
   {
    "sciezka": "gra/kod/moduly/15-governance.js",
-   "sha": "57ace6969f35697d92e76515dc8a86965c754a63fe8a6f2ed6cadfbb520ab35b",
-   "bajtow": 75663
+   "sha": "f4721ec64e69c3edab2f16702d14494fb04deac4829e3fa53c2eb5e11afadf20",
+   "bajtow": 76582
   },
   {
    "sciezka": "gra/kod/moduly/16-goals-panels.js",
-   "sha": "8e0f7199e31e38f5a8c724fe4bcd22f2ce713788cfbec765adedb9e16b60e031",
-   "bajtow": 80302
+   "sha": "b6dc4a35e571fa1f416bee1404aa02a43d36095a6e50ca21694d3a209623ae6c",
+   "bajtow": 80400
   },
   {
    "sciezka": "gra/kod/moduly/17-elections-endgame.js",
@@ -109,8 +109,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/18-bootstrap.js",
-   "sha": "7a54fe5aaf779a218dac33c18fe08cd8ab1c109a4f3d5e227aa484dbfcefaff4",
-   "bajtow": 17406
+   "sha": "989a0a93b9d975b865f334f5595c4b6060a66361acc5fef428b09a75aed80f10",
+   "bajtow": 17547
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -843,6 +843,11 @@
    "bajtow": 107026
   },
   {
+   "sciezka": "gra/obrazki/ui-party-draft-room-v2.webp",
+   "sha": "2b2efde11bc0f85c4ca0938eee4964522e2d9eefa617b9a8ceef3007482264ac",
+   "bajtow": 100954
+  },
+  {
    "sciezka": "gra/obrazki/ui-party-roster.webp",
    "sha": "1b85648381da21dbd96a9697b56ff7c72eb23f0ae365c7bbb09be913b511eb39",
    "bajtow": 94304
@@ -899,8 +904,8 @@
   },
   {
    "sciezka": "gra/wyglad/desktop.css",
-   "sha": "ef66a39d540f17b6ea0ff5c13d1c60987c56a665e89e09c352363664d9d8efd5",
-   "bajtow": 12469
+   "sha": "710b2ef507c5554d0c7aa601113ce33ebff4d93a995a068d44e4c68447d86e0a",
+   "bajtow": 14362
   },
   {
    "sciezka": "gra/wyglad/redesign.css",
@@ -909,8 +914,8 @@
   },
   {
    "sciezka": "gra/wyglad/sejm-v4.css",
-   "sha": "ec30cbff7b7190ff60d16339f28a8eba60e91b4ce978ea7f05e10e18c210f2d2",
-   "bajtow": 207115
+   "sha": "406413783045175f812ca1783c1e5d43d4746243a1b174dc1f7bbaeb4565c634",
+   "bajtow": 212078
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -935,6 +940,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "b6cece918de426e3581d79435cc970a2c95978d9"
+ }
 }

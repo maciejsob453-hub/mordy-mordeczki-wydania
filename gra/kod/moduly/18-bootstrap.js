@@ -18,6 +18,7 @@ function sprawdzZapis(s){
   if(s.v&&s.v>ZAPIS_WERSJA)return `zapis pochodzi z nowszej wersji gry${s.gra?` (${s.gra})`:''} — zaktualizuj grę`;
   return null;
 }
+if(typeof window!=='undefined')Object.assign(window,{realClockToggle,realClockSpeed,realClockStart,realClockInit});
 function loadCode(code){
   const raw=b64d(String(code||'').trim().replace(/^MM/,''));
   if(!raw)throw new Error('nieczytelny kod — sprawdź, czy skopiowałeś go w całości');
@@ -157,7 +158,7 @@ Object.assign(window,{radykalowie,radykalowieWszystkim,iskra,waznePozycje,wazneP
      kliknięciu. Animacja ma się odpalić tylko przy realnej zmianie widoku. */
   setTab:k=>{if(G.tab!==k)G._we=1;G.tab=k;G.fx='';if(G&&G.tutSeen)G.tutSeen[k]=1;render()}, setCat:c=>{G.cat=c;G.fx='';render()}, setFx:f=>{G.fx=f;render()},
   signAgent,agentCost,agentFree,AGENTS,render,
-  ekonomiaTab,kapitalTab,kapPryw,kapPrywRazem,podzialMajatku,kasa,kasaSkrot,
+  ekonomiaTab,kapitalTab,kapPryw,kapPrywRazem,podzialMajatku,kasa,kasaSkrot,budzetInit,budzetWydatek,
   rolaOsoby,pkbTydzien,pkbLicz,pkbMnoznik,pkbCzynniki,pkbCios,stawkaMajatkowa,
   wszyscyZaplecze,alive,openZrzutka,zrzutkaWez,zrzutkaDaje,aiZrzutka,
   stolWpis,stolZatwierdz,zarobekLidera,zarobekTydzien,pkbWykres,openWariant,wariantyUstawy,wariantPo,

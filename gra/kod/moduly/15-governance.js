@@ -218,12 +218,17 @@ function premierRozmowa(id,nick){
      <p class="dim">Lepsza relacja i kompetentne zaplecze zwiększają zgodę. Odmowa psuje relacje, ale nie blokuje kolejnej rozmowy w późniejszym tygodniu.</p>`,
     [{l:'Składam propozycję',f:()=>{
       close();
-      if(ch(szansa)){obsadz(id,nick,null);say(`<b>Premier zgadza się.</b> ${nick} obejmuje resort ${res.n}.`,'good')}
+      if(ch(szansa)){obsadz(id,nick,null,true);say(`<b>Premier zgadza się.</b> ${nick} obejmuje resort ${res.n}.`,'good')}
       else{G.rel[G.me][pm]=cl((G.rel[G.me][pm]||0)-5,-100,100);G.rel[pm][G.me]=cl((G.rel[pm][G.me]||0)-5,-100,100);me().ctr=cl(me().ctr+2);say(`<b>Premier odmawia.</b> Uważa, że ${nick} nie pasuje do resortu ${res.n}. Relacje spadają.`,'bad');render()}
     }},{l:'Jeszcze nie teraz',f:close}],close);
 }
 function openResort(id){
   radaInit();
+  const premier=!!(G.gov&&G.pmOk&&G.gov.pm===G.me);
+  const koalicjant=!!(G.gov&&G.gov.parties&&G.gov.parties.includes(G.me));
+  if(!premier&&!koalicjant)return modal('Rada ministrów','Brak uprawnień',
+    '<p>Obsadzanie resortów należy do premiera. Z opozycji możesz tylko złożyć propozycję, gdy twoja partia jest w koalicji.</p>',
+    [{l:'Wracam',f:close}],close);
   const res=RESORTY.find(r=>r.id===id);if(!res)return;
   const siedzi=radaKto(id), blok=siedzi?ministerBlokada(id):0;
   if(blok>0)return modal('Rada ministrów',res.n,
@@ -243,7 +248,7 @@ function openResort(id){
     l:rozmowa?`Proponuję ${n} premierowi`:`${n} <span class="ok">(twoja partia)</span>`,
     s:rozmowa?`relacja z premierem i kompetencja wpływają na zgodę · komp. ${L(n).komp}`:`kompetencja ${L(n).komp} · sława +3, aktywność +2`,
     f:()=>rozmowa?premierRozmowa(id,n):obsadz(id,n,null)}));
-  obcy.slice(0,10).forEach(([n,k])=>opcje.push({
+  if(premier)obcy.slice(0,10).forEach(([n,k])=>opcje.push({
     l:`${n} <span class="dim">(${G.p[k].ab})</span>`,
     s:`kompetencja ${L(n).komp} · relacje z ${G.p[k].ab} +10`,
     f:()=>obsadz(id,n,k)}));
@@ -262,7 +267,11 @@ function openResort(id){
        <b>${bezResortu.map(k=>`${G.p[k].ab} (${G.p[k].seats} ${pl(G.p[k].seats,'mandat','mandaty','mandatów')})`).join(', ')}</b>.
        Jeśli zgarniesz całą radę dla siebie, policzą krzesła i to odbije się na relacjach.</p>`:''}`,opcje,close);
 }
-function obsadz(id,nick,zPartii){
+function obsadz(id,nick,zPartii,fromTalk){
+  if(!(G.gov&&G.pmOk&&G.gov.pm===G.me)&&!fromTalk){
+    say('<b>Nie jesteś premierem.</b> Nominację może zatwierdzić tylko szef rządu.','bad');
+    close();render();return;
+  }
   radaInit();
   const res=RESORTY.find(r=>r.id===id);
   if(!res)return;                       // resort mógł zniknąć razem z zapisem ze starszej wersji
@@ -1132,7 +1141,8 @@ function applyLaw(id,opcje){
     const w=wariantPo(id,opcje.wariant);
     if(w){
       const p=me(), szef=p.lead, koszt=w.mln*1e6;
-      G.kapPryw[szef]=Math.max(1000,Math.round(kapPryw(szef)-koszt));
+      if(id==='event'&&typeof budzetWydatek==='function')budzetWydatek(koszt,`event: ${w.n}`);
+      else G.kapPryw[szef]=Math.max(1000,Math.round(kapPryw(szef)-koszt));
       const msg=w.ef(p);
       say(`<b>${w.n}</b> — ${szef} wyłożył <b>${kasaSkrot(koszt)}</b> z własnej kieszeni. ${msg}`,'good');
       /* Wykład i reportaż trzeba jeszcze nagrać. Sama ustawa daje swoje,
@@ -1217,6 +1227,9 @@ function odrzucenieWeta(id,opcje,pmK,glosy){
     if(prezK&&G.p[prezK]){G.p[prezK].fame=cl(G.p[prezK].fame-6);M(G.p[prezK],-12)}
     say(`<b>Sejm odrzucił weto</b> ${za}:${przeciw}. ${law.n} wchodzi w życie mimo prezydenta.`,'good');
   }else{
+    /* Weto utrzymane nie jest wejściem ustawy w życie. Czyścimy ewentualny
+       ślad ze starych zapisów, żeby Media, Sąd i Pedia nie otwierały się bokiem. */
+    if(G.law&&G.law[id]&&!G.law[id].__accepted)delete G.law[id];
     G.lawTerm[id]=1;
     if(G.gov)G.gov.spraw=cl((G.gov.spraw||50)-8);
     say(`<b>Weto utrzymane</b> ${za}:${przeciw} przy progu ${potrzeba}. ${law.n} nie wchodzi w życie.`,'bad');

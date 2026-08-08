@@ -9,6 +9,24 @@
    skąd PKB ma brać wzrost i co dokładnie ma z nim robić ustawa podatkowa.  */
 const PKB_START=51894432103;
 
+/* Budżet rządu jest osobną kasą od kapitału partii i prywatnych portfeli.
+   Podatki zasilają go co tydzień; wydatki publiczne mogą zejść pod kreskę,
+   ale wtedy rząd płaci odsetkami i nie udaje, że event był darmowy. */
+function budzetInit(){
+  if(!G)return 0;
+  if(typeof G.budzet!=='number')G.budzet=Math.max(0,Number(G.skarb)||0);
+  if(!Array.isArray(G.budzetHistoria))G.budzetHistoria=[];
+  return G.budzet;
+}
+function budzetWydatek(kwota,opis){
+  budzetInit();
+  const v=Math.max(0,Math.round(Number(kwota)||0));
+  G.budzet-=v;
+  if(v&&opis)G.budzetHistoria.push({t:G.term,w:G.week,v:-v,opis:String(opis).slice(0,100)});
+  if(G.budzetHistoria.length>24)G.budzetHistoria.shift();
+  return G.budzet;
+}
+
 /* Mordedolar — znak przy każdej kwocie w grze.
    Bierzemy obrazek z gra/obrazki/mordedolar.png. Dopóki pliku tam nie ma,
    przeglądarka odpala onerror i w to miejsce wchodzi rysowana sakiewka:
@@ -307,7 +325,17 @@ function pkbTydzien(){
     // dług nie „rośnie" sam ku dodatnim — od tego jest dlugTydzien
     G.kapPryw[n]=v<0?Math.round(v):Math.max(1000,Math.round(nowe));
   });
-  if(wplyw>0)G.skarb=(G.skarb||0)+wplyw;
+  if(wplyw>0){
+    G.skarb=(G.skarb||0)+wplyw;
+    budzetInit();G.budzet+=wplyw;
+    G.budzetHistoria.push({t:G.term,w:G.week,v:wplyw,opis:'wpływy z podatku'});
+  }
+  budzetInit();
+  if(G.budzet<0){
+    const odsetki=Math.max(1,Math.round(Math.abs(G.budzet)*.02));
+    G.budzet-=odsetki;
+    G.budzetHistoria.push({t:G.term,w:G.week,v:-odsetki,opis:'odsetki od deficytu'});
+  }
   G.podatekOstatnio=wplyw;
   G.kapPop=d.suma;
   G.pkbPop=G.pkb||pkbLicz();

@@ -2880,3 +2880,98 @@ body:not(:has(.mg)):has(.nocekran) .nrow::before{background:var(--pc,var(--atlas
   body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"] .royalhero{grid-template-columns:1fr;padding:21px 19px!important}
   body:not(:has(.mg)):has(.hud) .widok[data-tab="krol"] .kroyal{grid-template-columns:1fr}
 }
+
+/* 1.1.175: ekran startu gry nie moze byc formularzem z listy. Selektor partii
+   dostaje stół dossier z jedną dużą kartą, a scenariusze korzystają z
+   archiwum obok niej. Kafelki zachowują dane, ale wizualnie są tylko indeksami. */
+body:not(:has(.mg)):has(.partyselect),
+body:not(:has(.mg)):has(.scenv3){
+  background:
+    linear-gradient(180deg,rgba(3,8,6,.2),rgba(3,9,7,.94)),
+    url("../obrazki/ui-party-draft-room-v2.webp") center top/cover fixed no-repeat,var(--atlas-ink)!important
+}
+body:not(:has(.mg)) .partyselect>.pickmain,
+body:not(:has(.mg)) .scenv3>.pickmain{
+  background:
+    linear-gradient(180deg,rgba(10,21,15,.86),rgba(4,11,8,.97)),
+    url("../obrazki/ui-party-draft-room-v2.webp") center/cover!important;
+  border-color:rgba(196,154,75,.48)!important;
+  box-shadow:0 24px 58px rgba(0,0,0,.4),inset 0 1px rgba(255,255,255,.06)!important
+}
+body:not(:has(.mg)) .partyselect .partyroster,
+body:not(:has(.mg)) .scenv3 .picklist{
+  background:rgba(4,11,8,.75)!important;border-color:rgba(196,154,75,.34)!important;
+  box-shadow:0 16px 36px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.035)
+}
+body:not(:has(.mg)) .partyselect .partyrosterhead,
+body:not(:has(.mg)) .scenv3 .picklist::before{
+  color:#e3c47b;letter-spacing:.18em
+}
+body:not(:has(.mg)) .partyselect .pickcell,
+body:not(:has(.mg)) .scenv3 .scenrow{
+  min-height:78px;border:1px solid rgba(196,154,75,.18);border-left:3px solid color-mix(in srgb,var(--pc,var(--party-theme,var(--atlas-brass))) 70%,rgba(196,154,75,.22));
+  background:linear-gradient(100deg,rgba(13,28,20,.9),rgba(5,13,9,.84))!important;
+  border-radius:3px!important
+}
+body:not(:has(.mg)) .partyselect .pickcell:hover,
+body:not(:has(.mg)) .partyselect .pickcell.on,
+body:not(:has(.mg)) .scenv3 .scenrow:hover,
+body:not(:has(.mg)) .scenv3 .scenrow.on{
+  transform:translateY(-1px);background:linear-gradient(100deg,color-mix(in srgb,var(--pc,var(--party-theme,var(--atlas-brass))) 16%,rgba(13,28,20,.95)),rgba(5,13,9,.88))!important;
+  border-color:color-mix(in srgb,var(--pc,var(--party-theme,var(--atlas-brass))) 64%,rgba(196,154,75,.26))!important;
+  box-shadow:0 10px 22px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.045)
+}
+body:not(:has(.mg)) .partyselect .pickstart,
+body:not(:has(.mg)) .scenv3 .pickmain>.btn{
+  min-height:44px!important;border-radius:3px!important;
+  background:linear-gradient(180deg,#e6c56e,#aa7628)!important;border-color:#f2d88f!important;color:#1b1408!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.65),0 7px 18px rgba(0,0,0,.28)!important
+}
+body:not(:has(.mg)) .partyselect .pickstart:hover,
+body:not(:has(.mg)) .scenv3 .pickmain>.btn:hover{background:linear-gradient(180deg,#f3d989,#c18e35)!important}
+body:not(:has(.mg)) .partyselect .partyfacts,
+body:not(:has(.mg)) .partyselect .partystats .row{
+  background:rgba(3,10,7,.55)!important;border-color:rgba(196,154,75,.23)!important
+}
+
+/* Kreator ma ten sam stół, ale zachowuje własny krokowiec — to narzędzie,
+   więc pola formularza dostają większy kontrast niż dekoracja. */
+body:not(:has(.mg)):has(.kreekran){
+  background:
+    linear-gradient(180deg,rgba(3,8,6,.2),rgba(3,9,7,.94)),
+    url("../obrazki/ui-creator-workbench.webp") center top/cover fixed no-repeat,var(--atlas-ink)!important
+}
+body:not(:has(.mg)):has(.kreekran) .krehead,
+body:not(:has(.mg)):has(.kreekran) .kresteps{
+  background:linear-gradient(90deg,rgba(196,154,75,.12),transparent 76%)!important;
+  border-color:rgba(196,154,75,.3)!important
+}
+body:not(:has(.mg)):has(.kreekran) .krepanel,
+body:not(:has(.mg)):has(.kreekran) .kreside{
+  background:linear-gradient(180deg,rgba(10,22,15,.9),rgba(4,11,8,.98)),url("../obrazki/ui-creator-workbench.webp") center/cover!important;
+  border-color:rgba(196,154,75,.38)!important;box-shadow:0 20px 44px rgba(0,0,0,.36),inset 0 1px rgba(255,255,255,.05)!important
+}
+
+@media(max-width:720px){
+  body:not(:has(.mg)) .partyselect>.pickmain,
+  body:not(:has(.mg)) .scenv3>.pickmain{padding:17px 14px!important}
+  body:not(:has(.mg)) .partyselect .pickcell,
+  body:not(:has(.mg)) .scenv3 .scenrow{min-height:68px}
+}
+
+/* 1.1.175 final cascade: karuzela ma bardziej szczegolowy selektor niz
+   dawna lista partii, dlatego nowy pokoj musi wygrac z !important starej
+   faktury, ale tylko na ekranie wyboru, nigdy w menu glownym. */
+body:not(:has(.mg)):has(.partyselect) .partyselect.fifa{
+  background:
+    linear-gradient(180deg,rgba(3,8,6,.2),rgba(3,9,7,.9)),
+    url("../obrazki/ui-party-draft-room-v2.webp") center/cover!important;
+  border-color:rgba(196,154,75,.48)!important;
+  box-shadow:0 26px 64px rgba(0,0,0,.46),inset 0 1px rgba(255,255,255,.055)!important
+}
+body:not(:has(.mg)):has(.partyselect) .partyselect.fifa>.pickmain{
+  background:
+    linear-gradient(155deg,rgba(12,22,16,.88),rgba(3,9,7,.97)),
+    url("../obrazki/ui-party-draft-room-v2.webp") center/cover!important;
+  border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 54%,rgba(196,154,75,.4))!important
+}

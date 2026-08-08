@@ -725,7 +725,7 @@ function sejmTab(){
       return `<div class="sejm-sala">${true?`<div class="hemi-filtry">
         <button class="hfil ${m==='party'?'on':''}" onclick="setHemi('party')">Podział partyjny</button>
         <button class="hfil ${m==='bloc'?'on':''}" onclick="setHemi('bloc')">Podział koalicyjny</button></div>`:''}
-      <div class="hemi-scena">${hemi(arrS,620,m)}</div>
+      <div class="hemi-scena">${hemi(arrS,960,m)}</div>
       <div class="sejmleg">
         ${grupy.map(g2=>{
           const wRzadzie=g2.k&&G.gov&&G.gov.parties.includes(g2.k);
@@ -816,6 +816,7 @@ function feed(n){
     ${!n&&G.log.length>ile?`<div class="kronika-stopka">Starsze wpisy są w zakładce Kronika.</div>`:''}</div></details>`;
 }
 
+const kosztCechy=t=>Math.round((t&&t.cost||0)*1.28);
 function leadTab(){
   const p=me(),ld=lead(G.me),sf=sizeF(p);
   const kto=leadWybrany(), ls=leads(p), wielu=ls.length>1;
@@ -848,14 +849,14 @@ function leadTab(){
     ${(()=>{const inni=[...new Set(p.bench.concat(p.main))].filter(n=>n!==p.lead&&traitsOf(n).length);
       return inni.length?'W zapleczu cechy mają też: '+inni.map(n=>n+' ('+traitsOf(n).map(x=>TRAITS.find(y=>y.id===x).n).join(', ')+')').join(' · ')+'.':''})()}</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:9px">
-    ${TRAITS.map(t=>{const has=traitsOf(kto).includes(t.id),can=xpOs(kto)>=t.cost,cf=conflictOf(t,kto);
+    ${TRAITS.map(t=>{const koszt=kosztCechy(t),has=traitsOf(kto).includes(t.id),can=xpOs(kto)>=koszt,cf=conflictOf(t,kto);
       return `<button class="act" ${has||!can||cf?'disabled':''} onclick="buyTrait('${t.id}')"
         style="${has?'border-color:var(--pos);opacity:1':''}">
         <h4 style="color:${has?'var(--pos)':cf?'var(--dim2)':'var(--tx)'}">${has?'✓ ':''}${t.n}</h4>
         <div class="dd">${t.d}</div>
         <div class="c">${has?'<span class="yes">wykupione</span>'
           :cf?`<span class="no">wyklucza się z: ${cf.n}</span>`
-          :`<span class="${can?'':'no'}">${t.cost} dośw.</span>`}
+          :`<span class="${can?'':'no'}">${koszt} dośw.</span>`}
           ${!has&&!cf&&t.excl?`<span class="dim">≠ ${t.excl.map(x=>TRAITS.find(y=>y.id===x).n).join(', ')}</span>`:''}</div>
       </button>`}).join('')}</div>
     <h4 style="margin:20px 0 10px">Statystyki${wielu?` <span class="dim" style="font-size:12px;font-weight:400">, ${kto}; partia liczy średnią całych sterów</span>`:''}</h4>
@@ -893,10 +894,11 @@ function conflictOf(t,who){
 }
 function buyTrait(id){
   const t=TRAITS.find(x=>x.id===id),who=leadWybrany();
-  if(!t||!who||traitsOf(who).includes(id)||xpOs(who)<t.cost||conflictOf(t,who))return;
+  const koszt=kosztCechy(t);
+  if(!t||!who||traitsOf(who).includes(id)||xpOs(who)<koszt||conflictOf(t,who))return;
   if(!G.ptraits)G.ptraits={};
   if(!G.ptraits[who])G.ptraits[who]=[];
-  xpPula()[who]-=t.cost;G.ptraits[who].push(id);
+  xpPula()[who]-=koszt;G.ptraits[who].push(id);
   say(`<b>${who}</b> rozwija cechę: <b>${t.n}</b>. Zostaje przy nim na stałe, także gdy odda przewodnictwo.`,'good');render();
 }
 function buyStat(i){
