@@ -206,10 +206,10 @@ function scenEventPartia(e){
 function scenEventMozna(e,k){
   if(!e||!k||!G.p[k])return false;const w=e.war||{},p=G.p[k],st=G.scenEventState[e.id]||{};
   const poprzednik=w.poWydarzeniu||w.wymagaWydarzenia;
-  if(poprzednik){const ps=G.scenEventState[poprzednik];if(!ps||!ps.ile)return false;if(w.poOpcji&&ps.opcja!==w.poOpcji)return false;if(w.poTygodniach&&absWeek()-(ps.ostatni||0)<+w.poTygodniach)return false}
+  if(poprzednik){const ps=G.scenEventState[poprzednik];if(!ps||!ps.ile)return false;if(w.poOpcji&&ps.opcja!==w.poOpcji)return false;if(w.poTygodniach&&czasGlobalny()-(ps.ostatniAt??((ps.ostatni||0)*168))<+w.poTygodniach*168)return false}
   if(w.term&&G.term!==+w.term)return false;if(w.week&&G.week!==+w.week)return false;
-  if(w.odTygodnia&&absWeek()<+w.odTygodnia)return false;if(w.coIle&&absWeek()%Math.max(1,+w.coIle)!==0)return false;
-  if(!w.powtarzalne&&st.ile)return false;if(w.przerwa&&st.ostatni&&absWeek()-st.ostatni<+w.przerwa)return false;
+  if(w.odTygodnia&&czasGlobalny()<+w.odTygodnia*168)return false;if(w.coIle&&Math.floor(czasGlobalny()/168)%Math.max(1,+w.coIle)!==0)return false;
+  if(!w.powtarzalne&&st.ile)return false;if(w.przerwa&&((st.ostatniAt??((st.ostatni||0)*168))>0)&&czasGlobalny()-(st.ostatniAt??((st.ostatni||0)*168))<+w.przerwa*168)return false;
   if(w.minMandaty&&p.seats<+w.minMandaty)return false;if(w.maxMandaty&&p.seats>+w.maxMandaty)return false;
   if(w.minSlawa&&p.fame<+w.minSlawa)return false;if(w.maxKontrowersja&&p.ctr>+w.maxKontrowersja)return false;
   if(w.urzad==='premier'&&!(G.gov&&G.gov.pm===k&&G.pmOk))return false;if(w.urzad==='prezydent'&&!(G.prez&&G.prez.party===k))return false;
@@ -228,7 +228,7 @@ function scenEventEfekt(k,ef){
   if(ef.ustawa){G.law=G.law||{};G.law[String(ef.ustawa).slice(0,20)]=ef.ustawaWlacz===false?0:1}
 }
 function scenEventWybierz(e,k,opcja){
-  if(!e||!opcja)return;scenEventEfekt(k,opcja.efekty);const st=G.scenEventState[e.id]||{ile:0};st.ile++;st.ostatni=absWeek();st.opcja=opcja.id||opcja.nazwa||'';G.scenEventState[e.id]=st;
+  if(!e||!opcja)return;scenEventEfekt(k,opcja.efekty);const st=G.scenEventState[e.id]||{ile:0};st.ile++;st.ostatniAt=czasGlobalny();st.ostatni=Math.floor(czasGlobalny()/168);st.opcja=opcja.id||opcja.nazwa||'';G.scenEventState[e.id]=st;
   say(`<b>${esc(e.nazwa)}.</b> ${esc(G.p[k].ab)}: ${esc(opcja.nazwa)}.`,opcja.klasa||'roy');
 }
 function scenEventAiOpcja(e,k){
@@ -244,6 +244,13 @@ function scenEventPokaz(e,k){
 function scenWydarzeniaTydzien(){
   if(PROBA||!G.scenEvents||!G.scenEvents.length)return;let pokaz=null;
   G.scenEvents.forEach(e=>{const k=scenEventPartia(e);if(!scenEventMozna(e,k))return;
+    if(k===G.me&&!pokaz)pokaz={e,k};else{const o=scenEventAiOpcja(e,k);if(o)scenEventWybierz(e,k,o)}});
+  if(pokaz&&!G.scenEventPending)G.scenEventPending={id:pokaz.e.id,k:pokaz.k};
+}
+function scenWydarzeniaCzas(){
+  if(PROBA||!G.realTimeEconomy||!G.scenEvents||!G.scenEvents.length)return;
+  const dzien=Math.floor(czasGlobalny()/24);if(G.scenEventDay===dzien)return;G.scenEventDay=dzien;
+  let pokaz=null;G.scenEvents.forEach(e=>{const k=scenEventPartia(e);if(!scenEventMozna(e,k))return;
     if(k===G.me&&!pokaz)pokaz={e,k};else{const o=scenEventAiOpcja(e,k);if(o)scenEventWybierz(e,k,o)}});
   if(pokaz&&!G.scenEventPending)G.scenEventPending={id:pokaz.e.id,k:pokaz.k};
 }

@@ -935,8 +935,10 @@ function fire(a,t,r,s,tm){
    bo to samo musi się dziać, gdy okno zniknie bez kliknięcia „wstecz”. */
 /* Dopisanie decyzji do stołu tygodnia razem z tym, co realnie zmieniła. */
 function stolWpis(a,przed,token){
-  const klucz=G.term+'-'+G.week;
-  if(!G.stol||G.stolTyg!==klucz){G.stol=[];G.stolTyg=klucz}
+  /* Stół jest kroczący: zmiana tygodnia nie może wyczyścić wykonanych ruchów. */
+  const now=czasGlobalny();
+  if(!Array.isArray(G.stol))G.stol=[];
+  G.stol=G.stol.filter(x=>x&&(!Number.isFinite(Number(x.at))||now-Number(x.at)<168));
   if(token&&G.stol.some(x=>x&&x.token===token))return;   // podwójne kliknięcie nie mnoży ruchu
   const po=snap(), zm={};
   /* Wszystko poniżej pół punktu zaokrąglało się do zera i znikało ze stołu —
@@ -946,7 +948,8 @@ function stolWpis(a,przed,token){
     const d=po[k]-(przed?przed[k]:po[k]);
     if(Math.abs(d)>=1)zm[k]=Math.round(d);
     else if(Math.abs(d)>=0.12)zm[k]=Math.round(d*10)/10;});
-  G.stol.push({id:a.id,n:a.n,kat:a.cat,ap:a.ap,zm,token:token||null,ok:1});
+  G.stol.push({id:a.id,n:a.n,kat:a.cat,ap:a.ap,zm,token:token||null,ok:1,at:now});
+  if(G.stol.length>12)G.stol=G.stol.slice(-12);
 }
 /* Decyzja okienkowa doszła do skutku — dopiero teraz ląduje na stole. */
 function stolZatwierdz(){

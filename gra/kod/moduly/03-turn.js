@@ -43,11 +43,76 @@ function realtimeDaily(){
   /* AI dostaje wiele okazji w ciągu kadencji, ale nie wykonuje ruchu co klatkę.
      Dzienny rytm jest tylko harmonogramem reakcji, nie turą gracza. */
   if(G.phase==='camp'){
+    realtimeDriftTick();
+    realtimeSituationTick();
     ai();aiGoals();aiAgents();aiTransfery();aiOpozycja();
-    if(G.gov){govTick();govKontraktTick();aiProposeLaw();aiObsadzRade();aiRekonstrukcja()}
+    if(G.gov){govTickRealtime();govKontraktTick();aiProposeLaw();aiObsadzRade();aiRekonstrukcja()}
     if(!G.queue||!G.queue.length)G.queue=buildEvents();
   }
   if(G.simHour%168===0)makeNoise();
+}
+
+/* Główne statystyki nie czekają już na sztuczną granicę tygodnia. Ten krok jest
+   celowo mały: siedem dobowych kroków daje w przybliżeniu dawny tygodniowy
+   dryf, ale gracz widzi reakcję świata od razu po zmianie daty. */
+function realtimeDriftTick(){
+  const s=1/7;
+  PID.forEach(k=>{
+    const p=G.p[k];if(!p||p.dead)return;
+    const ld=lead(k),t=Math.max(1,p.mem),re_=p.comp.eli/t,ri=p.comp.int/t,rs=p.comp.ser/t;
+    p.fame=cl(p.fame-(p.fame*.022+Math.min(.30,p.fame*.028))*s);
+    p.act=cl(p.act-1.3*s);p.ctr=cl(p.ctr-(G.wojna?.7:1.4)*s);
+    p.uni=cl(p.uni+(-.4+(ld.autor-54)/32+ri*1.5+re_*.7-rs*2.4)*s);
+    if(p.mem<=3)p.uni=Math.max(p.uni,14);
+    p.ctr=cl(p.ctr+(rs*1.5*(k===G.me&&hasT('populista')?.5:1)+re_*2.6-ri*.9+eliteRisk(p)*6)*s);
+    p.fame=cl(p.fame+(ri*1.4+re_*1.9)*s);
+    p.pret=cl(p.pret+(ri*1.6-rs*1.1)*s);
+    p.cred=cl(p.cred+((ld.komp-52)/30+(p.comp.int*.9+p.comp.eli*.5-p.comp.ser*.7)/Math.max(1,p.mem)+(k===G.me&&hasT('technokrata')?.8:0))*s);
+    REG.forEach(r=>{const baz=p.robMode?BAL.zanikObecnosciRob:p.kanMode?BAL.zanikObecnosciKanal:BAL.zanikObecnosci;p.pres[r.id]=cl(p.pres[r.id]*Math.pow(baz,s))});
+    if(p.fame>p.pot)p.fame=cl(p.fame-(p.fame-p.pot)*.18*s);
+    p.mom=cl((p.mom||0)*Math.pow(.83,s),-35,42);
+    if(p.mom>28&&ch(.20*s)&&p.pot<BASE[k].pot+16)p.pot=cl(p.pot+.5*s);
+    if(p.mom<-18&&ch(.20*s))p.pot=cl(Math.max(BASE[k].pot-14,p.pot-.5*s));
+    if(k==='KK')p.act=cl(p.act-1.1*s);if(k==='ROM')p.act=cl(p.act-2*s);
+    realtimeGoalDrift(k,s);
+    if(p.fame<p.pot*.55)p.fame=cl(p.fame+(1.1+(p.mem<12?1.1:0))*s);
+    if(k==='FD')p.pret=cl(p.pret+.5*s);
+    realtimeLeaderTraitDrift(p,p.lead,s);leads(p).slice(1).forEach(n=>realtimeLeaderTraitDrift(p,n,s));
+    if(G.gov&&!G.pmOk&&G.gov.parties.includes(k))p.uni=cl(p.uni-.8*s);
+  });
+}
+function realtimeGoalDrift(k,s){
+  const p=G.p[k];
+  if(G.law&&G.law.sady)p.ctr=cl(p.ctr-1.1*s);
+  if(G.law&&G.law.kodeks)p.ctr=cl(p.ctr-.7*s);
+  if(p.adsMode){p.uni=cl(p.uni-2.6*s);p.fame=cl(p.fame+2.8*s);p.act=cl(p.act+1.2*s);p.ctr=cl(p.ctr+1.1*s)}
+  if(p.horMode){p.act=cl(p.act+4.1*s);p.uni=cl(p.uni+1.3*s);p.cred=cl(p.cred+.9*s)}
+  if(p.lib2Mode)p.uni=cl(p.uni-1.6*s);if(p.postMode)p.act=cl(p.act+3.2*s);
+  if(p.robMode){p.uni=cl(p.uni+1*s);p.act=cl(p.act+1.1*s);p.ctr=cl(p.ctr+1.2*s)}
+  if(p.rom12Mode){p.uni=cl(p.uni+1.2*s);p.cred=cl(p.cred+.7*s);p.ctr=cl(p.ctr-1*s)}
+  if(p.swiaMode){p.ctr=cl(p.ctr-.8*s);if(p.cred<62)p.cred=62}
+  if(p.cenMode){p.uni=cl(p.uni+.45*s);p.cred=cl(p.cred+1.3*s);p.ctr=cl(p.ctr-1.1*s);p.pret=cl(p.pret-.8*s);p.act=cl(p.act+1*s)}
+  if(p.hegMode){p.fame=cl(p.fame+2.2*s);p.act=cl(p.act+1.4*s);alive().forEach(x=>{if(x!==k&&G.rel[x])G.rel[x][k]=cl(G.rel[x][k]-.7*s,-100,100)})}
+  if(p.perMode){p.cred=cl(Math.max(55,p.cred+1.4*s));p.ctr=cl(p.ctr+.8*s);alive().forEach(x=>{if(x!==k&&G.rel[k])G.rel[k][x]=cl(G.rel[k][x]+1*s,-100,100)})}
+  if(p.azMode){p.cred=cl(p.cred+.6*s);p.act=cl(p.act+.8*s);p.uni=cl(p.uni+.35*s)}
+}
+function realtimeLeaderTraitDrift(p,name,s){
+  const add=(k,v)=>{p[k]=cl(p[k]+v*s)};
+  switch(name){
+    case 'Maciek':add('ctr',2.8);add('pret',2.2);break;case 'Lager':add('act',-2.4);break;
+    case 'loof':if(!goalDone('demokraci')){add('cred',1.5);add('uni',1.2);add('ctr',2.6)}break;
+    case 'Peterdeus':add('act',-1.9);add('uni',-1.4);break;case 'Fazmiś':add('fame',1.6);add('act',3.4);add('cred',-1.8);break;
+    case 'Aryati':add('act',4.2);break;case 'Śledzik':add('uni',2.2);add('fame',3.4);break;case 'Mietek Nocul':add('ctr',-1.8);break;
+    case 'kenzo':add('act',2.6);add('cred',1.6);break;case 'Bartek':add('cred',-2.8);add('act',-1.6);break;
+    case 'Kaziu':if(goalDone('kazik')){add('cred',1.6);add('uni',1.4)}else{add('cred',-2.2);add('act',-2.6)}break;
+    case 'Sulejman':add('uni',2.4);add('ctr',1.4);break;case 'Supernes':add('fame',3.4);add('act',3.8);p.cred=Math.min(p.cred,40);break;
+    case 'Vengeance':add('pret',1.6);add('fame',1.8);break;case 'Mnem':add('fame',3.2);add('cred',-2.4);add('pret',2);break;
+  }
+}
+function realtimeSituationTick(){
+  if(typeof sitTickCzas==='function')sitTickCzas();
+  if(typeof scenWydarzeniaCzas==='function')scenWydarzeniaCzas();
+  if(typeof sadCzas==='function')sadCzas();
 }
 function realtimeEconomyTick(){
   if(!G||G.phase!=='camp')return;
@@ -177,9 +242,10 @@ function endWeek(automatic=false){
   const p=me();
   const dateFrom=gameDate();
   ustawPlany();
-  ai();drift();aiGoals();aiAgents();aiTransfery();sitTick();scenWydarzeniaTydzien();
+  ai();if(G.realTimeEconomy!==true)drift();aiGoals();aiAgents();aiTransfery();
+  if(G.realTimeEconomy!==true){sitTick();scenWydarzeniaTydzien();}
   sprzatnijRade();   // po transferach i odejściach rada musi zgadzać się ze składami partii
-  sadTydzien();      // sąd sprząta skład i wygasza stare materiały dowodowe
+  if(G.realTimeEconomy!==true)sadTydzien();      // zegar ciągły robi to codziennie
   zwlokaPrezydenta();   // ustawa nie może leżeć na biurku bez końca
   if(isEraNiestab()&&!G.eraNiestab){G.eraNiestab=1;
     say('<b>Era niestabilności.</b> Grudniowo-styczniowy chaos na serwerze ułatwia podbieranie ludzi z innych partii, i tobie, i botom. Potrwa do końca stycznia.','roy');}

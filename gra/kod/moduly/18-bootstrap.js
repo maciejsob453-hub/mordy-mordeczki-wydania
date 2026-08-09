@@ -177,7 +177,7 @@ function dead(){
   majatekSzefa,panelGlosowania,nextCandidate,pkbZapiszOdczyt,
   RANGI,ranga,rangaNr,nastepnaRanga,mnoznikRangi,rangiStart,sprawdzRangi,absolutorium,
   rangaKoszt,rangaWymog,oknoAbsolutorium,sadTab,sadSklad,sadInit,sadZglos,sadWybierz,
-  sadOpenSprawa,sadWnies,sadDowody,sadWymagaObslugi,sadTydzien,nagranieStart,liveLap,DANINA_ZA_PUNKT,NAGR_TRYBY,
+  sadOpenSprawa,sadWnies,sadDowody,sadWymagaObslugi,sadTydzien,sadCzas,nagranieStart,liveLap,DANINA_ZA_PUNKT,NAGR_TRYBY,
   mediaTab,mediaTydzien,mediaTick,dlugTick,mediaBilans,
   zasiegMediow,aiMedia,dlugTydzien,kieszenSzefa,MEDIA_ZASIEG,MEDIA_UTRZYMANIE,absWeek,tally,
   mediaOdcinekGraj,mediaFilmGraj,serduszka,MEDIA_TYP,nagranieMAN,mediaGotowe,mediaZa,mediaJest,
@@ -214,7 +214,7 @@ window.__game={przewidz,podglad,get PROBA(){return PROBA},
   openCamp,campBar,campRank,runFinalCamp,closeFinalCamp,partyCouncilNeedsPrimary,partyCouncilChoosePrimary,
   get G(){return G}, czasAkcji,przesunCzas, setRender(f){render=f}, setModal(f){modal=f},
   MODY:()=>MODY, ustawMody:v=>{MODY=Array.isArray(v)?v:[]}, wczytajMody, modEfekty, modyDoScen,
-  scenRuntimeStart,scenWydarzeniaTydzien,scenEventWybierz};
+  scenRuntimeStart,scenWydarzeniaTydzien,scenWydarzeniaCzas,scenEventWybierz};
 render();
 /* Mody dociągamy po pierwszym rysowaniu: most do Pythona wstaje chwilę po stronie,
    a ekran wyboru scenariusza i tak przerysuje się, gdy lista dojdzie. */

@@ -155,6 +155,12 @@ function sadTydzien(){
   Object.keys(s.tropy).forEach(k=>s.tropy[k]=Math.max(0,s.tropy[k]-3));
   sadZapewnijSklad();
 }
+function sadCzas(){
+  if(!G||!G.realTimeEconomy||!lawDone('sady'))return;
+  const s=sadInit();
+  Object.keys(s.tropy).forEach(k=>s.tropy[k]=Math.max(0,s.tropy[k]-3/7));
+  sadZapewnijSklad();
+}
 function sadTab(){
   const jest=lawDone('sady'), res=RESORTY.find(r=>r.id==='spraw'), min=res?radaKto(res.id):null;
   if(!jest)return `<div class="card sadzamkniety"><div class="h"><h3>Sąd</h3><span class="n">nie istnieje</span></div><div class="b">

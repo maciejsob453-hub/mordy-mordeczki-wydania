@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.189':{data:'9 sierpnia 2026',zmiany:[
+  'Dryf partii, sytuacje, wydarzenia scenariusza i materialy sadu rozliczaja sie codziennie podczas plyniecia zegara.',
+  'Gabinet AI reaguje malymi krokami zamiast skakac calym rozliczeniem na granicy tygodnia.',
+  'Stol decyzji przechowuje ostatnie ruchy kroczaco, wiec zmiana daty nie tworzy pustej luki ani nie kasuje wykonanej akcji.'
+ ]},
  '1.1.188':{data:'9 sierpnia 2026',zmiany:[
   'Cooldown kategorii, transferow, rekrutacji i wpadek liczy teraz godziny, a nie ukryty reset tygodnia.',
   'Zmeczenie powtarzanej decyzji wygasa po siedmiu dniach od jej wykonania zamiast losowo na granicy tygodnia.',

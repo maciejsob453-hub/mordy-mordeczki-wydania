@@ -429,6 +429,22 @@ function govTick(){
     say(`<b>Wpadka rządu.</b> Poparcie −${d}.`,g.parties.includes(G.me)?'bad':'good')}
   radaTick();
 }
+/* Dobowy odpowiednik rozliczenia gabinetu. Nie udajemy tu końca tygodnia:
+   poparcie, wakaty i ryzyko mniejszości narastają małymi krokami. */
+function govTickRealtime(){
+  const g=G.gov;if(!g)return;const s=1/7;
+  APPR((R(-3.5,2.6)+(g.minority?-4.5:0)+(G.pmOk?0:-3)+(G.prez&&!g.parties.includes(G.prez.party)?-1.2:.6))*s);
+  if(g.minority){const seats=g.parties.reduce((a,k)=>a+G.p[k].seats,0);
+    if(seats>=MAJ){g.minority=0;g.royal=0;say('<b>Rząd odzyskał większość.</b>','good')}
+    else if((ch(.26*s)||g.appr<26)&&ch(.18*s)){collapseGov(`Rząd mniejszościowy ${G.p[g.pm].lead} (${seats}/${TOTAL_SEATS}) nie przetrwał głosowania.`);return;}}
+  if(ch(.10*s)){const d=RI(4,11);APPR(-d*s);say(`<b>Wpadka rządu.</b> Poparcie −${fmt(d*s)}.` ,g.parties.includes(G.me)?'bad':'good')}
+  radaTickRealtime();
+}
+function radaTickRealtime(){
+  const g=G.gov;if(!g)return;const s=1/7;radaInit();
+  RESORTY.forEach(r=>{const kto=radaKto(r.id),k=kto&&partiaOsoby(kto);if(!k||!G.p[k]||G.p[k].dead)return;const komp=L(kto).komp;G.p[k].fame=cl(G.p[k].fame+(.34+komp/380)*s);G.p[k].act=cl(G.p[k].act+.28*s);if(komp>=72)G.p[k].cred=cl(G.p[k].cred+.16*s)});
+  const puste=RESORTY.filter(r=>!radaKto(r.id)).length;if(!puste||G.week<=3)return;APPR(-puste*.9*s);const pm=g.pm&&G.p[g.pm];if(pm){pm.ctr=cl(pm.ctr+puste*.55*s);pm.mom=(pm.mom||0)-puste*1.4*s;}
+}
 /* Ministrowie pracują na konto swoich partii, a puste resorty mszczą się na premierze. */
 function radaTick(){
   radaInit();

@@ -921,7 +921,7 @@ function radykalowieTydzien(k){
 }
 
 /* ══════════ SYTUACJE CZASOWE ══════════ */
-const absWeek=()=>((G.term-1)*12+G.week);
+const absWeek=()=>((G.term-1)*Math.max(1,G.weeks||12)+G.week);
 function sitDate(abs){const d=new Date(2026,7,1);d.setDate(d.getDate()+(abs-1)*7);return d}
 const SITS={
  koniecROM:{
@@ -980,7 +980,7 @@ function sitTick(){
 }
 function sitBanner(){
   if(!G.sits||!G.sits.some(x=>!x.done))return '';
-  return G.sits.filter(x=>!x.done).map(x=>{const s=SITS[x.id],left=x.to-absWeek();
+  return G.sits.filter(x=>!x.done).map(x=>{const s=SITS[x.id],leftHours=G.realTimeEconomy&&Number.isFinite(Number(x.toAt))?Math.max(0,x.toAt-czasGlobalny()):Math.max(0,(x.to-absWeek())*168),left=Math.ceil(leftHours/168);
     return `<div class="sitbar">
       ${s.logo?crest(s.logo,'m'):''}
       <div style="flex:1;min-width:0">
@@ -989,7 +989,7 @@ function sitBanner(){
         <p>${s.d}</p>
       </div>
       <div class="sitleft"><b>${left}</b><span>${pl(left,'tydzień','tygodnie','tygodni')}</span>
-        <em>do ${dateStr(sitDate(x.to))}</em></div>
+        <em>do ${G.realTimeEconomy?dateStr(new Date(gameDate().getTime()+leftHours/24*86400000)):dateStr(sitDate(x.to))}</em></div>
     </div>`}).join('');
 }
 function eraBanner(){
@@ -1055,6 +1055,42 @@ function sitKraniecEnd(){
   } else {
     q.uni=cl(q.uni+6);say('<b>Kraniec PPP rozstrzygnięty.</b> Nikt się nie zgłosił, Lager zostaje i partia dogorywa dalej.','bad');
   }
+}
+/* W zegarze ciągłym sytuacja nie dostaje siedmiu identycznych kar naraz na
+   granicy tygodnia. Trzymamy osobny termin w godzinach i rozliczamy ją raz na
+   dobę, dzięki czemu data, efekt i moment zakończenia są spójne. */
+function sitTickCzas(){
+  if(!G||!G.realTimeEconomy)return;
+  if(!G.sits)G.sits=[];
+  const now=czasGlobalny();
+  const kr=G.sits.find(x=>x.id==='kraniecPPP');
+  Object.keys(SITS).forEach(id=>{
+    const s=SITS[id];if(G.sits.some(x=>x.id===id))return;
+    let start=false;
+    if(id==='kraniecPPP')start=G.term===1&&now>=168;
+    else if(id==='koniecROM')start=!!(kr&&kr.done&&now>=Number(kr.toAt||0)+336);
+    else start=!!s.start();
+    if(start){
+      const x={id,from:absWeek(),to:absWeek()+s.weeks,fromAt:now,toAt:now+s.weeks*168,lastAt:now-24};
+      G.sits.push(x);
+      say(`<b>Nowa sytuacja: ${s.n}.</b> ${s.d} Rozstrzygnie się do ${dateStr(new Date(gameDate().getTime()+s.weeks*7*86400000))}.`,'roy');
+    }
+  });
+  G.sits.forEach(x=>{
+    if(x.done)return;const s=SITS[x.id];if(!s)return;
+    if(!Number.isFinite(Number(x.toAt)))x.toAt=now+Math.max(1,(x.to||absWeek()+s.weeks)-absWeek())*168;
+    if(now>=x.toAt){x.done=1;s.end();return}
+    if(now-Number(x.lastAt||0)<24)return;x.lastAt=now;
+    const q=x.id==='kraniecPPP'?G.p.PPP:G.p.ROM;if(!q||q.dead)return;
+    if(x.id==='kraniecPPP'){
+      q.fame=cl(q.fame-3.4/7);q.act=cl(q.act-2.6/7);q.uni=cl(q.uni-2.2/7);q.ctr=cl(q.ctr+1.2/7);q.bank=Math.max(0,(q.bank||0)-18/7);M(q,-4/7);
+      if(G.me==='PPP'&&ch(.60/7)){const g=giveBackCap(q,1),n=g.eli+g.int+g.ser;if(n)say(`<b>Kraniec PPP:</b> odchodzi ${n} ${pl(n,'osoba','osoby','osób')}.`,'bad')}
+      if(G.me==='PPP')G.kp=Math.max(-40,G.kp-6/7);
+    }else{
+      q.fame=cl(q.fame-3.8/7);q.uni=cl(q.uni-3.4/7);q.cred=cl(q.cred-2.8/7);q.act=cl(q.act-1.6/7);q.bank=Math.max(0,(q.bank||0)-12/7);M(q,-3/7);
+      if(G.me==='ROM'&&ch(.50/7)){const g=giveBackCap(q,1),n=g.eli+g.int+g.ser;if(n)say('<b>Koniec liderstwa:</b> ktoś wypisał się z partii.','bad')}
+    }
+  });
 }
 
 /* Każda partia przechodzi przez ten sam wewnętrzny rozjazd. Wcześniej tick

@@ -124,11 +124,13 @@ function govKontraktTick(){
     const d=g.kontrakt.demands&&g.kontrakt.demands[k];if(!d)return;
     const ma=resortyPartii(k), temat=(TEMAT[d.temat]||[]).some(id=>G.lawBy&&G.lawBy[id]===k);
     d.przydzielone=ma;d.tematDone=temat?1:0;
-    const poTerminie=G.week>=4, problem=ma<d.resorty||(poTerminie&&!temat);
+    const startKad=((Math.max(1,G.term||1)-1)*Math.max(1,G.weeks||12))*168;
+    const poTerminie=czasGlobalny()-startKad>=4*168, problem=ma<d.resorty||(poTerminie&&!temat);
     if(!problem){d.status='spelniony';return}
     d.status='zagrozony';
-    if(absWeek()<(d.ostatniaKara||-99)+2)return;
-    d.ostatniaKara=absWeek();
+    const now=czasGlobalny();
+    if(now-(Number(d.ostatniaKaraAt)||-1e9)<2*168)return;
+    d.ostatniaKaraAt=now;d.ostatniaKara=absWeek();
     /* Kontrakt ma granicę. Gdy relacja spadnie poniżej -45, koalicjant nie
        marudzi już w panelu, tylko formalnie wychodzi z rządu. Dzięki temu
        zaniedbany temat może wywołać prawdziwy kryzys większości. */
@@ -155,12 +157,13 @@ function renegocjujKontrakt(k){
      relacji/kapitału pilnują, żeby nie dało się spamować jej w jednej turze. */
   const g=G.gov,d=g&&g.kontrakt,q=d&&d.demands&&d.demands[k];
   if(!g||g.pm!==G.me||k===G.me||!q||!G.p[k]||G.p[k].dead)return;
-  if(q.ostatniaRenegocjacja===absWeek())return modal('Kontrakt gabinetu','Rozmowa juĹĽ byĹ‚a',
+  const now=czasGlobalny();
+  if((Number.isFinite(Number(q.ostatniaRenegocjacjaAt))&&now-q.ostatniaRenegocjacjaAt<168)||(!Number.isFinite(Number(q.ostatniaRenegocjacjaAt))&&q.ostatniaRenegocjacja===absWeek()))return modal('Kontrakt gabinetu','Rozmowa już była',
     `<p>Z ${G.p[k].ab} renegocjowaĹ‚eĹ› warunki w tym tygodniu. NastÄ™pna rozmowa bÄ™dzie moĹĽliwa po zmianie tygodnia.</p>`,[{l:'Rozumiem',f:close}],close);
   const tematy=['ekon','podatki','konst','mordepedia','man','media','zagadki','cytaty'];
   const nowy=tematy.find(id=>!(G.lawBy&&G.lawBy[id]===k))||q.temat;
   const ab=G.p[k].ab;
-  const wykonaj=(typ,fn)=>{close();fn();q.ostatniaRenegocjacja=absWeek();
+  const wykonaj=(typ,fn)=>{close();fn();q.ostatniaRenegocjacja=absWeek();q.ostatniaRenegocjacjaAt=czasGlobalny();
     G.gov.spraw=cl((G.gov.spraw||50)-1);if(typeof aiPamietaj==='function')aiPamietaj(k,'renegocjacja',{typ});render()};
   const opcje=[];
   if(q.resorty>1)opcje.push({l:'Odpuść jedno ministerstwo',s:`Wymóg spada do ${q.resorty-1}. Relacja +4, sprawczość rządu -1.`,f:()=>wykonaj('resort',()=>{q.resorty--;G.rel[G.me][k]=cl(G.rel[G.me][k]+4,-100,100);G.rel[k][G.me]=cl(G.rel[k][G.me]+4,-100,100)})});
