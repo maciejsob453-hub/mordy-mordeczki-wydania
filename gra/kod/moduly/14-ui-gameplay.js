@@ -225,6 +225,13 @@ function actFx(id){return AFX[id]||[]}
    nie było po niej śladu poza wpisem w kronice — kafel po prostu szarzał. */
 const STOL_NAZWY={fame:'sława',cred:'wiarygodność',uni:'jedność',act:'aktywność',mem:'ludzie'};
 function stolTygodnia(){
+  decyzjeSweep();
+  const live=decyzjeInit().filter(x=>x&&x.status==='ACTIVE'),closed=decyzjeInit().filter(x=>x&&x.status!=='ACTIVE').slice(-4).reverse();
+  if(live.length||closed.length){
+    const now=czasGlobalny();
+    return `<div class="stol live-actions"><div class="stolh"><h3>Akcje w toku</h3><span class="stoln">${live.length} aktywnych · ${Math.max(0,G.ap)}/${G.apMax} AP</span></div><div class="stolm live-actions-grid">${live.map(d=>{const left=Math.max(0,Number(d.deadline||now)-now),days=Math.ceil(left/24);return `<div class="mj live-action" style="--ac:${CATCOL[d.cat]||'var(--line2)'}"><div class="live-action-mark">◷</div><h4>${esc(d.n)}</h4><span>AKTYWNA · ${days} ${pl(days,'dzień','dni','dni')}</span><small>do ${dateStr(new Date(gameDate().getTime()+left*3600000))}</small></div>`}).join('')}${closed.map(d=>`<div class="mj live-action closed" style="--ac:${CATCOL[d.cat]||'var(--line2)'}"><div class="live-action-mark">${d.status==='COMPLETED'?'✓':'×'}</div><h4>${esc(d.n)}</h4><span>${d.status==='COMPLETED'?'ZAKOŃCZONA':'WYGASŁA'}</span></div>`).join('')}</div></div>`;
+  }
+  return '';
   const klucz=G.term+'-'+G.week;
   /* Stare zapisy mogły zawierać puste wpisy utworzone przez samo otwarcie okna.
      Nie pokazujemy ich jako wykonanych ruchów. Nowe wpisy mają znacznik ok. */
@@ -677,7 +684,7 @@ function actTab(){
   // ile kategorii stoi jeszcze otworem — inaczej gracz widzi tylko wyszarzone kafle
   const wolnych=cats.filter(([c])=>c==='spe'||!kategoriaUzyta(c)).length;
   return `${stolTygodnia()}
-  <div class="card"><div class="h"><h3>Decyzje tygodnia</h3>
+  <div class="card"><div class="h"><h3>Decyzje dostępne teraz</h3>
     <span class="n">${ikona('akcje','sm')}${G.ap}/${G.apMax} akcji · ${ikona('kapital','sm')}${Math.round(G.kp)} kapitału · ${ikona('energia','sm')}${Math.round(G.en)} energii
     · ${wolnych} ${pl(wolnych,'kategoria otwarta','kategorie otwarte','kategorii otwartych')}</span></div>
     <div class="b">
@@ -857,9 +864,10 @@ function fire(a,t,r,s,tm){
      decyzja. Limit kategorii i akcje nadal są tygodniowe, więc nie da się
      obejść zasad przez szybkie klikanie. */
   const dni=czasAkcji(a),wpisCzas=przesunCzas(dni,a);
+  const cyklDecyzji=decyzjaStart(a,wpisCzas);
   if(!G.odnowy)G.odnowy={};
   G.odnowy[a.id]=czasGlobalny()+czasOdnowy(a);
-  if(G.lastCharge)G.lastCharge.czasSeq=wpisCzas&&wpisCzas.seq;
+  if(G.lastCharge){G.lastCharge.czasSeq=wpisCzas&&wpisCzas.seq;G.lastCharge.decisionToken=cyklDecyzji&&cyklDecyzji.token}
   G.catUsed[a.cat]=(G.catUsed[a.cat]||0)+1;
   if(a.cat!=='spe'){
     if(!G.catTimes)G.catTimes={};

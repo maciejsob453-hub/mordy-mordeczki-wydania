@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.183",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/5bc0ad2622e0f53ed9eea1059df85f63633d6690",
+ "wersja": "1.1.184",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,13 +14,13 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "57d45b19c31e9d76f414de392b30c3eb9862fa2622f6af06c40094a521fd9ba3",
+   "sha": "74abae3a29b9c3c690322d2a355b2635229bad8595147d48bd02d9e3448dc166",
    "bajtow": 531
   },
   {
    "sciezka": "gra/kod/moduly/00-data.js",
-   "sha": "ffb7d2b5ff7fb88b29faaa98dc10f47ff8f20be938fbc25605ab8f0ff0db5386",
-   "bajtow": 49780
+   "sha": "145b1d36361734760f8938a80adefd1ff08c81d4585c3b6d56407314882517b7",
+   "bajtow": 49795
   },
   {
    "sciezka": "gra/kod/moduly/01-election-sejm.js",
@@ -29,18 +29,18 @@
   },
   {
    "sciezka": "gra/kod/moduly/02-actions-events.js",
-   "sha": "8284274fdf1d76611b43ddd2d93f3adfaf30e17c06bd79c4e9c7775e87fbb95b",
-   "bajtow": 53944
+   "sha": "10899d6b1e815ef6bd250ea16c61bfac6f5f07d65468f2f83ca442dd78353d77",
+   "bajtow": 55156
   },
   {
    "sciezka": "gra/kod/moduly/03-turn.js",
-   "sha": "ae979b3f1419a832dd4dc53dd50e31fc10245bfd3923ccb44591779ccf4e7b35",
-   "bajtow": 21540
+   "sha": "6e128857deb9216ee40307057b6e2351170a370b36820343dcf3d9b42de4eda9",
+   "bajtow": 21656
   },
   {
    "sciezka": "gra/kod/moduly/04-ai.js",
-   "sha": "74bddc2669e88df5cbfa423ed4afc9c25fa6676817be2e9a0cd91cbae2e5d06f",
-   "bajtow": 24090
+   "sha": "91e9b7e51fd02da135a2cdd21dbc2a159d72ceb58c06f57dda90e1e3b1ab7729",
+   "bajtow": 24433
   },
   {
    "sciezka": "gra/kod/moduly/05-election-cycle.js",
@@ -69,8 +69,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "e28d1a17c52611d51f9af3047b886ba10190da48abf651b54528788589f87ac6",
-   "bajtow": 111063
+   "sha": "0a587b3057271e6f726113e85ea2a8fa1f54e75b56a7a0c2f394d24de88013a7",
+   "bajtow": 111528
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
@@ -89,8 +89,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/14-ui-gameplay.js",
-   "sha": "54a8f0262879684fb40021cf45b287d1beb994ce4ce64c1fa83c982634fb27cc",
-   "bajtow": 96581
+   "sha": "a04d3ad2b0448b209029cf0d581ed2d675e28e25ceef66692760b3e4f17ad00a",
+   "bajtow": 97816
   },
   {
    "sciezka": "gra/kod/moduly/15-governance.js",
@@ -99,8 +99,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/16-goals-panels.js",
-   "sha": "b24cc5becfe400a3c2f3c9c28f1806738248d10e547d3f0422f2d6a1a033e9cb",
-   "bajtow": 113577
+   "sha": "8849d1eb3eed051e1889786798ac3e0faa545e6824e1ee2f4fd213dfce118a53",
+   "bajtow": 116384
   },
   {
    "sciezka": "gra/kod/moduly/17-elections-endgame.js",
@@ -109,8 +109,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/18-bootstrap.js",
-   "sha": "066fff49fc096fba4c06e51f675fb2f50b14bc92995e6d1c7bbc9fb16c8a62e2",
-   "bajtow": 18237
+   "sha": "7f527898236858e0a454cc45ba0e17b864ab8cf8b26ddf4662f153e6ed79052c",
+   "bajtow": 18297
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -523,6 +523,51 @@
    "bajtow": 826
   },
   {
+   "sciezka": "gra/obrazki/cel-dyplomacja.svg",
+   "sha": "6ef53a70d56c1cc7dd5e4b1e41fb6d1413a21085d1add1b7dc6b5752f8278fa1",
+   "bajtow": 445
+  },
+  {
+   "sciezka": "gra/obrazki/cel-gwiazda.svg",
+   "sha": "0a1078421ab4fe0a1e664383e5099869cb7a27cf8fdd76e25e79e3019aa16152",
+   "bajtow": 261
+  },
+  {
+   "sciezka": "gra/obrazki/cel-hotdog.svg",
+   "sha": "bec6eff33b9e2a225e7c64218575d48d6ac3041c387d6403dc77b082ae16ddcc",
+   "bajtow": 427
+  },
+  {
+   "sciezka": "gra/obrazki/cel-krol.svg",
+   "sha": "c5005b9eb702e8dd3a38461d1847f1b284fd4031c9c5a3339f08b7d14e205ae0",
+   "bajtow": 300
+  },
+  {
+   "sciezka": "gra/obrazki/cel-liberalizm.svg",
+   "sha": "cb3640169add17c54285bd5df5f3766eef262bca47eb4e34c7e81cb0402659e8",
+   "bajtow": 537
+  },
+  {
+   "sciezka": "gra/obrazki/cel-oko.svg",
+   "sha": "0f15eea97b192010b0e29d89f3fefb807abf62040d20fbe51f6f17a0b091731d",
+   "bajtow": 330
+  },
+  {
+   "sciezka": "gra/obrazki/cel-rada.svg",
+   "sha": "0fa2e43a685a36b9fe4a01bb1742629f5b4dadadc036a31715239b386d3b2a1a",
+   "bajtow": 426
+  },
+  {
+   "sciezka": "gra/obrazki/cel-republika.svg",
+   "sha": "e3329729df2413e481cc0bfb8de379df083b63a456099f514ae718a596e09541",
+   "bajtow": 320
+  },
+  {
+   "sciezka": "gra/obrazki/cel-roza.svg",
+   "sha": "03d470ae3de760296f4df68b068616d27ca128ff1ee3e41b603eacb1053f8129",
+   "bajtow": 370
+  },
+  {
    "sciezka": "gra/obrazki/cfd70f7b77a6.webp",
    "sha": "c9053ea3399b97e80aa9c64ea3e120a2fc51b419b77c7d5758703892bc5c7add",
    "bajtow": 1428
@@ -904,8 +949,8 @@
   },
   {
    "sciezka": "gra/wyglad/desktop.css",
-   "sha": "cf75191239478a07789634bb843e30ae9f2d0b5fd1326d7f545e21a355712563",
-   "bajtow": 44776
+   "sha": "2436e0b06e335b580d537f8ce2079dd2dd75df0bdf499956d2bf83d1a8af7e17",
+   "bajtow": 48075
   },
   {
    "sciezka": "gra/wyglad/redesign.css",
@@ -940,6 +985,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "5bc0ad2622e0f53ed9eea1059df85f63633d6690"
+ }
 }

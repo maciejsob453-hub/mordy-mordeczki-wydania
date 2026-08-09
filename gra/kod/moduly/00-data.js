@@ -619,7 +619,7 @@ function newGame(id){
      /* Simulowany kalendarz: decyzje przesuwają dzień, a luka tygodnia nadal
         pozostaje cotygodniowym limitem akcji i rozliczeń. */
      dzienTygodnia:1,czasTygodnia:0,czasGodzTygodnia:0,godzina:8,simHour:0,realCarry:0,
-     harmonogram:[],odnowy:{},pkbCiosy:[],
+     harmonogram:[],decisionLog:[],odnowy:{},pkbCiosy:[],
      /* Parametr jest wyłącznie dla automatycznego podglądu. Normalna gra startuje
         z dźwiękiem, a test nie budzi człowieka przy komputerze. */
      mute:typeof location!=='undefined'&&new URLSearchParams(location.search).has('mute'), night:null,

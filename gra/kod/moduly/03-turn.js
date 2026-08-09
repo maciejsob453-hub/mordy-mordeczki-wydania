@@ -30,6 +30,7 @@ function realClockInit(){
 }
 function realtimeHourly(){
   const p=me&&me();if(!p)return;
+  if(typeof decyzjeSweep==='function')decyzjeSweep(czasGlobalny());
   const eg=typeof enGain==='function'?enGain():0;
   G.en=cl(G.en+eg/168);
   G._apCarry=(G._apCarry||0)+(G.apMax||3)/168;
@@ -41,7 +42,7 @@ function realtimeDaily(){
      Dzienny rytm jest tylko harmonogramem reakcji, nie turą gracza. */
   if(G.phase==='camp'){
     ai();aiGoals();aiAgents();aiTransfery();aiOpozycja();
-    if(G.gov){govTick();govKontraktTick()}
+    if(G.gov){govTick();govKontraktTick();aiProposeLaw();aiObsadzRade();aiRekonstrukcja()}
     if(!G.queue||!G.queue.length)G.queue=buildEvents();
   }
   if(G.simHour%168===0)makeNoise();

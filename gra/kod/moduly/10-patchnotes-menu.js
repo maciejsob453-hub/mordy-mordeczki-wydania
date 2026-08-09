@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.184':{data:'9 sierpnia 2026',zmiany:[
+  'Decyzje maja teraz wlasny cykl zycia z terminem, statusem i automatycznym wygasaniem zamiast wspolnego stolu tygodnia.',
+  'AI reaguje w rytmie godzinowym, sklada ustawy i uzupelnia gabinet podczas plyniecia czasu, a zegar jest jednym panelem daty i predkosci.',
+  'Mapa celow jest pionowym drzewem bez dodatkowego dashboardu, zachowuje zoom i pan, a cele dostaly dedykowane znaki zamiast herbów partii.'
+ ]},
  '1.1.183':{data:'9 sierpnia 2026',zmiany:[
   'Zegar gry dziala teraz godzinami: spacja tylko pauzuje i wznawia symulacje, a predkosc odtwarza pojedyncze godziny bez przeskokow.',
   'Decyzje nie teleportuja kalendarza, odnowy i limity kategorii licza sie z ciaglego czasu, a boty dostaja codzienne okazje do reakcji.',
@@ -1177,7 +1182,7 @@ function game(){
     ${streakBox()}
     </div>
     <div class="hudend">
-      <div class="rtclock" title="Opcjonalny zegar czasu rzeczywistego">
+      <div class="rtclock rtclock-command" title="Sterowanie czasem symulacji">
         <button class="btn g sm" onclick="realClockToggle()">${G.realPaused?'▶ Czas':'⏸ Pauza'}</button>
         <select onchange="realClockSpeed(this.value)" aria-label="Tempo czasu rzeczywistego">
           ${[.5,1,2,3,4,5].map(v=>`<option value="${v}" ${G.realSpeed===v?'selected':''}>x${v}</option>`).join('')}

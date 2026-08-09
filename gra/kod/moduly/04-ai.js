@@ -128,7 +128,12 @@ function aiSad(k){
 
 function ai(){
   alive().forEach(k=>{
-    if(k===G.me)return;const p=G.p[k],ld=lead(k);
+    if(k===G.me)return;const p=G.p[k],ld=lead(k),now=czasGlobalny();
+    /* AI nie dostaje czterech ruchów za każdy dzienny render. Jeden rytm ma
+       własny cooldown w godzinach, więc komputer działa w tym samym świecie
+       czasu co gracz. */
+    if(p.aiNextAt&&now<p.aiNextAt)return;
+    p.aiNextAt=now+Math.max(18,Math.round(42-aiProfil(k).aktywnosc*8+R(-8,12)));
     /* Plan nie jest już wyrokiem na całą kadencję. Gdy partia straci rząd,
        mandaty albo zjedzie pod próg, zmienia priorytet i pamięta dlaczego. */
     if(p.planTerm===G.term&&p.plan){
@@ -138,8 +143,8 @@ function ai(){
         say(`<b>${p.ab}</b> zmienia cel: ${PLAN_OPIS[nowy]||nowy}.`,'');
       }
     }
-    /* Bot ma ten sam tygodniowy limit ruchow co gracz. */
-    p.aiAp=Math.max(2,Math.min(4,3+(p.uni>=78?1:0)));
+    /* Jeden pakiet akcji na własny rytm zamiast tygodniowego resetu. */
+    p.aiAp=Math.max(1,Math.min(2,1+(p.uni>=78?1:0)));
     aiZrzutka(k);          // po prywatne pieniądze sięga tylko partia pod kreską
     aiMedia(k);            // boty prowadzą własne wydawnictwa i też mają z nich zasięg
     const wagi=aiWagi(k,p);

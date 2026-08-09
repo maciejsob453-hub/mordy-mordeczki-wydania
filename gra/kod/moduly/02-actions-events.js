@@ -40,6 +40,33 @@ function kategoriaUzyta(cat){
   G.catUsed[cat]=G.catTimes[cat].length||(G.catUsed[cat]||0);
   return G.catUsed[cat];
 }
+/* Każda decyzja ma własny cykl życia. Nie chowamy wykonanych ruchów w
+   tygodniowym stole: aktywna decyzja kończy się na swoim terminie, a slot
+   wraca przez ciągłe odnowienie AP. Dzięki temu lista nie może rosnąć w
+   nieskończoność przy przejściu między kadencjami. */
+function decyzjeInit(){
+  if(!G)return [];
+  if(!Array.isArray(G.decisionLog))G.decisionLog=[];
+  return G.decisionLog;
+}
+function decyzjeSweep(now){
+  if(!G)return;
+  const t=typeof now==='number'?now:czasGlobalny(),log=decyzjeInit();
+  log.forEach(d=>{
+    if(!d||d.status!=='ACTIVE')return;
+    if(t>=Number(d.deadline||0)){d.status='COMPLETED';d.completedAt=t}
+  });
+  /* Historia jest przydatna w kronice, ale nie może stać się drugim stołem
+     tygodnia. Trzymamy tylko ostatnie decyzje. */
+  if(log.length>24)G.decisionLog=log.slice(-24);
+  if(Array.isArray(G.harmonogram))G.harmonogram=G.harmonogram.filter(x=>x&&Number(x.do||0)>t-336);
+}
+function decyzjaStart(a,wpis){
+  if(!G||!wpis)return null;
+  const d={token:wpis.seq,id:a&&a.id||wpis.id,n:a&&a.n||wpis.n,cat:a&&a.cat||'',
+    startedAt:wpis.od,deadline:wpis.do,status:'ACTIVE',days:wpis.dni};
+  decyzjeInit().push(d);decyzjeSweep(wpis.od);return d;
+}
 function czasAkcji(a){
   if(!a)return 1;
   const dom=RT_DNI[a.id]||Math.max(1,Math.ceil((a.ap||1)*1.35));

@@ -457,7 +457,7 @@ function switchIdentity(mode){
    muszą zachować wykonane cele partyjne, a Concordia dostaje nową, czasową
    ścieżkę bez kasowania historii. */
 const NATIONAL_GOALS={
- nplr_liberal:{n:'Liber? Libro? Liberalizm!',days:35,prev:null,logo:'LIB',
+ nplr_liberal:{avatar:'obrazki/cel-liberalizm.svg',n:'Liber? Libro? Liberalizm!',days:35,prev:null,logo:'LIB',
   what:'Pierwszy krok Concordii: liberalizm przestaje być żartem z nazwy i staje się programem, który da się prowadzić przez kilka kadencji.',
   accessText:'Dostępne od początku rozgrywki.',
   cons:['Sława +6, wiarygodność +7 i aktywność +5.','Partia dostaje znacznik pierwszego liberalnego przełomu.'],
@@ -542,6 +542,8 @@ const NATIONAL_GOALS={
   access:()=>!!(G&&me()&&me().mem>=178&&kingFav(G.me)>=50&&(isPM()||hasPrez())&&me().act>=80),
   run(){const p=me();p.n='Partia Republikańska';p.ab='PR';p.c='#1e63d0';p.logo='REP';p.repMode=1;p.fame=cl(p.fame+20);p.cred=cl(p.cred+14);p.act=cl(p.act+12);p.uni=cl(p.uni+8);M(p,20)}}
 };
+/* Dedykowane znaki celów: nigdy nie używamy herbu partii jako zastępczej grafiki. */
+Object.assign(NATIONAL_GOALS,{nplr_liberal:{avatar:'obrazki/cel-liberalizm.svg'},nplr_hotdog:{avatar:'obrazki/cel-hotdog.svg'},nplr_rose:{avatar:'obrazki/cel-roza.svg'},nplr_king:{avatar:'obrazki/cel-krol.svg'},nplr_jewish:{avatar:'obrazki/cel-gwiazda.svg'},nplr_star:{avatar:'obrazki/cel-gwiazda.svg'},nplr_blue:{avatar:'obrazki/cel-oko.svg'},nplr_diplomacy:{avatar:'obrazki/cel-dyplomacja.svg'},nplr_council:{avatar:'obrazki/cel-rada.svg'},nplr_gloria:{avatar:'obrazki/cel-republika.svg'},nplr_power:{avatar:'obrazki/cel-rada.svg'},nplr_friendship:{avatar:'obrazki/cel-dyplomacja.svg'},nplr_aurea:{avatar:'obrazki/cel-republika.svg'},nplr_aurea_republic:{avatar:'obrazki/cel-republika.svg'}});
 const NATIONAL_BASE_ORDER=['nplr_liberal','nplr_hotdog','nplr_rose','nplr_king','nplr_jewish','nplr_star'];
 const NATIONAL_BRANCHES={republican:{name:'Rozwidlenie republikańskie',ids:['nplr_blue','nplr_diplomacy','nplr_council','nplr_gloria']},freedom:{name:'Rozwidlenie wolnościowe',ids:['nplr_power','nplr_friendship','nplr_aurea','nplr_aurea_republic']}};
 const NATIONAL_ORDER=Object.keys(NATIONAL_GOALS);
@@ -1442,4 +1444,13 @@ function goalTabCommand(){
 }
 /* Nadpisanie starego renderera celów. Mechanika pozostaje w goalCard/doGoal,
    a ten ekran tylko układa te same dane w drzewo i panel inspektora. */
-goalTab=goalTabCommand;
+function goalTabCommandCompact(){
+  nationalGoalTick();
+  const party=myPartyGoals(),national=myNationalGoals(),items=goalsAllViews(party,national);
+  if(!items.length)return identSwitcher()+`<div class="goals-command-empty"><span>✦</span><h2>Brak aktywnego programu</h2><p>Ta partia nie ma obecnie osobnej ścieżki celów.</p></div>`;
+  const active=items.find(x=>x.active)||items.find(x=>!x.done)||items[items.length-1];
+  if(!G.goalFocus||!items.some(x=>x.id===G.goalFocus))G.goalFocus=active.id;
+  const selected=goalViewById(G.goalFocus)||active,done=items.filter(x=>x.done).length;
+  return `<div class="goals-command goals-command-compact"><header class="goals-command-header"><div class="goals-command-title"><span class="eyebrow">PROGRAM PARTII</span><h1>${me().n}</h1><p>${done}/${items.length} celów ukończonych · kliknij węzeł, by otworzyć szczegóły</p></div><div class="goals-command-readout"><span>AKTYWNY CEL</span><b>${active.name}</b><small>${active.progress}% · ${active.status}</small></div></header><div class="goals-command-layout"><main class="goals-command-main">${goalsBranchPanel()}<div class="goals-tree-toolbar"><div><span class="eyebrow">MAPA CELÓW</span><h2>Ścieżka strategiczna</h2></div><div class="goals-tree-counter"><b>${done}</b><span>/ ${items.length}<br>WYKONANYCH</span></div></div><div class="goals-map-toolbar"><button type="button" onclick="goalsZoom(-.1)">−</button><output id="goalsZoomValue">100%</output><button type="button" onclick="goalsZoom(.1)">+</button><button type="button" onclick="goalsMapReset()">CENTRUJ</button></div><div class="goals-map-frame" data-goals-map><div class="goals-map-canvas" data-goals-canvas><div class="goals-map-grid">${goalsTreeBlock('Cele narodowe','Przełomy Concordii.',national.map(nationalGoalView),'national')}${goalsTreeBlock('Cele partyjne','Program i organizacja partii.',party.map(partyGoalView),'party')}</div></div></div></main>${goalsInspector(selected)}</div></div>`;
+}
+goalTab=goalTabCommandCompact;
