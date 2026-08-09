@@ -197,7 +197,7 @@ function scenRuntimeStart(d){
   if(Array.isArray(w.ustawy)){G.law=G.law||{};w.ustawy.forEach(id=>G.law[String(id).slice(0,20)]=1)}
   const media=w.media||{};if(Object.values(media).some(x=>+x>0)){G.law=G.law||{};G.law.media=1;G.aiMedia=G.aiMedia||{};
     Object.keys(media).forEach(k=>{if(!G.p[k])return;const ile=cl(Math.round(+media[k]||0),0,3);G.aiMedia[k]=G.aiMedia[k]||[];
-      ['gazeta','tv','kino'].slice(0,ile).forEach((typ,i)=>{if(!G.aiMedia[k].some(m=>m.typ===typ))G.aiMedia[k].push({typ,nazwa:aiNazwaMedia(k,typ,i),szef:G.p[k].lead,bilans:0,staz:0,serca:0,numery:0,ostatnio:0,ostatnieWyd:-99})})})}
+      ['gazeta','tv','kino'].slice(0,ile).forEach((typ,i)=>{if(!G.aiMedia[k].some(m=>m.typ===typ))G.aiMedia[k].push({typ,nazwa:aiNazwaMedia(k,typ,i),szef:G.p[k].lead,bilans:0,staz:0,serca:0,numery:0,ostatnio:0,ostatnieWyd:-16632})})})}
 }
 function scenEventPartia(e){
   if(e.party==='gracz'||!e.party)return G.me;if(e.party==='losowa'){

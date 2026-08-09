@@ -559,10 +559,10 @@ function aiMedia(k){
   if(!G.aiMediaPlan)G.aiMediaPlan={};
   if(!G.aiMedia[k])G.aiMedia[k]=[];
   const p=G.p[k]; if(!p||p.dead)return;
-  const szef=p.lead, moje=G.aiMedia[k], teraz=absWeek();
+  const szef=p.lead, moje=G.aiMedia[k], teraz=czasGlobalny();
   moje.forEach((m,i)=>{if(!m.nazwa||/[📰📺🎬]$/.test(m.nazwa))m.nazwa=aiNazwaMedia(k,m.typ,i)});
   const profil=aiProfil(k),limit=profil.media>.78?3:profil.media>.42?2:1;
-  if(G.aiMediaPlan[k]===undefined)G.aiMediaPlan[k]=teraz+RI(0,Math.max(1,Math.round(3-profil.media*2)));
+  if(G.aiMediaPlan[k]===undefined)G.aiMediaPlan[k]=teraz+RI(0,Math.max(24,Math.round(72-profil.media*48)));
 
   /* Bot zawsze zaczyna od gazety, a droższe formaty dokłada dopiero później.
      Losowa szansa zakupu sprawiała, że część partii przez całe kadencje nie robiła
@@ -576,10 +576,10 @@ function aiMedia(k){
       G.kapPryw[szef]=Math.round(maj-koszt);
       const nazwa=aiNazwaMedia(k,chce,moje.length);
       moje.push({typ:chce,nazwa,szef,bilans:0,staz:0,serca:0,numery:0,
-                 ostatnio:0,ostatnieWyd:-99});
-      G.aiMediaPlan[k]=teraz+RI(Math.max(2,Math.round(7-profil.media*4)),Math.max(3,Math.round(9-profil.media*4)));
+                 ostatnio:0,ostatnieWyd:-16632});
+      G.aiMediaPlan[k]=teraz+RI(Math.max(48,Math.round(168-profil.media*96)),Math.max(72,Math.round(240-profil.media*120)));
       say(`<b>${p.ab} zakłada ${nazwa}.</b> ${szef} wyłożył ${kasaSkrot(koszt)}.`,'');
-    }else G.aiMediaPlan[k]=teraz+2;
+    }else G.aiMediaPlan[k]=teraz+48;
   }
 
   // Każdy szyld płaci koszty i publikuje, gdy kończy mu się przerwa.
@@ -588,7 +588,7 @@ function aiMedia(k){
     const utrz=MEDIA_UTRZYMANIE[m.typ]||0;
     m.bilans=(m.bilans||0)-utrz;
     G.kapPryw[m.szef]=Math.round((G.kapPryw[m.szef]!==undefined?G.kapPryw[m.szef]:kapPryw(m.szef))-utrz);
-    if(teraz-(m.ostatnieWyd!==undefined?m.ostatnieWyd:-99)<MEDIA_PRZERWA[m.typ])return;
+    if(teraz-(m.ostatnieWyd!==undefined?m.ostatnieWyd:-16632)<MEDIA_PRZERWA[m.typ])return;
     const ld=L(m.szef)||{komp:50,char:50};
     const skala={gazeta:.9,tv:1.6,kino:1.9}[m.typ]||1;
     const zysk=Math.max(12000,Math.round((p.cred*.5+p.act*.4+ld.komp*.3-18)*skala*22000*R(.7,1.3)));

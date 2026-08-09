@@ -29,8 +29,8 @@ function zasiegMediow(k){
   const lista=kto===G.me?(G.media||[]):((G.aiMedia&&G.aiMedia[kto])||[]);
   if(!lista.length)return 0;
   return lista.reduce((a,m)=>{
-    const odKiedy=absWeek()-(m.ostatnieWyd!==undefined?m.ostatnieWyd:-99);
-    const swiezosc=odKiedy<=1?1:odKiedy<=3?.6:odKiedy<=6?.25:0;
+    const odKiedy=czasGlobalny()-(m.ostatnieWyd!==undefined?m.ostatnieWyd:-16632);
+    const swiezosc=odKiedy<=168?1:odKiedy<=504?.6:odKiedy<=1008?.25:0;
     return a+(MEDIA_ZASIEG[m.typ]||0)*swiezosc;
   },0);
 }
@@ -65,9 +65,9 @@ function serduszkaProg(m){
 }
 /* Ile tygodni musi minąć między wydaniami. Gazeta wychodzi co dwa tygodnie,
    antena i ekran co tydzień — inaczej dałoby się klikać w kółko bez końca. */
-const MEDIA_PRZERWA={gazeta:2,tv:1,kino:1};
-const mediaGotowe=m=>absWeek()-(m.ostatnieWyd||-99)>=MEDIA_PRZERWA[m.typ];
-const mediaZa=m=>Math.max(0,MEDIA_PRZERWA[m.typ]-(absWeek()-(m.ostatnieWyd||-99)));
+const MEDIA_PRZERWA={gazeta:336,tv:168,kino:168};
+const mediaGotowe=m=>czasGlobalny()-(m.ostatnieWyd===undefined?-16632:m.ostatnieWyd)>=MEDIA_PRZERWA[m.typ];
+const mediaZa=m=>Math.max(0,MEDIA_PRZERWA[m.typ]-(czasGlobalny()-(m.ostatnieWyd===undefined?-16632:m.ostatnieWyd)));
 /* Utrzymanie wydawnictwa. Wcześniej samo posiadanie nic nie kosztowało, więc
    media były darmową maszynką: kupujesz raz i tylko zbierasz. Teraz każdy szyld
    ma koszty stałe i płaci je przewodniczący ze swojej kieszeni — jeśli z niego
@@ -176,7 +176,7 @@ function mediaNumer(i){
   const serca=Math.max(0,s);
   const zysk=Math.round((serca-10)*18000);
   m.bilans+=zysk; m.serca=serca; m.ostatnio=zysk;
-  m.numery=(m.numery||0)+1; m.ostatnieWyd=absWeek();
+  m.numery=(m.numery||0)+1; m.ostatnieWyd=czasGlobalny();
   const szef=p.lead;
   kieszenSzefa(zysk);
   SFX.media();
@@ -227,7 +227,7 @@ function mediaOdcinekGraj(i,t){
      ciągnie z AKTYWNOŚCI partii i charyzmy prowadzącego, nie ze sławy. */
   const widz=Math.max(3,Math.round(dop*2.2*(1+p.act/95)*(1+ld.char/190)*R(.72,1.34)));
   const zysk=Math.round(widz*90000);
-  m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.ostatnieWyd=absWeek();
+  m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.ostatnieWyd=czasGlobalny();
   m.numery=(m.numery||0)+1;
   kieszenSzefa(zysk);
   SFX.media();
@@ -262,7 +262,7 @@ function mediaFilmGraj(i,f){
   const m=mediaMoje()[i], p=me();
   const widz=Math.max(4,Math.round(p.fame*.30*f.mn*R(.7,1.4)));
   const zysk=Math.round(widz*110000);
-  m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.ostatnieWyd=absWeek();
+  m.bilans+=zysk; m.ostatnio=zysk; m.widz=widz; m.ostatnieWyd=czasGlobalny();
   m.numery=(m.numery||0)+1;
   kieszenSzefa(zysk);
   SFX.media();

@@ -58,6 +58,13 @@ function loadCode(code){
   G.useTerm=G.useTerm||{};G.catUsed=G.catUsed||{};G.once=G.once||{};G.used=G.used||{};G.tydz2Times=G.tydz2Times||{};G.lastRealActionAt=Number.isFinite(G.lastRealActionAt)?G.lastRealActionAt:null;G.decisionLog=Array.isArray(G.decisionLog)?G.decisionLog:[];
   if(G.premierProposalTerm===undefined)G.premierProposalTerm=null;
   G.catTimes=G.catTimes||{};
+  /* Media zapisywały ostatnią publikację jako numer tygodnia. Zegar ciągły
+     trzyma teraz godziny, więc stare zapisy przeliczamy tylko raz. */
+  if(G.mediaClockVersion!==2){
+    const wszystkie=[].concat(Array.isArray(G.media)?G.media:[],...Object.values(G.aiMedia||{}).map(x=>Array.isArray(x)?x:[]));
+    wszystkie.forEach(m=>{if(m&&Number.isFinite(+m.ostatnieWyd)&&Math.abs(+m.ostatnieWyd)<1000)m.ostatnieWyd=Math.round(+m.ostatnieWyd*168)});
+    G.mediaClockVersion=2;
+  }
   G.lup=G.lup||{};G.xpOs=G.xpOs||{};G.znuz=G.znuz||{};G.znuzKad=G.znuzKad||{};
   G.rada=G.rada||{};G.radaOd=G.radaOd||{};G.lawTerm=G.lawTerm||{};G.law=G.law||{};
   G.coal=G.coal||{};G.free=G.free||{eli:0,int:0,ser:0};G.king=G.king||{rel:52,paid:0};

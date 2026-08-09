@@ -451,7 +451,9 @@ function mogeZglosic(id){
 /* Sejm rozpatruje jeden projekt tygodniowo. Każda ustawa z osobna ma nadal swoje
    jedno podejście na kadencję — ten limit tylko rozkłada je w czasie, żeby nie
    dało się w jednym tygodniu przepchnąć całego programu naraz. */
-const ustawaWTymTygodniu=()=>G.lawWeek===G.term+'-'+G.week;
+const ustawaWTymTygodniu=()=>G.lawWeek===null?false:Number.isFinite(+G.lawAt)
+  ? czasGlobalny()-Number(G.lawAt)<168
+  : G.lawWeek===G.term+'-'+G.week;
 function startLaw(id){
   const l=lawById(id);if(!l||!mogeZglosic(id)||G.lawPend||G.lawTerm[id])return;
   if(lawDone(id)&&!lawEdytowalna(id))return;

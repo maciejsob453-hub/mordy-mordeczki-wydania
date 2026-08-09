@@ -1,6 +1,6 @@
 {
  "wersja": "1.1.186",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/c8cc85604cbcd8a263baf90a40ed1b5f95bd4f30",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -59,8 +59,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/08-scenarios.js",
-   "sha": "b89c392a1b173762eb656dccfc0fb66a6474e51c7b31d2f5b8155e88e43d8adf",
-   "bajtow": 41386
+   "sha": "0a7bedfc61b8f2645934f2af9a88438c12a7f553d57dc4474b388645b03724f0",
+   "bajtow": 41389
   },
   {
    "sciezka": "gra/kod/moduly/09-screens.js",
@@ -74,13 +74,13 @@
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
-   "sha": "62aad82a7b8b75fd0ed86aa25d8d102ff3aae328bbe20f0866496a3e96bd7d58",
-   "bajtow": 34126
+   "sha": "b040112e432689764c18b7b8b29437d63ac3e41dba57e72821d47135e8caa410",
+   "bajtow": 34150
   },
   {
    "sciezka": "gra/kod/moduly/12-media.js",
-   "sha": "b087be239eef4265a246b9e8c09f12242591dac9b648d6e98f3a310f60ac1c5b",
-   "bajtow": 20126
+   "sha": "5e90a5fce50816a4baa7e717b4ca11bab9c462e05e8b877b2628ab384ad45892",
+   "bajtow": 20228
   },
   {
    "sciezka": "gra/kod/moduly/13-court.js",
@@ -89,13 +89,13 @@
   },
   {
    "sciezka": "gra/kod/moduly/14-ui-gameplay.js",
-   "sha": "10394a21b67001bb01a72e5992451fe44e283c3157ef55ce0f3828c26062335e",
-   "bajtow": 98449
+   "sha": "b60e0fb43277f30fe8f0a936bd2e95b676e7977a318193d911981535901dd7cb",
+   "bajtow": 98541
   },
   {
    "sciezka": "gra/kod/moduly/15-governance.js",
-   "sha": "109d9c0aa87cdabb522e17affd4c0e0ea5269b1c49eb83facd90814def339da5",
-   "bajtow": 77130
+   "sha": "c37444e0c8ae71ab22e23e9cea431ca47ba4f748413931c1b960be4e589eee0f",
+   "bajtow": 77256
   },
   {
    "sciezka": "gra/kod/moduly/16-goals-panels.js",
@@ -109,8 +109,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/18-bootstrap.js",
-   "sha": "58f0f7be9d1e61126722e2fc3ee4499821df26299e2ea070da651ec0a9d6fc66",
-   "bajtow": 18473
+   "sha": "eaa4b7c703a4a3faf62c52521971c9d0070b83383613a8cba100f975826c9a8a",
+   "bajtow": 18959
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -985,6 +985,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "c8cc85604cbcd8a263baf90a40ed1b5f95bd4f30"
+ }
 }

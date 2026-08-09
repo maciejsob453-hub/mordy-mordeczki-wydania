@@ -875,7 +875,7 @@ function proposeLaw(id,opcje){
   /* Podejście zużywa się dopiero wtedy, gdy sprawa naprawdę się kończy — przy
      przegranym głosowaniu albo po podpisie. Weto prezydenta nie może spalać
      projektu, który sejm przegłosował: premier wygrał izbę i ma prawo wrócić. */
-  G.lawWeek=G.term+'-'+G.week;                      // laska marszałkowska zajęta do końca tygodnia
+  G.lawWeek=G.term+'-'+G.week;G.lawAt=czasGlobalny(); // laska zajęta przez kroczące 7 dni
   const w=lawVote(id,opcje);
   close();
   if(!w.ok){
@@ -897,7 +897,7 @@ function proposeLaw(id,opcje){
   SFX.lawPass();
   sprawczosc(true,G.me);
   if(G.przekupiony&&G.przekupiony.doTerm===G.term)G.przekupiony=null;
-  G.lawPend={id,opcje:opcje||null,za:w.za,przeciw:w.przeciw,wstrzym:w.wstrzym,by:w.by,przez:G.me,odTerm:G.term,odWeek:G.week};
+  G.lawPend={id,opcje:opcje||null,za:w.za,przeciw:w.przeciw,wstrzym:w.wstrzym,by:w.by,przez:G.me,odTerm:G.term,odWeek:G.week,odAt:czasGlobalny()};
   say(`<b>${law.n} przechodzi przez sejm.</b> Za ${w.za}, przeciw ${w.przeciw}. Czeka na podpis prezydenta.`,'good');
   const prezK=G.prez?G.prez.party:null;
   modal('Sejm','Ustawa uchwalona',
@@ -1079,7 +1079,7 @@ function rozstrzygnijUstawe(id,opcje,pm,mojGlos,relZmiana){
   SFX.lawPass();
   sprawczosc(true,pm);
   if(G.przekupiony&&G.przekupiony.doTerm===G.term)G.przekupiony=null;
-  G.lawPend={id,opcje:opcje||null,za:w.za,przeciw:w.przeciw,wstrzym:w.wstrzym,by:w.by,przez:pm,odTerm:G.term,odWeek:G.week};
+  G.lawPend={id,opcje:opcje||null,za:w.za,przeciw:w.przeciw,wstrzym:w.wstrzym,by:w.by,przez:pm,odTerm:G.term,odWeek:G.week,odAt:czasGlobalny()};
   say(`<b>${law.n}</b> przechodzi przez sejm głosami ${w.za}:${w.przeciw}. Firmuje ją ${G.p[pm].ab}.`);
   if(mojGlos!==undefined)modal('Sejm','Ustawa przeszła',
     `<p><b>${law.n}</b> przechodzi. Firmuje ją <b>${G.p[pm]?G.p[pm].ab:'rząd'}</b>.</p>
@@ -1171,8 +1171,12 @@ const ZWLOKA_MAX=3;
 function zwlokaPrezydenta(){
   const l=G.lawPend;
   if(!l||!hasPrez())return;                    // pałac nie nasz albo nic nie czeka
-  if(typeof l.odTerm!=='number')return;
-  const ile=(G.term-l.odTerm)*12+(G.week-l.odWeek);
+  let ile;
+  if(typeof l.odAt==='number')ile=Math.floor((czasGlobalny()-l.odAt)/168);
+  else{
+    if(typeof l.odTerm!=='number')return;
+    ile=(G.term-l.odTerm)*12+(G.week-l.odWeek);
+  }
   if(ile<ZWLOKA_MAX){
     if(ile===ZWLOKA_MAX-1)
       say(`<b>Ustawa czeka na twój podpis.</b> Zostaje ostatni tydzień — potem serwer uzna, że prezydent ucieka od decyzji.`,'bad');
