@@ -1453,4 +1453,10 @@ function goalTabCommandCompact(){
   const selected=goalViewById(G.goalFocus)||active,done=items.filter(x=>x.done).length;
   return `<div class="goals-command goals-command-compact"><header class="goals-command-header"><div class="goals-command-title"><span class="eyebrow">PROGRAM PARTII</span><h1>${me().n}</h1><p>${done}/${items.length} celów ukończonych · kliknij węzeł, by otworzyć szczegóły</p></div><div class="goals-command-readout"><span>AKTYWNY CEL</span><b>${active.name}</b><small>${active.progress}% · ${active.status}</small></div></header><div class="goals-command-layout"><main class="goals-command-main">${goalsBranchPanel()}<div class="goals-tree-toolbar"><div><span class="eyebrow">MAPA CELÓW</span><h2>Ścieżka strategiczna</h2></div><div class="goals-tree-counter"><b>${done}</b><span>/ ${items.length}<br>WYKONANYCH</span></div></div><div class="goals-map-toolbar"><button type="button" onclick="goalsZoom(-.1)">−</button><output id="goalsZoomValue">100%</output><button type="button" onclick="goalsZoom(.1)">+</button><button type="button" onclick="goalsMapReset()">CENTRUJ</button></div><div class="goals-map-frame" data-goals-map><div class="goals-map-canvas" data-goals-canvas><div class="goals-map-grid">${goalsTreeBlock('Cele narodowe','Przełomy Concordii.',national.map(nationalGoalView),'national')}${goalsTreeBlock('Cele partyjne','Program i organizacja partii.',party.map(partyGoalView),'party')}</div></div></div></main>${goalsInspector(selected)}</div></div>`;
 }
-goalTab=goalTabCommandCompact;
+/* Keep the identity switcher in the compact command-center view as well. The
+   older compact renderer omitted it, hiding unlocked party logos. */
+const goalTabCompactBase=goalTabCommandCompact;
+goalTab=()=>{
+  const html=goalTabCompactBase();
+  return myIdentities().length>=2&&html.indexOf('brand-switch-logo')<0?identSwitcher()+html:html;
+};

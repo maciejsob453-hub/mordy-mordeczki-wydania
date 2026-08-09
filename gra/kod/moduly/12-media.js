@@ -73,15 +73,20 @@ const mediaZa=m=>Math.max(0,MEDIA_PRZERWA[m.typ]-(czasGlobalny()-(m.ostatnieWyd=
    ma koszty stałe i płaci je przewodniczący ze swojej kieszeni — jeśli z niego
    nic nie wychodzi, po prostu topi pieniądze. */
 const MEDIA_UTRZYMANIE={gazeta:35e3,tv:420e3,kino:700e3};
-function mediaTydzien(){
+function mediaTick(godziny=168){
   if(!G)return;
   mediaInit();
   if(!G.media.length)return;
-  let koszt=0;
-  G.media.forEach(m=>{m.staz=(m.staz||0)+1;koszt+=MEDIA_UTRZYMANIE[m.typ]||0;
-    m.bilans-=MEDIA_UTRZYMANIE[m.typ]||0});
+  const skala=cl((Number(godziny)||0)/168,0,1);let koszt=0;
+  G.media.forEach(m=>{
+    m.staz=(m.staz||0)+skala;
+    const brutto=(m._kosztReszta||0)+(MEDIA_UTRZYMANIE[m.typ]||0)*skala;
+    const zaplacono=Math.floor(brutto);
+    m._kosztReszta=brutto-zaplacono;koszt+=zaplacono;m.bilans-=zaplacono;
+  });
   if(koszt>0)kieszenSzefa(-koszt);
 }
+function mediaTydzien(){mediaTick(168)}
 /* Wspólne wejście do kieszeni przewodniczącego — także pod kreskę. */
 function kieszenSzefa(delta){
   const szef=me().lead; if(!szef)return 0;
@@ -96,23 +101,25 @@ function kieszenSzefa(delta){
    kontrowersję, a przy dostatecznie głębokim dołku wierzyciele zabierają
    wydawnictwa. To jest ta spirala: im dłużej tkwisz, tym trudniej wyjść. */
 const DLUG_ODSETKI=.09;
-function dlugTydzien(){
+function dlugTick(godziny=168){
   if(!G)return;
   const szef=me().lead; if(!szef)return;
   const stan=(G.kapPryw[szef]!==undefined?G.kapPryw[szef]:kapPryw(szef));
   if(stan>=0){G.dlugTygodni=0;return}
+  const skala=cl((Number(godziny)||0)/168,0,1),poprzedni=Number(G.dlugTygodni)||0;
   const p=me();
-  G.dlugTygodni=(G.dlugTygodni||0)+1;
-  G.kapPryw[szef]=Math.round(stan*(1+DLUG_ODSETKI));      // dług rośnie sam
+  G.dlugTygodni=poprzedni+skala;
+  G.kapPryw[szef]=Math.round(stan*(1+DLUG_ODSETKI*skala));      // dług rośnie sam
   const glebokosc=Math.min(4,Math.abs(stan)/8e6);
-  p.cred=cl(p.cred-Math.round(2+glebokosc*1.6));
-  p.ctr =cl(p.ctr +Math.round(3+glebokosc*2.2));
-  p.uni =cl(p.uni -Math.round(1+glebokosc));
-  say(`<b>${szef} tonie w długach.</b> Na koncie ${kasa(G.kapPryw[szef])}, `
-     +`odsetki ${Math.round(DLUG_ODSETKI*100)}% tygodniowo. Wiarygodność w dół, kontrowersja w górę.`,'bad');
+  p.cred=cl(p.cred-(2+glebokosc*1.6)*skala);
+  p.ctr =cl(p.ctr +(3+glebokosc*2.2)*skala);
+  p.uni =cl(p.uni -(1+glebokosc)*skala);
+  if(Math.floor(G.dlugTygodni)>Math.floor(poprzedni))
+    say(`<b>${szef} tonie w długach.</b> Na koncie ${kasa(G.kapPryw[szef])}, `
+       +`odsetki ${Math.round(DLUG_ODSETKI*100)}% tygodniowo. Wiarygodność w dół, kontrowersja w górę.`,'bad');
   /* Po trzech tygodniach pod kreską wierzyciele zabierają wydawnictwa — jedno
      po drugim, zaczynając od najdroższego. */
-  if(G.dlugTygodni>=3&&(G.media||[]).length){
+  if(Math.floor(G.dlugTygodni)>Math.floor(poprzedni)&&G.dlugTygodni>=3&&(G.media||[]).length){
     const i=G.media.map((m,j)=>({j,c:MEDIA_TYP[m.typ].koszt})).sort((a,b)=>b.c-a.c)[0].j;
     const m=G.media[i];
     G.media.splice(i,1);
@@ -122,6 +129,7 @@ function dlugTydzien(){
        +`z licytacji wróciło ${kasaSkrot(MEDIA_TYP[m.typ].koszt*.45)}.`,'bad');
   }
 }
+function dlugTydzien(){dlugTick(168)}
 function mediaKup(typ){
   const t=MEDIA_TYP[typ]; if(!t)return;
   mediaInit();

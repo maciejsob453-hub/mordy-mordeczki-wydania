@@ -283,10 +283,10 @@ function zarobekLidera(k){
   const rynek=1+(pkbMnoznik()-PKB_MNOZNIK_BAZA)/260;   // dobra gospodarka podnosi wszystkich
   return Math.round(baza*urzad*wstyd*rynek*mnoznikRangi(ld.n||p.lead));
 }
-function zarobekTydzien(){
+function zarobekTydzien(skala=1){
   alive().forEach(k=>{
     const kto=G.p[k].lead; if(!kto)return;
-    const z=zarobekLidera(k); if(z<=0)return;
+    const z=Math.max(0,Math.round(zarobekLidera(k)*Math.max(0,Number(skala)||0))); if(z<=0)return;
     G.kapPryw[kto]=(G.kapPryw[kto]!==undefined?G.kapPryw[kto]:kapPryw(kto))+z;
     if(k===G.me)G.zarobekOstatnio=z;
   });
@@ -294,10 +294,11 @@ function zarobekTydzien(){
 
 /* Tygodniowy ruch gospodarki: fiskus strzyże konta, majątek sam z siebie
    rośnie albo maleje, a PKB przelicza się z tego, co zostało. */
-function pkbTydzien(){
+function pkbTydzien(skala=1){
   if(!G)return;
+  skala=cl(Number(skala)||1,0,1);
   if(!G.kapPryw)G.kapPryw={};
-  zarobekTydzien();                  // najpierw przewodniczący zarabiają, potem fiskus
+  zarobekTydzien(skala);             // najpierw przewodniczący zarabiają, potem fiskus
   const st=stawkaMajatkowa(), prog=progresjaWlaczona();
   const d=podzialMajatku();
   let wplyw=0;
@@ -315,11 +316,11 @@ function pkbTydzien(){
      najpierw pod kreską lądują ci, którzy rosną najwolniej: najbogatsi. */
   const tempoMajatku=v=>Math.max(.0010,.075*Math.pow(4e5/(4e5+Math.max(0,v)),.55));
   d.lu.forEach(({n,v})=>{
-    let nowe=v*(1+tempoMajatku(v)-st*.0011);
+    let nowe=v*(1+(tempoMajatku(v)-st*.0011)*skala);
     if(st>0){
       // progresja decyduje, kogo to naprawdę boli
       const mnoz=prog?(v>=d.sr?1.7:.3):1;
-      const pobrane=Math.round(v*(st/100)*mnoz/12);       // stawka jest roczna
+      const pobrane=Math.round(v*(st/100)*mnoz/12*skala);       // stawka jest roczna
       nowe-=pobrane; wplyw+=pobrane;
     }
     // dług nie „rośnie" sam ku dodatnim — od tego jest dlugTydzien
@@ -342,8 +343,7 @@ function pkbTydzien(){
   G.pkb=pkbLicz();
   G.pkbTempo=G.pkbPop?(G.pkb-G.pkbPop)/G.pkbPop:0;
   radykalowieWszystkim();             // każda partia płaci za własny rozjazd
-  mediaTydzien();                    // wydawnictwa naliczają swoje koszty stałe
-  dlugTydzien();                     // kto wszedł pod kreskę, ten zaczyna tonąć
+  if(G.realTimeEconomy!==true){mediaTydzien();dlugTydzien();} // tryb zgodności dla starych wywołań
   sprawdzRangi();                    // kto przekroczył próg, ten awansuje i płaci wpisowe
   pkbZapiszOdczyt();
   if(Array.isArray(G.pkbCiosy))G.pkbCiosy=G.pkbCiosy.filter(x=>x&&(+x.do||0)>absWeek());
@@ -584,17 +584,21 @@ function aiMedia(k){
 
   // Każdy szyld płaci koszty i publikuje, gdy kończy mu się przerwa.
   moje.forEach(m=>{
-    m.staz=(m.staz||0)+1;
+    const poprzedniCzas=Number.isFinite(+m._economyAt)?+m._economyAt:teraz;
+    const czasSkala=cl((teraz-poprzedniCzas)/168,0,1);
+    m._economyAt=teraz;
+    m.staz=(m.staz||0)+czasSkala;
     const utrz=MEDIA_UTRZYMANIE[m.typ]||0;
-    m.bilans=(m.bilans||0)-utrz;
-    G.kapPryw[m.szef]=Math.round((G.kapPryw[m.szef]!==undefined?G.kapPryw[m.szef]:kapPryw(m.szef))-utrz);
+    const brutto=(m._kosztReszta||0)+utrz*czasSkala,zaplacono=Math.floor(brutto);
+    m._kosztReszta=brutto-zaplacono;m.bilans=(m.bilans||0)-zaplacono;
+    G.kapPryw[m.szef]=Math.round((G.kapPryw[m.szef]!==undefined?G.kapPryw[m.szef]:kapPryw(m.szef))-zaplacono);
     if(teraz-(m.ostatnieWyd!==undefined?m.ostatnieWyd:-16632)<MEDIA_PRZERWA[m.typ])return;
     const ld=L(m.szef)||{komp:50,char:50};
-    const skala={gazeta:.9,tv:1.6,kino:1.9}[m.typ]||1;
-    const zysk=Math.max(12000,Math.round((p.cred*.5+p.act*.4+ld.komp*.3-18)*skala*22000*R(.7,1.3)));
+    const formatSkala={gazeta:.9,tv:1.6,kino:1.9}[m.typ]||1;
+    const zysk=Math.max(12000,Math.round((p.cred*.5+p.act*.4+ld.komp*.3-18)*formatSkala*22000*R(.7,1.3)));
     m.bilans+=zysk;m.ostatnio=zysk;m.ostatnieWyd=teraz;m.numery=(m.numery||0)+1;
     m.serca=m.typ==='gazeta'?Math.max(1,Math.round((p.cred+ld.komp+m.staz)/14)):m.serca;
-    m.widz=m.typ==='gazeta'?0:Math.max(3,Math.round((p.act+p.fame+ld.char)/9*skala));
+    m.widz=m.typ==='gazeta'?0:Math.max(3,Math.round((p.act+p.fame+ld.char)/9*formatSkala));
     G.kapPryw[m.szef]=Math.round(G.kapPryw[m.szef]+zysk);
     p.fame=cl(p.fame+Math.min(2.5,(m.widz||m.serca||1)/16));
   });

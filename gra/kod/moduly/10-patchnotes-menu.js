@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.187':{data:'9 sierpnia 2026',zmiany:[
+  'Ekonomia rozlicza sie teraz codziennie podczas plyniecia czasu, a nie tylko na granicy tygodnia.',
+  'Utrzymanie mediow i odsetki od dlugu sa naliczane ulamkowo, bez podwojnego kosztu przy tickach AI.',
+  'Reczne przejscie tygodnia zachowuje date zegara, a mapa celow nie traci uchwytu po odswiezeniu.',
+ ]},
  '1.1.186':{data:'9 sierpnia 2026',zmiany:[
   'Mapa celow zachowuje przesuniecie i nie rozpada sie podczas plyniecia zegara.',
   'Limity regeneracji licza kroczace siedem dni, a cofniecie decyzji nie zostawia pustego ruchu.',

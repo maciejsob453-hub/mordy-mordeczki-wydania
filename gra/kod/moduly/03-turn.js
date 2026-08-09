@@ -23,6 +23,7 @@ function simClockMigrate(){
 function realClockInit(){
   if(!G)return;
   simClockMigrate();
+  G.realTimeEconomy=true;
   if(typeof G.realSpeed!=='number')G.realSpeed=1;
   if(typeof G.realPaused!=='boolean')G.realPaused=false;
   /* Ĺšwiat ma jeden logiczny krok = jedna godzina. Timer tylko odtwarza te
@@ -48,6 +49,16 @@ function realtimeDaily(){
   }
   if(G.simHour%168===0)makeNoise();
 }
+function realtimeEconomyTick(){
+  if(!G||G.phase!=='camp')return;
+  /* Dobowe rozliczenie jest ułamkiem starego tygodnia. Dzięki temu kapitał,
+     dług, media i rangi reagują w trakcie płynięcia czasu, a nie dopiero na
+     ukrytej granicy tygodnia. */
+  if(typeof pkbTydzien==='function')pkbTydzien(1/7);
+  if(typeof mediaTick==='function')mediaTick(24);
+  if(typeof dlugTick==='function')dlugTick(24);
+  if(typeof sprawdzRangi==='function')sprawdzRangi();
+}
 function realtimeBoundary(){
   /* Stare procedury rozliczeń zachowujemy wyłącznie jako konserwację zapisu i
      przejście kadencji. Gracz nie wywołuje ich klawiszem ani przyciskiem; świat
@@ -63,6 +74,7 @@ function simClockStep(){
   simClockMigrate();
   G.simHour=Math.max(0,Math.floor(G.simHour)+1);
   simClockSync();realtimeHourly();
+  if(G.simHour%24===0)realtimeEconomyTick();
   if(G.simHour%168===0)realtimeBoundary();
   else if(G.simHour%24===0)realtimeDaily();
   if(G.phase==='finalcamp'&&G.electionAt&&G.simHour>=G.electionAt){
@@ -146,7 +158,13 @@ function endWeek(automatic=false){
     return;
   }
   if(puste.length&&automatic)say('<b>Wakat w radzie ministrów.</b> Symulacja płynie dalej, a brak resortów osłabia rząd.','bad');
-  if(typeof sadWymagaObslugi==='function'&&sadWymagaObslugi()&&!automatic){
+  /* Wakaty w Sądzie są obowiązkowe dla gabinetu, który je otworzył, ale nie
+     mogą zatrzymywać opozycji ani pierwszej kadencji przed powstaniem rządu.
+     Wcześniej sam fakt wejścia ustawy w życie blokował każdemu ręczne przejście
+     tygodnia, nawet gdy gracz nie miał żadnej możliwości obsadzenia sędziów. */
+  const sadWymagaGracza=typeof sadWymagaObslugi==='function'&&sadWymagaObslugi()
+    &&!!(G.gov&&G.gov.pm===G.me&&G.pmOk);
+  if(sadWymagaGracza&&!automatic){
     G.tab='sad';
     modal('Sąd','Najpierw obsadź skład sądu',
       `<p>Ustawa o sądzie weszła w życie, ale nadal brakuje sędziów. Każda kandydatura musi przejść przez głosowanie sejmu.</p>
@@ -204,6 +222,13 @@ function endWeek(automatic=false){
      „13 z 12”, czyli tydzień, którego w kadencji nie ma. */
   const tydzienPrzed=G.week, ostatniTydzien=G.week>=G.weeks;
   if(!ostatniTydzien)G.week++;
+  /* Kompatybilność ze starym wywołaniem endWeek(): ręczne testy, stare zapisy i
+     część modów mogą nadal zamknąć tydzień przyciskiem. Zegar musi wtedy dostać
+     ten sam skok, inaczej następny render przelicza simHour=0 z powrotem na
+     tydzień pierwszy i wygląda to jak zablokowany kalendarz. Przy prawdziwym
+     ticku czasu simHour jest już dalej, więc niczego nie cofamy. */
+  const oczekiwanyStart=((Math.max(1,G.term||1)-1)*Math.max(1,G.weeks||1)+(Math.max(1,G.week||1)-1))*168;
+  if(!Number.isFinite(Number(G.simHour))||Number(G.simHour)<oczekiwanyStart)G.simHour=oczekiwanyStart;
   /* Nowy tydzień zaczyna się od pierwszego dnia, ale historia czasu zostaje
      w zapisie, żeby gracz widział rytm decyzji zamiast teleportu bez śladu. */
   G.dzienTygodnia=1;G.czasTygodnia=0;G.czasGodzTygodnia=0;G.godzina=8;
@@ -234,7 +259,7 @@ function endWeek(automatic=false){
        podatek od majątku dotyczy prywatnych kont i przez nie rusza PKB. */
   }
   // gospodarka rusza się raz na tydzień, po rozliczeniu daniny
-  pkbTydzien();
+  if(G.realTimeEconomy!==true)pkbTydzien();
   G.en=cl(G.en+enGain());
   Object.keys(G.used).forEach(k=>{if(ch(.42))G.used[k]=Math.max(0,G.used[k]-1)});
   // Tygodniowy ruch jest drobny i tylko uzupełnia to, co naprawdę liczy się przy
