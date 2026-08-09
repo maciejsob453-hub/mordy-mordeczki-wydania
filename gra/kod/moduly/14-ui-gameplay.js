@@ -960,6 +960,7 @@ function oddajOplate(){
   if(G.lastAct===c.id)G.lastAct=c.lastActPrzed||null;
   if(G.actedWeek===G.term+'-'+G.week)G.actedWeek=c.actedWeekPrzed||null;
   if(c.czasPrzed){G.dzienTygodnia=c.czasPrzed.dzien;G.czasTygodnia=c.czasPrzed.czas;G.czasGodzTygodnia=c.czasPrzed.godz;G.godzina=c.czasPrzed.h;if(c.czasPrzed.simHour!==null)G.simHour=c.czasPrzed.simHour;if(Array.isArray(G.harmonogram)&&c.czasSeq)G.harmonogram=G.harmonogram.filter(x=>x.seq!==c.czasSeq)}
+  if(c.decisionToken&&Array.isArray(G.decisionLog)){const d=G.decisionLog.find(x=>x&&x.token===c.decisionToken);if(d){d.status='CANCELLED';d.cancelledAt=czasGlobalny()}}
   if(!G.odnowy)G.odnowy={};if(c.czasPrzed)G.odnowy[c.id]=c.czasPrzed.odnowa;else delete G.odnowy[c.id];
   G.lastCharge=null;
 }
