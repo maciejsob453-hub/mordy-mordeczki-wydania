@@ -4,6 +4,10 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.190':{data:'9 sierpnia 2026',zmiany:[
+  'Skladki partii i energia nie skacza juz przy granicy tygodnia, tylko rozliczaja sie w plynnym czasie.',
+  'Akcje nie dostaja dodatkowego resetu AP ani limitow przy zmianie daty; odnowa zostaje kroczaca.'
+ ]},
  '1.1.189':{data:'9 sierpnia 2026',zmiany:[
   'Dryf partii, sytuacje, wydarzenia scenariusza i materialy sadu rozliczaja sie codziennie podczas plyniecia zegara.',
   'Gabinet AI reaguje malymi krokami zamiast skakac calym rozliczeniem na granicy tygodnia.',

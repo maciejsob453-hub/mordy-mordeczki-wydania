@@ -120,6 +120,9 @@ function realtimeEconomyTick(){
      dług, media i rangi reagują w trakcie płynięcia czasu, a nie dopiero na
      ukrytej granicy tygodnia. */
   if(typeof pkbTydzien==='function')pkbTydzien(1/7);
+  /* Składki partii były dotąd dopisywane jednorazowo przy granicy tygodnia.
+     W trybie ciągłym ta sama kwota wpada po kawałku, tak jak majątki prywatne. */
+  if(typeof income==='function')G.kp+=income().total/7;
   if(typeof mediaTick==='function')mediaTick(24);
   if(typeof dlugTick==='function')dlugTick(24);
   if(typeof sprawdzRangi==='function')sprawdzRangi();
@@ -299,7 +302,7 @@ function endWeek(automatic=false){
      w zapisie, żeby gracz widział rytm decyzji zamiast teleportu bez śladu. */
   G.dzienTygodnia=1;G.czasTygodnia=0;G.czasGodzTygodnia=0;G.godzina=8;
   dateAnim={from:dateFrom,to:gameDate()};
-  G.apMax=apBase();G.ap=G.apMax;
+  G.apMax=apBase();if(G.realTimeEconomy!==true)G.ap=G.apMax;
   G.sztab=G.sztabMax=5+Math.floor(p.mem/22);
   {  // premier i pałac ściągają ludzi sami z siebie
     const urz=(isPM()?1:0)+(hasPrez()?1:0);
@@ -307,7 +310,7 @@ function endWeek(automatic=false){
       if(n){p.comp.eli+=g.eli;p.comp.int+=g.int;p.comp.ser+=g.ser;p.mem+=n;
         say(`<b>Urząd przyciąga.</b> ${isPM()&&hasPrez()?'Fotel premiera i pałac dorzucają':isPM()?'Fotel premiera dorzuca':'Pałac prezydencki dorzuca'} ${n} ${pl(n,'osobę','osoby','osób')} w tym tygodniu.`,'good')}}
   }
-  G.kp+=income().total;
+  if(G.realTimeEconomy!==true)G.kp+=income().total;
   {  // kapitał ma pracować: nadwyżka topnieje, a serwer zaczyna gadać o partii, która tylko zbiera
     const lim=Math.max(70,income().total*6)*(hasLsd(G.me)?1.9:1);
     if(G.kp>lim){
@@ -326,7 +329,7 @@ function endWeek(automatic=false){
   }
   // gospodarka rusza się raz na tydzień, po rozliczeniu daniny
   if(G.realTimeEconomy!==true)pkbTydzien();
-  G.en=cl(G.en+enGain());
+  if(G.realTimeEconomy!==true)G.en=cl(G.en+enGain());
   /* Zmęczenie decyzji wygasa rollingowo po 168 godzinach w ostatnieUzycia().
      Nie losujemy już raz na granicy tygodnia, bo to było kolejne ukryte
      „odświeżenie tury”. */
@@ -354,7 +357,8 @@ function endWeek(automatic=false){
   aiRekonstrukcja();       // a niewygodnego koalicjanta potrafi wyrzucić
   aiOpozycja();            // opozycja rozlicza rząd bez czekania na gracza
   histPush();SFX.week();
-  G.catUsed={};G.used2={};G.lastCharge=null;G.stolPend=null;podgladCache={};   // niedokończone okno nie może przejść na kolejny tydzień
+  if(G.realTimeEconomy!==true){G.catUsed={};G.used2={};}
+  G.lastCharge=null;G.stolPend=null;podgladCache={};   // niedokończone okno nie może przejść na kolejny tydzień
   /* Nastroje trzech części serwera pozostają lekkim, losowym pulsem elektoratu.
      Nie ma już osobnego systemu zadowolenia grup interesu, który nadpisywał
      ten ruch i drugi raz liczył ten sam podział ludzi. */
