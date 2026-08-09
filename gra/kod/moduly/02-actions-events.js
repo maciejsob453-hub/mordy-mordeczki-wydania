@@ -40,6 +40,12 @@ function kategoriaUzyta(cat){
   G.catUsed[cat]=G.catTimes[cat].length||(G.catUsed[cat]||0);
   return G.catUsed[cat];
 }
+function kategoriaPozostala(cat){
+  if(!G||cat==='spe')return 0;
+  const times=Array.isArray(G.catTimes&&G.catTimes[cat])?G.catTimes[cat].filter(t=>czasGlobalny()-t<168):[];
+  if(!times.length)return 0;
+  return Math.max(0,168-(czasGlobalny()-Math.min(...times)));
+}
 /* Każda decyzja ma własny cykl życia. Nie chowamy wykonanych ruchów w
    tygodniowym stole: aktywna decyzja kończy się na swoim terminie, a slot
    wraca przez ciągłe odnowienie AP. Dzięki temu lista nie może rosnąć w

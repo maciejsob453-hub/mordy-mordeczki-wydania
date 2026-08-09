@@ -612,7 +612,7 @@ function newGame(id){
     let v=RI(-8,26); if(ca&&ca===cb) v+=RI(30,46); rel[a][b]=v})});
   G={me:id,p,rel,coal:startCoal,term:1,week:1,weeks:12,ap:3,apMax:3,kp:26,en:100,
      sztab:5,sztabMax:5,log:[],used:{},once:{},tab:'mapa',cat:'kam',sel:'ogolny',
-     gov:null,pmOk:false,pmProc:null,queue:[],phase:'camp',prest:0,hist:[],prev:null,
+     gov:null,pmOk:false,pmProc:null,premierProposalTerm:null,queue:[],phase:'camp',prest:0,hist:[],prev:null,
      turnout:.85,lup:{},recCd:0,xp:0,xpOs:{},traits:[],ptraits:{},tut:null,tutSeen:{},streak:0,noise:{},useTerm:{},catUsed:{},lastAct:null,
      king:{rel:52,paid:0}, sejmPrez:null, mar:null, goals:{}, nationalGoals:{}, partyCouncil:null, agents:{}, agentWeek:null, sits:[], polls:[], scen:null,catTimes:{},
      rng:RNG_STATE,aiMemory:{},aiLedger:[],

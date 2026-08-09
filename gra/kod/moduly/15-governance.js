@@ -210,6 +210,9 @@ function partiaOsoby(nick){
 function premierRozmowa(id,nick){
   const pm=G.gov&&G.gov.pm, res=RESORTY.find(r=>r.id===id);
   if(!pm||!res||pm===G.me||!G.gov.parties.includes(G.me))return;
+  if(G.premierProposalTerm===G.term)return modal('Rozmowa z premierem','Limit propozycji wykorzystany',
+    '<p>W tej kadencji złożyłeś już jedną propozycję obsady resortu. Premier nie przyjmie kolejnej kandydatury do następnych wyborów.</p>',
+    [{l:'Rozumiem',f:close}],close);
   const rel=(G.rel[G.me]&&G.rel[G.me][pm])||0, komp=L(nick).komp;
   const szansa=cl(.28+rel/220+(komp-50)/180+(me().seats/(TOTAL_SEATS*6)),.05,.9);
   modal('Rozmowa z premierem',res.n,
@@ -217,7 +220,7 @@ function premierRozmowa(id,nick){
      <div class="talkmeter"><span>relacja ${Math.round(rel)}</span><b>${Math.round(szansa*100)}% szansy</b><span>kompetencja ${komp}</span></div>
      <p class="dim">Lepsza relacja i kompetentne zaplecze zwiększają zgodę. Odmowa psuje relacje, ale nie blokuje kolejnej rozmowy w późniejszym tygodniu.</p>`,
     [{l:'Składam propozycję',f:()=>{
-      close();
+      G.premierProposalTerm=G.term;close();
       if(ch(szansa)){obsadz(id,nick,null,true);say(`<b>Premier zgadza się.</b> ${nick} obejmuje resort ${res.n}.`,'good')}
       else{G.rel[G.me][pm]=cl((G.rel[G.me][pm]||0)-5,-100,100);G.rel[pm][G.me]=cl((G.rel[pm][G.me]||0)-5,-100,100);me().ctr=cl(me().ctr+2);say(`<b>Premier odmawia.</b> Uważa, że ${nick} nie pasuje do resortu ${res.n}. Relacje spadają.`,'bad');render()}
     }},{l:'Jeszcze nie teraz',f:close}],close);
@@ -243,10 +246,10 @@ function openResort(id){
     .slice(0,4).forEach(n=>obcy.push([n,k])));
 
   const opcje=[];
-  const rozmowa=!isPM()&&G.gov&&G.gov.parties.includes(G.me);
+  const rozmowa=!isPM()&&G.gov&&G.gov.parties.includes(G.me),propozycjaZuzyta=G.premierProposalTerm===G.term;
   moi.slice(0,8).forEach(n=>opcje.push({
-    l:rozmowa?`Proponuję ${n} premierowi`:`${n} <span class="ok">(twoja partia)</span>`,
-    s:rozmowa?`relacja z premierem i kompetencja wpływają na zgodę · komp. ${L(n).komp}`:`kompetencja ${L(n).komp} · sława +3, aktywność +2`,
+    l:rozmowa?(propozycjaZuzyta?'Propozycja wykorzystana w tej kadencji':`Proponuję ${n} premierowi`):`${n} <span class="ok">(twoja partia)</span>`,
+    s:rozmowa?(propozycjaZuzyta?'Kolejna kandydatura będzie możliwa po wyborach':`relacja z premierem i kompetencja wpływają na zgodę · komp. ${L(n).komp}`):`kompetencja ${L(n).komp} · sława +3, aktywność +2`,
     f:()=>rozmowa?premierRozmowa(id,n):obsadz(id,n,null)}));
   if(premier)obcy.slice(0,10).forEach(([n,k])=>opcje.push({
     l:`${n} <span class="dim">(${G.p[k].ab})</span>`,
@@ -983,12 +986,13 @@ function aiProposeLaw(){
   });
   if(!zglaszajacy.length)return;
 
-  const teraz=absWeek();
-  if(G.aiLawNext&&teraz<G.aiLawNext)return;
-  /* Losowa szansa potrafiła nie wypalić przez całą kadencję. Teraz inicjatywa
-     ma czytelny rytm: rząd co dwa tygodnie, minister lub opozycja co trzy. */
+  const teraz=czasGlobalny();
+  if(G.aiLawNextAt&&teraz<G.aiLawNextAt)return;
+  /* Ustawa ma cooldown liczony godzinami, nie numerem tygodnia. Rząd dostaje
+     krótszy rytm, minister i opozycja dłuższy, ale żadna inicjatywa nie czeka
+     na sztuczny reset kadencji. */
   const wybor=zglaszajacy.sort((a,b)=>(b.rola*(.55+aiProfil(b.k).prawo))-(a.rola*(.55+aiProfil(a.k).prawo))||G.p[b.k].seats-G.p[a.k].seats)[0];
-  G.aiLawNext=teraz+Math.max(1,Math.round(wybor.co+1-aiProfil(wybor.k).prawo*2));
+  G.aiLawNextAt=teraz+Math.max(36,Math.round((wybor.co+1-aiProfil(wybor.k).prawo*2)*24));
   const pm=wybor.k, mozliwe=wybor.pula;
   // Składa to, co jemu się opłaca: partia serwerowicka ciśnie rozrywkę,
   // elitarna ekonomię, a ktoś ledwo nad progiem próbuje ruszyć ordynację.

@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.185':{data:'9 sierpnia 2026',zmiany:[
+  'Cele narodowe sa teraz wylacznie sciezka Concordii, a loga partii i avatary konkretnych postaci sa uzywane tam, gdzie pasuja do tresci celu.',
+  'AI sklada ustawy i reaguje na sad oraz rzad wedlug cooldownow godzinowych zamiast czekac na reset tygodnia.',
+  'Propozycja kandydata premierowi ma limit jednej rozmowy na kadencje, a kategorie decyzji pokazuja realny czas odnowy zamiast udawanej luki tygodnia.'
+ ]},
  '1.1.184':{data:'9 sierpnia 2026',zmiany:[
   'Decyzje maja teraz wlasny cykl zycia z terminem, statusem i automatycznym wygasaniem zamiast wspolnego stolu tygodnia.',
   'AI reaguje w rytmie godzinowym, sklada ustawy i uzupelnia gabinet podczas plyniecia czasu, a zegar jest jednym panelem daty i predkosci.',

@@ -56,6 +56,7 @@ function loadCode(code){
      wywracała się przy pierwszym kliknięciu na „G.useTerm.stery” — a to znaczy,
      że gracz tracił rozgrywkę tylko dlatego, że wyszła nowa wersja. */
   G.useTerm=G.useTerm||{};G.catUsed=G.catUsed||{};G.once=G.once||{};G.used=G.used||{};G.decisionLog=Array.isArray(G.decisionLog)?G.decisionLog:[];
+  if(G.premierProposalTerm===undefined)G.premierProposalTerm=null;
   G.catTimes=G.catTimes||{};
   G.lup=G.lup||{};G.xpOs=G.xpOs||{};G.znuz=G.znuz||{};G.znuzKad=G.znuzKad||{};
   G.rada=G.rada||{};G.radaOd=G.radaOd||{};G.lawTerm=G.lawTerm||{};G.law=G.law||{};

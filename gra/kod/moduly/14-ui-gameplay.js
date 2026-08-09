@@ -318,6 +318,7 @@ function actCards(list,fx){
     const usedT=(a.term1&&G.useTerm[a.id]);
     const noShame=a.shame&&!(G.shame&&G.shame>G.week);
     const catFull=a.cat!=='spe'&&kategoriaUzyta(a.cat)>=1;
+    const catLeft=catFull?kategoriaPozostala(a.cat):0;
     const cdDo=(G.odnowy&&G.odnowy[a.id])||0, cd=cdDo>czasGlobalny();
     // decyzje z limitem tygodniowym (regeneracja): dwa razy i koniec
     const limT=!!a.tydz2&&((G.used2&&G.used2[a.id])||0)>=2;
@@ -329,7 +330,7 @@ function actCards(list,fx){
     const blok=done?'wykorzystane':usedT?'zużyte w tej kadencji'
       // blokuje kategoria, nie ta jedna decyzja — bez tego wygląda to na zepsuty przycisk
       :limT?'wykorzystane dwa razy w tym tygodniu'
-      :catFull?`nie ta decyzja — cała kategoria ${katN} zamknięta do przyszłego tygodnia`
+      :catFull?`kategoria ${katN} wróci za ${Math.max(1,Math.ceil(catLeft/24))} ${pl(Math.max(1,Math.ceil(catLeft/24)),'dzień','dni','dni')}`
       :cd?`odnowa za ${Math.max(1,Math.ceil((cdDo-czasGlobalny())/24))} ${pl(Math.max(1,Math.ceil((cdDo-czasGlobalny())/24)),'dzień','dni','dni')}`
       :noShame?'dostępne tylko tuż po wpadce':(a.id==='rekr'&&G.recCd>0)?`nabór wraca za ${G.recCd} ${pl(G.recCd,'tydzień','tygodnie','tygodni')}`
       :G.ap<a.ap?'za mało akcji':G.kp<kpC?'za mało kapitału':(a.en>0&&G.en<a.en)?'za mało energii':'';
@@ -689,9 +690,9 @@ function actTab(){
     · ${wolnych} ${pl(wolnych,'kategoria otwarta','kategorie otwarte','kategorii otwartych')}</span></div>
     <div class="b">
     <div class="cats">${cats.map(([c,n])=>{
-      const zuzyta=c!=='spe'&&kategoriaUzyta(c)>=1;   // jedna decyzja z kategorii wraca po 168 godzinach
+      const zuzyta=c!=='spe'&&kategoriaUzyta(c)>=1,poz=zuzyta?kategoriaPozostala(c):0,pozD=Math.max(1,Math.ceil(poz/24));
       return `<button class="${!fx&&G.cat===c?'on':''} ${zuzyta?'spent':''} ${c==='prz'||c==='prem'?'roy':''}"
-        onclick="setCat('${c}')" title="${zuzyta?'Decyzja z tej kategorii już wykorzystana w tym tygodniu':n}">${zuzyta?'✓ ':''}${n}</button>`}).join('')}</div>
+        onclick="setCat('${c}')" title="${zuzyta?`Kategoria wróci za ${pozD} ${pl(pozD,'dzień','dni','dni')}`:n}">${zuzyta?'◷ ':''}${n}</button>`}).join('')}</div>
     <div class="fxbar">
       <span class="fxlab">Filtruj po skutku decyzji</span>
       <button class="fx ${fx?'':'on'}" onclick="setFx('')">wszystkie</button>
@@ -700,11 +701,10 @@ function actTab(){
         onclick="setFx('${f}')">${AFXN[f][0]}</button>`).join('')}
     </div>
     ${(!fx&&G.cat!=='spe'&&kategoriaUzyta(G.cat)>=1)?`<div class="spentbar">
-      <b>${(CATS.find(c=>c[0]===G.cat)||['',''])[1]} jest już zamknięta na ten tydzień.</b>
-      Zagrałeś tu decyzję, dlatego wszystko poniżej jest wyszarzone i nie reaguje na kliknięcia — tak ma być.
-      Wróci za 1 tydzień, po naciśnięciu <b>Kolejny tydzień</b>. Do tego czasu zostają ci kategorie bez znaczka ✓.</div>`:''}
+      <b>${(CATS.find(c=>c[0]===G.cat)||['',''])[1]} ma aktywny cooldown.</b>
+      Zagrałeś tu decyzję, dlatego karta czeka na własny termin odnowy. Nie musisz kończyć ani rozpoczynać tygodnia — czas płynie sam.</div>`:''}
     <div class="actgrid">${actCards(list,fx)}</div>
-    <div class="note"><b>Jedna decyzja z każdej kategorii na tydzień.</b> Kolejność też się liczy: kanwasing przed wiecem daje ×1,55, ale manifest przed memami tylko ×0,55.
+    <div class="note"><b>Jedna decyzja z kategorii na jej cooldown.</b> Kolejność też się liczy: kanwasing przed wiecem daje ×1,55, ale manifest przed memami tylko ×0,55.
     Filtr „po skutku” pokazuje decyzje z wszystkich kategorii naraz.</div>
   </div></div>
   ${agentBox()}`;

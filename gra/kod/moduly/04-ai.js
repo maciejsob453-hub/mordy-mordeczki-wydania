@@ -114,12 +114,13 @@ function aiCel(k,prog){
 function aiSad(k){
   if(typeof sadWnies!=='function'||typeof sadSklad!=='function'||!lawDone('sady'))return;
   if(sadSklad().length<2)return;
-  G.aiCourtWeek=G.aiCourtWeek||{};
-  if(G.aiCourtWeek[k]===absWeek()||!ch(.012+aiProfil(k).ryzyko*.028))return;
+  G.aiCourtAt=G.aiCourtAt||{};
+  const now=czasGlobalny();
+  if(G.aiCourtAt[k]!==undefined&&now-G.aiCourtAt[k]<168||!ch(.012+aiProfil(k).ryzyko*.028))return;
   const cel=aiCel(k,10);if(!cel||cel===k||!G.p[cel]||G.p[cel].dead)return;
   const nick=G.p[cel].lead;
   const typ=['urzad','korupcja','procedura'][RI(0,2)];
-  const wynik=sadWnies(nick,typ,true);G.aiCourtWeek[k]=absWeek();
+  const wynik=sadWnies(nick,typ,true);G.aiCourtAt[k]=now;
   if(!wynik)return;
   aiPamietaj(k,'pozew',{cel,zarzut:typ,wyrok:wynik.wyrok,wygrana:wynik.win});
   aiPamietaj(cel,'pozew_otrzymany',{sprawca:k,zarzut:typ,wyrok:wynik.wyrok});
