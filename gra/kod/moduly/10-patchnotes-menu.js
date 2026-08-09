@@ -7,7 +7,7 @@ const PATCHNOTE={
  '1.1.184':{data:'9 sierpnia 2026',zmiany:[
   'Decyzje maja teraz wlasny cykl zycia z terminem, statusem i automatycznym wygasaniem zamiast wspolnego stolu tygodnia.',
   'AI reaguje w rytmie godzinowym, sklada ustawy i uzupelnia gabinet podczas plyniecia czasu, a zegar jest jednym panelem daty i predkosci.',
-  'Mapa celow jest pionowym drzewem bez dodatkowego dashboardu, zachowuje zoom i pan, a cele dostaly dedykowane znaki zamiast herbów partii.'
+  'Mapa celow jest pionowym drzewem bez dodatkowego dashboardu, zachowuje zoom i pan, a cele dostaly dedykowane znaki zamiast herbow partii.'
  ]},
  '1.1.183':{data:'9 sierpnia 2026',zmiany:[
   'Zegar gry dziala teraz godzinami: spacja tylko pauzuje i wznawia symulacje, a predkosc odtwarza pojedyncze godziny bez przeskokow.',
