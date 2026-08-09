@@ -56,6 +56,7 @@ function loadCode(code){
      wywracała się przy pierwszym kliknięciu na „G.useTerm.stery” — a to znaczy,
      że gracz tracił rozgrywkę tylko dlatego, że wyszła nowa wersja. */
   G.useTerm=G.useTerm||{};G.catUsed=G.catUsed||{};G.once=G.once||{};G.used=G.used||{};
+  G.catTimes=G.catTimes||{};
   G.lup=G.lup||{};G.xpOs=G.xpOs||{};G.znuz=G.znuz||{};G.znuzKad=G.znuzKad||{};
   G.rada=G.rada||{};G.radaOd=G.radaOd||{};G.lawTerm=G.lawTerm||{};G.law=G.law||{};
   G.coal=G.coal||{};G.free=G.free||{eli:0,int:0,ser:0};G.king=G.king||{rel:52,paid:0};
@@ -71,6 +72,7 @@ function loadCode(code){
   if(typeof G.weeks!=='number'||G.weeks<1)G.weeks=12;
   if(typeof G.week!=='number'||G.week<1)G.week=1;
   if(G.week>G.weeks)G.week=G.weeks;      // stare zapisy potrafią mieć trzynasty tydzień
+  simClockMigrate();
   if(!G.ptraits){G.ptraits={};if(G.traits&&G.traits.length)G.ptraits[G.p[G.me].lead]=G.traits.slice()}
   G.sejmPrez=null;G.mar=null;
   if(G.phase==='marszalek')G.phase='camp';
@@ -150,7 +152,7 @@ function dead(){
   Object.assign(window,{radykalowie,radykalowieWszystkim,iskra,waznePozycje,waznePasek,modyfikatory,podejrzyjScen,menuIdz,backToMenu,opisTrybu,mediaNumer,mediaKup,mediaNazwij,mediaSzef,mediaOdcinek,mediaFilm,slepyLos,kreWyjdz,kreatorDoPliku,kreatorDane,kreatorEkran,wczytajScenPlik,zapiszScenPlik,podglad,przewidz,start,pickParty,danina,openSave,doLobby,tryLoadFromSetup,marContinue,marDeclare,setMarWho,setHemi:m=>{G.hemiMode=m;render()},endWeek,runElection,doAct,sendTeam,tryGov,goOpo,summary,tg,pay,buyTrait,buyStat,openPush,prezPush,prezWait,togList,makeList,joinList,leaveList,resetLists,aiCoal,listWill,renameBloc,shortFree,opoCard,opoParties,makeOpo,joinOpo,leaveOpo,modalName,actBack,openWerb,openWerb2,werbDo,werbChance,werbPool,openCreator,crClose,crSet,crSetR,crAdj,crImg,crRel,crPoach,crTake,crPeople,crFinish,creator,registerCustom,crCostOf,crMem,doGoal,goalTab,myGoals,myPartyGoals,myNationalGoals,chooseNationalBranch,chooseNationalOptional,openPartyCouncil,nationalGoalReady,nationalGoalDone,nationalGoalProgress,nationalGoalTick,NATIONAL_GOALS,goalReady,goalOk,switchIdentity,libBecome,hasLib,hasLib2,hasPost,hasLsd,hasKan,hasRob,hasPer,applyGoals,goalDone,GOALS,aiGoals,adsBecome,hasAds,hasHor,apBase,
   openTrain,openRecruit,pmPick,pmVote,pmNext,afterPM,prezGo,prezDone,setPrezWho,
   openStery,sterySet,steryTog,steryOk,openDym,mojeResorty,mogeZglosic,rozwiazChance,LAWS,RESORTY,radaKto,openCamp,campBar,
-  pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,sideToggle,
+  pokazPatch,patchZamknij,naborTog,naborPublikuj,setLeadSel,sideToggle,goalsZoom,goalsMapReset,initGoalsMap,
   openResort,renegocjujKontrakt,startLaw,signLaw,premierTab,prezydentTab,
   closeFinalCamp,runFinalCamp,partyCouncilNeedsPrimary,partyCouncilChoosePrimary,openEdycja,edytSet,edytOk,
   /* _we to jednorazowa flaga animacji wejścia. Ekran przerysowuje się po każdej
@@ -181,7 +183,7 @@ Object.assign(window,{kreMandat,kreResetMandaty,krePreset,kreRzadTryb,kreRzadTog
 window.__game={przewidz,podglad,get PROBA(){return PROBA},
   get rng(){return G&&G.rng},get aiLedger(){return G&&G.aiLedger||[]},
   get KRE(){return KRE}, SCEN, kreatorDane,
-  myGoals,myPartyGoals,myNationalGoals,chooseNationalBranch,chooseNationalOptional,openPartyCouncil,partyCouncilCandidates,goalsFocus,nationalGoalReady,nationalGoalDone,nationalGoalProgress,nationalGoalTick,NATIONAL_GOALS,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,
+  myGoals,myPartyGoals,myNationalGoals,chooseNationalBranch,chooseNationalOptional,openPartyCouncil,partyCouncilCandidates,goalsFocus,goalsZoom,goalsMapReset,initGoalsMap,nationalGoalReady,nationalGoalDone,nationalGoalProgress,nationalGoalTick,NATIONAL_GOALS,goalDone,goalOk,signAgent,agentFree,agentCost,agenciZostalo,AGENCI_NA_KADENCJE,
   openDym,pusteResorty,openZmiana,openPrzekup,cenaDzialacza,ministerStaz,ministerBlokada,mojeResorty,
   zawiedzeniKoalicjanci,demografiaSerwera,SERVER,SERVER_MAX,AGENTS,mogeZglosic,rozwiazChance,radaKto,RESORTY,pmOsoba,pmOsoby,leads,roster,
   aiTransfery,aiOpozycja,aiObsadzRade,aiRekonstrukcja,aiSad,znuzenie,hegemon,resortyPartii,leadWybrany,aiPlan,ustawPlany,aiPamiec,aiPamietaj,aiAgenda,govKontraktTick,

@@ -27,9 +27,19 @@ const ODNOWA_GODZ={wiec:30,kanwas:24,spot:48,debata:96,memy:18,manifest:96,rekr:
   wotum:96,oredzieP:72,sabotaz:96,odp:24};
 /* Jeden zegar świata dla odnowień. Kadencja i tydzień są tylko etykietą
    kalendarza; cooldown liczy się z ciągłej liczby godzin od startu gry. */
-const czasGlobalny=()=>G?(((Math.max(1,G.term||1)-1)*(G.weeks||12)+(Math.max(1,G.week||1)-1))*168)+(G.czasGodzTygodnia||0):0;
+const czasGlobalny=()=>G?Math.max(0,Math.floor(typeof G.simHour==='number'?G.simHour:
+  (((Math.max(1,G.term||1)-1)*(G.weeks||12)+(Math.max(1,G.week||1)-1))*168)+(G.czasGodzTygodnia||0))):0;
 const czasOdnowy=a=>Math.max(0,Math.round(+((a||{}).odnowa||ODNOWA_GODZ[(a||{}).id]||0)));
 const odnowaPozostala=a=>Math.max(0,Math.ceil((((G.odnowy&&G.odnowy[a.id])||0)-czasGlobalny())/24));
+function kategoriaUzyta(cat){
+  if(!G||cat==='spe')return 0;
+  if(!G.catTimes)G.catTimes={};
+  const teraz=czasGlobalny(),stare=Array.isArray(G.catTimes[cat])?G.catTimes[cat]:[];
+  G.catTimes[cat]=stare.filter(t=>teraz-t<168);
+  G.catUsed=G.catUsed||{};
+  G.catUsed[cat]=G.catTimes[cat].length||(G.catUsed[cat]||0);
+  return G.catUsed[cat];
+}
 function czasAkcji(a){
   if(!a)return 1;
   const dom=RT_DNI[a.id]||Math.max(1,Math.ceil((a.ap||1)*1.35));
@@ -38,12 +48,12 @@ function czasAkcji(a){
 function przesunCzas(dni,a){
   if(!G||PROBA)return;
   const d=cl(Math.round(+dni||1),1,BAL.czasAkcjiMax);
-  const start=G.dzienTygodnia||1,koniec=Math.min(BAL.dniTygodnia,start+d);
-  G.czasTygodnia=(G.czasTygodnia||0)+d;G.czasGodzTygodnia=(G.czasGodzTygodnia||0)+d*24;
-  G.dzienTygodnia=koniec;G.godzina=(8+(G.czasGodzTygodnia%24))%24;
+  const start=czasGlobalny(),koniec=start+d*24;
   if(!Array.isArray(G.harmonogram))G.harmonogram=[];
   G.czasSeq=(G.czasSeq||0)+1;
-  const wpis={seq:G.czasSeq,id:a&&a.id||'',n:a&&a.n||'Decyzja',od:start,do:koniec,dni:d,tydzien:G.term+'-'+G.week};
+  const wpis={seq:G.czasSeq,id:a&&a.id||'',n:a&&a.n||'Decyzja',od:start,do:koniec,dni:d,
+    odData:dateStr(gameDate()),doData:dateStr(new Date(gameDate().getTime()+d*86400000)),
+    tydzien:G.term+'-'+G.week};
   G.harmonogram.unshift(wpis);
   if(G.harmonogram.length>24)G.harmonogram.pop();
   return wpis;

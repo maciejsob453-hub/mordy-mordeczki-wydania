@@ -457,11 +457,18 @@ function enGain(){
 const KING='Mordeczka';
 const MIES=['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
 function gameDate(){
-  const d=new Date(2026,7,1);
-  d.setDate(d.getDate()+((G.term-1)*12+(G.week-1))*7+Math.max(0,(G&&G.dzienTygodnia||1)-1));
+  const d=new Date(2026,7,1,8,0,0,0);
+  /* Kalendarz opiera się na jednym liczniku godzin. Stare zapisy nie mają tego
+     pola, więc zachowują dotychczasową datę do chwili migracji w bootstrapie. */
+  const h=G&&typeof G.simHour==='number'&&isFinite(G.simHour)
+    ?G.simHour
+    :((Math.max(1,G&&G.term||1)-1)*12+(Math.max(1,G&&G.week||1)-1))*168
+      +Math.max(0,G&&G.czasGodzTygodnia||0);
+  d.setTime(d.getTime()+Math.max(0,h)*3600000);
   return d;
 }
 const dateStr=d=>d.getDate()+' '+MIES[d.getMonth()]+' '+d.getFullYear();
+const timeStr=d=>String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
 function isEraNiestab(){
   if(!G)return false;
   const d=gameDate();
@@ -607,11 +614,12 @@ function newGame(id){
      sztab:5,sztabMax:5,log:[],used:{},once:{},tab:'mapa',cat:'kam',sel:'ogolny',
      gov:null,pmOk:false,pmProc:null,queue:[],phase:'camp',prest:0,hist:[],prev:null,
      turnout:.85,lup:{},recCd:0,xp:0,xpOs:{},traits:[],ptraits:{},tut:null,tutSeen:{},streak:0,noise:{},useTerm:{},catUsed:{},lastAct:null,
-     king:{rel:52,paid:0}, sejmPrez:null, mar:null, goals:{}, nationalGoals:{}, partyCouncil:null, agents:{}, agentWeek:null, sits:[], polls:[], scen:null,
+     king:{rel:52,paid:0}, sejmPrez:null, mar:null, goals:{}, nationalGoals:{}, partyCouncil:null, agents:{}, agentWeek:null, sits:[], polls:[], scen:null,catTimes:{},
      rng:RNG_STATE,aiMemory:{},aiLedger:[],
      /* Simulowany kalendarz: decyzje przesuwają dzień, a luka tygodnia nadal
         pozostaje cotygodniowym limitem akcji i rozliczeń. */
-     dzienTygodnia:1,czasTygodnia:0,czasGodzTygodnia:0,godzina:8,harmonogram:[],odnowy:{},pkbCiosy:[],
+     dzienTygodnia:1,czasTygodnia:0,czasGodzTygodnia:0,godzina:8,simHour:0,realCarry:0,
+     harmonogram:[],odnowy:{},pkbCiosy:[],
      /* Parametr jest wyłącznie dla automatycznego podglądu. Normalna gra startuje
         z dźwiękiem, a test nie budzi człowieka przy komputerze. */
      mute:typeof location!=='undefined'&&new URLSearchParams(location.search).has('mute'), night:null,

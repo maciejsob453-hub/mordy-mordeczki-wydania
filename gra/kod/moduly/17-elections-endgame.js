@@ -149,7 +149,8 @@ function campBar(){
   const rank=campRank(),moj=G.camp.contrib[G.me],czolo=rank.slice(0,3);
   return `<div class="runoff campbar">
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <span class="pill">ostatni tydzień kampanii</span>
+      <span class="pill">ostatnie 24 godziny kampanii</span>
+      ${G.electionAt?`<span class="dim" style="font-size:12px">Urny: <b>${dateStr(new Date(new Date(2026,7,1,8,0,0).getTime()+G.electionAt*3600000))}</b> <b>${String((8+G.electionAt%24)%24).padStart(2,'0')}:00</b></span>`:''}
       <span class="dim" style="font-size:12.5px">Najwięcej wykłada
         ${czolo.map(k=>`<b style="color:${G.p[k].c}">${G.p[k].ab}</b> ${G.camp.contrib[k]||0}`).join(' · ')}</span>
       ${campDecided()
@@ -221,7 +222,12 @@ function runFinalCamp(v){
   }
   close();render();
 }
-function closeFinalCamp(){G.phase='elect';render()}
+function closeFinalCamp(){
+  if(G.electionAt&&typeof G.simHour==='number'&&G.simHour<G.electionAt){
+    say(`<b>Urny jeszcze zamknięte.</b> Wybory rozpoczną się ${dateStr(new Date(new Date(2026,7,1,8,0,0).getTime()+G.electionAt*3600000))} o ${String((8+G.electionAt%24)%24).padStart(2,'0')}:00.`,'roy');render();return;
+  }
+  G.phase='elect';G.electionAt=null;render();
+}
 function preElect(){
   resetLists();
   const p=me(), my=p.coal, sel=G.newList||[];
@@ -983,7 +989,7 @@ function startTerm(){
   // Orędzie prezydenckie rozlicza się z kadencją prezydencką, a ta trwa dwie
   // parlamentarne — inaczej prezydent miałby dwa orędzia na jedną swoją kadencję.
   const oredzieBylo=G.useTerm.oredzieP;
-  G.once.ordynacja=0;G.useTerm={};G.camp=null;G.campPoster=null;
+  G.once.ordynacja=0;G.useTerm={};G.camp=null;G.campPoster=null;G.electionAt=null;
   if(oredzieBylo&&G.prez&&G.prezOredzieFor===prezKadencja())G.useTerm.oredzieP=1;
   say(`<b>Kadencja ${G.term}.</b> ${G.gov?`Rząd: ${G.gov.parties.map(k=>G.p[k].ab).join(' + ')}, premier ${G.gov.pmLead||G.p[G.gov.pm].lead}.`:'Brak rządu.'}`,
       isPM()?'good':'');

@@ -310,7 +310,7 @@ function actCards(list,fx){
     const f=fat(a.id),done=a.once&&G.once[a.id];
     const usedT=(a.term1&&G.useTerm[a.id]);
     const noShame=a.shame&&!(G.shame&&G.shame>G.week);
-    const catFull=a.cat!=='spe'&&(G.catUsed[a.cat]||0)>=1;
+    const catFull=a.cat!=='spe'&&kategoriaUzyta(a.cat)>=1;
     const cdDo=(G.odnowy&&G.odnowy[a.id])||0, cd=cdDo>czasGlobalny();
     // decyzje z limitem tygodniowym (regeneracja): dwa razy i koniec
     const limT=!!a.tydz2&&((G.used2&&G.used2[a.id])||0)>=2;
@@ -675,14 +675,14 @@ function actTab(){
   if(fx)list=A.filter(a=>actFx(a.id).includes(fx)&&cats.some(c=>c[0]===a.cat));
   const dost=new Set();A.forEach(a=>{if(cats.some(c=>c[0]===a.cat))actFx(a.id).forEach(f=>dost.add(f))});
   // ile kategorii stoi jeszcze otworem — inaczej gracz widzi tylko wyszarzone kafle
-  const wolnych=cats.filter(([c])=>c==='spe'||!(G.catUsed[c]||0)).length;
+  const wolnych=cats.filter(([c])=>c==='spe'||!kategoriaUzyta(c)).length;
   return `${stolTygodnia()}
   <div class="card"><div class="h"><h3>Decyzje tygodnia</h3>
     <span class="n">${ikona('akcje','sm')}${G.ap}/${G.apMax} akcji · ${ikona('kapital','sm')}${Math.round(G.kp)} kapitału · ${ikona('energia','sm')}${Math.round(G.en)} energii
     · ${wolnych} ${pl(wolnych,'kategoria otwarta','kategorie otwarte','kategorii otwartych')}</span></div>
     <div class="b">
     <div class="cats">${cats.map(([c,n])=>{
-      const zuzyta=c!=='spe'&&(G.catUsed[c]||0)>=1;   // widać od razu, w czym już zagrałeś w tym tygodniu
+      const zuzyta=c!=='spe'&&kategoriaUzyta(c)>=1;   // jedna decyzja z kategorii wraca po 168 godzinach
       return `<button class="${!fx&&G.cat===c?'on':''} ${zuzyta?'spent':''} ${c==='prz'||c==='prem'?'roy':''}"
         onclick="setCat('${c}')" title="${zuzyta?'Decyzja z tej kategorii już wykorzystana w tym tygodniu':n}">${zuzyta?'✓ ':''}${n}</button>`}).join('')}</div>
     <div class="fxbar">
@@ -692,7 +692,7 @@ function actTab(){
         style="${fx===f?`background:${AFXN[f][1]};border-color:${AFXN[f][1]};color:#10140f`:`color:${AFXN[f][1]};border-color:${AFXN[f][1]}55`}"
         onclick="setFx('${f}')">${AFXN[f][0]}</button>`).join('')}
     </div>
-    ${(!fx&&G.cat!=='spe'&&(G.catUsed[G.cat]||0)>=1)?`<div class="spentbar">
+    ${(!fx&&G.cat!=='spe'&&kategoriaUzyta(G.cat)>=1)?`<div class="spentbar">
       <b>${(CATS.find(c=>c[0]===G.cat)||['',''])[1]} jest już zamknięta na ten tydzień.</b>
       Zagrałeś tu decyzję, dlatego wszystko poniżej jest wyszarzone i nie reaguje na kliknięcia — tak ma być.
       Wróci za 1 tydzień, po naciśnięciu <b>Kolejny tydzień</b>. Do tego czasu zostają ci kategorie bez znaczka ✓.</div>`:''}
@@ -811,7 +811,7 @@ function fire(a,t,r,s,tm){
   G.stolSeq=(G.stolSeq||0)+1;
   const stolToken=G.stolSeq;
   const czasPrzed={dzien:G.dzienTygodnia||1,czas:G.czasTygodnia||0,godz:G.czasGodzTygodnia||0,h:G.godzina||8,
-    odnowa:G.odnowy&&G.odnowy[a.id]||0};
+    simHour:typeof G.simHour==='number'?G.simHour:null,odnowa:G.odnowy&&G.odnowy[a.id]||0};
   G.lastCharge={ap:a.ap,kp:Math.round(a.kp*kpMul),en:(a.en>0?a.en*enMul:a.en),id:a.id,cat:a.cat,token:stolToken,
                 czasPrzed,
                 term1:limitStad,once:razStad,
@@ -861,6 +861,11 @@ function fire(a,t,r,s,tm){
   G.odnowy[a.id]=czasGlobalny()+czasOdnowy(a);
   if(G.lastCharge)G.lastCharge.czasSeq=wpisCzas&&wpisCzas.seq;
   G.catUsed[a.cat]=(G.catUsed[a.cat]||0)+1;
+  if(a.cat!=='spe'){
+    if(!G.catTimes)G.catTimes={};
+    if(!Array.isArray(G.catTimes[a.cat]))G.catTimes[a.cat]=[];
+    G.catTimes[a.cat].push(czasGlobalny());
+  }
   if(msg)say(`<b>${a.n}.</b> ${msg} <span class="dim">Czas: ${dni} ${pl(dni,'dzień','dni','dni')}.</span>`);
   else if(!PROBA)say(`<b>${a.n}.</b> Decyzja rozpoczęta. Potrwa około ${dni} ${pl(dni,'dzień','dni','dni')}.`,'roy');
   const decyzjaZla=p.fame<f0-4||p.ctr>c0+10;
@@ -934,6 +939,7 @@ function oddajOplate(){
   G.ap+=c.ap;G.kp+=c.kp;G.en=cl(G.en+c.en);
   if(G.used[c.id])G.used[c.id]--;
   if(G.catUsed[c.cat])G.catUsed[c.cat]--;
+  if(c.cat!=='spe'&&G.catTimes&&Array.isArray(G.catTimes[c.cat]))G.catTimes[c.cat].pop();
   if(c.used2Przed!==null&&G.used2){
     if(c.used2Przed)G.used2[c.id]=c.used2Przed;
     else delete G.used2[c.id];
@@ -945,7 +951,7 @@ function oddajOplate(){
   if(c.once)delete G.once[c.id];
   if(G.lastAct===c.id)G.lastAct=c.lastActPrzed||null;
   if(G.actedWeek===G.term+'-'+G.week)G.actedWeek=c.actedWeekPrzed||null;
-  if(c.czasPrzed){G.dzienTygodnia=c.czasPrzed.dzien;G.czasTygodnia=c.czasPrzed.czas;G.czasGodzTygodnia=c.czasPrzed.godz;G.godzina=c.czasPrzed.h;if(Array.isArray(G.harmonogram)&&c.czasSeq)G.harmonogram=G.harmonogram.filter(x=>x.seq!==c.czasSeq)}
+  if(c.czasPrzed){G.dzienTygodnia=c.czasPrzed.dzien;G.czasTygodnia=c.czasPrzed.czas;G.czasGodzTygodnia=c.czasPrzed.godz;G.godzina=c.czasPrzed.h;if(c.czasPrzed.simHour!==null)G.simHour=c.czasPrzed.simHour;if(Array.isArray(G.harmonogram)&&c.czasSeq)G.harmonogram=G.harmonogram.filter(x=>x.seq!==c.czasSeq)}
   if(!G.odnowy)G.odnowy={};if(c.czasPrzed)G.odnowy[c.id]=c.czasPrzed.odnowa;else delete G.odnowy[c.id];
   G.lastCharge=null;
 }

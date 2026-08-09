@@ -518,7 +518,7 @@ function kreSymulujWidok(){
   if(!KRE_TEST)return;const s=KRE_TEST.stats,party=krePartiaDane(KRE_TEST.party)||{},logs=KRE_TEST.log.slice().reverse();
   const logHtml=logs.length?logs.map(x=>`<div class="lh"><span><b>K${x.term} · T${x.week}</b> ${esc(x.event)}</span><small>${esc(x.party)}: ${esc(x.option)}</small></div>`).join(''):'<p class="dim">Jeszcze nic się nie wydarzyło. Przewiń pierwszy tydzień.</p>';
   const body=`<p>Suchy test scenariusza dla partii <b>${esc(party.ab||KRE_TEST.party)}</b>. Nie zmienia prawdziwej rozgrywki.</p><div class="krefinalstats"><div><b>K${KRE_TEST.term} · T${KRE_TEST.week}</b><span>czas testu</span></div><div><b>${KRE_TEST.log.length}</b><span>odpalonych wydarzeń</span></div><div><b>${s.fame}</b><span>sława</span></div><div><b>${s.cred}</b><span>wiarygodność</span></div></div><div class="kretestscores"><span>Jedność <b>${s.uni}</b></span><span>Aktywność <b>${s.act}</b></span><span>Kontrowersja <b>${s.ctr}</b></span><span>Kapitał <b>${KRE_TEST.kapital}</b></span></div><div class="lawheld kretestlog">${logHtml}</div>`;
-  const stop=()=>{KRE_TEST=null;close()};modal('Symulator scenariusza',esc(KRE.nazwa||'Bez nazwy'),body,[{l:KRE_TEST.done?'Koniec testu':'Następny tydzień',s:KRE_TEST.done?'':'Uruchom warunki i wydarzenia',f:()=>kreSymulujKrok(),dis:KRE_TEST.done},{l:KRE_TEST.tryb==='ai'?'Wybór: AI':'Wybór: pierwsza odpowiedź',s:'Zmień sposób podejmowania decyzji',f:()=>{KRE_TEST.tryb=KRE_TEST.tryb==='ai'?'pierwsza':'ai';kreSymulujWidok()}},{l:'Restart',f:()=>kreSymulujStart()},{l:'Zamknij',f:stop}],stop);
+  const stop=()=>{KRE_TEST=null;close()};modal('Symulator scenariusza',esc(KRE.nazwa||'Bez nazwy'),body,[{l:KRE_TEST.done?'Koniec testu':'Następny etap czasu',s:KRE_TEST.done?'':'Uruchom warunki i wydarzenia',f:()=>kreSymulujKrok(),dis:KRE_TEST.done},{l:KRE_TEST.tryb==='ai'?'Wybór: AI':'Wybór: pierwsza odpowiedź',s:'Zmień sposób podejmowania decyzji',f:()=>{KRE_TEST.tryb=KRE_TEST.tryb==='ai'?'pierwsza':'ai';kreSymulujWidok()}},{l:'Restart',f:()=>kreSymulujStart()},{l:'Zamknij',f:stop}],stop);
 }
 function kreatorSymulator(){kreSymulujStart()}
 function kreatorProbuj(){
@@ -766,11 +766,14 @@ function initKeys(){
   if(initKeys.done||typeof document==='undefined'||!document.addEventListener)return;
   initKeys.done=1;
   document.addEventListener('keydown',e=>{
-    if(!G||document.getElementById('veil'))return;
+    if(!G)return;
     if(e.target&&/input|textarea/i.test(e.target.tagName||''))return;
+    /* Spacja steruje wyłącznie zegarem. Nie istnieje już skrót „następny
+       tydzień”, bo kalendarz ma płynąć niezależnie od kliknięć gracza. */
+    if(e.code==='Space'){e.preventDefault();if(typeof realClockToggle==='function')realClockToggle();return}
+    if(document.getElementById('veil'))return;
     const T=['mapa','akcje','lider','krol','sondaz','cele','sejm'];
     if(e.key>='1'&&e.key<='7'){const t=T[+e.key-1];if(t){G.tab=t;if(G.tutSeen)G.tutSeen[t]=1;render()}}
-    else if(e.code==='Space'&&G.phase==='camp'){e.preventDefault();if(typeof endWeek==='function')endWeek()}
     else if(e.key==='m'||e.key==='M')toggleMute();
   });
 }

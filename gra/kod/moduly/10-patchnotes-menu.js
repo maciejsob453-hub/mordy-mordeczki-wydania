@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.183':{data:'9 sierpnia 2026',zmiany:[
+  'Zegar gry dziala teraz godzinami: spacja tylko pauzuje i wznawia symulacje, a predkosc odtwarza pojedyncze godziny bez przeskokow.',
+  'Decyzje nie teleportuja kalendarza, odnowy i limity kategorii licza sie z ciaglego czasu, a boty dostaja codzienne okazje do reakcji.',
+  'Cele narodowe maja przesuwalna i skalowalna mape, tooltipy nie lamia slow na pojedyncze znaki, a wybory maja zaplanowana godzine startu.'
+ ]},
  '1.1.182':{data:'9 sierpnia 2026',zmiany:[
   'Zegar ma teraz czytelna date bez dodatkowych opisow dnia, tygodnia i technicznych komunikatow.',
   'Naprawiono klikalnosc nawigacji po wejscu w Cele oraz wymiarowanie selektora partii i Sadu.'
@@ -1175,11 +1180,11 @@ function game(){
       <div class="rtclock" title="Opcjonalny zegar czasu rzeczywistego">
         <button class="btn g sm" onclick="realClockToggle()">${G.realPaused?'▶ Czas':'⏸ Pauza'}</button>
         <select onchange="realClockSpeed(this.value)" aria-label="Tempo czasu rzeczywistego">
-          ${[.5,1,2,4].map(v=>`<option value="${v}" ${G.realSpeed===v?'selected':''}>x${v}</option>`).join('')}
+          ${[.5,1,2,3,4,5].map(v=>`<option value="${v}" ${G.realSpeed===v?'selected':''}>x${v}</option>`).join('')}
         </select>
       </div>
       <button class="sndbtn" onclick="toggleMute()" title="${G.mute?'Włącz dźwięk':'Wycisz'}">${G.mute?'♪̸':'♪'}</button>
-      <div class="datechip" key="${G.term}-${G.week}"><b>${dateStr(gameDate())}</b></div>
+      <div class="datechip" key="${G.simHour||0}"><b>${dateStr(gameDate())}</b><span class="clocktime">${timeStr(gameDate())}</span></div>
       <button class="btn g sm" onclick="openSave()" title="Zapis i wczytanie">Zapis</button>
       <!-- wyjście do menu siedziało wcześniej dopiero w oknie zapisu i nikt go tam nie szukał -->
       <button class="btn g sm" onclick="doLobby()" title="Wyjście do menu głównego">Menu</button>

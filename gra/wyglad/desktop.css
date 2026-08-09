@@ -458,3 +458,28 @@ body:has(.hud) .widok[data-tab="sad"] .sadkolumny>.card{height:auto!important;mi
 body:has(.hud) .widok[data-tab="sad"] .sadekran>.card:last-child{height:auto!important;min-height:220px}
 body:has(.hud) .widok[data-tab="sad"] .sadzamkniety{height:auto!important;min-height:calc(100vh - 165px);box-sizing:border-box}
 @media(max-width:1280px){body:has(.hud) .widok[data-tab="sad"] .sadkolumny>.card{min-height:0}}
+
+/* Czas i drzewo celów: jedna godzina logiczna na krok, a mapa jest osobnym
+   płótnem przesuwanym kursorem zamiast dashboardu rozciągniętego na całą stronę. */
+body:not(:has(.mg)):has(.hud) .hud .datechip{gap:9px;min-width:182px}
+body:not(:has(.mg)):has(.hud) .hud .datechip .clocktime{display:inline!important;padding-left:9px;border-left:1px solid rgba(217,171,69,.45);color:#b7c6b5;font:600 13px var(--m);letter-spacing:.08em;white-space:nowrap}
+body:not(:has(.mg)):has(.hud) .hud .rtclock{min-width:208px}
+body:not(:has(.mg)):has(.hud) .hud .rtclock select{min-width:56px}
+body:not(:has(.mg)):has(.hud) .goals-map-toolbar{display:flex;align-items:center;gap:6px;margin:0 0 9px;padding:6px 8px;border:1px solid #30443a;background:#0b1510;position:sticky;top:0;z-index:4}
+body:not(:has(.mg)):has(.hud) .goals-map-toolbar button{min-width:31px;height:27px;padding:0 8px;border:1px solid #536d5a;border-radius:3px;background:#132219;color:var(--tx);font:10px var(--m);cursor:pointer}
+body:not(:has(.mg)):has(.hud) .goals-map-toolbar button:hover{border-color:#d9ab45;color:#f0d48c}
+body:not(:has(.mg)):has(.hud) .goals-map-toolbar output{min-width:52px;text-align:center;color:#d9ab45;font:10px var(--m);letter-spacing:.08em}
+body:not(:has(.mg)):has(.hud) .goals-map-frame{position:relative;min-height:520px;overflow:hidden;border:1px solid #30443a;background:radial-gradient(circle at 50% 10%,rgba(57,82,60,.18),transparent 42%),repeating-linear-gradient(0deg,rgba(126,156,129,.045) 0 1px,transparent 1px 32px),repeating-linear-gradient(90deg,rgba(126,156,129,.045) 0 1px,transparent 1px 32px);cursor:grab;touch-action:none}
+body:not(:has(.mg)):has(.hud) .goals-map-frame.dragging{cursor:grabbing}
+body:not(:has(.mg)):has(.hud) .goals-map-canvas{position:absolute;left:0;top:0;min-width:100%;transform-origin:0 0;padding:28px 28px 80px;box-sizing:border-box}
+body:not(:has(.mg)):has(.hud) .goals-map-grid{display:flex;flex-direction:column;gap:44px;min-width:860px}
+body:not(:has(.mg)):has(.hud) .goals-map-grid .goals-tree-block{margin:0;padding:14px 15px 18px;border-color:#405848;background:rgba(8,18,12,.78)}
+body:not(:has(.mg)):has(.hud) .goals-map-grid .goals-tree-block>header{margin-bottom:13px}
+body:not(:has(.mg)):has(.hud) .goals-map-grid .goal-tree-row{display:flex;align-items:stretch;gap:28px;overflow:visible;padding:8px 4px 12px;width:max-content;min-width:100%}
+body:not(:has(.mg)):has(.hud) .goals-map-grid .goal-node-wrap{flex:0 0 220px;width:220px;padding-right:28px}
+body:not(:has(.mg)):has(.hud) .goals-map-grid .goal-node-wrap:not(.last)::after{right:0;width:28px;background:#77947d;box-shadow:0 0 8px rgba(128,178,139,.3)}
+body:not(:has(.mg)):has(.hud) .goals-map-grid .goal-node{min-height:108px}
+body:not(:has(.mg)):has(.hud) #app .tipbox{min-width:280px;max-width:min(360px,calc(100vw - 24px));overflow-wrap:break-word;word-break:normal;white-space:normal}
+body:not(:has(.mg)):has(.hud) #app .tipbox .l{min-width:0;align-items:flex-start}
+body:not(:has(.mg)):has(.hud) #app .tipbox .l span{min-width:0;word-break:normal;overflow-wrap:break-word;white-space:normal}
+@media(max-width:720px){body:not(:has(.mg)):has(.hud) .goals-map-frame{min-height:430px}body:not(:has(.mg)):has(.hud) .goals-map-grid{min-width:720px}body:not(:has(.mg)):has(.hud) .goals-map-grid .goal-node-wrap{flex-basis:190px;width:190px}}

@@ -143,6 +143,7 @@ function render(){if(PROBA)return;
   if(G.phase==='marszalek')return marScreen();
   if(G.phase==='prez')return prezScreen();
   game();
+  if(G.tab==='cele'&&typeof initGoalsMap==='function')setTimeout(initGoalsMap,0);
   setTimeout(fxFlush,10);
   if(dateAnim)setTimeout(runDateAnim,20);
   if(G.sitPending&&SITS[G.sitPending]&&SITS[G.sitPending].resolve){

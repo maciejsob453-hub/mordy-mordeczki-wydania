@@ -1,6 +1,6 @@
 {
- "wersja": "1.1.182",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/c2f8437412c4d666814d138449d4f5d3df7d8505",
+ "wersja": "1.1.183",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -14,13 +14,13 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "d843530dbe855718bfb5c6f0824f6723df6d17dbecaa9e8952ba239a64d2c96f",
+   "sha": "57d45b19c31e9d76f414de392b30c3eb9862fa2622f6af06c40094a521fd9ba3",
    "bajtow": 531
   },
   {
    "sciezka": "gra/kod/moduly/00-data.js",
-   "sha": "601838a2ca91f3ca037a08a58d8af222fb99a339a0a3b80ad31a62f0a124052a",
-   "bajtow": 49317
+   "sha": "ffb7d2b5ff7fb88b29faaa98dc10f47ff8f20be938fbc25605ab8f0ff0db5386",
+   "bajtow": 49780
   },
   {
    "sciezka": "gra/kod/moduly/01-election-sejm.js",
@@ -29,13 +29,13 @@
   },
   {
    "sciezka": "gra/kod/moduly/02-actions-events.js",
-   "sha": "94efa5dc4fed480ba65f561d1fea7e0eaf6091427505908282f2b2c9cd91ecb2",
-   "bajtow": 53623
+   "sha": "8284274fdf1d76611b43ddd2d93f3adfaf30e17c06bd79c4e9c7775e87fbb95b",
+   "bajtow": 53944
   },
   {
    "sciezka": "gra/kod/moduly/03-turn.js",
-   "sha": "847278f91c7326a50e8da7631de0fded795180ff5c18a8497d6087c856baee47",
-   "bajtow": 20093
+   "sha": "06685126c03c2da1969855eac3c6858367524bd70a7046078ab6bfcd44613b26",
+   "bajtow": 21455
   },
   {
    "sciezka": "gra/kod/moduly/04-ai.js",
@@ -49,8 +49,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/06-render.js",
-   "sha": "42ce69d9dbaa87568afa776df270121f8bb961e1ccae4bdcf5cdd1506363960e",
-   "bajtow": 12029
+   "sha": "4c53a9d014717fd2e401978322929346563a026285ae710e840826ddc0c4dc69",
+   "bajtow": 12111
   },
   {
    "sciezka": "gra/kod/moduly/07-creator.js",
@@ -64,13 +64,13 @@
   },
   {
    "sciezka": "gra/kod/moduly/09-screens.js",
-   "sha": "9fde9ec494f3a1c5a545253cd7a6433b0e314030a0f2dfff253f8bbfc6ff3134",
-   "bajtow": 128947
+   "sha": "895a3a2d776ebb23fdb49aee8437e98cdf2e274ef50b27d2be368ea87a023aea",
+   "bajtow": 129128
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "965bcfb71e3da928c60a15a3831019fc491cebd01a485603705770c62e90a59c",
-   "bajtow": 110545
+   "sha": "e28d1a17c52611d51f9af3047b886ba10190da48abf651b54528788589f87ac6",
+   "bajtow": 111063
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
@@ -89,8 +89,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/14-ui-gameplay.js",
-   "sha": "71904c0a251726ddc9f5e06a4b6b64485862857966cfa6549cf063c707a9c11a",
-   "bajtow": 96219
+   "sha": "54a8f0262879684fb40021cf45b287d1beb994ce4ce64c1fa83c982634fb27cc",
+   "bajtow": 96581
   },
   {
    "sciezka": "gra/kod/moduly/15-governance.js",
@@ -99,18 +99,18 @@
   },
   {
    "sciezka": "gra/kod/moduly/16-goals-panels.js",
-   "sha": "36fef8ff0c6a7a7c88453f13d5684df8c698f6e29f45b1dd4c751ef17a3f64af",
-   "bajtow": 111688
+   "sha": "b24cc5becfe400a3c2f3c9c28f1806738248d10e547d3f0422f2d6a1a033e9cb",
+   "bajtow": 113577
   },
   {
    "sciezka": "gra/kod/moduly/17-elections-endgame.js",
-   "sha": "6548f1ea9458e85820d1e4c415d21518e6d9060415d2adc24243ba7209dbcaaf",
-   "bajtow": 76071
+   "sha": "18e9fee3d13f432b86f7b3a54812f9cec2ee6d14c4318f2c097d9ef62085b9ca",
+   "bajtow": 76641
   },
   {
    "sciezka": "gra/kod/moduly/18-bootstrap.js",
-   "sha": "7a5c6f9ac1b1964172961068f05d4be2bdf1cd8c304a445bd6f269dd2fe605f1",
-   "bajtow": 18113
+   "sha": "066fff49fc096fba4c06e51f675fb2f50b14bc92995e6d1c7bbc9fb16c8a62e2",
+   "bajtow": 18237
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -904,8 +904,8 @@
   },
   {
    "sciezka": "gra/wyglad/desktop.css",
-   "sha": "2a47af0c7d69fd99a9124d0b0bcf42f812800fae99a9ada7a2ffa17e0838201a",
-   "bajtow": 41430
+   "sha": "cf75191239478a07789634bb843e30ae9f2d0b5fd1326d7f545e21a355712563",
+   "bajtow": 44776
   },
   {
    "sciezka": "gra/wyglad/redesign.css",
@@ -940,6 +940,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "c2f8437412c4d666814d138449d4f5d3df7d8505"
+ }
 }

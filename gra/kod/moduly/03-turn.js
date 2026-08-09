@@ -1,48 +1,85 @@
 'use strict';
 /* ══════════ TURA ══════════ */
 let REAL_TIMER=null;
+function simClockSync(){
+  if(!G)return;
+  const h=Math.max(0,Math.floor(Number(G.simHour)||0)),kad=G.weeks*168;
+  const inKad=h%kad;
+  G.term=Math.floor(h/kad)+1;
+  G.week=Math.floor(inKad/168)+1;
+  G.czasGodzTygodnia=inKad;
+  G.czasTygodnia=Math.floor(inKad/24);
+  G.dzienTygodnia=Math.min(7,Math.floor((inKad%168)/24)+1);
+  G.godzina=(8+(h%24))%24;
+}
+function simClockMigrate(){
+  if(!G)return;
+  if(typeof G.simHour!=='number'||!isFinite(G.simHour))
+    G.simHour=Math.max(0,((Math.max(1,G.term||1)-1)*(G.weeks||12)+(Math.max(1,G.week||1)-1))*168+(G.czasGodzTygodnia||0));
+  if(typeof G.realCarry!=='number'||!isFinite(G.realCarry))G.realCarry=0;
+  simClockSync();
+}
 function realClockInit(){
   if(!G)return;
+  simClockMigrate();
   if(typeof G.realSpeed!=='number')G.realSpeed=1;
   if(typeof G.realPaused!=='boolean')G.realPaused=false;
-  if(!G.realPaused&&!REAL_TIMER)REAL_TIMER=setInterval(realClockPaint,1000);
+  /* Ĺšwiat ma jeden logiczny krok = jedna godzina. Timer tylko odtwarza te
+     kroki częściej lub rzadziej; prędkość nie przeskakuje po kilka godzin. */
+  if(!REAL_TIMER)REAL_TIMER=setInterval(realClockPaint,250);
+}
+function realtimeHourly(){
+  const p=me&&me();if(!p)return;
+  const eg=typeof enGain==='function'?enGain():0;
+  G.en=cl(G.en+eg/168);
+  G._apCarry=(G._apCarry||0)+(G.apMax||3)/168;
+  while(G._apCarry>=1&&G.ap<G.apMax){G.ap++;G._apCarry-=1}
+  if(typeof kategoriaUzyta==='function'&&G.catTimes)Object.keys(G.catTimes).forEach(k=>kategoriaUzyta(k));
+}
+function realtimeDaily(){
+  /* AI dostaje wiele okazji w ciągu kadencji, ale nie wykonuje ruchu co klatkę.
+     Dzienny rytm jest tylko harmonogramem reakcji, nie turą gracza. */
+  if(G.phase==='camp'){
+    ai();aiGoals();aiAgents();aiTransfery();aiOpozycja();
+    if(G.gov){govTick();govKontraktTick()}
+  }
+  if(G.simHour%168===0)makeNoise();
+}
+function realtimeBoundary(){
+  /* Stare procedury rozliczeń zachowujemy wyłącznie jako konserwację zapisu i
+     przejście kadencji. Gracz nie wywołuje ich klawiszem ani przyciskiem; świat
+     idzie dalej godzinami, a decyzje mają własne odnowy liczone w godzinach. */
+  if(!G||G.phase!=='camp')return;
+  const nowTerm=G.term,nowWeek=G.week,oldWeek=nowWeek>1?nowWeek-1:G.weeks,oldTerm=nowWeek>1?nowTerm:Math.max(1,nowTerm-1);
+  const h=G.simHour;G.term=oldTerm;G.week=oldWeek;
+  endWeek(true);
+  G.simHour=h;simClockSync();
+}
+function simClockStep(){
+  if(!G||PROBA)return false;
+  simClockMigrate();
+  G.simHour=Math.max(0,Math.floor(G.simHour)+1);
+  simClockSync();realtimeHourly();
+  if(G.simHour%168===0)realtimeBoundary();
+  else if(G.simHour%24===0)realtimeDaily();
+  if(G.phase==='finalcamp'&&G.electionAt&&G.simHour>=G.electionAt){
+    G.phase='elect';G.electionAt=null;say('<b>Wybory się rozpoczęły.</b> Urny są otwarte.','roy');
+  }
+  return true;
 }
 function realClockPaint(){
   if(!G||PROBA||G.realPaused)return;
-  /* Okno decyzji nie zatrzymuje świata. Pauza jest wyłącznie świadomą akcją
-     gracza, a modal może zostać na ekranie podczas dalszego upływu czasu. */
-  G.czasGodzTygodnia=(G.czasGodzTygodnia||0)+Math.max(.5,Number(G.realSpeed)||1);
-  G.czasTygodnia=Math.floor(G.czasGodzTygodnia/24);
-  G.dzienTygodnia=Math.min(7,Math.floor(G.czasTygodnia)+1);
-  G.godzina=(8+(G.czasGodzTygodnia%24))%24;
-  if(G.czasGodzTygodnia>=168){
-    /* Ekrany przejściowe (absolutorium i wybory) mają własne kroki procedury.
-       Zegar nie może w tym momencie odpalić ukrytego ticka ponownie co sekundę,
-       bo ostatni tydzień kadencji zapętlał absolutorium albo mnożył noc wyborczą.
-       Świat pozostaje uruchomiony, ale granica tygodnia czeka na zakończenie
-       procedury, tak jak w prawdziwym kalendarzu parlamentarnym. */
-    if(G.phase&&G.phase!=='camp'){
-      G.czasGodzTygodnia=167.999;G.czasTygodnia=6;G.dzienTygodnia=7;G.godzina=23.99;
-      render();return;
-    }
-    /* EndWeek jest teraz niewidocznym tickiem symulacji: odświeża gospodarkę,
-       AI i limity tygodniowe, ale nie czeka na kliknięcie „następny tydzień”. */
-    G.czasGodzTygodnia=168;G.czasTygodnia=7;G.dzienTygodnia=7;G.godzina=8;
-    endWeek(true);return;
-  }
-  render();
+  simClockMigrate();
+  G.realCarry=(G.realCarry||0)+Math.max(.5,Number(G.realSpeed)||1)/4;
+  let n=0;while(G.realCarry>=1&&n<8){G.realCarry-=1;simClockStep();n++}
+  if(n)render();
 }
-function realClockStart(){
-  realClockInit();G.realPaused=false;
-  if(!REAL_TIMER)REAL_TIMER=setInterval(realClockPaint,1000);
-  render();
-}
+function realClockStart(){realClockInit();G.realPaused=false;render()}
 function realClockToggle(){
-  realClockInit();
-  if(G.realPaused)realClockStart();else{G.realPaused=true;render()}
+  realClockInit();G.realPaused=!G.realPaused;render();
 }
 function realClockSpeed(v){
-  realClockInit();const n=Number(v);G.realSpeed=[.5,1,2,4].includes(n)?n:1;render();
+  realClockInit();const n=Number(v);G.realSpeed=[.5,1,2,3,4,5].includes(n)?n:1;render();
 }
 function buildEvents(){
   /* Nie w trakcie wyborów. Wydarzenie wskakujące w środek liczenia głosów albo
@@ -231,7 +268,7 @@ function endWeek(automatic=false){
     }
     else if(p.ctr>=70)say(`<b>Kontrowersja ${Math.round(p.ctr)}/100.</b> Przy 96 partia wpada w paraliż: sondaż słabnie, kapitał ucieka, ludzie wychodzą.`,'bad');
     else if(p.fame<=9&&p.act<=9)say(`<b>${p.lead} ma dość.</b> Sława ${Math.round(p.fame)}, aktywność ${Math.round(p.act)}, o partii nikt już nie pamięta. Rozwiązać cię nikt nie rozwiąże, ale tak się nie wygrywa wyborów.`,'bad');
-    if(ostatniTydzien){G.phase='finalcamp';absolutorium()}
+    if(ostatniTydzien){G.phase='finalcamp';G.electionAt=(G.simHour||czasGlobalny())+24;absolutorium()}
     else if(G.prez2&&G.week>=G.prez2.week){runRunoff();return}
     else if(G.week===6&&G.term%2===0&&(!G.prez||G.term>=G.prez.until)){G.phase='prez';G.prezState=null}
   }
