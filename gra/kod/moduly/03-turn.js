@@ -42,6 +42,7 @@ function realtimeDaily(){
   if(G.phase==='camp'){
     ai();aiGoals();aiAgents();aiTransfery();aiOpozycja();
     if(G.gov){govTick();govKontraktTick()}
+    if(!G.queue||!G.queue.length)G.queue=buildEvents();
   }
   if(G.simHour%168===0)makeNoise();
 }
@@ -255,7 +256,7 @@ function endWeek(automatic=false){
     G.mood[b]=cl(G.mood[b]-R(.05,.11),.76,1.28);
     say(`<b>Zmiana nastrojów.</b> „${sn(a)}” się mobilizują, „${sn(b)}” tracą zapał.`)}
   makeNoise();
-  G.queue=buildEvents();
+  if(!G.queue||!G.queue.length)G.queue=buildEvents();
   {
     // ostrzeżenia nie mogą wstrzymywać kalendarza, inaczej wybory nigdy nie nadchodzą
     if(p.ctr>=96){
