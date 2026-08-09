@@ -22,7 +22,10 @@ const MRUG_LICZBY='.rs .rv b,.nocsz .tabliczki b';
 const MRUG_PUDLO='.rs,.tabliczki>div';
 
 const tenSamWezel=(a,b)=>a.nodeType===b.nodeType&&
-  (a.nodeType!==1||(a.tagName===b.tagName&&(a.id||'')===(b.id||'')));
+  (a.nodeType!==1||(a.tagName===b.tagName&&(
+    (a.dataset&&b.dataset&&(a.dataset.goalsMap!==undefined&&b.dataset.goalsMap!==undefined)) ||
+    (a.dataset&&b.dataset&&(a.dataset.goalsCanvas!==undefined&&b.dataset.goalsCanvas!==undefined)) ||
+    (a.id||'')===(b.id||''))));
 
 function zszyjAtrybuty(stary,nowy){
   const na=nowy.attributes;
@@ -146,16 +149,16 @@ function render(){if(PROBA)return;
   if(G.tab==='cele'&&typeof initGoalsMap==='function')setTimeout(initGoalsMap,0);
   setTimeout(fxFlush,10);
   if(dateAnim)setTimeout(runDateAnim,20);
-  if(G.sitPending&&SITS[G.sitPending]&&SITS[G.sitPending].resolve){
+  if(!document.getElementById('veil')&&G.sitPending&&SITS[G.sitPending]&&SITS[G.sitPending].resolve){
     const id=G.sitPending;G.sitPending=null;SITS[id].resolve();
   }
-  else if(G.queue&&G.queue.length){
+  else if(!document.getElementById('veil')&&G.queue&&G.queue.length){
     /* Kolejka mogła powstać przed wyjściem z rządu. Kryzys koalicyjny nie może
        wtedy czekać w pamięci i wyskoczyć już w opozycji. */
     G.queue=G.queue.filter(e=>e&&e.id!=='kryzKoal'||inGov());
     if(G.queue.length)showEvent(G.queue.shift());
   }
-  else if(G.scenEventPending){const z=G.scenEventPending,e=(G.scenEvents||[]).find(x=>x.id===z.id);if(e)scenEventPokaz(e,z.k);else G.scenEventPending=null}
+  else if(!document.getElementById('veil')&&G.scenEventPending){const z=G.scenEventPending,e=(G.scenEvents||[]).find(x=>x.id===z.id);if(e)scenEventPokaz(e,z.k);else G.scenEventPending=null}
 }
 
 let SEL='PPP';

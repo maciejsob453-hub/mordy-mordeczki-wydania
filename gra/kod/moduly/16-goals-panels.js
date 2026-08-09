@@ -797,7 +797,7 @@ function identSwitcher(){
     <div style="display:flex;gap:9px;flex-wrap:wrap">
     ${ms.map(m=>{const b=IDENT_BRAND[m],on=p.n===b.n;
       return `<button class="opt" style="flex:1;min-width:190px;${on?'border-color:var(--acc)':''}" ${on?'disabled':''} onclick="switchIdentity('${m}')">
-        <b>${on?'✓ ':''}${b.n}</b><span>${b.ab}</span></button>`}).join('')}
+        <span class="brand-switch-logo"><img src="${LOGOS[b.logo]||''}" alt=""></span><b>${on?'✓ ':''}${b.n}</b><span>${b.ab}</span></button>`}).join('')}
     </div></div></div>`;
 }
 function oldGoalTab(){

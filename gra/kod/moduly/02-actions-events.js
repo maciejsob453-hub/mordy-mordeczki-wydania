@@ -31,6 +31,16 @@ const czasGlobalny=()=>G?Math.max(0,Math.floor(typeof G.simHour==='number'?G.sim
   (((Math.max(1,G.term||1)-1)*(G.weeks||12)+(Math.max(1,G.week||1)-1))*168)+(G.czasGodzTygodnia||0))):0;
 const czasOdnowy=a=>Math.max(0,Math.round(+((a||{}).odnowa||ODNOWA_GODZ[(a||{}).id]||0)));
 const odnowaPozostala=a=>Math.max(0,Math.ceil((((G.odnowy&&G.odnowy[a.id])||0)-czasGlobalny())/24));
+/* Regeneracja lidera ma limit dwóch użyć, ale ten limit jest kroczący. Stary
+   licznik resetowany przy końcu tygodnia powodował, że zegar czasu rzeczywistego
+   i ekran decyzji mówiły o dwóch różnych światach. */
+function limit2Uzyte(a){
+  if(!G||!a||!a.tydz2)return 0;
+  if(!G.tydz2Times)G.tydz2Times={};
+  const now=czasGlobalny(),arr=Array.isArray(G.tydz2Times[a.id])?G.tydz2Times[a.id]:[];
+  G.tydz2Times[a.id]=arr.filter(t=>now-Number(t)<168);
+  return G.tydz2Times[a.id].length;
+}
 function kategoriaUzyta(cat){
   if(!G||cat==='spe')return 0;
   if(!G.catTimes)G.catTimes={};

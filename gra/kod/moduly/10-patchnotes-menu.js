@@ -4,6 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.186':{data:'9 sierpnia 2026',zmiany:[
+  'Mapa celow zachowuje przesuniecie i nie rozpada sie podczas plyniecia zegara.',
+  'Limity regeneracji licza kroczace siedem dni, a cofniecie decyzji nie zostawia pustego ruchu.',
+  'Loga Partii Liberalnej i Alternatywy Zydowskiej sa widoczne w przelaczniku szyldu.',
+  'Zamkniete Media, Sad i Mordepedia maja czytelne przyciski z pelnym tlem.',
+ ]},
  '1.1.185':{data:'9 sierpnia 2026',zmiany:[
   'Cele narodowe sa teraz wylacznie sciezka Concordii, a loga partii i avatary konkretnych postaci sa uzywane tam, gdzie pasuja do tresci celu.',
   'AI sklada ustawy i reaguje na sad oraz rzad wedlug cooldownow godzinowych zamiast czekac na reset tygodnia.',

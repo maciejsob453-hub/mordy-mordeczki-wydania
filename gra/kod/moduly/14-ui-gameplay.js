@@ -321,7 +321,7 @@ function actCards(list,fx){
     const catLeft=catFull?kategoriaPozostala(a.cat):0;
     const cdDo=(G.odnowy&&G.odnowy[a.id])||0, cd=cdDo>czasGlobalny();
     // decyzje z limitem tygodniowym (regeneracja): dwa razy i koniec
-    const limT=!!a.tydz2&&((G.used2&&G.used2[a.id])||0)>=2;
+    const limT=!!a.tydz2&&limit2Uzyte(a)>=2;
     const kpC=Math.round(a.kp*sizeF(me()).kp*inflacja());   // cena z uwzględnieniem inflacji
     const ok=G.ap>=a.ap&&G.kp>=kpC&&(a.en<0||G.en>=a.en)&&!done&&!usedT&&!limT&&!catFull&&!noShame&&!cd&&!(a.id==='rekr'&&G.recCd>0);
     const col=CATCOL[a.cat]||'var(--line2)';
@@ -329,7 +329,7 @@ function actCards(list,fx){
     const katN=(CATS.find(x=>x[0]===a.cat)||['',''])[1]||'Ta kategoria';
     const blok=done?'wykorzystane':usedT?'zużyte w tej kadencji'
       // blokuje kategoria, nie ta jedna decyzja — bez tego wygląda to na zepsuty przycisk
-      :limT?'wykorzystane dwa razy w tym tygodniu'
+      :limT?'wykorzystane dwa razy w ostatnich 7 dniach'
       :catFull?`kategoria ${katN} wróci za ${Math.max(1,Math.ceil(catLeft/24))} ${pl(Math.max(1,Math.ceil(catLeft/24)),'dzień','dni','dni')}`
       :cd?`odnowa za ${Math.max(1,Math.ceil((cdDo-czasGlobalny())/24))} ${pl(Math.max(1,Math.ceil((cdDo-czasGlobalny())/24)),'dzień','dni','dni')}`
       :noShame?'dostępne tylko tuż po wpadce':(a.id==='rekr'&&G.recCd>0)?`nabór wraca za ${G.recCd} ${pl(G.recCd,'tydzień','tygodnie','tygodni')}`
@@ -812,7 +812,7 @@ function fire(a,t,r,s,tm){
   const limitStad=!!a.term1&&!G.useTerm[a.id], razStad=!!a.once&&!G.once[a.id];
   if(a.once)G.once[a.id]=1;
   if(a.term1)G.useTerm[a.id]=1;
-  if(a.tydz2){if(!G.used2)G.used2={};G.used2[a.id]=(G.used2[a.id]||0)+1}
+  const tydz2Przed=a.tydz2?((G.tydz2Times&&Array.isArray(G.tydz2Times[a.id]))?G.tydz2Times[a.id].slice():[]):null;
   const f=fat(a.id);G.used[a.id]=(G.used[a.id]||0)+1;
   // limity zapisujemy razem z kosztem, żeby rezygnacja w oknie cofnęła jedno i drugie
   G.stolSeq=(G.stolSeq||0)+1;
@@ -826,7 +826,9 @@ function fire(a,t,r,s,tm){
                    sterują karą za pusty tydzień, kombinacją i limitem dwa razy
                    na tydzień; bez ich poprzedniego stanu cofnięta decyzja nadal
                    była liczona jako zagrana. */
-                used2Przed:a.tydz2?((G.used2&&G.used2[a.id])||1)-1:null,
+                used2Przed:null,
+                tydz2Przed,
+                lastRealActionAtPrzed:G.lastRealActionAt,
                 lastActPrzed:G.lastAct,
                 actedWeekPrzed:G.actedWeek};
   const msg=a.f(me(),f,t,r,s,tm);
@@ -867,6 +869,11 @@ function fire(a,t,r,s,tm){
   const cyklDecyzji=decyzjaStart(a,wpisCzas);
   if(!G.odnowy)G.odnowy={};
   G.odnowy[a.id]=czasGlobalny()+czasOdnowy(a);
+  if(a.tydz2){
+    if(!G.tydz2Times)G.tydz2Times={};
+    if(!Array.isArray(G.tydz2Times[a.id]))G.tydz2Times[a.id]=[];
+    G.tydz2Times[a.id].push(czasGlobalny());
+  }
   if(G.lastCharge){G.lastCharge.czasSeq=wpisCzas&&wpisCzas.seq;G.lastCharge.decisionToken=cyklDecyzji&&cyklDecyzji.token}
   G.catUsed[a.cat]=(G.catUsed[a.cat]||0)+1;
   if(a.cat!=='spe'){
@@ -898,6 +905,7 @@ function fire(a,t,r,s,tm){
     if(a.ap)fxPush('−'+a.ap+' '+pl(a.ap,'akcja','akcje','akcji'),'');
   }
   G.actedWeek=G.term+'-'+G.week;
+  G.lastRealActionAt=czasGlobalny();
   /* Stół tygodnia. Zapisujemy nie sam identyfikator, tylko różnicę, jaką ta
      decyzja zrobiła — dzięki temu kafel na stole mówi, co naprawdę wyszło,
      a nie powtarza ogólny opis z listy. */
@@ -948,9 +956,10 @@ function oddajOplate(){
   if(G.used[c.id])G.used[c.id]--;
   if(G.catUsed[c.cat])G.catUsed[c.cat]--;
   if(c.cat!=='spe'&&G.catTimes&&Array.isArray(G.catTimes[c.cat]))G.catTimes[c.cat].pop();
-  if(c.used2Przed!==null&&G.used2){
-    if(c.used2Przed)G.used2[c.id]=c.used2Przed;
-    else delete G.used2[c.id];
+  if(c.tydz2Przed!==null){
+    if(!G.tydz2Times)G.tydz2Times={};
+    if(c.tydz2Przed.length)G.tydz2Times[c.id]=c.tydz2Przed.slice();
+    else delete G.tydz2Times[c.id];
   }
   /* Limit „raz na kadencję” zużywa się dopiero wtedy, gdy gracz naprawdę coś
      zatwierdzi. Wcześniej wystarczyło zajrzeć w zmianę przewodniczącego
@@ -959,6 +968,8 @@ function oddajOplate(){
   if(c.once)delete G.once[c.id];
   if(G.lastAct===c.id)G.lastAct=c.lastActPrzed||null;
   if(G.actedWeek===G.term+'-'+G.week)G.actedWeek=c.actedWeekPrzed||null;
+  if(c.lastRealActionAtPrzed===undefined)delete G.lastRealActionAt;
+  else G.lastRealActionAt=c.lastRealActionAtPrzed;
   if(c.czasPrzed){G.dzienTygodnia=c.czasPrzed.dzien;G.czasTygodnia=c.czasPrzed.czas;G.czasGodzTygodnia=c.czasPrzed.godz;G.godzina=c.czasPrzed.h;if(c.czasPrzed.simHour!==null)G.simHour=c.czasPrzed.simHour;if(Array.isArray(G.harmonogram)&&c.czasSeq)G.harmonogram=G.harmonogram.filter(x=>x.seq!==c.czasSeq)}
   if(c.decisionToken&&Array.isArray(G.decisionLog)){const d=G.decisionLog.find(x=>x&&x.token===c.decisionToken);if(d){d.status='CANCELLED';d.cancelledAt=czasGlobalny()}}
   if(!G.odnowy)G.odnowy={};if(c.czasPrzed)G.odnowy[c.id]=c.czasPrzed.odnowa;else delete G.odnowy[c.id];

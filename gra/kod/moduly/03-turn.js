@@ -1,6 +1,7 @@
 'use strict';
 /* ══════════ TURA ══════════ */
 let REAL_TIMER=null;
+let REAL_LAST_RENDER=0;
 function simClockSync(){
   if(!G)return;
   const h=Math.max(0,Math.floor(Number(G.simHour)||0)),kad=G.weeks*168;
@@ -74,7 +75,15 @@ function realClockPaint(){
   simClockMigrate();
   G.realCarry=(G.realCarry||0)+Math.max(.5,Number(G.realSpeed)||1)/4;
   let n=0;while(G.realCarry>=1&&n<8){G.realCarry-=1;simClockStep();n++}
-  if(n)render();
+  if(n){
+    /* Symulacja moze isc co godzine, ale calego DOM-u nie trzeba skladac przy
+       kazdym kroku. Wczesniej mapa celow tracila uchwyt i scroll skakal, bo
+       zegar wymuszal pelny render kilka razy na sekunde. Stan swiata zostaje
+       aktualizowany od razu; ekran odswiezamy najwyzej dwa-trzy razy na sekunde
+       albo natychmiast, gdy czeka wydarzenie wymagajace reakcji. */
+    const now=Date.now(),pilne=!!(G.queue&&G.queue.length)||!!G.sitPending||G.phase!=='camp';
+    if(pilne||now-REAL_LAST_RENDER>=420){REAL_LAST_RENDER=now;render()}
+  }
 }
 function realClockStart(){realClockInit();G.realPaused=false;render()}
 function realClockToggle(){
@@ -236,11 +245,15 @@ function endWeek(automatic=false){
   /* Kara szła z tego, że zostały niewydane akcje — a część decyzji akcję zwraca,
      więc odpalała się też komuś, kto zagrał i odzyskał punkt. Liczy się fakt
      zagrania czegokolwiek w tym tygodniu, i tylko to. */
-  if(G.actedWeek!==G.term+'-'+tydzienPrzed){
+  /* Kara sprawdza faktyczny czas ostatniej zatwierdzonej decyzji. Samo pole
+     actedWeek bylo tylko etykietą i po cofnięciu okna potrafiło zostawić pusty
+     tydzień jako wykonany albo odwrotnie. */
+  const mialRuch=Number(G.lastRealActionAt)>=czasGlobalny()-168;
+  if(!mialRuch){
     p.fame=cl(p.fame-1.8);p.act=cl(p.act-2.5);M(p,-4);p.uni=cl(p.uni-1);
     say('<b>Tydzień bez ruchu.</b> Nie zagrałeś ani jednej decyzji, więc kanały partii milczały: sława −1,8, aktywność −2,5, jedność −1.','bad');
   }
-  if(G.actedWeek===G.term+'-'+tydzienPrzed)G.streak=(G.streak||0)+1;
+  if(mialRuch)G.streak=(G.streak||0)+1;
   else G.streak=0;
   if(G.recCd>0)G.recCd--;
   aiProposeLaw();          // premier sterowany przez komputer też składa projekty
