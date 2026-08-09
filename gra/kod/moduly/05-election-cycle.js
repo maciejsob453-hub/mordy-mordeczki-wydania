@@ -585,13 +585,24 @@ function rgb2hsl(r,g,b){r/=255;g/=255;b/=255;
     h=mx===r?(g-b)/d+(g<b?6:0):mx===g?(b-r)/d+2:(r-g)/d+4;h/=6}
   return [h*360,s*100,l*100]}
 const HSL=(h,s,l)=>`hsl(${Math.round(h)} ${Math.round(s)}% ${l.toFixed(1)}%)`;
-const THEMEKEYS=['--bg','--p1','--p2','--p3','--line','--line2','--tx','--dim','--dim2','--glowa','--glowb'];
+const THEMEKEYS=['--bg','--p1','--p2','--p3','--line','--line2','--tx','--dim','--dim2','--glowa','--glowb','--party-theme','--party-theme-soft','--party-theme-deep','--party-theme-ink','--game-accent'];
 function applyTheme(){
   const R=document.documentElement&&document.documentElement.style;
   if(!R||!R.setProperty)return;
-  if(!G||!G.p||!G.p[G.me])return THEMEKEYS.forEach(k=>R.removeProperty(k));
-  const col=G.p[G.me].c, rgb=hex2rgb(col), hs=rgb2hsl(rgb[0],rgb[1],rgb[2]);
+  /* Ekran wyboru partii powstaje jeszcze przed G. WczeĹ›niej motyw byĹ‚ wtedy
+     neutralny, a po wejĹ›ciu do gry nagle zmieniaĹ‚ siÄ™ pod kursorem. Szyld
+     jest jedynym ĹşrĂłdĹ‚em koloru i dziaĹ‚a zarĂłwno dla karuzeli, jak i HUD-u. */
+  const key=G&&G.p&&G.p[G.me]?G.me:(typeof SEL==='string'&&BASE&&BASE[SEL]?SEL:null);
+  if(!key||!BASE||!BASE[key])return THEMEKEYS.forEach(k=>R.removeProperty(k));
+  const col=String((G&&G.p&&G.p[key]&&G.p[key].c)||BASE[key].c||'#d9ab45');
+  const rgb=hex2rgb(col), hs=rgb2hsl(rgb[0],rgb[1],rgb[2]);
   const h=hs[0], sat=x=>Math.min(hs[1],x);
+  const mix=(l,s=45)=>HSL(h,sat(s),l);
+  R.setProperty('--party-theme',col);
+  R.setProperty('--party-theme-soft',`hsla(${Math.round(h)} ${Math.round(sat(54))}% 52% / .18)`);
+  R.setProperty('--party-theme-deep',mix(15,42));
+  R.setProperty('--party-theme-ink',mix(8,34));
+  R.setProperty('--game-accent',col);
   R.setProperty('--bg',   HSL(h,sat(30),5.2));
   R.setProperty('--p1',   HSL(h,sat(24),8.4));
   R.setProperty('--p2',   HSL(h,sat(22),11));

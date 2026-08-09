@@ -146,6 +146,7 @@ function render(){if(PROBA)return;
   if(G.phase==='marszalek')return marScreen();
   if(G.phase==='prez')return prezScreen();
   game();
+  if(!document.getElementById('veil')&&typeof aiMinisterOfferShow==='function')aiMinisterOfferShow();
   if(G.tab==='cele'&&typeof initGoalsMap==='function')setTimeout(initGoalsMap,0);
   setTimeout(fxFlush,10);
   if(dateAnim)setTimeout(runDateAnim,20);

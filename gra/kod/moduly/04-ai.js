@@ -299,6 +299,53 @@ function aiObsadzRade(){
 
 /* Opozycja, która realnie rozlicza rząd: wotum nieufności, a przy bardzo słabym
    gabinecie nawet wniosek o rozwiązanie sejmu. */
+/* Premier sterowany przez komputer nie powinien zawsze zabierac koalicjantom
+   ludzi bez slowa. Od czasu do czasu sklada konkretna propozycje graczowi,
+   tak jak gracz moze zaproponowac kandydata premierowi. To jest oferta, nie
+   teleport ministra: gracz musi ja przyjac, a odmowa ma koszt relacyjny. */
+function aiProponujMinistra(){
+  const g=G&&G.gov;
+  if(!g||!G.pmOk||g.pm===G.me||!g.parties||!g.parties.includes(G.me))return;
+  const now=czasGlobalny();
+  if(G.aiMinisterOffer||G.aiMinisterOfferAt&&now<G.aiMinisterOfferAt)return;
+  const wolne=RESORTY.filter(r=>!radaKto(r.id));
+  if(!wolne.length)return;
+  const kand=roster(me()).filter(n=>!Object.values(G.rada||{}).includes(n)&&!isPrezPerson(n)&&!isMarPerson(n));
+  if(!kand.length)return;
+  const rel=(G.rel[G.me]&&G.rel[G.me][g.pm])||0;
+  const best=kand.slice().sort((a,b)=>(L(b).komp+L(b).autor*.55)-(L(a).komp+L(a).autor*.55))[0];
+  const res=wolne.sort((a,b)=>a.id==='fin'?-1:b.id==='fin'?1:0)[0];
+  const szansa=cl(.18+rel/260+(L(best).komp-50)/240+G.p[g.pm].seats/180,.08,.72);
+  if(!ch(.16))return;
+  G.aiMinisterOfferAt=now+96;
+  G.aiMinisterOffer={pm:g.pm,party:G.me,resort:res.id,nick:best,szansa};
+}
+function aiMinisterOfferReject(o,cicho){
+  if(!o||!G.gov||G.gov.pm!==o.pm){if(!cicho)render();return}
+  const pm=o.pm;
+  if(G.rel[G.me]&&G.rel[G.me][pm]!==undefined){G.rel[G.me][pm]=cl(G.rel[G.me][pm]-4,-100,100);G.rel[pm][G.me]=cl(G.rel[pm][G.me]-4,-100,100)}
+  if(!cicho){say(`<b>Odrzucasz propozycje premiera.</b> ${o.nick} nie obejmuje resortu.`,'bad');render()}
+}
+function aiMinisterOfferAccept(o){
+  const res=RESORTY.find(r=>r.id===o.resort),pm=o&&o.pm;
+  if(!res||!G.gov||G.gov.pm!==pm||radaKto(res.id)||!roster(me()).includes(o.nick))return aiMinisterOfferReject(o);
+  G.rada[res.id]=o.nick;G.radaOd[res.id]={at:czasGlobalny(),t:G.term,w:G.week};
+  G.rel[G.me][pm]=cl((G.rel[G.me][pm]||0)+8,-100,100);G.rel[pm][G.me]=cl((G.rel[pm][G.me]||0)+8,-100,100);
+  say(`<b>Premier powoluje ${o.nick}.</b> Obejmuje resort ${res.n}; relacje z ${G.p[pm].ab} rosna.`,'good');render();
+}
+function aiMinisterOfferShow(){
+  if(PROBA||!G||!G.aiMinisterOffer||document.getElementById('veil'))return;
+  const o=G.aiMinisterOffer;G.aiMinisterOffer=null;
+  const res=RESORTY.find(r=>r.id===o.resort),pm=G.p[o.pm];
+  if(!res||!pm||!G.gov||G.gov.pm!==o.pm)return;
+  modal('Kancelaria premiera','Propozycja obsady resortu',
+    `<p>Premier <b>${esc(pm.lead)}</b> proponuje, by <b>${esc(o.nick)}</b> z twojej partii objal(a) resort <b>${res.n}</b>.</p>
+     <div class="talkmeter"><span>relacja ${Math.round(G.rel[G.me][o.pm]||0)}</span><b>${Math.round(o.szansa*100)}% zgodnosci</b><span>kompetencja ${L(o.nick).komp}</span></div>
+     <p class="dim">To dobrowolna oferta koalicyjna. Przyjecie daje twojej partii udzial w rzadzie i wzmacnia relacje.</p>`,
+    [{l:'Przyjmuje',s:'Kandydat obejmuje resort',f:()=>{close();aiMinisterOfferAccept(o)}},{l:'Odrzucam',s:'Relacje z premierem -4',f:()=>{close();aiMinisterOfferReject(o)}}],
+    ()=>aiMinisterOfferReject(o,true));
+}
+
 function aiOpozycja(){
   const g=G.gov;if(!g||!G.pmOk)return;
   if(G.week<3||G.week>G.weeks-1)return;              // nie na starcie i nie tuż przed urnami

@@ -4,6 +4,16 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.191':{data:'10 sierpnia 2026',zmiany:[
+  'Tematyczny interfejs bierze teraz kolor wybranej partii: Concordia jest fioletowa, PPP zielona, a ramki, naglowki, przyciski i pasek nawigacji trzymaja jeden akcent.',
+  'Szyna kategorii i boczny rejestr dostaly wiecej miejsca. Kondycja partii nie lamie nazw cech na pojedyncze litery, a boczne panele maja wlasne przewijanie zamiast rozpychac cala strone.',
+  'Naprawiono nachodzenie nawigacji na pierwszy naglowek widoku oraz tlo przyciskow w decyzjach, Sadzie, Mediach i Pediach.',
+  'Sad ma teraz prawdziwy uklad kafelkow: sklad, kandydaci i oskarzeni rozciagaja sie w responsywnych kolumnach bez sciskania tekstu.',
+  'Media, Sad i Pedia korzystaja z jednego wygladu zamknietego kanalu, z czytelnym przyciskiem odblokowania.',
+  'Losowe decyzje o pretensjonalnosci, nudzie i wychodzeniu z rzadu nie zapychaja juz kolejki. Zostaly tylko konkretne propozycje od bota, admina albo palacego konfliktu.',
+  'AI moze teraz zaproponowac koalicjantowi konkretnego ministra. Przyjecie wymaga klikniecia i daje relacje, odmowa ma niewielki koszt.',
+  'AI sklada ustawe tylko jako legalny premier albo minister swojego resortu; tekst glosowania rozroznia autora projektu od zaslugi rzadu.'
+ ]},
  '1.1.190':{data:'9 sierpnia 2026',zmiany:[
   'Skladki partii i energia nie skacza juz przy granicy tygodnia, tylko rozliczaja sie w plynnym czasie.',
   'Akcje nie dostaja dodatkowego resetu AP ani limitow przy zmianie daty; odnowa zostaje kroczaca.'

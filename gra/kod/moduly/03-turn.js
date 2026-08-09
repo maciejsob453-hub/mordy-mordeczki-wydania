@@ -2,6 +2,7 @@
 /* ══════════ TURA ══════════ */
 let REAL_TIMER=null;
 let REAL_LAST_RENDER=0;
+const BOT_EVENT_IDS=new Set(['mediacja','sojusz','talent','donacja','prezKonf']);
 function simClockSync(){
   if(!G)return;
   const h=Math.max(0,Math.floor(Number(G.simHour)||0)),kad=G.weeks*168;
@@ -46,7 +47,8 @@ function realtimeDaily(){
     realtimeDriftTick();
     realtimeSituationTick();
     ai();aiGoals();aiAgents();aiTransfery();aiOpozycja();
-    if(G.gov){govTickRealtime();govKontraktTick();aiProposeLaw();aiObsadzRade();aiRekonstrukcja()}
+    if(G.gov){govTickRealtime();govKontraktTick();aiProposeLaw();aiObsadzRade();aiProponujMinistra();aiRekonstrukcja()}
+    if(Array.isArray(G.queue))G.queue=G.queue.filter(e=>e&&BOT_EVENT_IDS.has(e.id));
     if(!G.queue||!G.queue.length)G.queue=buildEvents();
   }
   if(G.simHour%168===0)makeNoise();
@@ -182,7 +184,11 @@ function buildEvents(){
      wyskoczyć, bo rozliczenie premiera z gospodarki ma być jedyną rzeczą,
      na którą gracz wtedy patrzy. */
   if(G.week>=G.weeks)return [];
-  const pool=EV.map(e=>({e,w:e.w()})).filter(x=>x.w>0);
+  /* Kolejka nie jest koszem na losowe kary za sam fakt, ze minal tydzien.
+     Zostaja tylko propozycje od konkretnego bota/admina. Kryzys koalicyjny,
+     pretensjonalnosc, nuda i podobne sprawy maja wynikac z decyzji albo
+     dzialania AI, a nie wyskakiwac graczowi bez przyczyny. */
+  const pool=EV.filter(e=>BOT_EVENT_IDS.has(e.id)).map(e=>({e,w:e.w()})).filter(x=>x.w>0);
   const n=ch(.14)?2:ch(.62)?1:0,q=[];
   for(let i=0;i<n;i++){
     const t=pool.reduce((a,x)=>a+x.w,0);if(!t)break;
@@ -354,6 +360,7 @@ function endWeek(automatic=false){
   if(G.recCdAt===undefined&&G.recCd>0)G.recCd--;
   aiProposeLaw();          // premier sterowany przez komputer też składa projekty
   aiObsadzRade();          // i sam obsadza ministerstwa, zamiast trzymać puste krzesła
+  aiProponujMinistra();    // czasem prosi koalicjanta o własnego kandydata
   aiRekonstrukcja();       // a niewygodnego koalicjanta potrafi wyrzucić
   aiOpozycja();            // opozycja rozlicza rząd bez czekania na gracza
   histPush();SFX.week();

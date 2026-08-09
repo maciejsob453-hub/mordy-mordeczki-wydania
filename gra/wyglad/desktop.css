@@ -526,3 +526,60 @@ body:not(:has(.mg)):has(.hud) #app .tipbox{min-width:280px;max-width:min(360px,c
 body:not(:has(.mg)):has(.hud) #app .tipbox .l{min-width:0;align-items:flex-start}
 body:not(:has(.mg)):has(.hud) #app .tipbox .l span{min-width:0;word-break:normal;overflow-wrap:break-word;white-space:normal}
 @media(max-width:720px){body:not(:has(.mg)):has(.hud) .goals-map-frame{min-height:430px}body:not(:has(.mg)):has(.hud) .goals-map-grid{min-width:720px}body:not(:has(.mg)):has(.hud) .goals-map-grid .goal-node-wrap{flex-basis:190px;width:190px}}
+
+/* 1.1.191: motyw partii i geometria centrum gry.
+   Kilka starszych warstw zwÄ™ĹĽaĹ‚o szynÄ™ oraz boczny rejestr do kolumny, w ktĂłrej
+   nazwy cech rozpadaĹ‚y siÄ™ na pojedyncze litery. Kolor partii jest akcentem
+   caĹ‚ej kancelarii, ale sygnaĹ‚y dobra i zĹ‚a zostajÄ… zielone/czerwone. */
+@supports selector(:has(*)){
+  body:has(.hud) .wrap:has(>.nav){grid-template-columns:240px minmax(0,1fr)!important;max-width:min(1980px,98vw)!important;column-gap:24px!important}
+  body:has(.hud) .wrap>.nav{width:240px;min-width:240px;max-height:calc(100vh - 26px);padding-top:12px!important;padding-bottom:24px!important;overflow-y:auto;overflow-x:hidden;z-index:8}
+  body:has(.hud) .wrap>.nav button{min-height:38px;padding:9px 14px!important;white-space:normal;line-height:1.2;overflow-wrap:anywhere;font-size:11px!important}
+  body:has(.hud) .layout{grid-template-columns:minmax(360px,390px) minmax(0,1fr)!important;gap:24px!important;position:relative;z-index:1}
+  body:has(.hud) .sidebar{max-height:calc(100vh - 154px);overflow-y:auto;overflow-x:visible;padding-right:5px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--party-theme,var(--acc)) rgba(0,0,0,.25)}
+  body:has(.hud) .sidebar>.card{min-width:0;width:100%}
+  body:has(.hud) .sidebar>.kond #paskiCech{grid-template-columns:repeat(2,minmax(150px,1fr))!important;gap:8px}
+  body:has(.hud) .sidebar>.kond #paskiCech .st{min-width:0;overflow:hidden}
+  body:has(.hud) .sidebar>.kond #paskiCech .st .l>span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;font-size:12px}
+  body:has(.hud) .sidebar>.kond #paskiCech .odczyt{white-space:nowrap;flex:none}
+  body:has(.hud) .sidebar>.kond .trk{min-width:0}
+}
+/* Kategorie nie wchodzÄ… na pierwszy nagĹ‚Ăłwek widoku. */
+body:has(.hud) .nav{position:relative!important;top:auto!important;z-index:8!important;margin-bottom:18px!important}
+body:has(.hud) .nav button{z-index:9!important}
+body:has(.hud) .layout,.widok,.sidebar{isolation:isolate}
+
+/* Ciemne przyciski pozostajÄ… przyciskami, nie samym tekstem na tle. */
+body:has(.hud) .widok .opt,body:has(.hud) .widok .cats button,body:has(.hud) .widok .act button,body:has(.hud) .widok .lawbtn,body:has(.hud) .widok .wcard button,body:has(.hud) .widok .sadoskarzeni button,body:has(.hud) .widok .sadkand button{
+  border:1px solid color-mix(in srgb,var(--party-theme,var(--acc)) 44%,var(--line2))!important;background:linear-gradient(180deg,color-mix(in srgb,var(--party-theme,var(--acc)) 13%,var(--p2)),var(--p1))!important;color:var(--tx);box-shadow:inset 0 1px rgba(255,255,255,.06),0 4px 12px -10px #000}
+body:has(.hud) .widok .opt:hover:not(:disabled),body:has(.hud) .widok .cats button:hover,body:has(.hud) .widok .act button:hover:not(:disabled),body:has(.hud) .widok .lawbtn:hover:not(:disabled),body:has(.hud) .widok .wcard button:hover:not(:disabled){border-color:var(--party-theme,var(--acc))!important;background:linear-gradient(180deg,color-mix(in srgb,var(--party-theme,var(--acc)) 24%,var(--p2)),var(--p1))!important}
+
+/* SÄ…d jest jednÄ… ramÄ…, a nie trzema Ĺ›ciĹ›niÄ™tymi paskami. */
+body:has(.hud) .widok[data-tab="sad"] .sadekran{display:grid!important;grid-template-columns:minmax(0,1fr)!important;min-width:0}
+body:has(.hud) .widok[data-tab="sad"] .sadkolumny{display:grid!important;grid-template-columns:minmax(330px,1.05fr) minmax(330px,.95fr)!important;gap:16px;min-width:0;align-items:start}
+body:has(.hud) .widok[data-tab="sad"] .sadkolumny>.card,body:has(.hud) .widok[data-tab="sad"] .sadekran>.card{min-width:0;width:100%;overflow:hidden}
+body:has(.hud) .widok[data-tab="sad"] .sadkand,body:has(.hud) .widok[data-tab="sad"] .sadoskarzeni{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));min-width:0;max-height:none}
+body:has(.hud) .widok[data-tab="sad"] .sadkand button,body:has(.hud) .widok[data-tab="sad"] .sadoskarzeni button{min-width:0;overflow:hidden}
+body:has(.hud) .widok[data-tab="sad"] .sadkand span,body:has(.hud) .widok[data-tab="sad"] .sadoskarzeni span{min-width:0;overflow-wrap:anywhere}
+body:has(.hud) .widok[data-tab="sad"] .sadhist{overflow:auto;max-height:340px}
+
+/* Media, SÄ…d i Pedia majÄ… wspĂłlny ekran blokady. */
+body:has(.hud) .sadzamkniety,body:has(.hud) .mediazamkniete,body:has(.hud) .mordelock{min-height:calc(100vh - 190px);height:auto!important;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:12px;padding:30px 34px!important;overflow:hidden;border:1px solid color-mix(in srgb,var(--party-theme,var(--acc)) 42%,var(--line2))!important;background:linear-gradient(135deg,color-mix(in srgb,var(--party-theme,var(--acc)) 12%,var(--p2)),var(--p1))!important}
+body:has(.hud) .sadzamkniety>.b,body:has(.hud) .mediazamkniete>.b{width:min(760px,100%);padding:0!important}
+body:has(.hud) .sadzamkniety .sadhero,body:has(.hud) .mediazamkniete .sadhero{width:100%;min-height:160px;margin:0!important}
+body:has(.hud) .sadzamkniety .btn,body:has(.hud) .mediazamkniete .btn,body:has(.hud) .mordelock .btn{background:linear-gradient(180deg,color-mix(in srgb,var(--party-theme,var(--acc)) 76%,#fff 10%),color-mix(in srgb,var(--party-theme,var(--acc)) 46%,#070b08))!important;border-color:var(--party-theme,var(--acc))!important;color:#fff!important}
+@media(max-width:1180px){body:has(.hud) .widok[data-tab="sad"] .sadkolumny{grid-template-columns:1fr!important}body:has(.hud) .sidebar{max-height:none;overflow:visible;padding-right:0}}
+@media(max-width:900px){body:has(.hud) .wrap:has(>.nav){grid-template-columns:1fr!important}body:has(.hud) .wrap>.nav{width:auto;min-width:0;max-height:none}body:has(.hud) .layout{grid-template-columns:1fr!important}}
+
+/* Akcent partii musi byc widoczny takze tam, gdzie starsza warstwa wpisywala
+   na sztywno mosiadz. */
+body:has(.hud) .card>.h{border-bottom-color:color-mix(in srgb,var(--party-theme,var(--acc)) 48%,var(--line))!important;background:linear-gradient(90deg,color-mix(in srgb,var(--party-theme,var(--acc)) 14%,transparent),transparent 72%)!important}
+body:has(.hud) .card>.h h3,body:has(.hud) .kick,body:has(.hud) .podnag h2{color:color-mix(in srgb,var(--party-theme,var(--acc)) 68%,#fff 32%)!important}
+body:has(.hud) .nav button.on{color:var(--party-theme,var(--acc))!important;box-shadow:inset 0 -3px 0 var(--party-theme,var(--acc))!important}
+body:has(.hud) .nav button.on:before{background:var(--party-theme,var(--acc))!important}
+body:has(.hud) .hud .datechip,body:has(.hud) .hud .rtclock-command{border-color:color-mix(in srgb,var(--party-theme,var(--acc)) 62%,var(--line2))!important;box-shadow:inset 0 1px rgba(255,255,255,.08),0 0 18px -12px var(--party-theme,var(--acc))!important}
+body:has(.hud) .hud .datechip b,body:has(.hud) .hud .rtclock-command .rtclock-date b{color:color-mix(in srgb,var(--party-theme,var(--acc)) 58%,#fff 42%)!important}
+body:has(.hud) .btn:not(.g):not(.r),body:has(.hud) .goals-action.primary{background:linear-gradient(180deg,color-mix(in srgb,var(--party-theme,var(--acc)) 78%,#fff 14%),color-mix(in srgb,var(--party-theme,var(--acc)) 50%,#161008))!important;border-color:color-mix(in srgb,var(--party-theme,var(--acc)) 76%,#fff 10%)!important}
+body:has(.hud) .btn:not(.g):not(.r):hover{filter:brightness(1.12)}
+body:has(.partyselect) .partyselect.fifa>.pickmain{border-color:color-mix(in srgb,var(--party-theme,var(--acc)) 62%,var(--line2))!important;box-shadow:0 18px 42px rgba(0,0,0,.48),0 0 38px -26px var(--party-theme,var(--acc))!important}
+body:has(.partyselect) .partyselect.fifa .pickstart,body:has(.partyselect) .partyselect.fifa .pickcell.on{background:var(--party-theme,var(--acc))!important;border-color:var(--party-theme,var(--acc))!important}

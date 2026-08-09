@@ -977,12 +977,12 @@ function aiProposeLaw(){
      Bot z resortem Finansów sięga po ustawę o podatkach tak samo jak ty. */
   const zglaszajacy=[];
   const pmK=G.gov.pm;
-  if(pmK&&pmK!==G.me&&G.p[pmK]&&!G.p[pmK].dead)
+  if(pmK&&pmK!==G.me&&G.gov.pm===pmK&&G.gov.parties.includes(pmK)&&G.p[pmK]&&!G.p[pmK].dead)
     zglaszajacy.push({k:pmK,pula:wolne,rola:3,co:2});
   alive().forEach(k=>{
     if(k===G.me||k===pmK||!G.p[k]||G.p[k].dead)return;
     const resorty=RESORTY.filter(r=>{const n=radaKto(r.id);return n&&partiaOsoby(n)===k}).map(r=>r.id);
-    const pula=wolne.filter(l=>l.resort&&resorty.includes(l.resort));
+    const pula=G.gov.parties.includes(k)?wolne.filter(l=>l.resort&&resorty.includes(l.resort)):[];
     if(pula.length)zglaszajacy.push({k,pula,rola:2,co:3});
     /* Gdy premierem jest gracz i nie oddał resortów botom, sejm nadal żyje.
        Najsilniejsza partia opozycyjna może złożyć projekt poselski. */
@@ -1041,7 +1041,7 @@ function openGlosowanie(law,opcje,pm){
   const nast=opcje?Object.keys(opcje).map(k=>`${LAWPAR[law.id].opis[k]}: <b>${opcje[k]}${k==='prog'?'%':''}</b>`).join(' · '):'';
   const rad=radykalnosc(law.id,opcje);
   modal('Sejm głosuje',law.n,
-    `<p><b>${G.p[pm].ab}</b> kieruje pod głosowanie ustawę, którą firmuje ${G.p[pm].lead}.
+    `<p><b>${G.p[pm].ab}</b> kieruje pod głosowanie ustawę, którą wnosi ${G.p[pm].lead}.
      ${G.gov&&G.pmOk&&G.gov.pm!==pm?`Projekt idzie spoza gabinetu — jeśli przejdzie,
        najwięcej zapisze sobie premier <b>${G.p[G.gov.pm].ab}</b>.`
       :'To projekt rządowy.'}</p>
