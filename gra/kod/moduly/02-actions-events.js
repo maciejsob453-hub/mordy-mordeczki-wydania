@@ -2,7 +2,19 @@
 /* ══════════ AKCJE ══════════ */
 /* Zmęczenie decyzją. Ta sama zagrywka powtarzana w kółko przestaje działać
    znacznie szybciej niż kiedyś — samo klikanie w to samo nie buduje już poparcia. */
-function fat(id){return Math.max(BAL.zmeczenieDno,1-BAL.zmeczenieKrok*(G.used[id]||0))}
+function ostatnieUzycia(id){
+  if(!G)return [];
+  if(!G.usedTimes)G.usedTimes={};
+  const arr=Array.isArray(G.usedTimes[id])?G.usedTimes[id]:[];
+  /* Stare zapisy miały tylko licznik. Zachowujemy go do pierwszego nowego
+     ruchu, a potem przechodzimy na prawdziwy rolling tydzień. */
+  if(!arr.length&&Number(G.used&&G.used[id])>0&&!G.usedTimes[id]){
+    G.usedTimes[id]=Array.from({length:Math.max(0,Math.round(G.used[id]))},()=>czasGlobalny());
+  }else G.usedTimes[id]=arr.filter(t=>czasGlobalny()-Number(t)<168);
+  G.used[id]=G.usedTimes[id].length;
+  return G.usedTimes[id];
+}
+function fat(id){return Math.max(BAL.zmeczenieDno,1-BAL.zmeczenieKrok*ostatnieUzycia(id).length)}
 function sizeF(p){ // im większa partia, tym drożej się nią rusza: decyzja to koszt dla całej struktury
   const kp=Math.round(cl(.38+p.mem*.031,.38,2.7)*100)/100;
   if(p.mem<8) return {kp,fame:1.60,en:.72,lab:'zwinność kanapowej partii'};
@@ -47,8 +59,21 @@ function kategoriaUzyta(cat){
   const teraz=czasGlobalny(),stare=Array.isArray(G.catTimes[cat])?G.catTimes[cat]:[];
   G.catTimes[cat]=stare.filter(t=>teraz-t<168);
   G.catUsed=G.catUsed||{};
-  G.catUsed[cat]=G.catTimes[cat].length||(G.catUsed[cat]||0);
+  /* Po siedmiu dniach rolling limit ma naprawdę spaść do zera. Stare poleganie
+     na poprzednim G.catUsed zostawiało blokadę aż do granicy tygodnia. */
+  G.catUsed[cat]=G.catTimes[cat].length;
   return G.catUsed[cat];
+}
+function shameAktywne(){
+  if(!G||!G.shame)return false;
+  const v=Number(G.shame)||0;
+  /* Stare zapisy trzymały numer tygodnia, nowe trzymają godzinę wygaśnięcia. */
+  return v<168?v>Number(G.week||0):v>czasGlobalny();
+}
+function rekrutacjaDni(){
+  if(!G)return 0;
+  if(Number.isFinite(Number(G.recCdAt)))return Math.max(0,Math.ceil((Number(G.recCdAt)-czasGlobalny())/24));
+  return Math.max(0,Math.round(Number(G.recCd)||0)*7);
 }
 function kategoriaPozostala(cat){
   if(!G||cat==='spe')return 0;
@@ -277,7 +302,7 @@ const A=[
     say(`<b>Administracja rozwiązuje ${o.n}.</b> Kanał zarchiwizowany, rola usunięta. Serwer wie, kto to zgłosił.`,'roy');
     return `<b>${o.ab} znika z serwera.</b> Kontrowersja +26, a reszta sceny patrzy na ciebie inaczej.`}
   p.ctr=cl(p.ctr+34);p.cred=cl(p.cred-14);p.fame=cl(p.fame-6);M(p,-16);
-  G.shame=G.week+6;
+  G.shame=czasGlobalny()+6*168;
   G.rel[G.me][t]=cl(G.rel[G.me][t]-40,-100,100);G.rel[t][G.me]=cl(G.rel[t][G.me]-40,-100,100);
   alive().forEach(k=>{if(k===G.me||k===t)return;G.rel[k][G.me]=cl(G.rel[k][G.me]-12,-100,100)});
   return `<b>Administracja odrzuciła zgłoszenie</b>, ale wyciekło, kto je złożył. Kontrowersja +34, wszyscy patrzą krzywo.`}},
@@ -379,7 +404,7 @@ const A=[
     REG.forEach(r=>p.pres[r.id]=cl(p.pres[r.id]-12));
     G.rel[G.me][t]=cl(G.rel[G.me][t]-25,-100,100);
     alive().forEach(x=>{if(x!==G.me)G.rel[G.me][x]=cl(G.rel[G.me][x]-9,-100,100)});
-    G.shame=G.week+6;
+    G.shame=czasGlobalny()+6*168;
     return `<b>Wykryto twoich ludzi.</b> Sława −${Math.round(d)}, wiarygodność −20, kontrowersja +26. Zostały ci publiczne przeprosiny.`}
   o.fame=cl(o.fame-R(9,15));o.act=cl(o.act-R(10,17));o.uni=cl(o.uni-7);M(o,-13);
   REG.forEach(r=>o.pres[r.id]=cl(o.pres[r.id]*.72));
@@ -489,7 +514,7 @@ const EV=[
 {id:'sojusz',w:()=>3,k:'Dyplomacja',t:'Ktoś proponuje układ',dyn:1,
  build(){const c=alive().filter(k=>k!==G.me).sort((a,b)=>G.rel[b][G.me]-G.rel[a][G.me])[0];
   return {x:`<b>${G.p[c].lead}</b> pisze na priv: „Nie musimy się lubić, ale możemy sobie nie przeszkadzać przez kilka tygodni”.`,
-   o:[{l:'Przyjmuję',s:'Pakt na 6 tygodni, relacje +18',f:p=>{p.pact[c]=G.week+6;G.rel[G.me][c]=cl(G.rel[G.me][c]+18,-100,100);G.rel[c][G.me]=cl(G.rel[c][G.me]+18,-100,100);return `Pakt z ${G.p[c].ab}.`}},
+   o:[{l:'Przyjmuję',s:'Pakt na 6 tygodni, relacje +18',f:p=>{p.pact[c]=czasGlobalny()+6*168;G.rel[G.me][c]=cl(G.rel[G.me][c]+18,-100,100);G.rel[c][G.me]=cl(G.rel[c][G.me]+18,-100,100);return `Pakt z ${G.p[c].ab}.`}},
       {l:'Odmawiam i publikuję',s:'Sława +5, relacje −25',f:p=>{p.fame=cl(p.fame+5);p.ctr=cl(p.ctr+8);G.rel[G.me][c]=cl(G.rel[G.me][c]-25,-100,100);return 'Serwer się uśmiał. Oni nie.'}},
       {l:'Odmawiam grzecznie',s:'Relacje −5',f:p=>{G.rel[G.me][c]=cl(G.rel[G.me][c]-5,-100,100);return 'Bez awantury.'}}]}}},
 {id:'mem',w:()=>3,k:'Serwer',t:'Twoja partia w memie',

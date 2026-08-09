@@ -261,7 +261,9 @@ function endWeek(automatic=false){
   // gospodarka rusza się raz na tydzień, po rozliczeniu daniny
   if(G.realTimeEconomy!==true)pkbTydzien();
   G.en=cl(G.en+enGain());
-  Object.keys(G.used).forEach(k=>{if(ch(.42))G.used[k]=Math.max(0,G.used[k]-1)});
+  /* Zmęczenie decyzji wygasa rollingowo po 168 godzinach w ostatnieUzycia().
+     Nie losujemy już raz na granicy tygodnia, bo to było kolejne ukryte
+     „odświeżenie tury”. */
   // Tygodniowy ruch jest drobny i tylko uzupełnia to, co naprawdę liczy się przy
   // rozliczeniu kadencji — patrz demografiaSerwera().
   const total=PID.reduce((a,k)=>a+G.p[k].mem,0)+freeTot();
@@ -280,7 +282,7 @@ function endWeek(automatic=false){
   }
   if(mialRuch)G.streak=(G.streak||0)+1;
   else G.streak=0;
-  if(G.recCd>0)G.recCd--;
+  if(G.recCdAt===undefined&&G.recCd>0)G.recCd--;
   aiProposeLaw();          // premier sterowany przez komputer też składa projekty
   aiObsadzRade();          // i sam obsadza ministerstwa, zamiast trzymać puste krzesła
   aiRekonstrukcja();       // a niewygodnego koalicjanta potrafi wyrzucić

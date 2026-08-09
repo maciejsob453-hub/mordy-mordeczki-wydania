@@ -229,15 +229,20 @@ const agentFree=n=>!(G&&G.agents&&G.agents[n]);
 const AGENCI_NA_KADENCJE=2;
 const agenciWziete=()=>(G&&G.agentTerm&&G.agentTerm.t===G.term)?G.agentTerm.n:0;
 const agenciZostalo=()=>Math.max(0,AGENCI_NA_KADENCJE-agenciWziete());
+const agentCooldownDni=()=>{
+  if(!G)return 0;
+  if(Number.isFinite(Number(G.agentAt)))return Math.max(0,Math.ceil((Number(G.agentAt)+168-czasGlobalny())/24));
+  return G.agentWeek===G.term+'-'+G.week?7:0;
+};
 function agentCost(n,k){const a=AGENTS.find(x=>x.n===n);if(!a)return 0;
   return Math.round(a.kp*(k?1:sizeF(me()).kp))}
 function signAgent(n){
   const a=AGENTS.find(x=>x.n===n);if(!a||!agentFree(n))return;
-  if(G.agentWeek===G.term+'-'+G.week)return;
+  if(agentCooldownDni()>0)return;
   if(!agenciZostalo())return;
   const c=agentCost(n);if(G.kp<c)return;
   const p=me();
-  G.kp-=c;G.agents[n]=G.me;G.agentWeek=G.term+'-'+G.week;SFX.coin();
+  G.kp-=c;G.agents[n]=G.me;G.agentAt=czasGlobalny();G.agentWeek=G.term+'-'+G.week;SFX.coin();
   G.agentTerm=(G.agentTerm&&G.agentTerm.t===G.term)?{t:G.term,n:G.agentTerm.n+1}:{t:G.term,n:1};
   p.comp[a.seg]++;p.mem++;
   if(!p.bench.includes(n))p.bench.push(n);
@@ -611,10 +616,10 @@ function newGame(id){
     const cb=(()=>{for(const c in COAL0)if(COAL0[c].m.includes(b))return c;return null})();
     let v=RI(-8,26); if(ca&&ca===cb) v+=RI(30,46); rel[a][b]=v})});
   G={me:id,p,rel,coal:startCoal,term:1,week:1,weeks:12,ap:3,apMax:3,kp:26,en:100,
-     sztab:5,sztabMax:5,log:[],used:{},once:{},tab:'mapa',cat:'kam',sel:'ogolny',
+     sztab:5,sztabMax:5,log:[],used:{},usedTimes:{},once:{},tab:'mapa',cat:'kam',sel:'ogolny',
      gov:null,pmOk:false,pmProc:null,premierProposalTerm:null,queue:[],phase:'camp',prest:0,hist:[],prev:null,
-     turnout:.85,lup:{},recCd:0,xp:0,xpOs:{},traits:[],ptraits:{},tut:null,tutSeen:{},streak:0,noise:{},useTerm:{},catUsed:{},lastAct:null,
-     king:{rel:52,paid:0}, sejmPrez:null, mar:null, goals:{}, nationalGoals:{}, partyCouncil:null, agents:{}, agentWeek:null, sits:[], polls:[], scen:null,catTimes:{},
+     turnout:.85,lup:{},recCd:0,recCdAt:null,xp:0,xpOs:{},traits:[],ptraits:{},tut:null,tutSeen:{},streak:0,noise:{},useTerm:{},catUsed:{},lastAct:null,
+     king:{rel:52,paid:0}, sejmPrez:null, mar:null, goals:{}, nationalGoals:{}, partyCouncil:null, agents:{}, agentWeek:null,agentAt:null, sits:[], polls:[], scen:null,catTimes:{},
      rng:RNG_STATE,aiMemory:{},aiLedger:[],
      /* Simulowany kalendarz: decyzje przesuwają dzień, a luka tygodnia nadal
         pozostaje cotygodniowym limitem akcji i rozliczeń. */

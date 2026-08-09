@@ -179,13 +179,17 @@ function radaKto(id){radaInit();return G.rada[id]||null}
    z dnia na dzień — rada ministrów to nie ławka rezerwowych, a każda roszada
    kosztuje rząd wiarygodność. */
 const KARENCJA=3;
-function ministerStaz(id){
+function ministerStazGodz(id){
   radaInit();
   const od=G.radaOd[id];
-  if(!od)return 99;
-  return (G.term-od.t)*12+(G.week-od.w);
+  if(!od)return 99999;
+  if(Number.isFinite(Number(od.at)))return Math.max(0,czasGlobalny()-Number(od.at));
+  return Math.max(0,((G.term-(od.t||G.term))*12+(G.week-(od.w||G.week)))*168);
 }
-const ministerBlokada=id=>Math.max(0,KARENCJA-ministerStaz(id));
+function ministerStaz(id){
+  return Math.floor(ministerStazGodz(id)/168);
+}
+const ministerBlokada=id=>Math.max(0,Math.ceil((KARENCJA*168-ministerStazGodz(id))/168));
 /* Minister musi być żywą osobą z istniejącej partii. Ludzie odchodzą z zaplecza
    do bezpartyjnych i dają się podkupić konkurencji — a ich resort zostawał
    podpisany nazwiskiem, którego nie ma już w żadnym składzie. */
@@ -297,7 +301,7 @@ function obsadz(id,nick,zPartii,fromTalk){
   }
   if(nick){
     G.rada[id]=nick;
-    if(stary!==nick)G.radaOd[id]={t:G.term,w:G.week};   // od tego tygodnia liczy się staż
+    if(stary!==nick)G.radaOd[id]={at:czasGlobalny(),t:G.term,w:G.week};   // od tej godziny liczy się staż
     if(zPartii){
       G.rel[G.me][zPartii]=cl(G.rel[G.me][zPartii]+10,-100,100);
       G.rel[zPartii][G.me]=cl(G.rel[zPartii][G.me]+10,-100,100);

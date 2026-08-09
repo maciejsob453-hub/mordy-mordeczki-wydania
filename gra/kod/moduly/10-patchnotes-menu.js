@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.188':{data:'9 sierpnia 2026',zmiany:[
+  'Cooldown kategorii, transferow, rekrutacji i wpadek liczy teraz godziny, a nie ukryty reset tygodnia.',
+  'Zmeczenie powtarzanej decyzji wygasa po siedmiu dniach od jej wykonania zamiast losowo na granicy tygodnia.',
+  'Kadencja ministra i pakty dyplomatyczne trzymaja prawdziwa date rozpoczecia, takze po wczytaniu starego zapisu.',
+ ]},
  '1.1.187':{data:'9 sierpnia 2026',zmiany:[
   'Ekonomia rozlicza sie teraz codziennie podczas plyniecia czasu, a nie tylko na granicy tygodnia.',
   'Utrzymanie mediow i odsetki od dlugu sa naliczane ulamkowo, bez podwojnego kosztu przy tickach AI.',

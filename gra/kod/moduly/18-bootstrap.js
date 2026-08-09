@@ -55,7 +55,9 @@ function loadCode(code){
   /* Zapis ze starszego wydania nie zna pól, które doszły później. Bez tego gra
      wywracała się przy pierwszym kliknięciu na „G.useTerm.stery” — a to znaczy,
      że gracz tracił rozgrywkę tylko dlatego, że wyszła nowa wersja. */
-  G.useTerm=G.useTerm||{};G.catUsed=G.catUsed||{};G.once=G.once||{};G.used=G.used||{};G.tydz2Times=G.tydz2Times||{};G.lastRealActionAt=Number.isFinite(G.lastRealActionAt)?G.lastRealActionAt:null;G.decisionLog=Array.isArray(G.decisionLog)?G.decisionLog:[];
+  G.useTerm=G.useTerm||{};G.catUsed=G.catUsed||{};G.once=G.once||{};G.used=G.used||{};G.usedTimes=G.usedTimes||{};G.tydz2Times=G.tydz2Times||{};G.lastRealActionAt=Number.isFinite(G.lastRealActionAt)?G.lastRealActionAt:null;G.decisionLog=Array.isArray(G.decisionLog)?G.decisionLog:[];
+  if(G.agentAt===undefined&&G.agentWeek===G.term+'-'+G.week)G.agentAt=czasGlobalny();
+  if(G.recCdAt===undefined&&Number(G.recCd)>0)G.recCdAt=czasGlobalny()+Number(G.recCd)*168;
   if(G.premierProposalTerm===undefined)G.premierProposalTerm=null;
   G.catTimes=G.catTimes||{};
   /* Media zapisywały ostatnią publikację jako numer tygodnia. Zegar ciągły

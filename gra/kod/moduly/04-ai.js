@@ -35,6 +35,11 @@ function aiProfil(k){
 }
 const charOf=k=>aiProfil(k);
 const aiAgenda=k=>aiProfil(k).agenda||[];
+const paktAktywny=(p,k)=>{
+  const v=Number(p&&p.pact&&p.pact[k]||0);
+  if(!v)return false;
+  return v>=168?v>czasGlobalny():v>Number(G.week||0);
+};
 function aiPamiec(k){
   if(!G.aiMemory)G.aiMemory={};const m=G.aiMemory[k]||(G.aiMemory[k]={wrog:null,sojusznik:null,zdrady:{},wpisy:[]}),inni=alive().filter(x=>x!==k);
   m.wpisy=Array.isArray(m.wpisy)?m.wpisy:[];
@@ -164,7 +169,7 @@ function ai(){
         // partie AI również prowadzą akcje sabotażowe
         const tg2=[aiCel(k,8)].filter(Boolean);
         if(tg2.length){const t2=tg2[0];
-          if(!(t2===G.me&&me().pact[k]>G.week)){
+          if(!(t2===G.me&&paktAktywny(me(),k))){
             if(ch(.62)){const o=G.p[t2];o.fame=cl(o.fame-R(5,10));o.act=cl(o.act-R(6,12));
               REG.forEach(r2=>o.pres[r2.id]=cl(o.pres[r2.id]*.82));M(o,-6);
               if(typeof sadTrop==='function')sadTrop(k,18+p.ctr*.12);
@@ -179,7 +184,7 @@ function ai(){
       else if(ruch==='atak'&&p.ctr<70){
         const tg=[aiCel(k,12)].filter(Boolean);
         if(tg.length){const t=tg[0];
-          if(t===G.me&&me().pact[k]>G.week)continue;
+          if(t===G.me&&paktAktywny(me(),k))continue;
           if(ch(.62)){const o=G.p[t];o.fame=cl(o.fame-R(1.5,4));o.cred=cl(o.cred-R(1,3.5));p.ctr=cl(p.ctr+4);
             if(typeof sadTrop==='function')sadTrop(k,10+p.ctr*.08);
             const pm=aiPamiec(t);pm.zdrady[k]=(pm.zdrady[k]||0)+1;

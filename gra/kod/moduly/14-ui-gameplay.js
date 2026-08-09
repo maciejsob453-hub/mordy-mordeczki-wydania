@@ -316,14 +316,14 @@ function actCards(list,fx){
   return list.map(a=>{
     const f=fat(a.id),done=a.once&&G.once[a.id];
     const usedT=(a.term1&&G.useTerm[a.id]);
-    const noShame=a.shame&&!(G.shame&&G.shame>G.week);
+    const noShame=a.shame&&!shameAktywne();
     const catFull=a.cat!=='spe'&&kategoriaUzyta(a.cat)>=1;
     const catLeft=catFull?kategoriaPozostala(a.cat):0;
     const cdDo=(G.odnowy&&G.odnowy[a.id])||0, cd=cdDo>czasGlobalny();
     // decyzje z limitem tygodniowym (regeneracja): dwa razy i koniec
     const limT=!!a.tydz2&&limit2Uzyte(a)>=2;
     const kpC=Math.round(a.kp*sizeF(me()).kp*inflacja());   // cena z uwzględnieniem inflacji
-    const ok=G.ap>=a.ap&&G.kp>=kpC&&(a.en<0||G.en>=a.en)&&!done&&!usedT&&!limT&&!catFull&&!noShame&&!cd&&!(a.id==='rekr'&&G.recCd>0);
+    const ok=G.ap>=a.ap&&G.kp>=kpC&&(a.en<0||G.en>=a.en)&&!done&&!usedT&&!limT&&!catFull&&!noShame&&!cd&&!(a.id==='rekr'&&rekrutacjaDni()>0);
     const col=CATCOL[a.cat]||'var(--line2)';
     const cb=G.lastAct&&COMBO.find(c=>c.a===G.lastAct&&c.b===a.id);
     const katN=(CATS.find(x=>x[0]===a.cat)||['',''])[1]||'Ta kategoria';
@@ -332,7 +332,7 @@ function actCards(list,fx){
       :limT?'wykorzystane dwa razy w ostatnich 7 dniach'
       :catFull?`kategoria ${katN} wróci za ${Math.max(1,Math.ceil(catLeft/24))} ${pl(Math.max(1,Math.ceil(catLeft/24)),'dzień','dni','dni')}`
       :cd?`odnowa za ${Math.max(1,Math.ceil((cdDo-czasGlobalny())/24))} ${pl(Math.max(1,Math.ceil((cdDo-czasGlobalny())/24)),'dzień','dni','dni')}`
-      :noShame?'dostępne tylko tuż po wpadce':(a.id==='rekr'&&G.recCd>0)?`nabór wraca za ${G.recCd} ${pl(G.recCd,'tydzień','tygodnie','tygodni')}`
+      :noShame?'dostępne tylko tuż po wpadce':(a.id==='rekr'&&rekrutacjaDni()>0)?`nabór wraca za ${rekrutacjaDni()} ${pl(rekrutacjaDni(),'dzień','dni','dni')}`
       :G.ap<a.ap?'za mało akcji':G.kp<kpC?'za mało kapitału':(a.en>0&&G.en<a.en)?'za mało energii':'';
     const wym=[a.reg?'okręg':'',a.tem?'temat':'',a.tgt?'cel':'',a.seg?'grupa':''].filter(Boolean);
     return `<button class="act" ${ok?'':'disabled'} style="--ac:${col}" onclick="doAct('${a.id}')"
@@ -602,7 +602,7 @@ const PODG_CECHY=[['fame','Sława'],['cred','Wiarygodność'],['uni','Jedność'
 let podgladCache={};
 function przewidz(id){
   const a=A.find(x=>x.id===id); if(!a||!a.f||!G)return null;
-  const klucz=id+'|'+G.term+'-'+G.week+'|'+Math.round(me().fame)+'|'+(G.used[id]||0);
+    const klucz=id+'|'+czasGlobalny()+'|'+Math.round(me().fame)+'|'+(G.used[id]||0);
   if(podgladCache[klucz])return podgladCache[klucz];
 
   const kopiaG=JSON.stringify(G), prawdziwe=G, rngPrawdziwe=RNG_STATE;
@@ -714,14 +714,15 @@ function actTab(){
 function agentBox(){
   const wolni=AGENTS.filter(a=>agentFree(a.n)), moi=AGENTS.filter(a=>G.agents[a.n]===G.me);
   const zostalo=agenciZostalo();
-  const blok=G.agentWeek===G.term+'-'+G.week||!zostalo;
+  const agentOstatni=agentCooldownDni();
+  const blok=agentOstatni>0||!zostalo;
   return `<div class="card" style="margin-top:14px"><div class="h"><h3>Transfery bezpartyjnych</h3>
     <span class="n">${wolni.length} ${pl(wolni.length,'wolny','wolnych','wolnych')} · ${moi.length} u ciebie ·
       <b style="color:${zostalo?'var(--acc)':'var(--neg)'}">${zostalo}/${AGENCI_NA_KADENCJE}</b> w kadencji</span></div><div class="b">
     <div class="note" style="margin:0 0 13px">Poza partiami chodzi po serwerze kilka osób, które da się ściągnąć czystym kapitałem, bez akcji i bez zgody kogokolwiek.
     <b>Dwa transfery na kadencję</b>, najwyżej jeden na tydzień.
     ${!zostalo?'<b style="color:var(--neg)">Limit tej kadencji wyczerpany</b> — kolejni bezpartyjni dopiero po wyborach.'
-      :G.agentWeek===G.term+'-'+G.week?'<b>W tym tygodniu podpisałeś już transfer.</b>':''}
+      :agentOstatni>0?`<b>Następny transfer za ${agentOstatni} ${pl(agentOstatni,'dzień','dni','dni')}.</b>`:''}
     Inne partie robią to samo, kto pierwszy ten lepszy.</div>
     <div class="agrid">${wolni.map(a=>{
       const c=agentCost(a.n), st=LEAD[a.n]||[50,50,50,50];
@@ -737,7 +738,7 @@ function agentBox(){
         </div>
         <div class="adesc">${a.d}</div>
         <div class="astat">${['charyzma','kompet.','wytrz.','autorytet'].map((x,i)=>`<span>${x} <b>${st[i]}</b></span>`).join('')}</div>
-        <button class="btn sm" ${ok?'':'disabled'} onclick="signAgent('${esc(a.n)}')">${!zostalo?'Limit kadencji wyczerpany':G.agentWeek===G.term+'-'+G.week?'Transfer w tym tygodniu zużyty':G.kp<c?'Za mało kapitału':'Podpisuję transfer'}</button>
+        <button class="btn sm" ${ok?'':'disabled'} onclick="signAgent('${esc(a.n)}')">${!zostalo?'Limit kadencji wyczerpany':agentOstatni>0?`Transfer za ${agentOstatni} dni`:G.kp<c?'Za mało kapitału':'Podpisuję transfer'}</button>
       </div>`}).join('')||'<span class="dim">Nikt wolny nie chodzi teraz po serwerze. Wróć za tydzień.</span>'}</div>
   </div></div>`;
 }
@@ -815,7 +816,10 @@ function fire(a,t,r,s,tm){
   if(a.once)G.once[a.id]=1;
   if(a.term1)G.useTerm[a.id]=1;
   const tydz2Przed=a.tydz2?((G.tydz2Times&&Array.isArray(G.tydz2Times[a.id]))?G.tydz2Times[a.id].slice():[]):null;
-  const f=fat(a.id);G.used[a.id]=(G.used[a.id]||0)+1;
+  const f=fat(a.id);
+  if(!G.usedTimes)G.usedTimes={};
+  ostatnieUzycia(a.id);
+  G.usedTimes[a.id].push(czasGlobalny());G.used[a.id]=G.usedTimes[a.id].length;
   // limity zapisujemy razem z kosztem, żeby rezygnacja w oknie cofnęła jedno i drugie
   G.stolSeq=(G.stolSeq||0)+1;
   const stolToken=G.stolSeq;
@@ -955,6 +959,7 @@ function oddajOplate(){
   if(G)G.stolPend=null;          // rezygnacja zdejmuje decyzję ze stołu
   const c=G&&G.lastCharge; if(!c)return;
   G.ap+=c.ap;G.kp+=c.kp;G.en=cl(G.en+c.en);
+  if(G.usedTimes&&Array.isArray(G.usedTimes[c.id]))G.usedTimes[c.id].pop();
   if(G.used[c.id])G.used[c.id]--;
   if(G.catUsed[c.cat])G.catUsed[c.cat]--;
   if(c.cat!=='spe'&&G.catTimes&&Array.isArray(G.catTimes[c.cat]))G.catTimes[c.cat].pop();
@@ -1565,7 +1570,9 @@ function naborPublikuj(){
     g=taken;
     p.act=cl(p.act+3);p.pres[reg]=cl(p.pres[reg]+8);
     if(g>=2)M(p,5); else if(g===0)M(p,-3);
-    G.recCd=hasT('sieciowiec')?4:6;   // nabór to rzadkie wydarzenie, nie co drugi tydzień
+    const cooldown=hasT('sieciowiec')?4:6;
+    G.recCd=cooldown;                 // pole zgodności dla starych zapisów
+    G.recCdAt=czasGlobalny()+cooldown*168;
     const opis=g?[got.eli?got.eli+' z elity':'',got.int?got.int+' z intelektualistów':'',got.ser?got.ser+' z serwerowiczów':''].filter(Boolean).join(', '):'nikt';
     say(`<b>Nabór w ${rn(reg)}.</b> Ocena ${res.sc}/100, dołącza ${opis}.`,g?'good':'bad');
     const col=eff>=76?'var(--pos)':eff>=52?'var(--acc)':'var(--neg)';
