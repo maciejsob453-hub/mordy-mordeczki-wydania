@@ -32,6 +32,9 @@ function loadCode(code){
   scenPartieAktywuj((s.G&&s.G.scen)||'zapis',s.SCEN_PARTIES||[],s.SCEN_GOALS||[],s.SCEN_EDITS||{});
   if(s.CUSTOM&&s.CUSTOM.id)registerCustom(s.CUSTOM);
   G=s.G;
+  /* Starsze zapisy mogĹ‚y zachowaÄ‡ pobranÄ… opĹ‚atÄ™ bez aktywnego okna. Po
+     wczytaniu zawsze wracamy do stanu sprzed niedokoĹ„czonej decyzji. */
+  if(typeof anulujNiedokonczonaDecyzje==='function')anulujNiedokonczonaDecyzje();
   /* Starsze zapisy nie mają RNG. Dostają stabilny seed z pozycji gry, a nowe
      zapisują bieżący stan generatora, więc błąd można odtworzyć. */
   rngSeed(G.rng||((G.term*1009+G.week*9176+String(G.me||'').length*37)>>>0));

@@ -671,7 +671,12 @@ function doGoal(id){
   if(!G.goals)G.goals={};
   if(!GOALS[id]||G.goals[id]||!myPartyGoals().includes(id)||!goalOk(id))return;
   const nameBefore=me().n;
-  G.goals[id]=1;GOALS[id].run();G.prest+=14;XP(30);applyGoals();
+  G.goals[id]=1;
+  const uniBefore=Number(me().uni)||0;
+  GOALS[id].run();
+  /* JednoĹ›Ä‡ nadal jest nagrodÄ…, ale cele nie mogÄ… jej pompowaÄ‡ bez koĹ„ca. */
+  if(Number(me().uni)>uniBefore)me().uni=cl(uniBefore+(me().uni-uniBefore)*.6);
+  G.prest+=14;XP(30);applyGoals();
   const p=me(),g=GOALS[id],renamed=p.n!==nameBefore;
   render();
   SFX.goal();burst(['#d9ab45','#f7e3aa','#c9a227','#8c6d1f'],130,1);

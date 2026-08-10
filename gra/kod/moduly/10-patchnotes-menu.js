@@ -4,6 +4,13 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.197':{data:'10 sierpnia 2026',zmiany:[
+  'Po osmiu odrzuconych kandydatach Krol powoluje rzad i procedura przechodzi dalej zamiast wracac do pustego glosowania.',
+  'Zapis nie utrwala otwartego okna decyzji: niedokonczona akcja jest zwracana i anulowana, wiec po wczytaniu nic nie blokuje ekranu.',
+  'Zegar wykonuje najwyzej jedna godzine na impuls, takze przy x5; czas nie przeskakuje juz po dwie godziny naraz.',
+  'Cele partyjne daja mniej jednosci, a zakonczone akcje znikaja z panelu Akcje w toku.',
+  'Usunieto wspolny cooldown kategorii. Odnowa dotyczy tylko konkretnej decyzji, a licznik akcji pokazuje pozostale miejsca.'
+ ]},
  '1.1.196':{data:'10 sierpnia 2026',zmiany:[
   'Wybory prezydenckie licza teraz obie tury w jednym, spokojnym tempie bez nakladania timerow.',
   'Mapa celow Concordii ma czysta przestrzen robocza i prawdziwe rozwidlenie: Republikanie albo Aurea Libertas.',

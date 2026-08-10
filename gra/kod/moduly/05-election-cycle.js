@@ -393,6 +393,10 @@ function pmFailForward(){
     // rząd z nadania, nie z wyboru — cały sejm płaci za przeciąganie
     alive().forEach(k=>{const q=G.p[k];q.cred=cl(q.cred-4);M(q,-6)});
     if(pm===G.me){G.prest+=6;M(me(),4)}
+    /* Procedura musi siÄ™ zakoĹ„czyÄ‡ przed otwarciem komunikatu. WczeĹ›niej
+       modal znikaĹ‚, ale faza pmvote i stary pmProc wracaĹ‚y przy nastÄ™pnym
+       renderze, wiÄ™c po oĹ›miu odmowach gracz wpadaĹ‚ w nieskoĹ„czonÄ… pÄ™tlÄ™. */
+    G.phase='camp';G.pmProc=null;
     say(`<b>Król Mordeczka kończy targi.</b> Po ${PM_RUNDY_MAX} nieudanych głosowaniach powołuje rząd `
       +`<b>${G.gov.pmLead}</b> (${G.p[pm].ab})${G.gov.minority?', bez większości':''}. Sejm wychodzi z tego bez twarzy.`,'roy');
     modal('Pałac','Król powołuje rząd z nadania',

@@ -156,7 +156,11 @@ function realClockPaint(){
   if(!G||PROBA||G.realPaused)return;
   simClockMigrate();
   G.realCarry=(G.realCarry||0)+Math.max(.5,Number(G.realSpeed)||1)/4;
-  let n=0;while(G.realCarry>=1&&n<8){G.realCarry-=1;simClockStep();n++}
+  /* Jeden impuls zegara = jedna godzina gry. Stara pÄ™tla potrafiĹ‚a wykonaÄ‡
+     kilka krokĂłw w jednym odĹ›wieĹĽeniu; przy x5 gracz widziaĹ‚ przeskoki po
+     dwie godziny, a zdarzenia dostawaĹ‚y kilka rozliczeĹ„ naraz. Nadmiar zostaje
+     w akumulatorze, ale nigdy nie przepuszczamy go seriÄ… w jednej klatce. */
+  let n=0;if(G.realCarry>=1){G.realCarry-=1;simClockStep();n=1}
   if(n){
     /* Symulacja moze isc co godzine, ale calego DOM-u nie trzeba skladac przy
        kazdym kroku. Wczesniej mapa celow tracila uchwyt i scroll skakal, bo

@@ -1249,6 +1249,9 @@ function b64d(s){try{
   return new TextDecoder().decode(b)}catch(e){return ''}}
 const ZAPIS_WERSJA=2;
 function saveCode(){
+  /* Okno wyboru nie jest czÄ™Ĺ›ciÄ… zapisu. Stabilizujemy stan i zwracamy koszt,
+     aby po wczytaniu nie zostaĹ‚a decyzja bez przycisku ani zablokowany slot. */
+  if(typeof anulujNiedokonczonaDecyzje==='function')anulujNiedokonczonaDecyzje();
   const snap={v:ZAPIS_WERSJA,gra:WERSJA,G,CUSTOM,SCEN_PARTIES:SCEN_PARTY_DEFS,SCEN_GOALS:SCEN_GOAL_DEFS,SCEN_EDITS:SCEN_EDIT_DEFS,
     REG:REG.map(r=>({id:r.id,n:r.n,pop:r.pop,eng:r.eng,seats:r.seats,x:r.x,y:r.y,mix:r.mix,d:r.d})),
     LUP:G.lup,LEADX:Object.fromEntries(Object.keys(LEAD).filter(n=>!AVA[n]).map(n=>[n,LEAD[n]]))};

@@ -226,8 +226,8 @@ function actFx(id){return AFX[id]||[]}
 const STOL_NAZWY={fame:'sława',cred:'wiarygodność',uni:'jedność',act:'aktywność',mem:'ludzie'};
 function stolTygodnia(){
   decyzjeSweep();
-  const live=decyzjeInit().filter(x=>x&&x.status==='ACTIVE'),closed=decyzjeInit().filter(x=>x&&x.status!=='ACTIVE').slice(-4).reverse();
-  if(live.length||closed.length){
+  const live=decyzjeInit().filter(x=>x&&x.status==='ACTIVE'),closed=[];
+  if(live.length){
     const now=czasGlobalny();
     return `<div class="stol live-actions"><div class="stolh"><h3>Akcje w toku</h3><span class="stoln">${live.length} aktywnych · ${Math.max(0,G.ap)}/${G.apMax} AP</span></div><div class="stolm live-actions-grid">${live.map(d=>{const left=Math.max(0,Number(d.deadline||now)-now),days=Math.ceil(left/24);return `<div class="mj live-action" style="--ac:${CATCOL[d.cat]||'var(--line2)'}"><div class="live-action-mark">◷</div><h4>${esc(d.n)}</h4><span>AKTYWNA · ${days} ${pl(days,'dzień','dni','dni')}</span><small>do ${dateStr(new Date(gameDate().getTime()+left*3600000))}</small></div>`}).join('')}${closed.map(d=>`<div class="mj live-action closed" style="--ac:${CATCOL[d.cat]||'var(--line2)'}"><div class="live-action-mark">${d.status==='COMPLETED'?'✓':'×'}</div><h4>${esc(d.n)}</h4><span>${d.status==='COMPLETED'?'ZAKOŃCZONA':'WYGASŁA'}</span></div>`).join('')}</div></div>`;
   }
@@ -316,14 +316,15 @@ function actCards(list,fx){
   return list.map(a=>{
     const f=fat(a.id),done=a.once&&G.once[a.id];
     const usedT=(a.term1&&G.useTerm[a.id]);
+    /* Kategoria nie ma wspĂłlnego cooldownu. Zostawiamy te zmienne dla starych
+       zapisĂłw i tekstĂłw kart, ale zawsze sÄ… wyĹ‚Ä…czone; odnowa naleĹĽy do id decyzji. */
+    const catFull=false,catLeft=0;
     const noShame=a.shame&&!shameAktywne();
-    const catFull=a.cat!=='spe'&&kategoriaUzyta(a.cat)>=1;
-    const catLeft=catFull?kategoriaPozostala(a.cat):0;
     const cdDo=(G.odnowy&&G.odnowy[a.id])||0, cd=cdDo>czasGlobalny();
     // decyzje z limitem tygodniowym (regeneracja): dwa razy i koniec
     const limT=!!a.tydz2&&limit2Uzyte(a)>=2;
     const kpC=Math.round(a.kp*sizeF(me()).kp*inflacja());   // cena z uwzględnieniem inflacji
-    const ok=G.ap>=a.ap&&G.kp>=kpC&&(a.en<0||G.en>=a.en)&&!done&&!usedT&&!limT&&!catFull&&!noShame&&!cd&&!(a.id==='rekr'&&rekrutacjaDni()>0);
+    const ok=G.ap>=a.ap&&G.kp>=kpC&&(a.en<0||G.en>=a.en)&&!done&&!usedT&&!limT&&!noShame&&!cd&&!(a.id==='rekr'&&rekrutacjaDni()>0);
     const col=CATCOL[a.cat]||'var(--line2)';
     const cb=G.lastAct&&COMBO.find(c=>c.a===G.lastAct&&c.b===a.id);
     const katN=(CATS.find(x=>x[0]===a.cat)||['',''])[1]||'Ta kategoria';
@@ -685,14 +686,12 @@ function actTab(){
   if(fx)list=A.filter(a=>actFx(a.id).includes(fx)&&cats.some(c=>c[0]===a.cat));
   const dost=new Set();A.forEach(a=>{if(cats.some(c=>c[0]===a.cat))actFx(a.id).forEach(f=>dost.add(f))});
   // ile kategorii stoi jeszcze otworem — inaczej gracz widzi tylko wyszarzone kafle
-  const wolnych=cats.filter(([c])=>c==='spe'||!kategoriaUzyta(c)).length;
   return `${stolTygodnia()}
   <div class="card"><div class="h"><h3>Decyzje dostępne teraz</h3>
-    <span class="n">${ikona('akcje','sm')}${G.ap}/${G.apMax} akcji · ${ikona('kapital','sm')}${Math.round(G.kp)} kapitału · ${ikona('energia','sm')}${Math.round(G.en)} energii
-    · ${wolnych} ${pl(wolnych,'kategoria otwarta','kategorie otwarte','kategorii otwartych')}</span></div>
+    <span class="n">${ikona('akcje','sm')}${Math.max(0,G.ap)}/${G.apMax} akcji pozostało · ${ikona('kapital','sm')}${Math.round(G.kp)} kapitału · ${ikona('energia','sm')}${Math.round(G.en)} energii</span></div>
     <div class="b">
     <div class="cats">${cats.map(([c,n])=>{
-      const zuzyta=c!=='spe'&&kategoriaUzyta(c)>=1,poz=zuzyta?kategoriaPozostala(c):0,pozD=Math.max(1,Math.ceil(poz/24));
+      const zuzyta=false,poz=0,pozD=0;
       return `<button class="${!fx&&G.cat===c?'on':''} ${zuzyta?'spent':''} ${c==='prz'||c==='prem'?'roy':''}"
         onclick="setCat('${c}')" title="${zuzyta?`Kategoria wróci za ${pozD} ${pl(pozD,'dzień','dni','dni')}`:n}">${zuzyta?'◷ ':''}${n}</button>`}).join('')}</div>
     <div class="fxbar">
@@ -702,11 +701,11 @@ function actTab(){
         style="${fx===f?`background:${AFXN[f][1]};border-color:${AFXN[f][1]};color:#10140f`:`color:${AFXN[f][1]};border-color:${AFXN[f][1]}55`}"
         onclick="setFx('${f}')">${AFXN[f][0]}</button>`).join('')}
     </div>
-    ${(!fx&&G.cat!=='spe'&&kategoriaUzyta(G.cat)>=1)?`<div class="spentbar">
+    ${false?`<div class="spentbar">
       <b>${(CATS.find(c=>c[0]===G.cat)||['',''])[1]} ma aktywny cooldown.</b>
       Zagrałeś tu decyzję, dlatego karta czeka na własny termin odnowy. Nie musisz kończyć ani rozpoczynać tygodnia — czas płynie sam.</div>`:''}
     <div class="actgrid">${actCards(list,fx)}</div>
-    <div class="note"><b>Jedna decyzja z kategorii na jej cooldown.</b> Kolejność też się liczy: kanwasing przed wiecem daje ×1,55, ale manifest przed memami tylko ×0,55.
+    <div class="note"><b>Każda decyzja ma własny termin odnowy.</b> Kolejność też się liczy: kanwasing przed wiecem daje ×1,55, ale manifest przed memami tylko ×0,55.
     Filtr „po skutku” pokazuje decyzje z wszystkich kategorii naraz.</div>
   </div></div>
   ${agentBox()}`;
@@ -746,7 +745,9 @@ function agentBox(){
 let pend=null;
 function doAct(id){
   const a=A.find(x=>x.id===id);
-  if(G.ap<a.ap||G.kp<a.kp||(a.en>0&&G.en<a.en)||((G.odnowy&&G.odnowy[id]||0)>czasGlobalny()))return;
+  const done=a.once&&G.once[a.id],usedT=a.term1&&G.useTerm[a.id],limT=!!a.tydz2&&limit2Uzyte(a)>=2;
+  const noShame=a.shame&&!shameAktywne(),cd=(G.odnowy&&G.odnowy[id]||0)>czasGlobalny();
+  if(G.ap<a.ap||G.kp<a.kp||(a.en>0&&G.en<a.en)||done||usedT||limT||noShame||cd||(a.id==='rekr'&&rekrutacjaDni()>0))return;
   pend={a,t:null,r:null,s:null,tem:null};
   if(me().ctr>=70&&actFx(a.id).includes('ctr')&&!G.noWarn){
     return modal('Ostrożnie','Ta decyzja podbije kontrowersję',
@@ -966,7 +967,7 @@ function oddajOplate(){
   if(G.used[c.id])G.used[c.id]--;
   if(G.catUsed[c.cat])G.catUsed[c.cat]--;
   if(c.cat!=='spe'&&G.catTimes&&Array.isArray(G.catTimes[c.cat]))G.catTimes[c.cat].pop();
-  if(c.tydz2Przed!==null){
+  if(Array.isArray(c.tydz2Przed)){
     if(!G.tydz2Times)G.tydz2Times={};
     if(c.tydz2Przed.length)G.tydz2Times[c.id]=c.tydz2Przed.slice();
     else delete G.tydz2Times[c.id];
@@ -988,6 +989,16 @@ function oddajOplate(){
 function actBack(){   // rezygnacja w oknie decyzji oddaje to, co pobrała sama decyzja
   oddajOplate();
   pend=null;close();render();
+}
+/* Zapis nie przechowuje otwartego okna wyboru. Przy zapisie lub wczytaniu
+   oddajemy opĹ‚atÄ™ i anulujemy wpis, zamiast blokowaÄ‡ grÄ™ niewidzialnym krokiem. */
+function anulujNiedokonczonaDecyzje(){
+  if(!G)return;
+  if(G.lastCharge)oddajOplate();
+  G.stolPend=null;pend=null;
+  if(typeof NABOR!=='undefined')NABOR=null;
+  if(typeof WYW!=='undefined')WYW=null;
+  if(typeof LIVE!=='undefined')LIVE=null;
 }
 function chooseReg(){const p=me();
   modal('Wybór okręgu',pend.a.n,`<p>${pend.a.d}</p>`,REG.map(r=>({l:r.n,
