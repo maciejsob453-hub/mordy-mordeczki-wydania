@@ -1,10 +1,10 @@
 {
- "wersja": "1.1.193",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/3b3a55aa90d003ea7d26a21aae45363c72532143",
+ "wersja": "1.1.194",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "05b6cff3d28cc9e1694e42c4d60b7bfc07003bfe66741f525d834624cd087e4a",
+   "sha": "db60660c3bd661470ccaf9a3133ab4360696fba7a739323cec8bba780c17d53f",
    "bajtow": 1979
   },
   {
@@ -14,7 +14,7 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "41a5606368c1cc31ca5772026c19274d09b6348a3418a2d3285ae56dc2e49bdd",
+   "sha": "bd93b0e5147624525e9f4b858917c6a922f1ee54dfe8264fda693da88850a0e6",
    "bajtow": 531
   },
   {
@@ -69,8 +69,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "1fd0a2f1c2538736c40e974ec10d0ac6447d19b6b7fc2784093d48db89ad4974",
-   "bajtow": 116280
+   "sha": "eee268bc3baa3f5c4a4d3fd59fbe9d085de4d84ba12abf763c258c3d1bb565a3",
+   "bajtow": 116834
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
@@ -99,8 +99,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/16-goals-panels.js",
-   "sha": "7ee9d9008345820d1ce5d87725897086b10b66f92bb98c86eb65922a8b91040e",
-   "bajtow": 121121
+   "sha": "484490f0cf5a4373922071b13391a85eaa27d700330a0c43c1845356414906ad",
+   "bajtow": 121804
   },
   {
    "sciezka": "gra/kod/moduly/17-elections-endgame.js",
@@ -969,8 +969,8 @@
   },
   {
    "sciezka": "gra/wyglad/sejm-v4.css",
-   "sha": "635a005af35eb821f99da5bcfc0c2da488720e5f617054453f7484a22d7b9e94",
-   "bajtow": 236262
+   "sha": "daefe97a3896e402696b9bfed5e90717dd7280642658b0124b3cf257662004b3",
+   "bajtow": 243918
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -995,6 +995,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "3b3a55aa90d003ea7d26a21aae45363c72532143"
+ }
 }

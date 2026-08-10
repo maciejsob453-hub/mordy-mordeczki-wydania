@@ -3248,3 +3248,116 @@ body:not(:has(.mg)):has(.hud) #app .widok .mordelock button.btn.btn:not(.tura):n
   background:linear-gradient(180deg,#e6c56e,#aa7628)!important;
   border-color:#f2d88f!important;color:#1b1408!important;-webkit-text-fill-color:#1b1408!important;
 }
+
+/* 1.1.194: drzewo celow jest teraz fokus-tree, nie siatka kart.
+   Sam przycisk nie rysuje prostokata — widoczny jest medalion i podpis,
+   a pionowe laczniki prowadza wzrok do kolejnego celu jak w grand strategy. */
+body:has(.hud) .goals-map-grid .goal-tree-row{
+  display:flex!important;flex-direction:column!important;align-items:center!important;
+  gap:0!important;width:100%!important;min-width:0!important;padding:22px 12px 36px!important;
+}
+body:has(.hud) .goals-map-grid .goal-node-wrap{
+  flex:0 0 auto!important;width:min(224px,100%)!important;min-width:0!important;
+  padding:0 0 54px!important;position:relative!important;
+}
+body:has(.hud) .goals-map-grid .goal-node-wrap:not(.last)::after{
+  content:''!important;position:absolute!important;left:50%!important;right:auto!important;
+  top:auto!important;bottom:16px!important;width:2px!important;height:34px!important;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--party-theme,#d6aa58) 88%,#fff 4%),rgba(111,143,119,.22))!important;
+  box-shadow:0 0 10px color-mix(in srgb,var(--party-theme,#d6aa58) 46%,transparent)!important;
+}
+body:has(.hud) .goals-map-grid .goal-node{
+  width:100%!important;min-width:0!important;min-height:0!important;height:auto!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;
+  gap:9px!important;padding:0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;color:var(--tx)!important;
+}
+body:has(.hud) .goals-map-grid .goal-node:hover,
+body:has(.hud) .goals-map-grid .goal-node.active,
+body:has(.hud) .goals-map-grid .goal-node.selected{transform:none!important;background:transparent!important;box-shadow:none!important}
+body:has(.hud) .goals-map-grid .goal-node-mark{display:none!important}
+body:has(.hud) .goals-map-grid .goal-node-icon{
+  flex:0 0 88px!important;width:88px!important;height:88px!important;display:grid!important;place-items:center!important;
+  border-radius:50%!important;overflow:hidden!important;
+  background:radial-gradient(circle at 35% 24%,rgba(255,255,255,.16),rgba(4,12,8,.98) 67%)!important;
+  border:2px solid color-mix(in srgb,var(--party-theme,#d6aa58) 78%,#9eaa94)!important;
+  box-shadow:0 0 0 5px rgba(4,12,8,.9),0 0 0 6px color-mix(in srgb,var(--party-theme,#d6aa58) 46%,transparent),0 9px 20px rgba(0,0,0,.35)!important;
+}
+body:has(.hud) .goals-map-grid .goal-node-icon img{width:72px!important;height:72px!important;object-fit:contain!important}
+body:has(.hud) .goals-map-grid .goal-node-copy{
+  width:auto!important;max-width:224px!important;min-width:0!important;align-items:center!important;gap:0!important;
+  padding:6px 12px!important;border:1px solid color-mix(in srgb,var(--party-theme,#d6aa58) 46%,rgba(196,154,75,.3))!important;
+  border-radius:3px!important;background:linear-gradient(180deg,rgba(14,25,18,.95),rgba(4,11,7,.98))!important;
+  box-shadow:0 5px 14px rgba(0,0,0,.24)!important;
+}
+body:has(.hud) .goals-map-grid .goal-node-copy em,
+body:has(.hud) .goals-map-grid .goal-node-copy small{display:none!important}
+body:has(.hud) .goals-map-grid .goal-node-copy b{
+  display:block!important;max-width:196px!important;white-space:normal!important;text-align:center!important;
+  line-height:1.15!important;font:600 12px var(--m)!important;color:#eadcb8!important;
+}
+body:has(.hud) .goals-map-grid .goal-node.locked{opacity:.42!important;filter:saturate(.5)!important}
+body:has(.hud) .goals-map-grid .goal-node.done .goal-node-icon{border-color:#76b681!important}
+body:has(.hud) .goals-map-grid .goal-node.active .goal-node-icon,
+body:has(.hud) .goals-map-grid .goal-node.selected .goal-node-icon{
+  border-color:#f0ca70!important;box-shadow:0 0 0 5px rgba(4,12,8,.9),0 0 0 7px #f0ca70,0 0 27px rgba(240,202,112,.52)!important;
+}
+
+/* Krol: dolne karty maja dwie rowne kolumny, a ranking dostaje cala szerokosc.
+   Dzięki temu nazwiska i punkty nie sa scisniete w waskim pasku. */
+@media(min-width:1180px){
+  body:has(.hud) .widok[data-tab="krol"]{
+    grid-template-columns:minmax(300px,.88fr) minmax(0,1.12fr)!important;gap:14px!important;align-items:start!important;
+  }
+  body:has(.hud) .widok[data-tab="krol"]>.royalhero,
+  body:has(.hud) .widok[data-tab="krol"]>.card.kroyal{grid-column:1/-1!important}
+  body:has(.hud) .widok[data-tab="krol"]>.card:nth-child(3){grid-column:1!important}
+  body:has(.hud) .widok[data-tab="krol"]>.card:nth-child(4){grid-column:2!important}
+  body:has(.hud) .widok[data-tab="krol"]>.card:nth-child(5){grid-column:1/-1!important}
+  body:has(.hud) .widok[data-tab="krol"]>.card:nth-child(5)>.b{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px 14px!important}
+  body:has(.hud) .widok[data-tab="krol"]>.card:nth-child(5) .minrow{min-height:58px!important;padding:9px 10px!important}
+}
+
+/* Sondaz: trzy najwazniejsze odczyty sa pelnym paskiem pod tytulem,
+   nie mala kolumna przyklejona do prawej krawedzi. */
+body:has(.hud) .widok[data-tab="sondaz"] .pollhero{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:16px!important;align-items:stretch!important;
+}
+body:has(.hud) .widok[data-tab="sondaz"] .pollheroStats{
+  grid-column:1!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  width:100%!important;min-width:0!important;
+}
+body:has(.hud) .widok[data-tab="sondaz"] .pollheroStats>div{
+  min-width:0!important;width:auto!important;text-align:center!important;padding:14px 12px!important;
+}
+body:has(.hud) .widok[data-tab="sondaz"] .pollheroStats>div:last-child{border-right:0!important}
+
+/* Zablokowane kanaly korzystaja z tej samej zwartej ramy i nie wciagaja
+   pustego obszaru do polowy ekranu. */
+body:has(.hud) .widok[data-tab="media"] .mediazamkniete,
+body:has(.hud) .widok[data-tab="sad"] .sadzamkniety,
+body:has(.hud) .widok[data-tab="mordepedia"] .mordelock{
+  min-height:340px!important;height:auto!important;max-height:none!important;overflow:hidden!important;
+  display:flex!important;flex-direction:column!important;justify-content:flex-start!important;align-items:flex-start!important;
+  gap:14px!important;padding:30px 34px!important;
+}
+body:has(.hud) .widok[data-tab="mordepedia"] .mordewynikisek{grid-column:1/-1!important}
+body:has(.hud) .widok[data-tab="mordepedia"] .mordewynikkarta{
+  display:grid!important;gap:8px!important;padding:10px 12px!important;
+  border-left:3px solid var(--party-theme,var(--game-accent,var(--acc)))!important;
+  border-radius:3px!important;background:rgba(0,0,0,.2)!important;
+}
+body:has(.hud) .widok[data-tab="mordepedia"] .mordewynikkarta>span{
+  font:700 8px var(--m)!important;letter-spacing:.13em!important;color:var(--dim2)!important;
+}
+body:has(.hud) .widok[data-tab="mordepedia"] .mordewynikkarta>div{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;
+}
+body:has(.hud) .widok[data-tab="mordepedia"] .mordewynik{
+  display:flex!important;align-items:baseline!important;justify-content:space-between!important;gap:7px!important;
+  min-width:0!important;padding:7px 8px!important;border:1px solid rgba(196,154,75,.18)!important;
+  background:rgba(7,15,10,.65)!important;border-radius:2px!important;
+}
+body:has(.hud) .widok[data-tab="mordepedia"] .mordewynik b{color:var(--tx)!important;font:700 12px var(--m)!important}
+body:has(.hud) .widok[data-tab="mordepedia"] .mordewynik em{color:var(--dim)!important;font:10px var(--m)!important;font-style:normal!important;white-space:nowrap!important}
+@media(max-width:760px){body:has(.hud) .widok[data-tab="mordepedia"] .mordewynikkarta>div{grid-template-columns:1fr!important}}

@@ -4,6 +4,13 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.194':{data:'10 sierpnia 2026',zmiany:[
+  'Cele Concordii maja teraz fokus-tree: okragle loga z podpisem schodza pionowo, a prostokat nie konkuruje z medalionem.',
+  'Krol dostal rowne dwie kolumny i szeroki ranking, dzieki czemu nazwiska oraz punkty sa czytelne.',
+  'Sondaz pokazuje trzy odczyty jako pelny rowny pasek pod tytulem zamiast malej prawej kolumny.',
+  'Blokady Medii, Sadu i Pedii maja zwarta rame i jednolity zloto-czarny przycisk.',
+  'Archiwum Pedii zachowuje premiera, prezydenta oraz wyniki urn bez dodatkowych ozdobnikow.'
+ ]},
  '1.1.193':{data:'10 sierpnia 2026',zmiany:[
   'Cele Concordii maja teraz pionowe drzewo decyzji: kolko z logiem i mala etykieta prowadza w dol jak w grand strategy.',
   'Ranking dworski dostal rowne karty i czytelny uklad kolumn, a sondaz trzy rowne odczyty bez pustego pola.',
