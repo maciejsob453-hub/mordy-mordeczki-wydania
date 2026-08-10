@@ -7,8 +7,13 @@ function simClockSync(){
   if(!G)return;
   const h=Math.max(0,Math.floor(Number(G.simHour)||0)),kad=G.weeks*168;
   const inKad=h%kad;
-  G.term=Math.floor(h/kad)+1;
-  G.week=Math.floor(inKad/168)+1;
+  const termZegara=Math.floor(h/kad)+1,weekZegara=Math.floor(inKad/168)+1;
+  /* Zegar daty może wejść w następną dobę, ale kadencja polityczna nie może
+     przeskoczyć przed zakończeniem wyborów. Inaczej noc wyborcza pokazywała
+     od razu „kadencja 2, tydzień 1”, a startTerm dodawał jeszcze jedną. */
+  const procedura=['finalcamp','elect','result','prez','pmvote','marszalek'].includes(G.phase)||G.prez2||G.prezState;
+  if(!procedura){G.term=termZegara;G.week=weekZegara}
+  else {G.term=Math.max(1,Number(G.term)||termZegara);G.week=Math.max(1,Number(G.week)||weekZegara)}
   G.czasGodzTygodnia=inKad;
   G.czasTygodnia=Math.floor(inKad/24);
   G.dzienTygodnia=Math.min(7,Math.floor((inKad%168)/24)+1);
