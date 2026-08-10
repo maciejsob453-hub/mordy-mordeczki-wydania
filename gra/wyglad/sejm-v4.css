@@ -2718,6 +2718,127 @@ body:has(.kreekran) *::-webkit-scrollbar-thumb:hover{
   }
 }
 
+/* 1.1.192: stabilny pulpit i mapa celów.
+   Zestaw wcześniejszych responsywnych poprawek ściskał HUD do kilku pikseli
+   i dodawał wewnętrzne scrolle. Tutaj pierwszeństwo ma czytelność: zasoby
+   zawsze mają własne miejsce, a przewija się cała strona, nie opis w karcie. */
+body:has(.hud) .hud{
+  grid-template-columns:minmax(230px,280px) minmax(0,1fr) auto!important;
+  min-width:0;overflow:visible!important;
+}
+body:has(.hud) .hudcenter{
+  display:grid!important;grid-template-columns:minmax(0,1.6fr) minmax(220px,.8fr)!important;
+  min-width:0;overflow:visible!important;opacity:1!important;visibility:visible!important;
+}
+body:has(.hud) .hudcenter .rgroup{min-width:0;overflow:visible!important;flex-wrap:nowrap!important;opacity:1!important;visibility:visible!important}
+body:has(.hud) .hudcenter .rgroup .rs{min-width:0;flex:1 1 0;overflow:visible!important}
+body:has(.hud) .sidebar{max-height:none!important;overflow:visible!important;padding-right:0!important}
+body:has(.hud) .widok,.widok[data-tab]{overflow:visible!important}
+body:has(.hud) .sadhist{max-height:none!important;overflow:visible!important}
+body:has(.hud) .goals-command-main,body:has(.hud) .goals-inspector{overflow:visible!important}
+
+/* Mapa nie jest dokumentem do zaznaczania. Przesuwanie działa tylko na ramie,
+   a cel jest znakiem/małą tabliczką, nie wielkim kaflem z akapitem. */
+body:has(.hud) .goals-map-frame{user-select:none!important;-webkit-user-select:none!important;touch-action:none!important;overflow:hidden!important}
+body:has(.hud) .goals-map-canvas{will-change:transform;transform-origin:0 0!important}
+body:has(.hud) .goals-map-grid .goal-tree-row{
+  display:grid!important;grid-template-columns:repeat(auto-fit,minmax(148px,1fr))!important;
+  gap:28px 18px!important;align-items:start!important;overflow:visible!important;
+  width:auto!important;min-width:0!important;padding:10px 12px 24px!important;
+}
+body:has(.hud) .goals-map-grid .goal-node-wrap{width:auto!important;min-width:0!important;padding:0!important;position:relative}
+body:has(.hud) .goals-map-grid .goal-node-wrap:not(.last)::after{
+  top:auto!important;left:50%!important;right:auto!important;bottom:-18px!important;
+  width:1px!important;height:18px!important;background:color-mix(in srgb,var(--party-theme,#d6aa58) 65%,#6f8976)!important;
+}
+body:has(.hud) .goals-map-grid .goal-node{
+  min-height:142px!important;width:100%!important;display:flex!important;flex-direction:column!important;
+  justify-content:center!important;align-items:center!important;gap:7px!important;padding:12px 9px!important;
+  text-align:center!important;background:rgba(8,20,13,.4)!important;border:1px solid rgba(214,170,88,.2)!important;
+  border-radius:3px!important;box-shadow:none!important;transform:none!important;
+}
+body:has(.hud) .goals-map-grid .goal-node:hover{transform:translateY(-2px)!important;background:rgba(23,48,30,.7)!important}
+body:has(.hud) .goals-map-grid .goal-node-icon{width:64px!important;height:64px!important;border-radius:50%!important;background:rgba(3,12,8,.8)!important}
+body:has(.hud) .goals-map-grid .goal-node-icon img{width:56px!important;height:56px!important;object-fit:contain!important}
+body:has(.hud) .goals-map-grid .goal-node-copy{align-items:center!important;gap:3px!important;min-width:0!important;width:100%!important}
+body:has(.hud) .goals-map-grid .goal-node-copy b{display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;white-space:normal!important;line-height:1.15!important}
+
+/* Opis nie dostaje własnej rolki. Jeśli modal jest długi, przewija się całe
+   okno, a nie lista graczy albo jeden akapit w środku. */
+body:has(.hud) .mdl .bd,body:has(.hud) .mdl .op{overflow:visible!important;max-height:none!important}
+body:has(.hud) .veil{overflow:auto!important;align-items:start!important;padding:24px!important}
+
+@media(min-width:1181px){
+  body:has(.hud) .wrap{padding:0 24px 42px!important;padding-left:24px!important;display:grid!important;grid-template-columns:188px minmax(0,1fr)!important;grid-template-rows:auto auto auto minmax(0,1fr)!important;column-gap:22px!important;row-gap:10px!important;max-width:min(1900px,98vw)!important}
+  body:has(.hud) .wrap>.nav{grid-column:1!important;grid-row:1 / span 4!important;position:sticky!important;top:0!important;align-self:start!important;margin:0!important}
+  body:has(.hud) .wrap>.hud{grid-column:2!important;grid-row:1!important;margin:0!important;width:auto!important}
+  body:has(.hud) .wrap>.luk{grid-column:2!important;grid-row:2!important;margin:0!important}
+  body:has(.hud) .wrap>.wazne{grid-column:2!important;grid-row:3!important;margin:0!important}
+  body:has(.hud) .wrap>.layout{grid-column:2!important;grid-row:4!important;margin:0!important}
+  body:not(:has(.mg)):has(.hud) .wrap:has(>.nav)>*:not(.nav){grid-column:2!important}
+  body:not(:has(.mg)):has(.hud) .wrap:has(>.nav)>.nav{grid-column:1!important}
+  body:not(:has(.mg)):has(.hud) .wrap:has(>.nav){grid-template-columns:188px minmax(0,1fr)!important}
+  body:not(:has(.mg)):has(.hud) .wrap:has(>.nav){grid-template-columns:188px minmax(0,1fr)!important}
+  body:not(:has(.mg)):has(.hud) .wrap:has(>.nav){grid-template-columns:188px minmax(0,1fr)!important}
+  body:not(:has(.mg)):has(.hud) .wrap:has(>.nav){grid-template-columns:188px minmax(0,1fr)!important}
+  body:not(:has(.mg)):has(.hud) .wrap:has(>.nav)>*:not(.nav){grid-column:2!important}
+  body:not(:has(.mg)):has(.hud) .wrap:has(>.nav)>.nav{grid-column:1!important}
+  body:not(:has(.mg)):has(.hud) .wrap:has(>.nav)>*:not(.nav){grid-column:2!important}
+  body:not(:has(.mg)):has(.hud) .wrap:has(>.nav)>.nav{grid-column:1!important}
+  body:not(:has(.mg)):has(.hud) .wrap:has(>.nav)>*:not(.nav){grid-column:2!important}
+  body:not(:has(.mg)):has(.hud) .wrap:has(>.nav)>.nav{grid-column:1!important}
+  body:has(.hud) .wrap>.nav{width:188px!important;min-width:188px!important;padding:86px 12px 20px!important}
+  body:has(.hud) .wrap>.nav::before{left:18px!important;top:22px!important;font-size:20px!important}
+  body:has(.hud) .wrap>.nav::after{left:19px!important;top:51px!important;font-size:7px!important}
+  body:has(.hud) .wrap>.nav button{font-size:11px!important;white-space:nowrap!important}
+}
+@media(max-width:1180px){
+  body:has(.hud) .hud{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+  body:has(.hud) .hudcenter{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+  body:has(.hud) .hudend{width:100%;justify-content:flex-end!important;flex-wrap:wrap!important}
+  body:has(.hud) .wrap>.nav{position:relative!important;top:auto!important;left:auto!important;bottom:auto!important;width:auto!important;min-width:0!important;max-height:none!important;
+    margin:0 0 14px!important;padding:6px 8px!important;display:flex!important;flex-direction:row!important;overflow-x:auto!important;overflow-y:hidden!important;gap:3px!important}
+  body:has(.hud) .wrap>.nav::before,body:has(.hud) .wrap>.nav::after{display:none!important}
+  body:has(.hud) .wrap>.nav button{flex:0 0 auto!important;white-space:nowrap!important;min-height:34px!important}
+}
+@media(max-width:680px){
+  body:has(.hud) .hudcenter{grid-template-columns:1fr!important}
+  body:has(.hud) .hudcenter .rgroup+.rgroup{border-left:0!important;border-top:1px solid rgba(196,154,75,.21);padding-top:5px}
+  body:has(.hud) .goals-map-grid .goal-tree-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:430px){body:has(.hud) .goals-map-grid .goal-tree-row{grid-template-columns:1fr!important}}
+
+/* 1.1.192 ultimate cascade: naprawa siatki powloki po dawnych breakpointach. */
+@media(min-width:1181px){
+  body:has(.hud) .wrap{display:grid!important;grid-template-columns:188px minmax(0,1fr)!important;grid-template-rows:auto auto auto minmax(0,1fr)!important;column-gap:22px!important;row-gap:10px!important;max-width:min(1900px,98vw)!important;padding:0 24px 42px!important;padding-left:24px!important}
+  body:has(.hud) .wrap>.nav{grid-column:1!important;grid-row:1 / span 4!important;position:sticky!important;top:0!important;align-self:start!important;width:188px!important;min-width:188px!important;margin:0!important;padding:86px 12px 20px!important}
+  body:has(.hud) .wrap>.hud{grid-column:2!important;grid-row:1!important;margin:0!important;width:auto!important}
+  body:has(.hud) .wrap>.luk{grid-column:2!important;grid-row:2!important;margin:0!important}
+  body:has(.hud) .wrap>.wazne{grid-column:2!important;grid-row:3!important;margin:0!important}
+  body:has(.hud) .wrap>.layout{grid-column:2!important;grid-row:4!important;margin:0!important}
+}
+
+/* 1.1.192 final: przy szerokosci laptopowej mapa celow ma cala kolumne,
+   a szczegoly schodza pod nia zamiast sciskac wezly do pionowej kreski. */
+@media(max-width:1180px){
+  body:has(.hud) .wrap{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto!important;column-gap:0!important;padding-left:12px!important;padding-right:12px!important}
+  body:has(.hud) .wrap>*{grid-column:1!important;grid-row:auto!important}
+  body:has(.hud) .goals-command-layout{grid-template-columns:minmax(0,1fr)!important}
+  body:has(.hud) .goals-inspector{grid-column:1/-1!important;border-left:0!important;border-top:1px solid var(--gc-line)!important}
+}
+
+@media(min-width:1181px){
+  /* Nav byla w gridzie rozciagnieta na kilkadziesiat implicitnych wierszy.
+     Przegladarka ustawiala przez to HUD setki pikseli nizej, jakby znikal.
+     Uklad ma cztery stale rzedu: pasek, luka, alerty i pulpit. */
+  body:has(.hud) .wrap{display:grid!important;grid-template-columns:188px minmax(0,1fr)!important;grid-template-rows:auto auto auto minmax(0,1fr)!important;column-gap:22px!important;row-gap:10px!important;max-width:min(1900px,98vw)!important;padding:0 24px 42px!important;padding-left:24px!important}
+  body:has(.hud) .wrap>.nav{grid-column:1!important;grid-row:1 / span 4!important;position:sticky!important;top:0!important;align-self:start!important;width:188px!important;min-width:188px!important;margin:0!important;padding:86px 12px 20px!important}
+  body:has(.hud) .wrap>.hud{grid-column:2!important;grid-row:1!important;margin:0!important;width:auto!important}
+  body:has(.hud) .wrap>.luk{grid-column:2!important;grid-row:2!important;margin:0!important}
+  body:has(.hud) .wrap>.wazne{grid-column:2!important;grid-row:3!important;margin:0!important}
+  body:has(.hud) .wrap>.layout{grid-column:2!important;grid-row:4!important;margin:0!important}
+}
+
 /* 1.1.173: cala rozgrywka dostaje wspolny pokoj odpraw. Wczesniej kazdy
    ekran mial osobna fakture i po przejsciu z decyzji do wyborow zmienial sie
    nie tylko temat, ale tez rytm kart. Nowe tlo jest ciche w centrum, a
@@ -2975,3 +3096,52 @@ body:not(:has(.mg)):has(.partyselect) .partyselect.fifa>.pickmain{
     url("../obrazki/ui-party-draft-room-v2.webp") center/cover!important;
   border-color:color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 54%,rgba(196,154,75,.4))!important
 }
+
+/* 1.1.192 final cascade: te reguły muszą być ostatnie, bo sejm-v4 ma kilka
+   historycznych breakpointów dla tego samego HUD-u i mapy. */
+body:has(.hud) .hud{grid-template-columns:minmax(230px,280px) minmax(0,1fr) auto!important;min-width:0;overflow:visible!important}
+body:has(.hud) .hudcenter{display:grid!important;grid-template-columns:minmax(0,1.6fr) minmax(220px,.8fr)!important;min-width:0;overflow:visible!important;opacity:1!important;visibility:visible!important}
+body:has(.hud) .hudcenter .rgroup{min-width:0;overflow:visible!important;flex-wrap:nowrap!important;opacity:1!important;visibility:visible!important}
+body:has(.hud) .hudcenter .rgroup .rs{min-width:0;flex:1 1 0;overflow:visible!important}
+body:has(.hud) .sidebar{max-height:none!important;overflow:visible!important;padding-right:0!important}
+body:has(.hud) .widok,.widok[data-tab],body:has(.hud) .sadhist{overflow:visible!important;max-height:none!important}
+body:has(.hud) .goals-command-main,body:has(.hud) .goals-inspector{overflow:visible!important}
+body:has(.hud) .goals-map-frame{user-select:none!important;-webkit-user-select:none!important;touch-action:none!important;overflow:hidden!important}
+body:has(.hud) .goals-map-canvas{will-change:transform;transform-origin:0 0!important}
+body:has(.hud) .goals-map-grid .goal-tree-row{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(148px,1fr))!important;gap:28px 18px!important;align-items:start!important;overflow:visible!important;width:auto!important;min-width:0!important;padding:10px 12px 24px!important}
+body:has(.hud) .goals-map-grid .goal-node-wrap{width:auto!important;min-width:0!important;padding:0!important;position:relative}
+body:has(.hud) .goals-map-grid .goal-node-wrap:not(.last)::after{top:auto!important;left:50%!important;right:auto!important;bottom:-18px!important;width:1px!important;height:18px!important;background:color-mix(in srgb,var(--party-theme,#d6aa58) 65%,#6f8976)!important}
+body:has(.hud) .goals-map-grid .goal-node{min-height:142px!important;width:100%!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:7px!important;padding:12px 9px!important;text-align:center!important;background:rgba(8,20,13,.4)!important;border:1px solid rgba(214,170,88,.2)!important;border-radius:3px!important;box-shadow:none!important;transform:none!important}
+body:has(.hud) .goals-map-grid .goal-node:hover{transform:translateY(-2px)!important;background:rgba(23,48,30,.7)!important}
+body:has(.hud) .goals-map-grid .goal-node-icon{width:64px!important;height:64px!important;border-radius:50%!important;background:rgba(3,12,8,.8)!important}
+body:has(.hud) .goals-map-grid .goal-node-icon img{width:56px!important;height:56px!important;object-fit:contain!important}
+body:has(.hud) .goals-map-grid .goal-node-copy{align-items:center!important;gap:3px!important;min-width:0!important;width:100%!important}
+body:has(.hud) .goals-map-grid .goal-node-copy b{display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;white-space:normal!important;line-height:1.15!important}
+body:has(.hud) .mdl .bd,body:has(.hud) .mdl .op{overflow:visible!important;max-height:none!important}
+body:has(.hud) .veil{overflow:auto!important;align-items:start!important;padding:24px!important}
+@media(min-width:1181px){
+  body:has(.hud) .wrap{padding:0 24px 42px!important;padding-left:24px!important;display:grid!important;grid-template-columns:188px minmax(0,1fr)!important;grid-template-rows:auto auto auto minmax(0,1fr)!important;column-gap:22px!important;row-gap:10px!important;max-width:min(1900px,98vw)!important}
+  body:has(.hud) .wrap>.nav{grid-column:1!important;grid-row:1 / span 4!important;position:sticky!important;top:0!important;align-self:start!important;margin:0!important}
+  body:has(.hud) .wrap>.hud{grid-column:2!important;grid-row:1!important;margin:0!important;width:auto!important}
+  body:has(.hud) .wrap>.luk{grid-column:2!important;grid-row:2!important;margin:0!important}
+  body:has(.hud) .wrap>.wazne{grid-column:2!important;grid-row:3!important;margin:0!important}
+  body:has(.hud) .wrap>.layout{grid-column:2!important;grid-row:4!important;margin:0!important}
+  body:has(.hud) .wrap>.nav{width:188px!important;min-width:188px!important;padding:86px 12px 20px!important}
+  body:has(.hud) .wrap>.nav::before{left:18px!important;top:22px!important;font-size:20px!important}
+  body:has(.hud) .wrap>.nav::after{left:19px!important;top:51px!important;font-size:7px!important}
+  body:has(.hud) .wrap>.nav button{font-size:11px!important;white-space:nowrap!important}
+}
+@media(max-width:1180px){
+  body:has(.hud) .hud{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+  body:has(.hud) .hudcenter{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+  body:has(.hud) .hudend{width:100%;justify-content:flex-end!important;flex-wrap:wrap!important}
+  /* Na laptopie inspektor nie moze zabierac polowy mapy. Spada pod nia,
+     wiec drzewo nadal ma szerokosc do klikniecia zamiast byc waskim paskiem. */
+  body:has(.hud) .goals-command-layout{grid-template-columns:minmax(0,1fr)!important}
+  body:has(.hud) .goals-inspector{grid-column:1/-1!important;border-left:0!important;border-top:1px solid var(--gc-line)!important}
+  body:has(.hud) .wrap>.nav{position:relative!important;top:auto!important;left:auto!important;bottom:auto!important;width:auto!important;min-width:0!important;max-height:none!important;margin:0 0 14px!important;padding:6px 8px!important;display:flex!important;flex-direction:row!important;overflow-x:auto!important;overflow-y:hidden!important;gap:3px!important}
+  body:has(.hud) .wrap>.nav::before,body:has(.hud) .wrap>.nav::after{display:none!important}
+  body:has(.hud) .wrap>.nav button{flex:0 0 auto!important;white-space:nowrap!important;min-height:34px!important}
+}
+@media(max-width:680px){body:has(.hud) .hudcenter{grid-template-columns:1fr!important}body:has(.hud) .hudcenter .rgroup+.rgroup{border-left:0!important;border-top:1px solid rgba(196,154,75,.21);padding-top:5px}body:has(.hud) .goals-map-grid .goal-tree-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:430px){body:has(.hud) .goals-map-grid .goal-tree-row{grid-template-columns:1fr!important}}

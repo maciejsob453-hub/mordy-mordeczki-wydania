@@ -4,6 +4,14 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.192':{data:'10 sierpnia 2026',zmiany:[
+  'HUD nie znika podczas plyniecia czasu: kapital, energia, sondaz i mandaty maja stale miejsce.',
+  'Mniejsze ekrany dostaja stabilny uklad HUD i kategorii bez nachodzenia na naglowek Sejm i Ksiega Spraw.',
+  'Mapa celow trzyma zoom i przesuniecie podczas odswiezania zegara, nie zaznacza tekstu i pokazuje loga z krotkimi nazwami.',
+  'Cele narodowe nie startuja same: gracz uruchamia odliczanie dopiero po kliknieciu przycisku.',
+  'Dodano autorskie loga Partii Liberalnej i Alternatywy Zydowskiej do celow i szyldow.',
+  'Usunieto wewnetrzne scrolle z paneli i opisow modalnych; przewija sie cale okno.'
+ ]},
  '1.1.191':{data:'10 sierpnia 2026',zmiany:[
   'Tematyczny interfejs bierze teraz kolor wybranej partii: Concordia jest fioletowa, PPP zielona, a ramki, naglowki, przyciski i pasek nawigacji trzymaja jeden akcent.',
   'Szyna kategorii i boczny rejestr dostaly wiecej miejsca. Kondycja partii nie lamie nazw cech na pojedyncze litery, a boczne panele maja wlasne przewijanie zamiast rozpychac cala strone.',

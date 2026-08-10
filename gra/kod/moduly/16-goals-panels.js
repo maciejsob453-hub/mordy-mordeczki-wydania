@@ -422,7 +422,7 @@ const GOALS={
 };
 function libBecome(k){
   const p=G.p[k];
-  p.n='Partia Liberalna';p.ab='PL';p.c='#e8c72e';p.logo='LIB';p.libMode=1;
+  p.n='Partia Liberalna';p.ab='PL';p.c='#e8c72e';p.logo='PLIB';p.libMode=1;
   p.pret=cl(p.pret-18);p.fame=cl(p.fame+12);p.cred=cl(p.cred+8);M(p,10);
 }
 function adsBecome(k){
@@ -434,7 +434,7 @@ const IDENT_BRAND={
  repMode:{n:'Partia Republikańska',ab:'PR',c:'#1e63d0',logo:'REP'},
  demMode:{n:'Partia Demokratyczna',ab:'PD',c:'#7aa842',logo:'PD'},
  adsMode:{n:'Alternatywa dla Serwera',ab:'AdS',c:'#0090d4',logo:'ADS'},
- libMode:{n:'Partia Liberalna',ab:'PL',c:'#e8c72e',logo:'LIB'},
+ libMode:{n:'Partia Liberalna',ab:'PL',c:'#e8c72e',logo:'PLIB'},
  lib2Mode:{n:'Alternatywa Liberalna',ab:'AL',c:'#c0392b',logo:'ALT'},
  robMode:{n:'Partia Kolektywnych Robotników',ab:'PKR',c:'#1d3f7a',logo:'PKR'},
  postMode:{n:'Postępowcy',ab:'PST',c:'#5b2d85',logo:'POST'},
@@ -443,7 +443,7 @@ const IDENT_BRAND={
  rom12Mode:{n:'Polska 1612',ab:'1612',c:'#8c3b2a',logo:'P1612'},
  cenMode:{n:'Partia Centrum',ab:'PC',c:'#1f7f86',logo:'CEN'},
  hegMode:{n:'Hegemonia Perspektywiczna',ab:'HP',c:'#c8952b',logo:'HEG'},
- azMode:{n:'Alternatywa Żydowska',ab:'AŻ',c:'#d46b9a',logo:'ALT'},
+ azMode:{n:'Alternatywa Żydowska',ab:'AŻ',c:'#d46b9a',logo:'AZ'},
  aureaMode:{n:'Aurea Libertas',ab:'AL',c:'#d9b34a',logo:'ALT'},
 };
 const myIdentities=()=>{const p=G&&G.p[G.me];return p?Object.keys(IDENT_BRAND).filter(m=>p[m]):[]};
@@ -469,7 +469,7 @@ const NATIONAL_GOALS={
   cons:['Aktywność +8 i obecność +10.','Sława +4 oraz dodatkowy kapitał partii.'],
   access:()=>!!(G&&G.p[G.me]&&roster(G.p[G.me]).includes('Pan Hod_Dog')),
   run(){const p=me();p.nplrHotdog=1;p.act=cl(p.act+8);p.uni=cl(p.uni+4);p.fame=cl(p.fame+4);p.pres&&REG.forEach(r=>{p.pres[r.id]=cl(p.pres[r.id]+10)});M(p,7)}},
- nplr_rose:{n:'Róża spadająca na słońce',days:70,prev:'nplr_hotdog',logo:'LIB',
+ nplr_rose:{n:'Róża spadająca na słońce',days:70,prev:'nplr_hotdog',logo:'PLIB',
   what:'Concordia dojrzewa do własnego szyldu. Róża nie jest już obietnicą — staje się Partią Liberalną.',
   accessText:'Poprzedni cel narodowy musi być ukończony.',
   cons:['Powstaje Partia Liberalna z żółtą różą.','Sława +4, wiarygodność +3 i mały zastrzyk kapitału.'],
@@ -487,12 +487,12 @@ const NATIONAL_GOALS={
   cons:['Relacja z PKD rośnie o 24 w obie strony.','Wiarygodność +6 i aktywność +3.'],
   access:()=>true,
   run(){const p=me(),a=G.rel&&G.rel[G.me],b=G.rel&&G.rel.PKD;if(a){a.PKD=cl((a.PKD||0)+24,-100,100)}if(b){b[G.me]=cl((b[G.me]||0)+24,-100,100)}p.cred=cl(p.cred+6);p.act=cl(p.act+3)}},
- nplr_star:{n:'Nie tylko na słońce, ale również na gwiazdę',days:35,prev:'nplr_jewish',logo:'ALT',
+ nplr_star:{n:'Nie tylko na słońce, ale również na gwiazdę',days:35,prev:'nplr_jewish',logo:'AZ',
   what:'Ostatni przełom tworzy Alternatywę Żydowską: mały, wyspecjalizowany szyld z własnym miejscem na scenie.',
   accessText:'Relacja z PKD musi wynosić co najmniej +50.',
   cons:['Powstaje Alternatywa Żydowska (AŻ).','Wiarygodność +5, aktywność +4 i jedność +3.'],
   access:()=>!!(G&&G.rel&&G.rel[G.me]&&G.rel[G.me].PKD>=50),
-  run(){const p=me();p.n='Alternatywa Żydowska';p.ab='AŻ';p.c='#d46b9a';p.logo='ALT';p.azMode=1;p.cred=cl(p.cred+5);p.act=cl(p.act+4);p.uni=cl(p.uni+3);M(p,8)}},
+  run(){const p=me();p.n='Alternatywa Żydowska';p.ab='AŻ';p.c='#d46b9a';p.logo='AZ';p.azMode=1;p.cred=cl(p.cred+5);p.act=cl(p.act+4);p.uni=cl(p.uni+3);M(p,8)}},
  nplr_blue:{n:'Niebieski blask na oczach mych',days:70,prev:'nplr_star',branch:'republican',logo:'REP',
   what:'Alternatywa Żydowska zbiera ludzi, którzy pamiętają dawny niebieski szyld i chcą go odbudować bez skrótu na samą nazwę.',
   accessText:'W partii muszą być Kaziu, Europejczyk, Eniki, Tako i Ponczus.',
@@ -543,7 +543,7 @@ const NATIONAL_GOALS={
   run(){const p=me();p.n='Partia Republikańska';p.ab='PR';p.c='#1e63d0';p.logo='REP';p.repMode=1;p.fame=cl(p.fame+20);p.cred=cl(p.cred+14);p.act=cl(p.act+12);p.uni=cl(p.uni+8);M(p,20)}}
 };
 /* Dedykowane znaki celów: nigdy nie używamy herbu partii jako zastępczej grafiki. */
-[['nplr_liberal','obrazki/cel-liberalizm.svg'],['nplr_hotdog','obrazki/16ca0d3b9eeb.webp'],['nplr_rose','obrazki/cel-roza.svg'],['nplr_king','obrazki/0051a52917ef.webp'],['nplr_jewish','obrazki/cel-gwiazda.svg'],['nplr_star','obrazki/cel-gwiazda.svg'],['nplr_blue','obrazki/cel-oko.svg'],['nplr_diplomacy','obrazki/cel-dyplomacja.svg'],['nplr_council','obrazki/cel-rada.svg'],['nplr_gloria','obrazki/cel-republika.svg'],['nplr_power','obrazki/cel-rada.svg'],['nplr_friendship','obrazki/cel-dyplomacja.svg'],['nplr_aurea','obrazki/cel-republika.svg'],['nplr_aurea_republic','obrazki/cel-republika.svg']].forEach(([id,avatar])=>{if(NATIONAL_GOALS[id])NATIONAL_GOALS[id].avatar=avatar});
+[['nplr_liberal','obrazki/cel-liberalizm.svg'],['nplr_hotdog','obrazki/16ca0d3b9eeb.webp'],['nplr_rose','obrazki/logo-partia-liberalna.png'],['nplr_king','obrazki/0051a52917ef.webp'],['nplr_jewish','obrazki/cel-gwiazda.svg'],['nplr_star','obrazki/logo-alternatywa-zydowska.png'],['nplr_blue','obrazki/cel-oko.svg'],['nplr_diplomacy','obrazki/cel-dyplomacja.svg'],['nplr_council','obrazki/cel-rada.svg'],['nplr_gloria','obrazki/cel-republika.svg'],['nplr_power','obrazki/cel-rada.svg'],['nplr_friendship','obrazki/cel-dyplomacja.svg'],['nplr_aurea','obrazki/cel-republika.svg'],['nplr_aurea_republic','obrazki/cel-republika.svg']].forEach(([id,avatar])=>{if(NATIONAL_GOALS[id])NATIONAL_GOALS[id].avatar=avatar});
 const NATIONAL_BASE_ORDER=['nplr_liberal','nplr_hotdog','nplr_rose','nplr_king','nplr_jewish','nplr_star'];
 const NATIONAL_BRANCHES={republican:{name:'Rozwidlenie republikańskie',ids:['nplr_blue','nplr_diplomacy','nplr_council','nplr_gloria']},freedom:{name:'Rozwidlenie wolnościowe',ids:['nplr_power','nplr_friendship','nplr_aurea','nplr_aurea_republic']}};
 const NATIONAL_ORDER=Object.keys(NATIONAL_GOALS);
@@ -572,14 +572,14 @@ function chooseNationalBranch(branch){
   const s=nationalState();if(s.branch||!s.done.nplr_star)return;
   s.branch=branch;s.waiting=null;
   say(`<b>Rozwidlenie celu narodowego.</b> Wybrano: ${NATIONAL_BRANCHES[branch].name}.`,'roy');
-  nationalGoalTick();render();
+  render();
 }
 function chooseNationalOptional(id){
   const g=NATIONAL_GOALS[id],s=nationalState();
   if(!G||G.me!=='PLR'||!g||!g.optional||!s||s.done[id]||s.optional[id]||!nationalGoalAccess(id))return;
   s.optional[id]=1;s.waiting=null;
-  say(`<b>Cel opcjonalny przyjęty.</b> ${g.n} zacznie odliczanie, gdy zakończy się poprzedni etap.`,'roy');
-  nationalGoalTick();render();
+  say(`<b>Cel opcjonalny odblokowany.</b> ${g.n} czeka na Twoje polecenie startu.`,'roy');
+  render();
 }
 function nationalGoalAccess(id){
   const g=NATIONAL_GOALS[id];if(!g||!G)return false;
@@ -607,6 +607,21 @@ function nationalComplete(id){
   say(`<b>Cel narodowy ukończony.</b> ${g.n} otwiera kolejny etap Concordii.`,'roy');
   if(typeof SFX!=='undefined'&&SFX.goal)SFX.goal();
 }
+/* Odliczanie jest decyzją gracza. Sam fakt spełnienia warunku nie uruchamia
+   celu w tle, bo wtedy mapa wyglądała jakby sama wybierała program za gracza. */
+function startNationalGoal(id){
+  if(!G||PROBA||G.me!=='PLR')return;
+  const g=NATIONAL_GOALS[id],s=nationalState();
+  if(!g||!s||s.done[id]||s.active)return;
+  if(g.branch&&!s.branch)return;
+  if(g.prev&&!s.done[g.prev])return;
+  if(g.optional&&!s.optional[id])return;
+  if(!nationalGoalAccess(id))return;
+  const today=nationalDayIndex();
+  s.active=id;s.waiting=null;s.started[id]={day:today,term:G.term,week:G.week};
+  say(`<b>Cel narodowy uruchomiony.</b> ${g.n} odlicza teraz ${g.days} dni.`,'roy');
+  render();
+}
 function nationalGoalTick(){
   if(!G||PROBA||G.me!=='PLR')return;
   const s=nationalState(),today=nationalDayIndex();
@@ -622,8 +637,7 @@ function nationalGoalTick(){
     if(g.prev&&!s.done[g.prev])return;
     if(!nationalGoalAccess(id)){s.waiting=id;return;}
     if(g.optional&&!s.optional[id]){s.waiting='optional:'+id;return;}
-    s.active=id;s.waiting=null;s.started[id]={day:today,term:G.term,week:G.week};
-    say(`<b>Nowy cel narodowy.</b> ${g.n} rozpoczyna odliczanie: ${g.days} dni.`,'roy');
+    s.waiting='ready:'+id;
     return;
   }
 }
@@ -648,7 +662,11 @@ function myPartyGoals(){
 function nationalGoalReady(){
   if(!G||G.me!=='PLR')return false;
   nationalGoalTick();
-  const s=nationalState();return !!(s&&s.active);
+  const s=nationalState();
+  /* Gotowy cel ma byc alertem, nie automatycznym startem. Wczesniej badge
+     pojawial sie dopiero po starcie, wiec gracz nie wiedzial, ze moze podjac
+     decyzje i jednoczesnie nie mogl jej swiadomie odroczyc. */
+  return !!(s&&s.active||s&&String(s.waiting||'').startsWith('ready:'));
 }
 function goalReady(){return myPartyGoals().some(id=>!goalDone(id)&&goalOk(id))}
 function doGoal(id){
@@ -778,7 +796,7 @@ function nationalGoalCard(id){
       <div class="national-goal-head"><img class="national-goal-logo" src="${src}" alt=""><div><p class="national-goal-what">${g.what}</p>
         <span class="pill ${p.done?'pos':p.active?'acc':''}">${p.done?'przełom osiągnięty':p.active?'aktywny cel narodowy':reason||'gotowy do uruchomienia'}</span></div></div>
       <div class="national-goal-timeline"><div class="trk"><i style="width:${p.pct}%"></i></div><b>${p.pct}%</b></div>
-      <div class="national-goal-meta"><span>${p.active?'Odliczanie trwa według kalendarza gry.':p.done?'Ukończono w dniu '+(nationalState().completedAt[id]??'—')+'.':reason||'Cel rozpocznie się automatycznie.'}</span><span>${g.days} dni</span></div>
+      <div class="national-goal-meta"><span>${p.active?'Odliczanie trwa według kalendarza gry.':p.done?'Ukończono w dniu '+(nationalState().completedAt[id]??'—')+'.':reason||'Warunki są spełnione. Ty decydujesz, kiedy uruchomić cel.'}</span><span>${g.days} dni</span></div>
       <h4>Warunek dostępu</h4><div class="national-goal-access">${g.accessText||'Poprzedni cel musi być ukończony.'}</div>
       <h4>Konsekwencje</h4>${g.cons.map(c=>`<div class="national-goal-consequence">${c}</div>`).join('')}
       ${id==='nplr_council'&&p.done?`<div class="council-callout"><b>Rada Partyjna</b><span>${G.partyCouncil&&G.partyCouncil.members&&G.partyCouncil.members.length===5?'Skład zapisany · '+G.partyCouncil.members.join(', '):'Nie wybrano jeszcze pięciu członków.'}</span>${G.partyCouncil&&G.partyCouncil.members&&G.partyCouncil.members.length===5?'':'<button class="btn sm" onclick="openPartyCouncil()">Wybierz radę →</button>'}</div>`:''}
@@ -1427,6 +1445,8 @@ function goalsInspector(item){
   let action='';
   if(item.type==='party'&&!item.done)action=`<button class="goals-action primary" ${item.ready?'':'disabled'} onclick="doGoal('${esc(item.id)}')">${item.ready?'WYPEŁNIJ CEL':'WARUNKI JESZCZE NIE SPEŁNIONE'} <span>→</span></button>`;
   if(item.type==='national'&&g.optional&&!item.done&&!item.active&&item.opted===false&&nationalGoalAccess(item.id))action=`<button class="goals-action primary" onclick="chooseNationalOptional('${esc(item.id)}')">PODEJMIJ CEL OPCJONALNY <span>→</span></button>`;
+  if(item.type==='national'&&!g.optional&&!item.done&&!item.active&&item.ready)action=`<button class="goals-action primary" onclick="startNationalGoal('${esc(item.id)}')">URUCHOM CEL <span>→</span></button>`;
+  if(item.type==='national'&&g.optional&&!item.done&&!item.active&&item.opted===true&&item.ready)action=`<button class="goals-action primary" onclick="startNationalGoal('${esc(item.id)}')">URUCHOM CEL <span>→</span></button>`;
   if(item.type==='national'&&item.id==='nplr_council'&&item.done&&!(G.partyCouncil&&G.partyCouncil.members&&G.partyCouncil.members.length===5))action=`<button class="goals-action primary" onclick="openPartyCouncil()">WYBIERZ RADĘ PARTYJNĄ <span>→</span></button>`;
   if(item.done)action=`<div class="goals-complete-stamp">✓ CEL ZREALIZOWANY</div>`;
   return `<aside class="goals-inspector"><div class="goal-inspector-top"><span class="goal-inspector-type">${item.type==='national'?'CEL NARODOWY':'CEL PARTYJNY'} · ${item.status.toUpperCase()}</span><span class="goal-inspector-id">${item.type==='national'?item.g.days+' DNI':'PROGRAM'}</span></div><div class="goal-inspector-title"><div class="goal-inspector-seal">${item.icon?`<img src="${item.icon}" alt="">`:'✦'}</div><div><h2>${item.name}</h2><p>${g.what||''}</p></div></div><div class="goal-inspector-progress"><div><span>POSTĘP</span><b>${item.progress}%</b></div><div class="goal-progress-track"><i style="width:${item.progress}%"></i></div></div><h4>WARUNKI OPERACYJNE</h4><ul class="goal-condition-list">${conditions}</ul><h4>SKUTKI POLITYCZNE</h4><div class="goal-effect-list">${(g.cons||[]).map(c=>`<div><span>◆</span>${c}</div>`).join('')}</div>${action}</aside>`;

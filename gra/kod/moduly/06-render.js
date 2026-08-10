@@ -29,13 +29,19 @@ const tenSamWezel=(a,b)=>a.nodeType===b.nodeType&&
 
 function zszyjAtrybuty(stary,nowy){
   const na=nowy.attributes;
+  /* Transform mapy celów jest stanem interakcji, nie częścią nowego HTML-a.
+     Zegar składa ekran kilka razy na sekundę; przepisywanie pustego style z
+     szablonu kasowało zoom i przesunięcie zaraz po wznowieniu gry. */
+  const mapaCelow=!!(stary.dataset&&stary.dataset.goalsCanvas!==undefined);
   for(let i=na.length-1;i>=0;i--){
     const at=na[i];
+    if(mapaCelow&&at.name==='style')continue;
     if(stary.getAttribute(at.name)!==at.value)stary.setAttribute(at.name,at.value);
   }
   const sa=stary.attributes;
   for(let i=sa.length-1;i>=0;i--){
     const at=sa[i];
+    if(mapaCelow&&at.name==='style')continue;
     if(!nowy.hasAttribute(at.name))stary.removeAttribute(at.name);
   }
   /* Pola formularza trzymają to, co wpisał gracz, we właściwości, a nie
