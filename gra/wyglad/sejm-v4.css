@@ -3145,3 +3145,106 @@ body:has(.hud) .veil{overflow:auto!important;align-items:start!important;padding
 }
 @media(max-width:680px){body:has(.hud) .hudcenter{grid-template-columns:1fr!important}body:has(.hud) .hudcenter .rgroup+.rgroup{border-left:0!important;border-top:1px solid rgba(196,154,75,.21);padding-top:5px}body:has(.hud) .goals-map-grid .goal-tree-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:430px){body:has(.hud) .goals-map-grid .goal-tree-row{grid-template-columns:1fr!important}}
+
+/* 1.1.193: cele czyta sie jak drzewo decyzji, nie jak rzad kart.
+   Ikona jest wezlem, a podpis tylko mala tabliczka pod nia. */
+body:has(.hud) .goals-map-grid .goal-tree-row{
+  display:flex!important;flex-direction:column!important;align-items:center!important;gap:0!important;
+  width:100%!important;min-width:0!important;overflow:visible!important;padding:18px 8px 28px!important
+}
+body:has(.hud) .goals-map-grid .goal-node-wrap{
+  width:min(360px,100%)!important;min-width:0!important;padding:0 0 34px!important;position:relative!important
+}
+body:has(.hud) .goals-map-grid .goal-node-wrap:not(.last)::after{
+  content:''!important;top:auto!important;left:50%!important;right:auto!important;bottom:8px!important;
+  width:1px!important;height:26px!important;background:linear-gradient(180deg,var(--party-theme,#d6aa58),rgba(125,151,132,.25))!important;
+  box-shadow:0 0 9px color-mix(in srgb,var(--party-theme,#d6aa58) 50%,transparent)!important
+}
+body:has(.hud) .goals-map-grid .goal-node{
+  min-height:0!important;width:100%!important;display:flex!important;flex-direction:column!important;align-items:center!important;
+  gap:7px!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;transform:none!important;color:var(--tx)!important
+}
+body:has(.hud) .goals-map-grid .goal-node:hover{transform:translateY(-2px)!important;background:transparent!important}
+body:has(.hud) .goals-map-grid .goal-node-mark{display:none!important}
+body:has(.hud) .goals-map-grid .goal-node-icon{
+  width:78px!important;height:78px!important;display:grid!important;place-items:center!important;border-radius:50%!important;
+  background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.1),rgba(3,11,7,.96) 68%)!important;
+  border:1px solid color-mix(in srgb,var(--party-theme,#d6aa58) 72%,#66806e)!important;
+  box-shadow:0 0 0 5px rgba(5,14,9,.8),0 0 0 6px color-mix(in srgb,var(--party-theme,#d6aa58) 38%,transparent),0 8px 20px rgba(0,0,0,.28)!important
+}
+body:has(.hud) .goals-map-grid .goal-node-icon img{width:66px!important;height:66px!important;object-fit:contain!important}
+body:has(.hud) .goals-map-grid .goal-node-copy{
+  width:auto!important;max-width:min(300px,100%)!important;align-items:center!important;gap:0!important;padding:6px 12px!important;
+  border:1px solid rgba(196,154,75,.28)!important;border-radius:3px!important;background:linear-gradient(180deg,rgba(18,30,22,.95),rgba(5,13,9,.98))!important;
+  box-shadow:0 5px 14px rgba(0,0,0,.22)!important
+}
+body:has(.hud) .goals-map-grid .goal-node-copy em,
+body:has(.hud) .goals-map-grid .goal-node-copy small{display:none!important}
+body:has(.hud) .goals-map-grid .goal-node-copy b{
+  display:block!important;white-space:normal!important;text-align:center!important;line-height:1.15!important;
+  font:600 12px var(--m)!important;color:#eadcb8!important
+}
+body:has(.hud) .goals-map-grid .goal-node.locked{opacity:.48!important;filter:saturate(.6)!important}
+body:has(.hud) .goals-map-grid .goal-node.active .goal-node-icon,
+body:has(.hud) .goals-map-grid .goal-node.selected .goal-node-icon{box-shadow:0 0 0 5px rgba(5,14,9,.8),0 0 0 7px var(--party-theme,#d6aa58),0 0 24px color-mix(in srgb,var(--party-theme,#d6aa58) 55%,transparent)!important}
+
+/* KrĂłl: ranking jest galeriÄ… dworskÄ…, nie ciasnÄ… tabelÄ…. */
+body:has(.hud) .widok[data-tab="krol"] .card:has(.krank) .b{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;padding:14px!important
+}
+body:has(.hud) .widok[data-tab="krol"] .card:has(.krank) .minrow{
+  display:grid!important;grid-template-columns:24px 34px minmax(0,1fr) 44px!important;align-items:center!important;gap:7px!important;
+  min-height:54px!important;margin:0!important;padding:8px!important;border:1px solid rgba(196,154,75,.22)!important;
+  border-left:3px solid color-mix(in srgb,var(--party-theme,#b896d8) 72%,rgba(196,154,75,.4))!important;
+  border-radius:3px!important;background:linear-gradient(145deg,rgba(25,20,27,.9),rgba(7,13,10,.96))!important
+}
+body:has(.hud) .widok[data-tab="krol"] .card:has(.krank) .minrow>span:nth-child(3){min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+body:has(.hud) .widok[data-tab="krol"] .card:has(.krank) .minrow .crest{width:30px!important;height:30px!important}
+@media(max-width:760px){body:has(.hud) .widok[data-tab="krol"] .card:has(.krank) .b{grid-template-columns:1fr!important}}
+
+/* SondaĹĽ: trzy odczyty majÄ… rĂłwny ciÄ™ĹĽar i nie zostawiajÄ… pustego czwartego pola. */
+body:has(.hud) .widok[data-tab="sondaz"] .pollheroStats{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;width:100%!important}
+body:has(.hud) .widok[data-tab="sondaz"] .pollheroStats>div{min-width:0!important;width:auto!important;padding:13px 10px!important}
+
+/* ZamkniÄ™te kanaĹ‚y nie powinny wypeĹ‚niaÄ‡ pustkÄ… caÅ‚ego ekranu. */
+body:has(.hud) .sadzamkniety,
+body:has(.hud) .mediazamkniete,
+body:has(.hud) .mordelock{
+  min-height:360px!important;height:auto!important;justify-content:flex-start!important;padding:28px 32px!important
+}
+body:has(.hud) .sadzamkniety .btn,
+body:has(.hud) .mediazamkniete .btn,
+body:has(.hud) .mordelock .btn{
+  background:linear-gradient(180deg,#e6c56e,#aa7628)!important;border-color:#f2d88f!important;color:#1b1408!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.6),0 6px 14px rgba(0,0,0,.26)!important
+}
+body:has(.hud) .sadzamkniety .btn:hover,
+body:has(.hud) .mediazamkniete .btn:hover,
+body:has(.hud) .mordelock .btn:hover{background:linear-gradient(180deg,#f3d989,#c18e35)!important}
+
+/* Stara reguĹ‚a .widok .btn:not(.g) jest bardziej szczegĂłĹ‚owa, wiÄ™c ekran
+   blokady dostaje celowo peĹ‚ny selektor i zawsze zachowuje zĹ‚oty przycisk. */
+body:not(:has(.mg)):has(.hud) .widok[data-tab="media"] .mediazamkniete .btn,
+body:not(:has(.mg)):has(.hud) .widok[data-tab="sad"] .sadzamkniety .btn,
+body:not(:has(.mg)):has(.hud) .widok[data-tab="mordepedia"] .mordelock .btn{
+  background:linear-gradient(180deg,#e6c56e,#aa7628)!important;border-color:#f2d88f!important;color:#1b1408!important
+}
+
+/* Ostateczny bezpiecznik: stare reguły przycisków mają selektory z .widok,
+   więc #app świadomie podbija specyficzność tylko na ekranach blokady. */
+#app .widok[data-tab="media"] .mediazamkniete .btn,
+#app .widok[data-tab="sad"] .sadzamkniety .btn,
+#app .widok[data-tab="mordepedia"] .mordelock .btn{
+  background:linear-gradient(180deg,#e6c56e,#aa7628)!important;
+  border-color:#f2d88f!important;color:#1b1408!important;
+}
+#app .mordesnapshot small{display:block;margin-top:3px;color:var(--dim2);font:10px var(--m)}
+
+/* Ten sam poziom specyficzności co historyczny reset .btn.btn z desktop.css. */
+body:not(:has(.mg)):has(.hud) #app .widok .mediazamkniete button.btn.btn:not(.tura):not(.g):not(.r):not(.red),
+body:not(:has(.mg)):has(.hud) #app .widok .sadzamkniety button.btn.btn:not(.tura):not(.g):not(.r):not(.red),
+body:not(:has(.mg)):has(.hud) #app .widok .mordelock button.btn.btn:not(.tura):not(.g):not(.r):not(.red){
+  background:linear-gradient(180deg,#e6c56e,#aa7628)!important;
+  border-color:#f2d88f!important;color:#1b1408!important;-webkit-text-fill-color:#1b1408!important;
+}

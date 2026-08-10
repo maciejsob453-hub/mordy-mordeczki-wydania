@@ -207,6 +207,14 @@ const LEAD={
  'Tako':[46,74,58,52],   // intelektualista: głowa tak, estrada nie
  'ke_Trab':[60,74,56,64],
 };
+/* Balans startowy: czesc nazwisk miala jednoczesnie bardzo wysokie wszystkie
+   cechy, przez co liderzy z zaplecza byli lepsi od kazdego wyboru gracza.
+   Nerf jest wspolny dla charyzmy, kompetencji, wytrzymalosci i autorytetu,
+   a nie zmienia pozniejszych doswiadczen ani decyzji w trakcie gry. */
+const NERFED_PEOPLE=['ekologiaball','mentos','Prewencjusz','Silesia','its.r3dz0l.eq','Pablo','bluetes33','Wiktor z Aeterny','Bober','Oli','Mietek Nocul','Kocur','Antoniopl','x_avi','Garibaldi','alan','Serty','Animu Player','Sirius','Gustaw','Rax','Ignacy','impir','Maciek','cargrzybov','Kromka'];
+const NERF_FACTOR=.82;
+NERFED_PEOPLE.forEach(n=>{if(LEAD[n])LEAD[n]=LEAD[n].map(v=>Math.max(1,Math.round(v*NERF_FACTOR)))})
+
 const AGENTS=[
  {n:'Korzeń',           seg:'ser',kp:18,d:'Siedzi na kanale od zawsze, nie napisał nic, co ktoś by zapamiętał. Ale jest.'},
  {n:'Maciej Starszy',   seg:'eli',kp:88,d:'Stary wyjadacz z czasów, o których nikt już nie pamięta. Waży w każdej rozmowie.'},

@@ -4,6 +4,13 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.193':{data:'10 sierpnia 2026',zmiany:[
+  'Cele Concordii maja teraz pionowe drzewo decyzji: kolko z logiem i mala etykieta prowadza w dol jak w grand strategy.',
+  'Ranking dworski dostal rowne karty i czytelny uklad kolumn, a sondaz trzy rowne odczyty bez pustego pola.',
+  'Media, Sad i Pedia nie wypelniaja juz ekranu pustym tlem, a przyciski odblokowania maja wyrazne zlote tlo.',
+  'Mordepedia zapisuje konkretnego premiera, prezydenta oraz trzy najmocniejsze wyniki wyborow z kadencji.',
+  'Obnizono startowe cechy wskazanych osob, zeby zaplecze nie bylo z automatu silniejsze od lidera gracza.'
+ ]},
  '1.1.192':{data:'10 sierpnia 2026',zmiany:[
   'HUD nie znika podczas plyniecia czasu: kapital, energia, sondaz i mandaty maja stale miejsce.',
   'Mniejsze ekrany dostaja stabilny uklad HUD i kategorii bez nachodzenia na naglowek Sejm i Ksiega Spraw.',

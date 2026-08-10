@@ -10,6 +10,8 @@ function runElection(){
   const p0=G.p[G.me];
   G.hist.push({term:G.term,seats:Object.fromEntries(PID.map(k=>[k,G.p[k].seats])),
     pct:q.res[G.me].tot/q.total*100,pm:G.gov?G.gov.pm:null,
+    pmLead:G.gov?(G.gov.pmLead||(G.p[G.gov.pm]&&G.p[G.gov.pm].lead)||null):null,
+    wyniki:Object.fromEntries(PID.map(k=>[k,{pct:q.res[k].tot/q.total*100,seats:G.p[k].seats,votes:Math.round(q.res[k].tot)}])),
     mem:p0.mem,goals:Object.keys(G.goals||{}).length,
     // stan, z którym poszedłeś do urn — na tym opiera się rozliczenie kadencji
     fame:Math.round(p0.fame),uni:Math.round(p0.uni),cred:Math.round(p0.cred),
@@ -569,7 +571,7 @@ function prezKadencja(){return G.prez?`${G.prez.party}|${G.prez.lead}|${G.prez.u
 function crownPrez(k,who){
   G.prez={party:k,lead:who||G.p[k].lead,until:G.term+2};
   G.prezOredzieFor=null;G.useTerm.oredzieP=0;   // nowy prezydent, nowe orędzie
-  G.prezHist.push({term:G.term,winner:k});
+  G.prezHist.push({term:G.term,winner:k,lead:G.prez.lead});
   if(k===G.me){G.prest+=15;XP(24);M(me(),16);me().fame=cl(me().fame+6)}
   gainAutor(G.prez.lead,RI(3,5));
   say(`<b>${G.prez.lead} (${G.p[k].ab}) prezydentem</b> na dwie kadencje.`,'roy');

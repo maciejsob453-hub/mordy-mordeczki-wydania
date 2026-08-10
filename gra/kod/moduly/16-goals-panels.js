@@ -957,6 +957,17 @@ function mordepediaTab(){
   </div>`;
 }
 
+/* Pedia v2: ten ekran pokazuje konkretne osoby, nie same partie i techniczne
+   liczniki. Stare zapisy nie maja pelnego wyniku, wiec dostaja bezpieczny opis. */
+function mordepediaTab(){
+  if(!lawDone('mordepedia'))return `<div class="mordekran"><section class="mordelock"><span class="mordeyear">ARCHIWUM SERWERA · ZAMKNIĘTE</span><h2>Mordepedia</h2><p>Archiwum premierów, prezydentów i wyników wyborów.</p><div class="mordelockfact"><b>Brakuje:</b><span>Ustawa o Mordopedii</span><small>Złóż ją w Sejmie, gdy masz właściwy resort albo fotel premiera.</small></div><button class="btn" onclick="setTab('sejm')">PRZEJDŹ DO USTAW →</button></section></div>`;
+  const topWynik=h=>Object.entries(h.wyniki||{}).sort((a,b)=>Number(b[1].pct||0)-Number(a[1].pct||0)).slice(0,3).map(([k,v])=>G.p[k]?`${G.p[k].ab} ${fmt(v.pct)}% · ${v.seats}`:'').filter(Boolean).join(' · ');
+  const premierzy=(G.hist||[]).slice().reverse().map(h=>{const p=h.pm&&G.p[h.pm],os=h.pmLead||(p&&p.lead)||'brak premiera',wynik=topWynik(h);return `<article class="mordekarta" style="--mc:${p?p.c:'var(--acc)'}"><span>KADENCJA ${h.term||'—'} · PREMIER</span><b>${esc(os)}</b><small>${p?p.ab:'wakat'}${wynik?' · '+wynik:''}</small></article>`}).join('');
+  const prezydenci=(G.prezHist||[]).slice().reverse().map(h=>{const p=h.winner&&G.p[h.winner],os=h.lead||(p&&p.lead)||'nieznany prezydent';return `<article class="mordekarta" style="--mc:${p?p.c:'var(--roy)'}"><span>PAŁAC · KADENCJA ${h.term||'—'}</span><b>${esc(os)}</b><small>${p?p.ab:'wakat'} · wybór prezydencki</small></article>`}).join('');
+  const rzad=G.gov&&G.gov.pm?G.gov.pmLead||G.p[G.gov.pm]?.lead:null,palac=G.prez&&G.p[G.prez.party]?G.prez:null;
+  return `<div class="mordekran"><section class="mordehero"><div><span class="mordeyear">ARCHIWUM SERWERA · AKTYWNE</span><h2>Mordepedia</h2><p>Jedna karta dla każdej kadencji: kto rządził i jaki był wynik urn.</p></div><div class="mordeseal">§<small>ustawa<br>obowiązuje</small></div></section><div class="mordesnapshot"><div><span>TERAZ · RZĄD</span><b>${rzad?esc(rzad):'brak gabinetu'}</b><small>${G.gov&&G.p[G.gov.pm]?G.p[G.gov.pm].ab:'wakat'}</small></div><div><span>TERAZ · PAŁAC</span><b>${palac?esc(palac.lead||G.p[palac.party].lead):'wakat'}</b><small>${palac&&G.p[palac.party]?G.p[palac.party].ab:'wakat'}</small></div><div><span>ZAPISANE WYBORY</span><b>${(G.hist||[]).length}</b><small>kadencji w archiwum</small></div></div><div class="mordecols"><section class="mordesek"><header><span>01</span><h3>Premierzy</h3><em>${(G.hist||[]).length} zapisów</em></header><div class="mordelist">${premierzy||'<p class="dim">Pierwsza kadencja dopiero się pisze.</p>'}</div></section><section class="mordesek"><header><span>02</span><h3>Prezydenci</h3><em>${(G.prezHist||[]).length} zapisów</em></header><div class="mordelist">${prezydenci||'<p class="dim">Pałac nie ma jeszcze pełnego wpisu.</p>'}</div></section></div><div class="mordenote"><b>Wyniki wyborów</b><span>Każdy wpis pokazuje trzy najsilniejsze partie, procent poparcia i mandaty z danej kadencji.</span></div></div>`;
+}
+
 function sejmTab(){
   const arr=[];alive().sort((a,b)=>G.p[b].seats-G.p[a].seats).forEach(k=>{for(let i=0;i<G.p[k].seats;i++)arr.push(k)});
   const g=G.gov;
