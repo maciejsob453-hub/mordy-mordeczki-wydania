@@ -705,11 +705,21 @@ const LAWPAR={
   jedn:''},
 };
 const lawEdytowalna=id=>!!LAWPAR[id];
+/* Liczba sedziow jest dyskretna. Stare zapisy i bot potrafily przepuscic
+   ulamek z losowania wspolnego dla wszystkich pokretel, np. „3.2 sedzi”. */
+function lawSnap(id,k,v){
+  const P=LAWPAR[id],z=P&&P.zakres&&P.zakres[k],step=P&&P.krok&&P.krok[k];
+  if(!z||!step)return v;
+  const x=cl(Number(v),z[0],z[1]),s=Number(step)||1;
+  return Math.round((z[0]+Math.round((x-z[0])/s)*s)*100)/100;
+}
 function lawParams(id){
   lawsInit();
   const P=LAWPAR[id];if(!P)return null;
   const zapisane=(G.law[id]&&typeof G.law[id]==='object')?G.law[id]:null;
-  return Object.assign({},P.baza,zapisane||{});
+  const out=Object.assign({},P.baza,zapisane||{});
+  Object.keys(P.baza).forEach(k=>{out[k]=lawSnap(id,k,out[k])});
+  return out;
 }
 /* 0 = tak jak było, 1 = skrajność, której nikt nie przepuści.
    Nie wszystko waży tyle samo: przy ordynacji ruszanie liczby mandatów przewraca
@@ -1028,7 +1038,7 @@ function aiProposeLaw(){
     Object.keys(P.baza).forEach(k=>{
       const z=P.zakres[k];
       const delta=(rnd()-.4)*(z[1]-z[0])*.16;
-      opcje[k]=Math.round(cl(teraz[k]+delta,z[0],z[1])*100)/100;
+      opcje[k]=lawSnap(law.id,k,teraz[k]+delta);
     });
   }
   G.lawTerm[law.id]=1;

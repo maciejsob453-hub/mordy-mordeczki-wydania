@@ -3403,3 +3403,73 @@ body:has(.hud) .sidebar .kond .balance-stat .balance-value{
   min-width:0!important;display:flex!important;align-items:baseline!important;
   justify-content:flex-end!important;white-space:nowrap!important;overflow:visible!important;
 }
+
+/* 1.1.196: kondycja jest kartoteką, nie tabelką z nachodzącymi znakami. */
+body:has(.hud) .sidebar .kond #paskiCech{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:7px!important;min-width:0!important;
+}
+body:has(.hud) .sidebar .kond #paskiCech .balance-stat{
+  display:grid!important;grid-template-columns:1fr!important;gap:5px!important;
+  min-width:0!important;padding:8px 9px!important;border:1px solid rgba(214,170,88,.2)!important;
+  border-radius:3px!important;background:rgba(7,18,12,.62)!important;
+}
+body:has(.hud) .sidebar .kond #paskiCech .balance-stat .l{
+  display:grid!important;grid-template-columns:1fr!important;gap:4px!important;
+  min-width:0!important;width:auto!important;align-items:start!important;
+}
+body:has(.hud) .sidebar .kond #paskiCech .balance-stat .balance-label{
+  display:flex!important;align-items:center!important;gap:4px!important;
+  min-width:0!important;width:auto!important;white-space:nowrap!important;
+  word-break:normal!important;overflow-wrap:normal!important;overflow:visible!important;
+  font:700 10px/1.15 var(--m)!important;letter-spacing:.01em!important;color:var(--tx)!important;
+}
+body:has(.hud) .sidebar .kond #paskiCech .balance-stat .balance-value{
+  display:flex!important;align-items:baseline!important;justify-content:flex-start!important;
+  gap:5px!important;min-width:0!important;white-space:nowrap!important;overflow:visible!important;
+}
+body:has(.hud) .sidebar .kond #paskiCech .balance-stat .balance-label .q,
+body:has(.hud) .sidebar .kond #paskiCech .balance-stat .balance-label .qtip,
+body:has(.hud) .sidebar .kond #paskiCech .balance-stat .balance-label .tipq{
+  width:13px!important;height:13px!important;flex:0 0 13px!important;display:inline-grid!important;
+  place-items:center!important;border:1px solid rgba(214,170,88,.45)!important;border-radius:50%!important;
+  font:700 9px/1 var(--m)!important;color:var(--acc)!important;
+}
+body:has(.hud) .sidebar .kond #paskiCech .balance-stat .trk{height:5px!important;margin-top:1px!important}
+body:has(.hud) .sidebar .kond #paskiCech .balance-stat .msc{margin-left:auto!important}
+
+/* Czysta mapa celów: szczegóły otwierają się w lekkim oknie po kliknięciu. */
+body:has(.hud) .goals-command-layout-maponly{grid-template-columns:150px minmax(0,1fr)!important}
+body:has(.hud) .goals-command-layout-maponly .goals-command-main{grid-column:2!important;min-width:0!important}
+body:has(.hud) .goal-node-icon img,
+body:has(.hud) .goal-inspector-seal img,
+body:has(.hud) .national-goal-logo{
+  border-radius:50%!important;object-fit:contain!important;background:rgba(8,15,12,.76)!important;
+}
+body:has(.hud) .goal-node-emoji{font-size:28px!important;line-height:1!important;filter:drop-shadow(0 2px 5px rgba(0,0,0,.5))}
+body:has(.hud) .goal-branch-split{
+  position:relative!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:28px!important;margin:34px 10px 0!important;
+}
+body:has(.hud) .goal-branch-split::before{
+  content:'';position:absolute;left:25%;right:25%;top:-18px;height:1px;
+  background:color-mix(in srgb,var(--party-theme,var(--acc)) 70%,#31463a)!important;
+  box-shadow:0 0 8px color-mix(in srgb,var(--party-theme,var(--acc)) 35%,transparent)!important;
+}
+body:has(.hud) .goal-branch-lane{position:relative!important;min-width:0!important;padding-top:12px!important}
+body:has(.hud) .goal-branch-lane::before{
+  content:'';position:absolute;top:-18px;left:50%;width:1px;height:18px;
+  background:color-mix(in srgb,var(--party-theme,var(--acc)) 70%,#31463a)!important;
+}
+body:has(.hud) .goal-branch-label{
+  margin:0 0 10px!important;text-align:center!important;color:var(--acc)!important;
+  font:700 10px/1.2 var(--m)!important;letter-spacing:.12em!important;text-transform:uppercase!important;
+}
+body:has(.hud) .goal-branch-lane .goal-tree-row{
+  display:grid!important;grid-template-columns:1fr!important;gap:16px!important;
+}
+@media(max-width:680px){
+  body:has(.hud) .goal-branch-split{grid-template-columns:1fr!important;gap:28px!important}
+  body:has(.hud) .goal-branch-split::before{left:20%;right:20%}
+  body:has(.hud) .sidebar .kond #paskiCech{grid-template-columns:1fr!important}
+}

@@ -4,6 +4,14 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.196':{data:'10 sierpnia 2026',zmiany:[
+  'Wybory prezydenckie licza teraz obie tury w jednym, spokojnym tempie bez nakladania timerow.',
+  'Mapa celow Concordii ma czysta przestrzen robocza i prawdziwe rozwidlenie: Republikanie albo Aurea Libertas.',
+  'Aurea Libertas dostala wlasne logo, Liber? Libro? Liberalizm! emotke ksiazki, a Gloria Reipublicanis herb Republikanow.',
+  'Aurea Libertas nie moze juz przechodzic do Partii Republikanskiej; wybor jednej galezi zamyka druga.',
+  'Liczba sedziow w ustawach jest zawsze calkowita, takze w starych zapisach i decyzjach AI.',
+  'Kondycja partii ma teraz osobne karty wskaznikow, a znaki zapytania nie nachodza na liczby.'
+ ]},
  '1.1.195':{data:'10 sierpnia 2026',zmiany:[
   'Naprawiono bilans wyboru partii: etykieta Slawa ma stabilny indeks i nie znika przy zwezonym panelu.',
   'Dodano ukryty tryb deweloperski na ekranie startowym. Haslo ILOVEPANCAKES ustawia premiera, prezydenta i 100% poparcia do testow.',

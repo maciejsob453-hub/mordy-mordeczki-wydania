@@ -1016,9 +1016,10 @@ function raceBar(x,total,poz){
     ${votes!==null?`<div class="lvotes">${votes} ${pl(votes,'głos','głosy','głosów')}</div>`:''}
     </div>`;
 }
-function prezStartNight(list){
+function prezStartNight(list,round){
   const turnout=cl(.68+R(-.05,.08),.55,.9);
-  G.prezNight={rows:(list||[]).slice(),i:0,frames:13,done:false,total:Math.round(SERVER*turnout)};
+  if(G.prezNight&&G.prezNight.timer)clearTimeout(G.prezNight.timer);
+  G.prezNight={rows:(list||[]).slice(),i:0,frames:13,done:false,total:Math.round(SERVER*turnout),round:round||1,timer:null};
 }
 function prezJitter(rows,t){
   const noise=rows.map(()=>rnd()+.15);
@@ -1081,7 +1082,13 @@ function prezNightScreen(){
         settled?'Przechodzę do wyników →':'Pokaż wynik od razu'}</button>
     </div>
   </div>`;
-  if(!settled)setTimeout(prezNightStep,remain<=1?950:remain<=2?560:280);
+  /* Render jest wywoływany także przez aktualizację zegara. Bez blokady każde
+     przerysowanie dokładało własny timeout i druga tura przyspieszała do kilku
+     klatek na sekundę. Jeden timer należy do jednego liczenia. */
+  if(!settled&&!N.timer){
+    const delay=remain<=1?1250:remain<=2?980:760;
+    N.timer=setTimeout(()=>{N.timer=null;prezNightStep()},delay);
+  }
 }
 function prezNightStep(){
   if(!G.prezNight||G.prezNight.i>=G.prezNight.frames)return;
@@ -1101,8 +1108,8 @@ function prezNightStep(){
 function liczenie(wlacz){
   try{document.body.classList.toggle('licze',!!wlacz)}catch(e){}
 }
-function prezNightSkip(){if(G.prezNight){G.prezNight.i=G.prezNight.frames;render()}}
-function prezNightEnd(){if(G.prezNight)G.prezNight.done=true;render()}
+function prezNightSkip(){if(G.prezNight){if(G.prezNight.timer)clearTimeout(G.prezNight.timer);G.prezNight.timer=null;G.prezNight.i=G.prezNight.frames;render()}}
+function prezNightEnd(){if(G.prezNight){if(G.prezNight.timer)clearTimeout(G.prezNight.timer);G.prezNight.timer=null;G.prezNight.done=true}render()}
 function partyCouncilNeedsPrimary(){
   return !!(G&&me()&&me().councilMode&&G.partyCouncil&&G.partyCouncil.party===G.me&&Array.isArray(G.partyCouncil.members)&&G.partyCouncil.members.length===5&&G.partyCouncil.primaryTerm!==G.term);
 }
@@ -1202,7 +1209,7 @@ function prezGo(kp,who){
     G.prez2={r1:st.r1,who:st.who,week:G.week+1,boost:0,spent:0};
     say(`<b>Pierwsza tura rozstrzygnięta.</b> Do drugiej idą ${st.r1[0].who} (${G.p[st.r1[0].k].ab}) i ${st.r1[1].who} (${G.p[st.r1[1].k].ab}). Zostaje tydzień.`,'roy');
   }
-  prezStartNight(st.r1);
+  prezStartNight(st.r1,1);
   render();
 }
 function prezPush(kp){
@@ -1216,7 +1223,7 @@ function runRunoff(){
   st.stage=2;G.prezState=st;G.phase='prez';
   crownPrez(st.winner,st.who[st.winner]);
   G.prez2=null;
-  prezStartNight(st.runoff);
+  prezStartNight(st.runoff,2);
   render();
 }
 function prezDone(){G.prezState=null;G.prezWho=null;G.phase='camp';render()}
