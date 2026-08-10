@@ -178,9 +178,19 @@ function realClockPaint(){
     if(pilne||now-REAL_LAST_RENDER>=420){REAL_LAST_RENDER=now;render()}
   }
 }
-function realClockStart(){realClockInit();G.realPaused=false;render()}
+function realClockStart(){
+  realClockInit();
+  if(['elect','result','prez','pmvote','marszalek'].includes(G.phase)||G.prez2||G.prezState){
+    G.realPaused=true;G.realPauseReason='procedure';render();return;
+  }
+  G.realPaused=false;G.realPauseReason=null;render()
+}
 function realClockToggle(){
-  realClockInit();G.realPaused=!G.realPaused;render();
+  realClockInit();
+  if(['elect','result','prez','pmvote','marszalek'].includes(G.phase)||G.prez2||G.prezState){
+    G.realPaused=true;G.realPauseReason='procedure';render();return;
+  }
+  G.realPaused=!G.realPaused;G.realPauseReason=G.realPaused?'manual':null;render();
 }
 function realClockSpeed(v){
   realClockInit();const n=Number(v);G.realSpeed=[.5,1,2,3,4,5].includes(n)?n:1;render();
