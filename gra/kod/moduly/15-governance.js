@@ -996,7 +996,8 @@ function aiProposeLaw(){
     if(pula.length)zglaszajacy.push({k,pula,rola:2,co:3});
     /* Gdy premierem jest gracz i nie oddał resortów botom, sejm nadal żyje.
        Najsilniejsza partia opozycyjna może złożyć projekt poselski. */
-    else if(G.p[k].seats>0&&!G.gov.parties.includes(k))zglaszajacy.push({k,pula:wolne,rola:1,co:3});
+    /* Opozycja nie ma inicjatywy ustawodawczej: projekt może wyjść tylko od
+       premiera albo ministra z aktywnego gabinetu. */
   });
   if(!zglaszajacy.length)return;
 
@@ -1238,7 +1239,10 @@ function odrzucenieWeta(id,opcje,pmK,glosy){
     else{przeciw+=s;by[k]='przeciw'}
   });
   const potrzeba=Math.ceil(TOTAL_SEATS*PROG_WETO);
-  const udalo=za>=potrzeba;
+  /* Weto prezydenta jest decyzją końcową. Stara wersja automatycznie robiła
+     drugie głosowanie i potrafiła aktywować ustawę mimo komunikatu „weto”.
+     Zostawiamy wynik głosów do kroniki, ale nie obchodzimy nim pałacu. */
+  const udalo=false;
   const w={za,przeciw,wstrzym,by,potrzeba,rad:0,ok:udalo};
   if(udalo){
     G.lawTerm[id]=1;
@@ -1251,7 +1255,9 @@ function odrzucenieWeta(id,opcje,pmK,glosy){
   }else{
     /* Weto utrzymane nie jest wejściem ustawy w życie. Czyścimy ewentualny
        ślad ze starych zapisów, żeby Media, Sąd i Pedia nie otwierały się bokiem. */
-    if(G.law&&G.law[id]&&!G.law[id].__accepted)delete G.law[id];
+    if(G.law)delete G.law[id];
+    if(G.lawApplied)delete G.lawApplied[id];
+    if(G.lawBy)delete G.lawBy[id];
     G.lawTerm[id]=1;
     if(G.gov)G.gov.spraw=cl((G.gov.spraw||50)-8);
     say(`<b>Weto utrzymane</b> ${za}:${przeciw} przy progu ${potrzeba}. ${law.n} nie wchodzi w życie.`,'bad');

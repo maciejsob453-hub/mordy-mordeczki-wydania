@@ -148,12 +148,19 @@ function simClockStep(){
   if(G.simHour%168===0)realtimeBoundary();
   else if(G.simHour%24===0)realtimeDaily();
   if(G.phase==='finalcamp'&&G.electionAt&&G.simHour>=G.electionAt){
-    G.phase='elect';G.electionAt=null;say('<b>Wybory się rozpoczęły.</b> Urny są otwarte.','roy');
+    G.phase='elect';G.electionAt=null;
+    /* Od chwili otwarcia urn zegar jest zamrożony. Wynik wyborów jest
+       osobnym ekranem proceduralnym, więc świat nie może płynąć pod spodem. */
+    G.realPaused=true;G.realPauseReason='election';
+    say('<b>Wybory się rozpoczęły.</b> Urny są otwarte.','roy');
   }
   return true;
 }
 function realClockPaint(){
   if(!G||PROBA||G.realPaused)return;
+  /* Każde modalne okno jest decyzją gracza. Nie pozwól, żeby godziny
+     uciekały w tle podczas czytania i wyboru odpowiedzi. */
+  if(G.sitPending||(typeof document!=='undefined'&&document.getElementById('veil')))return;
   simClockMigrate();
   G.realCarry=(G.realCarry||0)+Math.max(.5,Number(G.realSpeed)||1)/4;
   /* Jeden impuls zegara = jedna godzina gry. Stara pÄ™tla potrafiĹ‚a wykonaÄ‡

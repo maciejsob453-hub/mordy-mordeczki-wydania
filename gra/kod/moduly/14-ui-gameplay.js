@@ -444,6 +444,8 @@ function mojeResorty(){
 }
 function mogeZglosic(id){
   const l=lawById(id);if(!l)return false;
+  /* Bez aktywnego gabinetu nie ma inicjatywy ustawodawczej. */
+  if(!G.gov||!G.pmOk||!G.gov.pm)return false;
   // kto nie ma ani jednego mandatu, ten nie ma prawa inicjatywy — nie miałby nawet jak zagłosować
   if(!me().seats)return false;
   if(isPM())return true;

@@ -4,6 +4,15 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.198':{data:'10 sierpnia 2026',zmiany:[
+  'Cele narodowe maja teraz pionowe lancuchy po rozgalezieniu, wiec kolejne kroki czyta sie z gory na dol.',
+  'Mordepedia pozostaje zamknieta do czasu ustawy i korzysta z tego samego, neutralnego ekranu blokady co Sad i Media.',
+  'Zegar zatrzymuje sie przy wyborach oraz przy kazdym otwartym oknie decyzji; nowa kadencja uruchamia go ponownie.',
+  'Bez aktywnego gabinetu nikt nie moze forsowac ustawy. Opozycja nie dostaje juz ukrytej inicjatywy ustawodawczej.',
+  'Weto prezydenta jest skuteczne: ustawa nie trafia do G.law nawet wtedy, gdy stare glosy probowaly je automatycznie odrzucic.',
+  'Krol ma pelna karte monarchy i pionowy ranking dworski, a Media dostaja rowne kafle oraz czytelne zlote przyciski.',
+  'Zamkniete kanaly nie maja juz zoltego tla na calej powierzchni; zolty akcent zostaje tylko na przycisku przejscia do ustawy.'
+ ]},
  '1.1.197':{data:'10 sierpnia 2026',zmiany:[
   'Po osmiu odrzuconych kandydatach Krol powoluje rzad i procedura przechodzi dalej zamiast wracac do pustego glosowania.',
   'Zapis nie utrwala otwartego okna decyzji: niedokonczona akcja jest zwracana i anulowana, wiec po wczytaniu nic nie blokuje ekranu.',
