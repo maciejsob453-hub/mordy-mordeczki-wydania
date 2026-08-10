@@ -4,6 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.195':{data:'10 sierpnia 2026',zmiany:[
+  'Naprawiono bilans wyboru partii: etykieta Slawa ma stabilny indeks i nie znika przy zwezonym panelu.',
+  'Dodano ukryty tryb deweloperski na ekranie startowym. Haslo ILOVEPANCAKES ustawia premiera, prezydenta i 100% poparcia do testow.',
+  'Drzewo Concordii pokazuje teraz obie galezie naraz. Po wyborze jednej druga zostaje widoczna, ale jest oznaczona jako zamknieta.',
+  'Tryb deweloperski daje pelna pule mandatow, kapital, energie i akcje, zeby mozna bylo sprawdzac dalsze systemy bez kampanii.'
+ ]},
  '1.1.194':{data:'10 sierpnia 2026',zmiany:[
   'Cele Concordii maja teraz fokus-tree: okragle loga z podpisem schodza pionowo, a prostokat nie konkuruje z medalionem.',
   'Krol dostal rowne dwie kolumny i szeroki ranking, dzieki czemu nazwiska oraz punkty sa czytelne.',
@@ -1140,6 +1146,7 @@ function setup(){
 function start(k){
   newGame(k);
   if(SCENSEL&&SCEN[SCENSEL]){G.scen=SCENSEL;try{SCEN[SCENSEL].apply()}catch(e){}}
+  if(typeof devModeApply==='function')devModeApply();
   histPush();SFX.enter();render();
   if(k==='PPP')graj('petarda');   // hymn Partii Pana Prezesa na powitanie
 }

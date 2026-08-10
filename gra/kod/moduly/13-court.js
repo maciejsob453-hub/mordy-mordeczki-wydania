@@ -294,7 +294,7 @@ function sidebar(p,q){
     const mie=r?(()=>{const odwr=!!CECHA_ODWROTNA[k];
       const lepsi=alive().filter(x=>x!==G.me&&!G.p[x].dead&&(odwr?G.p[x][k]<v:G.p[x][k]>v)).length;
       return lepsi+1})():0;
-    return `<div class="st"><div class="l"><span>${l}${statTip(k)}</span><span class="odczyt">
+    return `<div class="st balance-stat" data-balance-label="${l}"><div class="l"><span class="balance-label">${l}${statTip(k)}</span><span class="odczyt balance-value">
       <b class="wart" data-c="${k}" data-v="${Math.round(v)}">${Math.round(v)}</b>${
       Math.abs(d)>.6?`<span class="d ${d>0?'up':'dn'}">${d>0?'+':''}${Math.round(d)}</span>`:''}${
       mie?`<span class="msc" title="twoje miejsce w stawce">#${mie}</span>`:''}</span></div>

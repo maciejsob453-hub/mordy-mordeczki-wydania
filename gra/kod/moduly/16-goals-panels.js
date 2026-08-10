@@ -548,6 +548,9 @@ const NATIONAL_BASE_ORDER=['nplr_liberal','nplr_hotdog','nplr_rose','nplr_king',
 const NATIONAL_BRANCHES={republican:{name:'Rozwidlenie republikańskie',ids:['nplr_blue','nplr_diplomacy','nplr_council','nplr_gloria']},freedom:{name:'Rozwidlenie wolnościowe',ids:['nplr_power','nplr_friendship','nplr_aurea','nplr_aurea_republic']}};
 const NATIONAL_ORDER=Object.keys(NATIONAL_GOALS);
 function nationalSequence(){const s=nationalState();return NATIONAL_BASE_ORDER.concat(s&&s.branch&&NATIONAL_BRANCHES[s.branch]?NATIONAL_BRANCHES[s.branch].ids:[])}
+/* Mechanika nadal idzie tylko wybrana galaz. Interfejs pokazuje jednak oba
+   rozwidlenia od razu, jak drzewko HOI4, zeby gracz widzial konsekwencje wyboru. */
+function nationalDisplaySequence(){return NATIONAL_BASE_ORDER.concat(Object.values(NATIONAL_BRANCHES).reduce((all,b)=>all.concat(b.ids),[]))}
 function nationalState(){
   if(!G)return null;
   if(!G.nationalGoals)G.nationalGoals={};
@@ -566,7 +569,7 @@ function nationalDayIndex(){
   const tyg=Math.max(1,Number(G.weeks)||12),term=Math.max(1,Number(G.term)||1),week=Math.max(1,Number(G.week)||1),day=Math.max(1,Number(G.dzienTygodnia)||1);
   return (term-1)*tyg*7+(week-1)*7+(day-1);
 }
-function myNationalGoals(){return G&&G.me==='PLR'?nationalSequence():[]}
+function myNationalGoals(){return G&&G.me==='PLR'?nationalDisplaySequence():[]}
 function chooseNationalBranch(branch){
   if(!G||G.me!=='PLR'||!NATIONAL_BRANCHES[branch])return;
   const s=nationalState();if(s.branch||!s.done.nplr_star)return;
@@ -593,6 +596,7 @@ function nationalGoalProgress(id){
 }
 function nationalGoalReason(id){
   const g=NATIONAL_GOALS[id],s=nationalState();if(!g||!s)return '';
+  if(g.branch&&s.branch&&g.branch!==s.branch)return 'Ta galaz zostala zamknieta po wyborze innego rozwidlenia.';
   if(g.branch&&!s.branch)return 'Najpierw wybierz jedno z dwóch rozwidleń.';
   if(g.prev&&!s.done[g.prev])return 'Najpierw ukończ: '+NATIONAL_GOALS[g.prev].n+'.';
   if(!nationalGoalAccess(id))return g.accessText||'Warunek dostępu nie jest jeszcze spełniony.';

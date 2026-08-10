@@ -120,6 +120,14 @@ function tally(){
     PID.forEach(k=>{const v=h[k]+left*soft[k][r.id];res[k].reg[r.id]=v;res[k].tot+=v});
   });
   const total=PID.reduce((a,k)=>a+res[k].tot,0);
+  /* DEV nie zmienia zwyklej matematyki dla normalnej gry. W trybie testowym
+     cala pula trafia do wybranej partii, dzieki czemu kazdy ekran widzi
+     rzeczywiste 100%, a nie tylko statystyke ustawiona na karcie. */
+  if(G.devMode&&G.me&&res[G.me]){
+    PID.forEach(k=>{res[k].tot=0;Object.keys(res[k].reg).forEach(r=>res[k].reg[r]=0)});
+    REG.forEach(r=>{res[G.me].reg[r.id]=rv[r.id]});
+    res[G.me].tot=total;
+  }
   return {res,total,rv};
 }
 function lists(res,total){

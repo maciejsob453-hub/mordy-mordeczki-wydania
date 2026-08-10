@@ -1195,6 +1195,46 @@ function menuGlowne(){
 }
 function backToMenu(){if(!G)scenPartieWyczysc();MENU=true;MODE=null;SCENSEL=null;render()}
 function pickMode(m){MODE=m;SFX.click();if(m==='tut'){scenPartieWyczysc();SCENSEL=null;return startTutorial()}if(m==='free'){scenPartieWyczysc();SCENSEL=null}render()}
+
+/* Tryb deweloperski jest schowany za haslem, zeby zwykly start nadal byl
+   czysta gra. Odblokowanie zapisujemy tylko w pamieci tej sesji; po ponownym
+   uruchomieniu trzeba podac haslo jeszcze raz. */
+function devModePrompt(){
+  if(typeof PROBA!=='undefined'&&PROBA)return;
+  const key=window.prompt('Tryb deweloperski. Podaj haslo:');
+  if(key===null)return;
+  if(key!=='ILOVEPANCAKES'){
+    window.alert('Nieprawidlowe haslo.');
+    return;
+  }
+  window.__devModeUnlocked=true;
+  window.__devModeLabel='DEV';
+  if(typeof render==='function')render();
+}
+function devModeApply(){
+  if(!window.__devModeUnlocked||!G||!G.p||G.devMode)return;
+  const k=G.me,p=G.p[k];
+  G.devMode=true;
+  G.devModeUnlocked=true;
+  /* Pelny mandat i oba najwyzsze urzedy pozwalaja testowac kazdy ekran bez
+     przechodzenia przez dwie godziny kampanii. */
+  PID.forEach(id=>{if(G.p[id]){G.p[id].seats=0;G.p[id].pres=Object.fromEntries(REG.map(r=>[r.id,0]));}});
+  p.seats=TOTAL_SEATS;
+  p.pres=Object.fromEntries(REG.map(r=>[r.id,100]));
+  ['fame','cred','uni','act'].forEach(id=>p[id]=100);
+  p.ctr=0;p.pret=0;p.mom=100;
+  G.gov=null;
+  if(typeof setGov==='function')setGov([k],k,100);
+  else G.gov={parties:[k],pm:k,appr:100,minority:0,spraw:100,wygrane:0,przegrane:0};
+  G.pmOk=true;
+  if(G.gov){G.gov.appr=100;G.gov.pm=k;G.gov.parties=[k];G.gov.pmLead=p.lead;G.gov.minority=0}
+  G.prez={party:k,lead:p.lead,until:999};
+  if(G.king)G.king.rel=100;
+  G.ap=G.apMax=9;G.kp=999999;G.en=100;G.sztab=G.sztabMax=99;
+  G.budzet=999999;G.skarb=999999;
+  if(typeof makeNoise==='function')makeNoise();
+  if(typeof say==='function')say('<b>TRYB DEV:</b> premier, prezydent i 100% poparcia sa aktywne.','good');
+}
 function backToMode(){if(!G){scenPartieWyczysc();SCENSEL=null}MODE=null;render()}
 /* Ikony trybów. Jedna definicja, żeby karty miały wspólny język i grubość kreski. */
 const IKO={
@@ -1276,6 +1316,7 @@ function modeScreen(){
       d:'Nie wybierasz nic. Ani sceny, ani partii. Dowiadujesz się, kim grasz, dopiero kiedy siadasz do stołu.',
       stopka:'losowa scena i partia',akcjaN:'Rzucam →'})}
   </div>
+  <div class="dev-access"><button type="button" class="btn g sm" onclick="devModePrompt()">Tryb deweloperski</button><span>testy wewnetrzne · haslo wymagane</span></div>
 
   </div>`;
   /* Panel po prawej startuje od karty głównej. Ustawiamy go po klatce, bo

@@ -196,7 +196,10 @@ function pickMain(){
   const ld=ld2?[0,1,2,3].map(i=>Math.round((ld1[i]+ld2[i])/2)):ld1;
   const ic1=INNATE[lp.main[0]], ic2=isDuo?INNATE[lp.main[1]]:null;
   const ics=[ic1,ic2].filter(Boolean);
-  const st=(n,v,c)=>`<div class="row"><div class="l"><span>${n}</span><b>${v}</b></div>
+  /* Etykieta musi miec wlasny, niekurczacy sie wezel. Wczesniej flex potrafil
+     scisnac pierwszy span do zera i z panelu znikala cala nazwa „Slawa”. */
+  const st=(n,v,c)=>`<div class="row balance-row" data-balance-label="${n}">
+    <div class="l"><span class="balance-label">${n}</span><b class="balance-value">${v}</b></div>
     <div class="trk"><i style="width:${v}%;background:${c}"></i></div></div>`;
   box.innerHTML=`
     <div style="position:absolute;right:-70px;top:-70px;width:280px;height:280px;border-radius:50%;
