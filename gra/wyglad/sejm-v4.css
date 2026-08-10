@@ -3456,6 +3456,10 @@ body:has(.hud) .goal-branch-split::before{
   background:color-mix(in srgb,var(--party-theme,var(--acc)) 70%,#31463a)!important;
   box-shadow:0 0 8px color-mix(in srgb,var(--party-theme,var(--acc)) 35%,transparent)!important;
 }
+body:has(.hud) .goal-branch-split::after{
+  content:'';position:absolute;left:50%;top:-34px;width:1px;height:16px;
+  background:color-mix(in srgb,var(--party-theme,var(--acc)) 70%,#31463a)!important;
+}
 body:has(.hud) .goal-branch-lane{position:relative!important;min-width:0!important;padding-top:12px!important}
 body:has(.hud) .goal-branch-lane::before{
   content:'';position:absolute;top:-18px;left:50%;width:1px;height:18px;

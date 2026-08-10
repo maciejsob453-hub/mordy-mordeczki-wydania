@@ -1,6 +1,6 @@
 {
  "wersja": "1.1.196",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/11fe5c9c01f78c69c673f94671ac22ef2c788e80",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -974,8 +974,8 @@
   },
   {
    "sciezka": "gra/wyglad/sejm-v4.css",
-   "sha": "a669889ccac99295cf9826af8b568dc823a66975e568cba571534e8c74a3fb46",
-   "bajtow": 250668
+   "sha": "e41680ed5cd31cca6e7d8e0504080478b79655f29b1ff5b98329fd8906527413",
+   "bajtow": 250870
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -1000,6 +1000,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "11fe5c9c01f78c69c673f94671ac22ef2c788e80"
+ }
 }
