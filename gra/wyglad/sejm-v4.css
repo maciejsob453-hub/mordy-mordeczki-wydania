@@ -3307,12 +3307,12 @@ body:has(.hud) .goals-map-grid .goal-node.selected .goal-node-icon{
    Dzięki temu nazwiska i punkty nie sa scisniete w waskim pasku. */
 @media(min-width:1180px){
   body:has(.hud) .widok[data-tab="krol"]{
-    grid-template-columns:minmax(300px,.88fr) minmax(0,1.12fr)!important;gap:14px!important;align-items:start!important;
+    grid-template-columns:minmax(0,1fr)!important;gap:14px!important;align-items:start!important;
   }
   body:has(.hud) .widok[data-tab="krol"]>.royalhero,
   body:has(.hud) .widok[data-tab="krol"]>.card.kroyal{grid-column:1/-1!important}
-  body:has(.hud) .widok[data-tab="krol"]>.card:nth-child(3){grid-column:1!important}
-  body:has(.hud) .widok[data-tab="krol"]>.card:nth-child(4){grid-column:2!important}
+  body:has(.hud) .widok[data-tab="krol"]>.card:nth-child(3),
+  body:has(.hud) .widok[data-tab="krol"]>.card:nth-child(4){grid-column:1/-1!important;width:100%!important;min-width:0!important}
   body:has(.hud) .widok[data-tab="krol"]>.card:nth-child(5){grid-column:1/-1!important}
   body:has(.hud) .widok[data-tab="krol"]>.card:nth-child(5)>.b{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px 14px!important}
   body:has(.hud) .widok[data-tab="krol"]>.card:nth-child(5) .minrow{min-height:58px!important;padding:9px 10px!important}

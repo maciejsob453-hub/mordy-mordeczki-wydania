@@ -1,6 +1,6 @@
 {
  "wersja": "1.1.201",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/926c4a0a1e52fbb955af458d638644d02fa8ec32",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
@@ -1009,8 +1009,8 @@
   },
   {
    "sciezka": "gra/wyglad/desktop.css",
-   "sha": "c5ecfb295977c5a279257bd98dfc6059e4f42db20675e165d81b787739159d53",
-   "bajtow": 65796
+   "sha": "746ab233c8702cd6b0fdda5f721e180b458837e559401fd67908f9987e6768c6",
+   "bajtow": 66192
   },
   {
    "sciezka": "gra/wyglad/redesign.css",
@@ -1019,8 +1019,8 @@
   },
   {
    "sciezka": "gra/wyglad/sejm-v4.css",
-   "sha": "e87d8a85ead422d0351cfdf51659009d016c40cbd93b1eaf8507dc2b270d3f83",
-   "bajtow": 253589
+   "sha": "cdd96b116a397764846b89bd45d95ddc681508ce3e8bac12473f234e2f0fa775",
+   "bajtow": 253588
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -1045,6 +1045,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "926c4a0a1e52fbb955af458d638644d02fa8ec32"
+ }
 }
