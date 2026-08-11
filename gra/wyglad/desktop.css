@@ -520,6 +520,8 @@ body:not(:has(.mg)):has(.hud) .live-action h4{margin:0 0 5px;color:var(--tx);fon
 body:not(:has(.mg)):has(.hud) .live-action span,.live-action small{display:block;color:var(--dim);font:9px var(--m);letter-spacing:.04em}
 body:not(:has(.mg)):has(.hud) .live-action small{margin-top:3px;color:var(--dim2);font-size:8px}
 body:not(:has(.mg)):has(.hud) .live-action-mark{position:absolute;left:8px;top:10px;color:var(--ac);font:16px var(--m)}
+body:not(:has(.mg)):has(.hud) .live-action-progress{height:4px;margin:8px 0 3px;border:1px solid color-mix(in srgb,var(--ac) 35%,var(--line));background:rgba(0,0,0,.45);border-radius:999px;overflow:hidden}
+body:not(:has(.mg)):has(.hud) .live-action-progress i{display:block;height:100%;background:var(--ac);border-radius:inherit;box-shadow:0 0 8px color-mix(in srgb,var(--ac) 60%,transparent)}
 body:not(:has(.mg)):has(.hud) .live-action.closed{opacity:.65}
 body:not(:has(.mg)):has(.hud) .goals-map-grid .goal-node{min-height:108px}
 body:not(:has(.mg)):has(.hud) #app .tipbox{min-width:280px;max-width:min(360px,calc(100vw - 24px));overflow-wrap:break-word;word-break:normal;white-space:normal}

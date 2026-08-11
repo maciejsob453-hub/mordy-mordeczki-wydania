@@ -229,9 +229,11 @@ function stolTygodnia(){
   const live=decyzjeInit().filter(x=>x&&x.status==='ACTIVE'),closed=[];
   if(live.length){
     const now=czasGlobalny();
-    return `<div class="stol live-actions"><div class="stolh"><h3>Akcje w toku</h3><span class="stoln">${live.length} aktywnych · ${Math.max(0,G.ap)}/${G.apMax} AP</span></div><div class="stolm live-actions-grid">${live.map(d=>{const left=Math.max(0,Number(d.deadline||now)-now),days=Math.ceil(left/24);return `<div class="mj live-action" style="--ac:${CATCOL[d.cat]||'var(--line2)'}"><div class="live-action-mark">◷</div><h4>${esc(d.n)}</h4><span>AKTYWNA · ${days} ${pl(days,'dzień','dni','dni')}</span><small>do ${dateStr(new Date(gameDate().getTime()+left*3600000))}</small></div>`}).join('')}${closed.map(d=>`<div class="mj live-action closed" style="--ac:${CATCOL[d.cat]||'var(--line2)'}"><div class="live-action-mark">${d.status==='COMPLETED'?'✓':'×'}</div><h4>${esc(d.n)}</h4><span>${d.status==='COMPLETED'?'ZAKOŃCZONA':'WYGASŁA'}</span></div>`).join('')}</div></div>`;
+    return `<div class="stol live-actions"><div class="stolh"><h3>Akcje w toku</h3><span class="stoln">${live.length} aktywnych · ${Math.max(0,G.ap)}/${G.apMax} AP</span></div><div class="stolm live-actions-grid">${live.map(d=>{const left=Math.max(0,Number(d.deadline||now)-now),total=Math.max(1,Number(d.deadline||now)-Number(d.startedAt||now)),pct=Math.round(cl((1-left/total)*100,0,100)),days=Math.ceil(left/24);return `<div class="mj live-action" style="--ac:${CATCOL[d.cat]||'var(--line2)'}"><div class="live-action-mark">◷</div><h4>${esc(d.n)}</h4><span>AKTYWNA · ${days} ${pl(days,'dzień','dni','dni')}</span><div class="live-action-progress"><i style="width:${pct}%"></i></div><small>${pct}% · do ${dateStr(new Date(gameDate().getTime()+left*3600000))}</small></div>`}).join('')}</div></div>`;
   }
-  return '';
+  /* Gdy nie ma działania w toku, wraca tygodniowy stół z pustymi miejscami.
+     Poprzedni return kończył funkcję tutaj i cały ten widok był martwy: po
+     ukończeniu akcji gracz widział pustkę zamiast liczby dostępnych ruchów. */
   const klucz=G.term+'-'+G.week;
   /* Stare zapisy mogły zawierać puste wpisy utworzone przez samo otwarcie okna.
      Nie pokazujemy ich jako wykonanych ruchów. Nowe wpisy mają znacznik ok. */

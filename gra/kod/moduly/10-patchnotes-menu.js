@@ -4,6 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.200':{data:'11 sierpnia 2026',zmiany:[
+  'Akcje w toku maja teraz pasek postepu, a po ich zakonczeniu wraca normalny stol tygodnia z wolnymi ruchami.',
+  'Zakladka Partie pokazuje plan i trzy priorytety kazdej partii sterowanej przez AI.',
+  'Budzet rzadu jest widoczny w gornym pasku i pokazuje ostatnie wplywy oraz wydatki.',
+  'Alerty przypominaja o aktywnych dzialaniach, ale nie zalewaja ekranu kolejnymi komunikatami.'
+ ]},
  '1.1.199':{data:'11 sierpnia 2026',zmiany:[
   'Jedna bramka uprawnien sprawdza teraz rzad, premiera, mandaty i resort przed kazda ustawa; opozycja bez gabinetu nie firmuje cudzych projektow.',
   'Rozmowa o ministrze wymaga zatwierdzonego rzadu, a propozycja spoza swojej partii nie moze wejsc bokiem przez stary zapis lub klikniecie.',
@@ -1253,6 +1259,7 @@ function game(){
         <div class="tot"><span>Razem</span><b class="m" style="color:${eg<8?'var(--neg)':'var(--acc)'}">+${eg}</b></div>
         <div class="tiprada">Energię zwiększasz przede wszystkim wytrzymałością przewodniczącego i jednością. Przy bardzo niskiej jedności lider praktycznie nie regeneruje sił.</div>
       </div></div>`})()}
+    ${G.gov&&G.pmOk?(()=>{budzetInit();const b=Number(G.budzet||0),hist=Array.isArray(G.budzetHistoria)?G.budzetHistoria.slice(-3):[],delta=hist.reduce((a,x)=>a+Number(x.v||0),0);return `<div class="rs tip hud-budget"><i class="ic ic-kapital" aria-hidden="true"></i><div class="rv"><b class="${b<0?'ujem':''}">${kasaSkrot(b)}<span class="plus" style="color:${delta<0?'var(--neg)':'var(--pos)'};-webkit-text-fill-color:${delta<0?'var(--neg)':'var(--pos)'}">${delta>=0?'+':''}${kasaSkrot(delta)}</span></b><span>budżet rządu</span></div><div class="tipbox"><div class="tiptyt">Budżet rządu</div><div class="tiprada" style="margin:0 0 8px">To kasa gabinetu, nie kapitał partii. Podatki ją zasilają, a eventy, kryzysy i odsetki ją zużywają.</div>${hist.map(x=>`<div class="l"><span>${esc(x.opis||'operacja')}</span><b class="${Number(x.v)<0?'bad':'ok'}">${Number(x.v)>=0?'+':''}${kasaSkrot(x.v)}</b></div>`).join('')||'<div class="dim">Brak operacji w tej kadencji.</div>'}</div></div>`})():''}
     </div>
     <div class="rgroup polityka">
     <div class="rs tip">${ikona('sondaz')}<div class="rv"><b>${fmt(shown(G.me,sh))}%<span class="plus" style="color:var(--info);-webkit-text-fill-color:var(--info)">?</span></b><span>sondaż</span></div>
@@ -1357,13 +1364,17 @@ function partieTab(){
     <div class="note" style="margin:0 0 14px">Kto realnie siedzi w cudzych partiach. Stąd bierzesz
     ludzi przy przekupywaniu działaczy i tu widać, kogo można komu podebrać.</div>
     ${obce.map(k=>{
-      const p=G.p[k], sklad=roster(p);
+      const p=G.p[k], sklad=roster(p), ai=typeof aiProfil==='function'?aiProfil(k):null;
+      const plan=typeof PLAN_OPIS!=='undefined'?(PLAN_OPIS[p.plan]||p.plan||'obserwuje scenę'):'obserwuje scenę';
+      const nazwy={ekon:'gospodarka',podatki:'podatki',media:'media',event:'eventy',zagadki:'zagadki',cytaty:'cytaty',konst:'konstytucja',ordyn:'ordynacja',mordepedia:'archiwum',sady:'sąd',kodeks:'kodeks',man:'edukacja'};
+      const agenda=ai&&Array.isArray(ai.agenda)?ai.agenda.slice(0,3).map(x=>nazwy[x]||x).join(' · '):'';
       return `<div class="pzap">
         <div class="pzh">${crest(k,'s')}
           <div style="min-width:0"><b>${p.ab}</b>
             <span class="dim">${p.n}</span></div>
           <span class="pill">${sklad.length} ${pl(sklad.length,'osoba','osoby','osób')}</span>
         </div>
+        ${ai?`<div class="aiintent"><b>${esc(ai.n||'AI')}</b> · ${esc(plan)}${agenda?` · priorytet: ${esc(agenda)}`:''}</div>`:''}
         <div class="benchgrid">
           ${sklad.map(n=>`<div class="bperson ${isLead(p,n)?'lead':''}" title="${esc(n)}${isLead(p,n)?' — przewodnictwo':''} — kapitał prywatny ${kasa(kapPryw(n))}${ranga(n)?' · '+ranga(n).n:''}">
             ${ava(n,p.c,34)}<span>${n}</span>

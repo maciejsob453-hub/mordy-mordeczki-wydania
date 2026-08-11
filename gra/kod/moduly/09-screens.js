@@ -827,6 +827,13 @@ function waznePozycje(){
     w.push({i:'♛',n:'Król jest na ciebie zły',d:'Przy ujemnej przychylności desygnacja przejdzie obok ciebie.',t:'krol',pilne:1});
   if(G.ap>0)
     w.push({i:'●',n:`${G.ap} ${pl(G.ap,'ruch','ruchy','ruchów')} do wykorzystania`,d:'Niewykorzystane akcje przepadają z końcem tygodnia.',t:'akcje'});
+  if(typeof decyzjeInit==='function'){
+    const live=decyzjeInit().filter(x=>x&&x.status==='ACTIVE');
+    if(live.length){
+      const naj=live.slice().sort((a,b)=>Number(a.deadline||0)-Number(b.deadline||0))[0];
+      w.push({i:'◷',n:`${live.length} akcje w toku`,d:`Najbliżej końca: ${naj.n}. Otwórz Decyzje, żeby zobaczyć postęp.`,t:'akcje'});
+    }
+  }
   if(mediaJest())(G.media||[]).filter(m=>mediaGotowe(m)).forEach(m=>
     w.push({i:'📰',n:`${m.nazwa} czeka na wydanie`,d:'Wydawnictwo jest gotowe, a nic z niego nie wychodzi.',t:'media'}));
   const p=me();
