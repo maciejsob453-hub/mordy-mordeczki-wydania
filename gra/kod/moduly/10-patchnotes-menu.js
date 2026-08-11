@@ -4,6 +4,14 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.202':{data:'11 sierpnia 2026',zmiany:[
+  'Mapa celow narodowych jest teraz pelnym ekranem; panel szczegolow otwiera sie dopiero po kliknieciu wezla i mozna go zamknac.',
+  'Usunieto pasek Serwerowego Kuriera oraz baner Sytuacja w toku, zeby gra nie dublowala informacji nad mapa.',
+  'Cele Concordii maja poprawione grafiki: ksiega, avatar Hod_Doga, zolta roza, traktat i rada pieciu osob.',
+  'Decyzje dostaly wieksze, czytelniejsze karty z akcentem kategorii i stala kolumna szczegolow.',
+  'Zamkniete kanaly nie pojawiaja sie w nawigacji przed uchwaleniem odpowiedniej ustawy.',
+  'Monarcha, Skarbiec i czynniki u Krola rozciagaja sie na cala szerokosc dostepnego pulpitu.'
+ ]},
  '1.1.201':{data:'11 sierpnia 2026',zmiany:[
   'Cele narodowe dostaly prawdziwe drzewko z widocznym rozwidleniem i panelem bocznym zamiast modala zaslaniajacego mape.',
   'Concordia korzysta z nowych log celow: oko, pretraktacje, ksiega, pielegnacja potegi i zlot przyjazni.',
@@ -1205,6 +1213,10 @@ function tryLoadFromSetup(){
 
 function game(){
   applyGoals();
+  /* Zapis nie moze otworzyc zamknietego kanalu po zmianie nawigacji. */
+  if(G.tab==='media'&&!mediaJest())G.tab='mapa';
+  if(G.tab==='sad'&&!lawDone('sady'))G.tab='mapa';
+  if(G.tab==='mordepedia'&&!lawDone('mordepedia'))G.tab='mapa';
   if(typeof realClockInit==='function')realClockInit();
   const p=me(),q=tally(),AL=allocate(q.res,q.total);
   /* Barwa partii jest własnością całej rozgrywki, nie tylko herbu w HUD-zie.
@@ -1314,7 +1326,6 @@ function game(){
     </div>
   </div>
   ${G.phase==='finalcamp'?campBar():''}
-  ${sitBanner()}
   ${eraBanner()}
   ${G.tut?tutBox():''}
   ${G.prez2?`<div class="runoff">
@@ -1341,16 +1352,16 @@ function game(){
       if(hasPrez())nv.push(['prezydent',nazwa('prezydent','Prezydent')]);
       nv.push(['sejm','Sejm i władza']);
       nv.push(['ekonomia','Ekonomia']);
-      // Media i Sąd są osobnymi systemami. Bez odpowiedniej ustawy widać je jako
-      // zamknięte, żeby gracz od razu wiedział, co może odblokować w Sejmie.
-      nv.push(['media','Media'+(mediaJest()?'':'<span class="badge wip">zamk.</span>')]);
-      nv.push(['sad','Sąd'+(lawDone('sady')?'':'<span class="badge wip">zamk.</span>')]);
-      nv.push(['mordepedia','<span title="Mordepedia">Pedia</span>'+(lawDone('mordepedia')?'':'<span class="badge wip">zamk.</span>')]);
+      // Zamknięte kanały nie zaśmiecają nawigacji. Pojawiają się dopiero po
+      // uchwaleniu właściwej ustawy, kiedy faktycznie można z nich korzystać.
+      if(mediaJest())nv.push(['media','Media']);
+      if(lawDone('sady'))nv.push(['sad','Sąd']);
+      if(lawDone('mordepedia'))nv.push(['mordepedia','<span title="Mordepedia">Pedia</span>']);
       return nv.map(([k,n])=>`<button class="${G.tab===k?'on':''}" onclick="setTab('${k}')">${n}</button>`).join('')})()}
   </div>
   <div class="layout">
     <div class="sidebar" style="display:flex;flex-direction:column;gap:14px">${sidebar(p,q)}</div>
-    <div class="widok${G._we?' wejscie':''}" data-tab="${G.tab}">${G.tab==='mapa'?kurier()+mapTab(q,AL):G.tab==='akcje'?actTab():G.tab==='partie'?partieTab():G.tab==='sondaz'?pollTab(q,AL)
+    <div class="widok${G._we?' wejscie':''}" data-tab="${G.tab}">${G.tab==='mapa'?mapTab(q,AL):G.tab==='akcje'?actTab():G.tab==='partie'?partieTab():G.tab==='sondaz'?pollTab(q,AL)
       :G.tab==='cele'?goalTab():G.tab==='lider'?leadTab():G.tab==='krol'?kingTab()
       :G.tab==='premier'?premierTab():G.tab==='prezydent'?prezydentTab()
       :G.tab==='ekonomia'?ekonomiaTab()

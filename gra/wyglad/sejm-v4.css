@@ -3494,3 +3494,44 @@ body:has(.hud) .widok[data-tab="media"] .medsklep{display:grid!important;grid-te
 body:has(.hud) .widok[data-tab="media"] .medakcje .btn,body:has(.hud) .widok[data-tab="media"] .medsklep .btn{background:linear-gradient(180deg,#e6c56e,#aa7628)!important;border-color:#f2d88f!important;color:#1b1408!important;-webkit-text-fill-color:#1b1408!important}
 body:has(.hud) .widok[data-tab="media"] .medakcje .btn.g:disabled,body:has(.hud) .widok[data-tab="media"] .medsklep .btn:disabled{opacity:.48!important;filter:saturate(.4)!important}
 @media(max-width:760px){body:has(.hud) .widok[data-tab="media"] .medsklep{grid-template-columns:1fr!important}}
+
+/* 1.1.202: cele i decyzje dostaja jeden czytelny pulpit, bez scisnietej
+   kolumny po lewej i bez stalego inspektora zabierajacego mape. */
+body:has(.hud) .goals-command-layout-maponly{grid-template-columns:minmax(0,1fr)!important}
+body:has(.hud) .goals-command-layout-maponly .goals-command-main{grid-column:1!important;min-width:0!important}
+body:has(.hud) .goals-command:has(.goals-inspector) .goals-command-layout-maponly{grid-template-columns:minmax(0,1fr) 370px!important}
+body:has(.hud) .goals-command:has(.goals-inspector) .goals-command-layout-maponly .goals-command-main{grid-column:1!important}
+body:has(.hud) .goals-command:has(.goals-inspector) .goals-command-layout-maponly>.goals-inspector{grid-column:2!important;grid-row:1!important}
+body:has(.hud) .goals-command-compact .goals-map-frame{min-height:calc(100vh - 310px)!important}
+body:has(.hud) .goals-map-grid .goals-tree-block{border:0!important;background:transparent!important;box-shadow:none!important;padding:4px 8px 18px!important}
+body:has(.hud) .goals-map-grid .goals-tree-block>header{padding:10px 2px 12px;margin-bottom:14px;border-bottom:1px solid color-mix(in srgb,var(--party-theme,var(--gc-gold)) 38%,#30443a)}
+body:has(.hud) .goals-map-grid .goals-tree-block>header>b{border:0!important;background:rgba(8,18,12,.65)}
+body:has(.hud) .goals-map-grid .goal-node-wrap:not(.last)::after{height:3px!important;background:linear-gradient(90deg,var(--party-theme,var(--gc-gold)),#6b8e70)!important;box-shadow:0 0 10px color-mix(in srgb,var(--party-theme,var(--gc-gold)) 48%,transparent)!important}
+body:has(.hud) .goals-map-grid .goal-branch-lane .goal-node-wrap:not(.last)::after{width:3px!important;height:26px!important;left:50%!important;right:auto!important;bottom:14px!important}
+body:has(.hud) .goal-inspector-close{margin-left:auto;border:1px solid color-mix(in srgb,var(--party-theme,var(--gc-gold)) 45%,#30443a);border-radius:3px;background:rgba(5,12,8,.75);color:var(--dim);font:18px/1 var(--m);cursor:pointer}
+body:has(.hud) .goal-inspector-close:hover{color:var(--tx);border-color:var(--party-theme,var(--gc-gold))}
+
+/* KrĂłl: wszystkie trzy bloki maja realnie cala szerokosc, takze zawartosc
+   wewnatrz karty monarchy, ktora dawniej zostawala w pierwszej kolumnie grida. */
+body:has(.hud) .widok[data-tab="krol"]>.royalhero,
+body:has(.hud) .widok[data-tab="krol"]>.card{width:100%!important;min-width:0!important}
+body:has(.hud) .widok[data-tab="krol"]>.card.kroyal{display:block!important;grid-column:1/-1!important}
+body:has(.hud) .widok[data-tab="krol"]>.card.kroyal>.b{display:block!important;width:100%!important;max-width:none!important}
+body:has(.hud) .widok[data-tab="krol"]>.card.kroyal .crown{width:100%!important}
+
+/* Decyzje: karty maja wyglad pulpitu operacyjnego, a nie listy linkĂłw. */
+body:has(.hud) .decision-desk{grid-template-columns:minmax(0,1fr) 390px!important;gap:16px!important}
+body:has(.hud) .decision-list-pane{padding:14px!important;border:1px solid color-mix(in srgb,var(--party-theme,var(--acc)) 35%,var(--line2));background:linear-gradient(155deg,rgba(18,31,22,.96),rgba(5,12,8,.98));box-shadow:0 16px 30px -25px #000,inset 0 1px rgba(255,255,255,.04)}
+body:has(.hud) .decision-list-head{padding-bottom:12px!important;margin-bottom:12px!important;border-bottom:1px solid rgba(111,142,112,.24)!important}
+body:has(.hud) .act-short-grid{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))!important;gap:10px!important}
+body:has(.hud) .act-short{min-height:86px!important;padding:12px 13px!important;border:1px solid color-mix(in srgb,var(--ac) 48%,var(--line2))!important;border-left:4px solid var(--ac)!important;border-radius:6px!important;background:linear-gradient(145deg,color-mix(in srgb,var(--ac) 13%,rgba(20,34,23,.97)),rgba(5,12,8,.99))!important;box-shadow:inset 0 1px rgba(255,255,255,.045),0 9px 20px -18px #000!important}
+body:has(.hud) .act-short:hover,body:has(.hud) .act-short.selected{transform:translateY(-2px)!important;border-color:color-mix(in srgb,var(--ac) 82%,#fff 10%)!important;box-shadow:0 0 0 1px color-mix(in srgb,var(--ac) 28%,transparent),0 13px 24px -18px #000!important}
+body:has(.hud) .act-short-mark{width:24px;height:24px;border:1px solid color-mix(in srgb,var(--ac) 70%,#fff 8%);border-radius:50%;background:color-mix(in srgb,var(--ac) 15%,#071109);font-size:15px!important}
+body:has(.hud) .act-short-main b{font:700 13px var(--fd)!important;letter-spacing:.015em}
+body:has(.hud) .act-short-main small{font-size:9px!important;line-height:1.3}
+body:has(.hud) .act-short-cost b{font-size:11px!important;color:color-mix(in srgb,var(--ac) 78%,#fff 22%)!important}
+body:has(.hud) .decision-inspector{position:sticky!important;top:10px;max-height:calc(100vh - 210px);overflow:auto;border:1px solid color-mix(in srgb,var(--ac,var(--party-theme,var(--acc))) 55%,var(--line2))!important;border-top:3px solid var(--ac,var(--party-theme,var(--acc)))!important;border-radius:6px!important;background:linear-gradient(160deg,rgba(22,35,25,.98),rgba(5,12,8,.99)),url("../obrazki/ui-briefing-room.webp") center/cover!important;box-shadow:0 18px 35px -24px #000,inset 0 1px rgba(255,255,255,.05)!important}
+body:has(.hud) .decision-inspector h2{font-family:var(--fd)!important;letter-spacing:.015em}
+body:has(.hud) .decision-specs>div{background:rgba(3,10,7,.62)!important;border-color:rgba(105,137,107,.26)!important}
+body:has(.hud) .decision-run{border-radius:4px!important;background:linear-gradient(180deg,color-mix(in srgb,var(--ac,var(--party-theme,var(--acc))) 78%,#fff 8%),color-mix(in srgb,var(--ac,var(--party-theme,var(--acc))) 48%,#10180f))!important;border-color:color-mix(in srgb,var(--ac,var(--party-theme,var(--acc))) 78%,#fff 8%)!important;color:#10170e!important;font-weight:800!important}
+@media(max-width:900px){body:has(.hud) .goals-command:has(.goals-inspector) .goals-command-layout-maponly{grid-template-columns:1fr!important}body:has(.hud) .goals-command:has(.goals-inspector) .goals-command-layout-maponly>.goals-inspector{grid-column:1!important;grid-row:auto!important}body:has(.hud) .decision-inspector{position:relative!important;top:auto;max-height:none}}

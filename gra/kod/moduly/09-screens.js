@@ -813,10 +813,6 @@ function waznePozycje(){
     w.push({i:'✒',n:'Ustawa czeka na podpis',d:'Prezydent musi ją podpisać albo zawetować.',t:'prezydent',pilne:1});
   if(isPM()&&lawsPending())
     w.push({i:'§',n:'Możesz zgłosić ustawę',d:'Żadna nie jest w toku — sejm czeka.',t:'premier'});
-  (G.sits||[]).filter(x=>!x.done).forEach(x=>{
-    const S=SITS[x.id];
-    w.push({i:'!',n:S?S.k:'Sytuacja na serwerze',d:S?S.n:'Coś się dzieje i czeka na rozstrzygnięcie.',t:'sejm',pilne:1});
-  });
   if(goalReady())
     w.push({i:'★',n:'Cel partyjny gotowy',d:'Warunki spełnione — możesz go odebrać.',t:'cele',pilne:1});
   if(typeof nationalGoalReady==='function'&&nationalGoalReady())

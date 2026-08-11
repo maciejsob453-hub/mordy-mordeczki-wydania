@@ -1,10 +1,10 @@
 {
- "wersja": "1.1.201",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/9e5546fbd4872310654f29d64c8316e757b4b551",
+ "wersja": "1.1.202",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "04ed68ac9d3e9e7670634269da5402a11f98117143d9ee0e91cdeb8acde126c9",
+   "sha": "5a809e4658a90017d0247eaeaad4584ae3d8cdea7f17e2e9ef6e41601cf7e5b3",
    "bajtow": 1979
   },
   {
@@ -14,7 +14,7 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "3fa272afcccaf3b712419b729824c42c1909d70c6be82e8e20096483d09bf53d",
+   "sha": "4c6201e7777d309788331130ca057b0f8162bf23e678dd27c64b9f087d8e9693",
    "bajtow": 531
   },
   {
@@ -64,13 +64,13 @@
   },
   {
    "sciezka": "gra/kod/moduly/09-screens.js",
-   "sha": "ee2892445d93dc6aacd8f7ddfd4665813bfbb3b78d2b5b9650d62fa6d5712de2",
-   "bajtow": 133612
+   "sha": "df48946f757c55093f8fa7f5ee990416eaf670ed2879945c61770b1a8af1a4f0",
+   "bajtow": 133410
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "8d2cdce8be18176e05bde8632c7038d6a67474ac1251c92b7347816893676dbf",
-   "bajtow": 123292
+   "sha": "880a380c096e4363a30db755feb7c922e04ac51b1eec0ef4618825bc3a89e29c",
+   "bajtow": 124066
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
@@ -99,8 +99,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/16-goals-panels.js",
-   "sha": "a0f9406f3437bfa469b6e5c1b086bec5b2343ce32b9f87feca6724e9c4252aab",
-   "bajtow": 122764
+   "sha": "59bb0de95a604a60b47c39621b81c11bacd0f006aecc3c414ad885fd9cfcdcc9",
+   "bajtow": 122726
   },
   {
    "sciezka": "gra/kod/moduly/17-elections-endgame.js",
@@ -523,6 +523,11 @@
    "bajtow": 826
   },
   {
+   "sciezka": "gra/obrazki/cel-ciaglosc-dyplomatyczna.png",
+   "sha": "e284e59823d37919eaff71d03719724d53fd992fccec1c2de32ea69fe9511f1b",
+   "bajtow": 2252351
+  },
+  {
    "sciezka": "gra/obrazki/cel-dyplomacja.svg",
    "sha": "6ef53a70d56c1cc7dd5e4b1e41fb6d1413a21085d1add1b7dc6b5752f8278fa1",
    "bajtow": 445
@@ -578,6 +583,11 @@
    "bajtow": 778014
   },
   {
+   "sciezka": "gra/obrazki/cel-rada-strofa.png",
+   "sha": "67e8d14a11175b90bd7d8f8e27af15cca58511e6ced7b44b2fb4ca765b58c654",
+   "bajtow": 982306
+  },
+  {
    "sciezka": "gra/obrazki/cel-rada.svg",
    "sha": "0fa2e43a685a36b9fe4a01bb1742629f5b4dadadc036a31715239b386d3b2a1a",
    "bajtow": 426
@@ -596,6 +606,11 @@
    "sciezka": "gra/obrazki/cel-roza-slonce-v2.png",
    "sha": "6d28b48b9fd8e54b24feb9fcbf8fe5ca27e0a0b6064bd5a40457575839163349",
    "bajtow": 2039799
+  },
+  {
+   "sciezka": "gra/obrazki/cel-roza-zolta.png",
+   "sha": "86491be2e91d6209b22c38740b852826246e0caae7dd41bac2fd50ebb5a88a9f",
+   "bajtow": 35078
   },
   {
    "sciezka": "gra/obrazki/cel-roza.svg",
@@ -1019,8 +1034,8 @@
   },
   {
    "sciezka": "gra/wyglad/sejm-v4.css",
-   "sha": "cdd96b116a397764846b89bd45d95ddc681508ce3e8bac12473f234e2f0fa775",
-   "bajtow": 253588
+   "sha": "292bf23cd3aa336c54f74d210126dde1a80f110cc64a8dfa26b3b0ea748953b0",
+   "bajtow": 259726
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -1045,6 +1060,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "9e5546fbd4872310654f29d64c8316e757b4b551"
+ }
 }

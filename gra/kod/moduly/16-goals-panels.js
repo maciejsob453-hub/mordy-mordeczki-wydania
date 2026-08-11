@@ -537,7 +537,7 @@ const NATIONAL_GOALS={
   run(){const p=me();p.aureaMode=1;p.n='Aurea Libertas';p.ab='AL';p.c='#d9b34a';p.logo='ALT';p.fame=cl(p.fame+16);p.cred=cl(p.cred+11);p.act=cl(p.act+9);p.uni=cl(p.uni+5);M(p,14)}},
 };
 /* Dedykowane znaki celów: nigdy nie używamy herbu partii jako zastępczej grafiki. */
- [ ['nplr_liberal','obrazki/cel-liber-libro.png'],['nplr_hotdog','obrazki/cel-hotdog-v2.png'],['nplr_rose','obrazki/cel-roza-slonce-v2.png'],['nplr_king','obrazki/0051a52917ef.webp'],['nplr_jewish','obrazki/cel-zydowskie-pretraktacje.png'],['nplr_star','obrazki/logo-alternatywa-zydowska.png'],['nplr_blue','obrazki/cel-niebieski-blask.png'],['nplr_diplomacy','obrazki/cel-dyplomacja.svg'],['nplr_council','obrazki/cel-rada.svg'],['nplr_gloria','obrazki/a56a5574593a.webp'],['nplr_power','obrazki/cel-pielegnacja-potegi.png'],['nplr_friendship','obrazki/cel-zlot-przyjazni.png'],['nplr_aurea','obrazki/logo-aurea-libertas.png'] ].forEach(([id,avatar])=>{if(NATIONAL_GOALS[id])NATIONAL_GOALS[id].avatar=avatar});
+ [ ['nplr_liberal','obrazki/cel-liber-libro.png'],['nplr_hotdog','obrazki/16ca0d3b9eeb.webp'],['nplr_rose','obrazki/cel-roza-zolta.png'],['nplr_king','obrazki/0051a52917ef.webp'],['nplr_jewish','obrazki/cel-zydowskie-pretraktacje.png'],['nplr_star','obrazki/logo-alternatywa-zydowska.png'],['nplr_blue','obrazki/cel-niebieski-blask.png'],['nplr_diplomacy','obrazki/cel-ciaglosc-dyplomatyczna.png'],['nplr_council','obrazki/cel-rada-strofa.png'],['nplr_gloria','obrazki/a56a5574593a.webp'],['nplr_power','obrazki/cel-pielegnacja-potegi.png'],['nplr_friendship','obrazki/cel-zlot-przyjazni.png'],['nplr_aurea','obrazki/logo-aurea-libertas.png'] ].forEach(([id,avatar])=>{if(NATIONAL_GOALS[id])NATIONAL_GOALS[id].avatar=avatar});
 const NATIONAL_BASE_ORDER=['nplr_liberal','nplr_hotdog','nplr_rose','nplr_king','nplr_jewish','nplr_star'];
 const NATIONAL_BRANCHES={republican:{name:'Droga republikańska',ids:['nplr_blue','nplr_diplomacy','nplr_council','nplr_gloria']},freedom:{name:'Droga Aurea Libertas',ids:['nplr_power','nplr_friendship','nplr_aurea']}};
 const NATIONAL_ORDER=Object.keys(NATIONAL_GOALS);
@@ -1447,14 +1447,14 @@ function goalNode(item,index,total){
   const pct=item.type==='national'?`${item.progress}%`:`${item.progress}%`;
   return `<div class="goal-node-wrap ${index===total-1?'last':''}">
     <button class="goal-node ${state} ${selected?'selected':''}" onclick="goalOpen('${esc(item.id)}')" aria-label="${esc(item.name)}">
-      <span class="goal-node-mark">${mark}</span><span class="goal-node-icon">${item.g.emoji?`<span class="goal-node-emoji">${item.g.emoji}</span>`:item.icon?`<img src="${item.icon}" alt="">`:'<i>✦</i>'}</span>
+      <span class="goal-node-mark">${mark}</span><span class="goal-node-icon">${item.icon?`<img src="${item.icon}" alt="">`:item.g.emoji?`<span class="goal-node-emoji">${item.g.emoji}</span>`:'<i>✦</i>'}</span>
       <span class="goal-node-copy"><em>${item.type==='national'?'CEL NARODOWY':'CEL PARTYJNY'}</em><b>${item.name}</b><small>${item.done?'UKOŃCZONY':item.active?'W TOKU · '+pct:item.ready?'DOSTĘPNY':'ZABLOKOWANY'}</small></span>
     </button>
   </div>`;
 }
 function goalsTreeBlock(label,sub,items,kind){
   if(!items.length)return '';
-  const head=`<header><div><span class="eyebrow">${kind==='national'?'NATIONAL DIRECTIVE':'PARTY DIRECTIVE'}</span><h3>${label}</h3><p>${sub}</p></div><b>${items.filter(x=>x.done).length}/${items.length}</b></header>`;
+  const head=`<header><div><span class="eyebrow">${kind==='national'?'CELE NARODOWE':'PARTY DIRECTIVE'}</span><h3>${label}</h3><p>${sub}</p></div><b>${items.filter(x=>x.done).length}/${items.length}</b></header>`;
   if(kind!=='national')return `<section class="goals-tree-block ${kind}">${head}<div class="goal-tree-row">${items.map((x,i)=>goalNode(x,i,items.length)).join('')}</div></section>`;
   const base=items.filter(x=>!x.g.branch);
   const lanes=Object.entries(NATIONAL_BRANCHES).map(([key,b])=>{
@@ -1468,7 +1468,7 @@ function goalsBranchPanel(){
   return `<div class="goals-branch-alert"><span class="goal-node-mark">◆</span><div><b>ROZWIDLENIE PO ALTERNATYWIE ŻYDOWSKIEJ</b><p>Wybierz jedną drogę. Decyzji nie można cofnąć w tej kampanii.</p></div><div class="goals-branch-actions"><button class="goals-action royal" onclick="chooseNationalBranch('republican')">REPUBLIKANIE</button><button class="goals-action freedom" onclick="chooseNationalBranch('freedom')">AUREA LIBERTAS</button></div></div>`;
 }
 function goalsInspector(item){
-  if(!item)return `<aside class="goals-inspector empty"><span class="goal-inspector-glyph">✦</span><h3>Wybierz węzeł</h3><p>Kliknij cel w drzewie, żeby otworzyć warunki, konsekwencje i decyzję.</p></aside>`;
+  if(!item)return '';
   const g=item.g,req=item.type==='party'?reqOf(item.id):null;
   const conditions=item.type==='party'?req.map(r=>{const yes=r.ok()||item.done;return `<li class="${yes?'yes':'no'}"><span>${yes?'✓':'×'}</span><div><b>${typeof r.t==='function'?r.t():r.t}</b><small>${item.done?'spełnione':r.v()}</small></div></li>`}).join(''):
     `<li class="${item.ready||item.done?'yes':'no'}"><span>${item.done?'✓':item.ready?'✓':'×'}</span><div><b>Warunek dostępu</b><small>${item.done?'cel wykonany':item.reason||g.accessText||'Poprzedni cel musi być ukończony.'}</small></div></li>`;
@@ -1479,8 +1479,9 @@ function goalsInspector(item){
   if(item.type==='national'&&g.optional&&!item.done&&!item.active&&item.opted===true&&item.ready)action=`<button class="goals-action primary" onclick="startNationalGoal('${esc(item.id)}')">URUCHOM CEL <span>→</span></button>`;
   if(item.type==='national'&&item.id==='nplr_council'&&item.done&&!(G.partyCouncil&&G.partyCouncil.members&&G.partyCouncil.members.length===5))action=`<button class="goals-action primary" onclick="openPartyCouncil()">WYBIERZ RADĘ PARTYJNĄ <span>→</span></button>`;
   if(item.done)action=`<div class="goals-complete-stamp">✓ CEL ZREALIZOWANY</div>`;
-  return `<aside class="goals-inspector"><div class="goal-inspector-top"><span class="goal-inspector-type">${item.type==='national'?'CEL NARODOWY':'CEL PARTYJNY'} · ${item.status.toUpperCase()}</span><span class="goal-inspector-id">${item.type==='national'?item.g.days+' DNI':'PROGRAM'}</span></div><div class="goal-inspector-title"><div class="goal-inspector-seal">${item.icon?`<img src="${item.icon}" alt="">`:'✦'}</div><div><h2>${item.name}</h2><p>${g.what||''}</p></div></div><div class="goal-inspector-progress"><div><span>POSTĘP</span><b>${item.progress}%</b></div><div class="goal-progress-track"><i style="width:${item.progress}%"></i></div></div><h4>WARUNKI OPERACYJNE</h4><ul class="goal-condition-list">${conditions}</ul><h4>SKUTKI POLITYCZNE</h4><div class="goal-effect-list">${(g.cons||[]).map(c=>`<div><span>◆</span>${c}</div>`).join('')}</div>${action}</aside>`;
+  return `<aside class="goals-inspector"><div class="goal-inspector-top"><span class="goal-inspector-type">${item.type==='national'?'CEL NARODOWY':'CEL PARTYJNY'} · ${item.status.toUpperCase()}</span><button class="goal-inspector-close" type="button" onclick="goalClose()" aria-label="Zamknij szczegóły">×</button><span class="goal-inspector-id">${item.type==='national'?item.g.days+' DNI':'PROGRAM'}</span></div><div class="goal-inspector-title"><div class="goal-inspector-seal">${item.icon?`<img src="${item.icon}" alt="">`:'✦'}</div><div><h2>${item.name}</h2><p>${g.what||''}</p></div></div><div class="goal-inspector-progress"><div><span>POSTĘP</span><b>${item.progress}%</b></div><div class="goal-progress-track"><i style="width:${item.progress}%"></i></div></div><h4>WARUNKI OPERACYJNE</h4><ul class="goal-condition-list">${conditions}</ul><h4>SKUTKI POLITYCZNE</h4><div class="goal-effect-list">${(g.cons||[]).map(c=>`<div><span>◆</span>${c}</div>`).join('')}</div>${action}</aside>`;
 }
+function goalClose(){if(!G)return;G.goalFocus=null;render()}
 function goalTabCommand(){
   nationalGoalTick();
   const party=myPartyGoals(),national=myNationalGoals(),items=goalsAllViews(party,national);
@@ -1499,8 +1500,7 @@ function goalTabCommandCompact(){
   const party=myPartyGoals(),national=myNationalGoals(),items=goalsAllViews(party,national);
   if(!items.length)return identSwitcher()+`<div class="goals-command-empty"><span>✦</span><h2>Brak aktywnego programu</h2><p>Ta partia nie ma obecnie osobnej ścieżki celów.</p></div>`;
   const active=items.find(x=>x.active)||items.find(x=>!x.done)||items[items.length-1];
-  if(!G.goalFocus||!items.some(x=>x.id===G.goalFocus))G.goalFocus=active.id;
-  const selected=goalViewById(G.goalFocus)||active,done=items.filter(x=>x.done).length;
+  const selected=G.goalFocus&&items.some(x=>x.id===G.goalFocus)?goalViewById(G.goalFocus):null,done=items.filter(x=>x.done).length;
   return `<div class="goals-command goals-command-compact"><header class="goals-command-header"><div class="goals-command-title"><span class="eyebrow">PROGRAM PARTII</span><h1>${me().n}</h1><p>${done}/${items.length} celów ukończonych · kliknij węzeł, by otworzyć szczegóły</p></div><div class="goals-command-readout"><span>AKTYWNY CEL</span><b>${active.name}</b><small>${active.progress}% · ${active.status}</small></div></header><div class="goals-command-layout goals-command-layout-maponly"><main class="goals-command-main">${goalsBranchPanel()}<div class="goals-tree-toolbar"><div><span class="eyebrow">MAPA CELÓW</span><h2>Ścieżka strategiczna</h2></div><div class="goals-tree-counter"><b>${done}</b><span>/ ${items.length}<br>WYKONANYCH</span></div></div><div class="goals-map-toolbar"><button type="button" onclick="goalsZoom(-.1)">−</button><output id="goalsZoomValue">100%</output><button type="button" onclick="goalsZoom(.1)">+</button><button type="button" onclick="goalsMapReset()">CENTRUJ</button></div><div class="goals-map-frame" data-goals-map><div class="goals-map-canvas" data-goals-canvas><div class="goals-map-grid">${goalsTreeBlock('Cele narodowe','Przełomy Concordii.',national.map(nationalGoalView),'national')}${goalsTreeBlock('Cele partyjne','Program i organizacja partii.',party.map(partyGoalView),'party')}</div></div></div></main>${goalsInspector(selected)}</div></div>`;
 }
 /* Keep the identity switcher in the compact command-center view as well. The
