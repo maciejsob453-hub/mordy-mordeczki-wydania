@@ -977,9 +977,9 @@ function startTerm(){
   G.memStart={};alive().forEach(k=>{G.memStart[k]=G.p[k].mem});
   G.lawTerm={};                 // każdą ustawę wolno zgłosić raz na kadencję
   G.oredzie=0;
-  G.term++;G.week=1;G.weeks=12;G.phase='camp';
+  G.term++;G.week=1;G.weeks=12;G.phase='camp';G.earlyElection=false;
   /* Powrót z nocy wyborczej ponownie uruchamia zegar. */
-  G.realPaused=false;G.realPauseReason=null;
+  G.realPaused=false;G.realPauseReason=null;G.realCarry=0;
   G.apMax=apBase();G.ap=G.apMax;
   /* Vengeance rośnie w autorytet z każdą kadencją, ale wolniej i z sufitem — przy
      pięciu punktach dochodził do maksimum w osiem kadencji i nie dało się z nim

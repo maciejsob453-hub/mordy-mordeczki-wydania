@@ -4,6 +4,14 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.203':{data:'11 sierpnia 2026',zmiany:[
+  'Zegar czasu ciaglego korzysta teraz z prawdziwego uplywu czasu, wiec predkosci x0.5-x5 nie zaleza od opoznionego interwalu przegladarki.',
+  'Pauza, otwarte okno i wybory zeruja akumulator czasu; po wznowieniu gra nie nadrabia godzin, ktore mialy stac.',
+  'Granica tygodnia nie pomija juz dobowego ticku: ekonomia, AI, sytuacje i wydarzenia aktualizuja sie takze w ostatniej dobie.',
+  'Wczesniejsze wybory po upadku rzadu nie nadpisuja daty ani nie teleportuja jej do konca kadencji.',
+  'Cele narodowe licza dni z godziny symulacji, a nie z etykiety tygodnia, wiec odliczanie nie cofa sie po granicy.',
+  'AI ma prawdziwy rytm godzinowy zamiast NaN i nie wykonuje ruchu codziennie bez kontroli.'
+ ]},
  '1.1.202':{data:'11 sierpnia 2026',zmiany:[
   'Mapa celow narodowych jest teraz pelnym ekranem; panel szczegolow otwiera sie dopiero po kliknieciu wezla i mozna go zamknac.',
   'Usunieto pasek Serwerowego Kuriera oraz baner Sytuacja w toku, zeby gra nie dublowala informacji nad mapa.',

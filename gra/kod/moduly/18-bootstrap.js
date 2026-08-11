@@ -64,6 +64,7 @@ function sanitizeGameState(){
   if(procedura||G.phase==='finalcamp'){G.realPaused=true;G.realPauseReason='procedure'}
   else if(G.realPauseReason==='procedure'||G.realPauseReason==='election')G.realPauseReason=null;
   if(typeof G.realPaused!=='boolean')G.realPaused=false;
+  if(typeof G.earlyElection!=='boolean')G.earlyElection=false;
 }
 function loadCode(code){
   const raw=b64d(String(code||'').trim().replace(/^MM/,''));

@@ -139,7 +139,11 @@ function ai(){
        własny cooldown w godzinach, więc komputer działa w tym samym świecie
        czasu co gracz. */
     if(p.aiNextAt&&now<p.aiNextAt)return;
-    p.aiNextAt=now+Math.max(18,Math.round(42-aiProfil(k).aktywnosc*8+R(-8,12)));
+    /* Profil nie ma pola "aktywnosc". Stare odwolanie dawalo NaN i bot dzialal
+       codziennie bez zadnego rytmu, przez co w czasie ciaglym zjadalo to cala
+       scene polityczna. Rytm wynika teraz z realnej aktywnosci partii. */
+    const rytm=cl((Number(p.act)||50)/100,0,1);
+    p.aiNextAt=now+Math.max(18,Math.round(42-rytm*8+R(-8,12)));
     /* Plan nie jest już wyrokiem na całą kadencję. Gdy partia straci rząd,
        mandaty albo zjedzie pod próg, zmienia priorytet i pamięta dlaczego. */
     if(p.planTerm===G.term&&p.plan){
@@ -366,7 +370,7 @@ function aiOpozycja(){
       p.fame=cl(p.fame+RI(8,13));M(p,16);
       say(`<b>${p.ab} przepchnął rozwiązanie sejmu</b> ${v.yes}:${v.no}. Idziemy do przedterminowych wyborów.`,
           g.parties.includes(G.me)?'bad':'good');
-      G.gov=null;G.pmOk=false;G.bloc=null;G.week=G.weeks;
+      G.gov=null;G.pmOk=false;G.bloc=null;G.week=G.weeks;G.earlyElection=true;
     }else{
       p.fame=cl(p.fame-RI(6,11));p.ctr=cl(p.ctr+9);APPR(+4);
       say(`<b>${p.ab} chciał rozwiązać sejm</b> i przegrał ${v.yes}:${v.no}.`,'');
@@ -380,7 +384,7 @@ function aiOpozycja(){
     say(`<b>${p.ab} obalił rząd</b> ${v.yes}:${v.no}. Przedterminowe wybory.`,
         g.parties.includes(G.me)?'bad':'good');
     p.fame=cl(p.fame+8);M(p,12);
-    G.gov=null;G.pmOk=false;G.week=G.weeks;
+    G.gov=null;G.pmOk=false;G.week=G.weeks;G.earlyElection=true;
   }else{
     p.fame=cl(p.fame-3);APPR(+3);
     say(`<b>${p.ab} złożył wotum nieufności</b> i przepadło ${v.yes}:${v.no}.`,'');
@@ -524,7 +528,7 @@ function collapseGov(why){
   say(`<b>Rząd upadł.</b> ${why} Przedterminowe wybory.`,'bad');
   if(G.gov&&G.gov.parties.includes(G.me))M(me(),-10);
   G.gov=null;G.pmOk=false;G.bloc=null;G.opoBloc=null;
-  G.week=Math.max(G.week,G.weeks);
+  G.week=Math.max(G.week,G.weeks);G.earlyElection=true;
 }
 function govLeave(c){
   if(!G.gov)return;

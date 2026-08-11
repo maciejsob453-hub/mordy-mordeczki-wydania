@@ -184,7 +184,7 @@ function ministerStazGodz(id){
   const od=G.radaOd[id];
   if(!od)return 99999;
   if(Number.isFinite(Number(od.at)))return Math.max(0,czasGlobalny()-Number(od.at));
-  return Math.max(0,((G.term-(od.t||G.term))*12+(G.week-(od.w||G.week)))*168);
+  return Math.max(0,((G.term-(od.t||G.term))*Math.max(1,G.weeks||12)+(G.week-(od.w||G.week)))*168);
 }
 function ministerStaz(id){
   return Math.floor(ministerStazGodz(id)/168);
@@ -545,7 +545,7 @@ function openWotum(){
       const v=sejmVote('wotum',g.pm,G.me,1);
       const szef=g.pmLead||G.p[g.pm].lead;
       if(v.pass){say(`<b>Rząd obalony</b> ${v.yes}:${v.no}. Przedterminowe wybory.`,'good');
-        G.gov=null;G.pmOk=false;G.week=G.weeks;me().fame=cl(me().fame+9);M(me(),14);XP(20);
+        G.gov=null;G.pmOk=false;G.week=G.weeks;G.earlyElection=true;me().fame=cl(me().fame+9);M(me(),14);XP(20);
         modal('Sejm','Rząd obalony',
           `<p>Wotum nieufności wobec rządu <b>${szef}</b> przeszło: za <b>${v.yes}</b>, przeciw <b>${v.no}</b>, wstrzymało się <b>${v.abst}</b>.</p>
            ${glosyBox(v)}<p style="margin-top:12px">Kadencja kończy się teraz, idziemy do przedterminowych wyborów.</p>`,
@@ -579,7 +579,7 @@ function openWotum(){
           REG.forEach(r=>q.pres[r.id]=cl(q.pres[r.id]*.82));M(q,-16)});
         me().fame=cl(me().fame+RI(9,15));me().act=cl(me().act+8);M(me(),18);XP(26);
         const bylRzad=rzad.map(k=>G.p[k].ab).join(', ');
-        G.gov=null;G.pmOk=false;G.bloc=null;G.week=G.weeks;
+        G.gov=null;G.pmOk=false;G.bloc=null;G.week=G.weeks;G.earlyElection=true;
         say(`<b>Sejm rozwiązany</b> ${v.yes}:${v.no}. Rząd idzie do wyborów z połamanym sondażem, a ty jako ten, kto to przepchnął.`,'good');
         modal('Sejm','Sejm rozwiązany',
           `<p>Wniosek przeszedł: za <b>${v.yes}</b>, przeciw <b>${v.no}</b>, wstrzymało się <b>${v.abst}</b>.</p>
@@ -1222,7 +1222,7 @@ function zwlokaPrezydenta(){
   if(typeof l.odAt==='number')ile=Math.floor((czasGlobalny()-l.odAt)/168);
   else{
     if(typeof l.odTerm!=='number')return;
-    ile=(G.term-l.odTerm)*12+(G.week-l.odWeek);
+    ile=(G.term-l.odTerm)*Math.max(1,G.weeks||12)+(G.week-l.odWeek);
   }
   if(ile<ZWLOKA_MAX){
     if(ile===ZWLOKA_MAX-1)

@@ -2,6 +2,8 @@
 /* ══════════ TURA ══════════ */
 let REAL_TIMER=null;
 let REAL_LAST_RENDER=0;
+let REAL_LAST_WALL=0;
+let REAL_TICKING=false;
 const BOT_EVENT_IDS=new Set(['mediacja','sojusz','talent','donacja','prezKonf']);
 function simClockSync(){
   if(!G)return;
@@ -12,7 +14,9 @@ function simClockSync(){
      przeskoczyć przed zakończeniem wyborów. Inaczej noc wyborcza pokazywała
      od razu „kadencja 2, tydzień 1”, a startTerm dodawał jeszcze jedną. */
   const procedura=['finalcamp','elect','result','prez','pmvote','marszalek'].includes(G.phase)||G.prez2||G.prezState;
-  if(!procedura){G.term=termZegara;G.week=weekZegara}
+  /* Wymuszone wybory sa stanem gry, a nie numerem tygodnia z daty. */
+  if(G.earlyElection&&G.phase==='camp'){G.term=termZegara;G.week=Math.max(1,G.weeks||12)}
+  else if(!procedura){G.term=termZegara;G.week=weekZegara}
   else {G.term=Math.max(1,Number(G.term)||termZegara);G.week=Math.max(1,Number(G.week)||weekZegara)}
   G.czasGodzTygodnia=inKad;
   G.czasTygodnia=Math.floor(inKad/24);
@@ -35,7 +39,7 @@ function realClockInit(){
   if(typeof G.realPaused!=='boolean')G.realPaused=false;
   /* Ĺšwiat ma jeden logiczny krok = jedna godzina. Timer tylko odtwarza te
      kroki częściej lub rzadziej; prędkość nie przeskakuje po kilka godzin. */
-  if(!REAL_TIMER)REAL_TIMER=setInterval(realClockPaint,250);
+  if(!REAL_TIMER){REAL_LAST_WALL=Date.now();REAL_TIMER=setInterval(realClockPaint,100)}
 }
 function realtimeHourly(){
   const p=me&&me();if(!p)return;
@@ -57,7 +61,8 @@ function realtimeDaily(){
     if(Array.isArray(G.queue))G.queue=G.queue.filter(e=>e&&BOT_EVENT_IDS.has(e.id));
     if(!G.queue||!G.queue.length)G.queue=buildEvents();
   }
-  if(G.simHour%168===0)makeNoise();
+  /* Ostatnia doba jest jeszcze zwyklym tickiem; tygodniowy szum robi endWeek,
+     zeby nie dodac go dwa razy na tej samej granicy. */
 }
 
 /* Główne statystyki nie czekają już na sztuczną granicę tygodnia. Ten krok jest
@@ -140,44 +145,61 @@ function realtimeBoundary(){
      przejście kadencji. Gracz nie wywołuje ich klawiszem ani przyciskiem; świat
      idzie dalej godzinami, a decyzje mają własne odnowy liczone w godzinach. */
   if(!G||G.phase!=='camp')return;
-  const h=G.simHour;
+  const h=G.simHour,forced=!!G.earlyElection;
   /* Liczymy zakonczony odcinek z godziny zegara, zamiast zgadywac na podstawie
      G.week, ktore simClockSync zdazyl juz ustawic na nastepny odcinek. */
   const zakonczony=Math.max(0,Math.floor((h-1)/168));
   G.term=Math.floor(zakonczony/(G.weeks||12))+1;
-  G.week=(zakonczony%(G.weeks||12))+1;
+  G.week=forced?Math.max(1,G.weeks||12):(zakonczony%(G.weeks||12))+1;
   endWeek(true);
-  G.simHour=h;simClockSync();
+  G.simHour=h;G.earlyElection=false;simClockSync();
 }
 function simClockStep(){
   if(!G||PROBA)return false;
   simClockMigrate();
   G.simHour=Math.max(0,Math.floor(G.simHour)+1);
   simClockSync();realtimeHourly();
-  if(G.simHour%24===0)realtimeEconomyTick();
+  /* Granica tygodnia nie moze zjadac dobowego ticku. Najpierw rozliczamy
+     ostatnia godzine/dobe, dopiero potem zamykamy tydzien. */
+  if(G.simHour%24===0){realtimeEconomyTick();realtimeDaily()}
   if(G.simHour%168===0)realtimeBoundary();
-  else if(G.simHour%24===0)realtimeDaily();
   if(G.phase==='finalcamp'&&G.electionAt&&G.simHour>=G.electionAt){
     G.phase='elect';G.electionAt=null;
     /* Od chwili otwarcia urn zegar jest zamrożony. Wynik wyborów jest
        osobnym ekranem proceduralnym, więc świat nie może płynąć pod spodem. */
-    G.realPaused=true;G.realPauseReason='election';
+    G.realPaused=true;G.realPauseReason='election';G.realCarry=0;
     say('<b>Wybory się rozpoczęły.</b> Urny są otwarte.','roy');
   }
   return true;
 }
 function realClockPaint(){
-  if(!G||PROBA||G.realPaused)return;
+  if(!G||PROBA)return;
+  const wall=Date.now();
+  if(!REAL_LAST_WALL)REAL_LAST_WALL=wall;
+  if(G.realPaused){REAL_LAST_WALL=wall;return}
   /* Każde modalne okno jest decyzją gracza. Nie pozwól, żeby godziny
      uciekały w tle podczas czytania i wyboru odpowiedzi. */
-  if(G.sitPending||(typeof document!=='undefined'&&document.getElementById('veil')))return;
+  if(G.sitPending||(typeof document!=='undefined'&&document.getElementById('veil'))){REAL_LAST_WALL=wall;return}
   simClockMigrate();
-  G.realCarry=(G.realCarry||0)+Math.max(.5,Number(G.realSpeed)||1)/4;
+  const dt=Math.min(1500,Math.max(0,wall-REAL_LAST_WALL));REAL_LAST_WALL=wall;
+  G.realCarry=(G.realCarry||0)+dt/1000*Math.max(.5,Number(G.realSpeed)||1);
   /* Jeden impuls zegara = jedna godzina gry. Stara pÄ™tla potrafiĹ‚a wykonaÄ‡
      kilka krokĂłw w jednym odĹ›wieĹĽeniu; przy x5 gracz widziaĹ‚ przeskoki po
      dwie godziny, a zdarzenia dostawaĹ‚y kilka rozliczeĹ„ naraz. Nadmiar zostaje
      w akumulatorze, ale nigdy nie przepuszczamy go seriÄ… w jednej klatce. */
-  let n=0;if(G.realCarry>=1){G.realCarry-=1;simClockStep();n=1}
+  let n=0;
+  if(!REAL_TICKING){
+    REAL_TICKING=true;
+    try{
+      while(G.realCarry>=1&&n<12){
+        G.realCarry-=1;if(!simClockStep())break;n++;
+        /* Procedura wyborcza albo modal zatrzymuje caly swiat natychmiast,
+           nawet gdy akumulator mial jeszcze kilka godzin do rozliczenia. */
+        if(G.realPaused||G.sitPending)break;
+      }
+    }finally{REAL_TICKING=false}
+  }
+  if(G.realCarry>24)G.realCarry=24;
   if(n){
     /* Symulacja moze isc co godzine, ale calego DOM-u nie trzeba skladac przy
        kazdym kroku. Wczesniej mapa celow tracila uchwyt i scroll skakal, bo
@@ -185,7 +207,8 @@ function realClockPaint(){
        aktualizowany od razu; ekran odswiezamy najwyzej dwa-trzy razy na sekunde
        albo natychmiast, gdy czeka wydarzenie wymagajace reakcji. */
     const now=Date.now(),pilne=!!(G.queue&&G.queue.length)||!!G.sitPending||G.phase!=='camp';
-    if(pilne||now-REAL_LAST_RENDER>=420){REAL_LAST_RENDER=now;render()}
+    const odstep=Math.max(100,Math.round(1000/Math.max(.5,Number(G.realSpeed)||1)));
+    if(pilne||now-REAL_LAST_RENDER>=odstep){REAL_LAST_RENDER=now;render()}
   }
 }
 function realClockStart(){
@@ -336,7 +359,9 @@ function endWeek(automatic=false){
      tydzień pierwszy i wygląda to jak zablokowany kalendarz. Przy prawdziwym
      ticku czasu simHour jest już dalej, więc niczego nie cofamy. */
   const oczekiwanyStart=((Math.max(1,G.term||1)-1)*Math.max(1,G.weeks||1)+(Math.max(1,G.week||1)-1))*168;
-  if(!Number.isFinite(Number(G.simHour))||Number(G.simHour)<oczekiwanyStart)G.simHour=oczekiwanyStart;
+  /* W zegarze ciaglym data nie moze teleportowac sie do poczatku etykiety
+     tygodnia. Ten bezpiecznik zostaje tylko dla starego recznego endWeek(). */
+  if(G.realTimeEconomy!==true&&(!Number.isFinite(Number(G.simHour))||Number(G.simHour)<oczekiwanyStart))G.simHour=oczekiwanyStart;
   /* Nowy tydzień zaczyna się od pierwszego dnia, ale historia czasu zostaje
      w zapisie, żeby gracz widział rytm decyzji zamiast teleportu bez śladu. */
   G.dzienTygodnia=1;G.czasTygodnia=0;G.czasGodzTygodnia=0;G.godzina=8;

@@ -366,7 +366,7 @@ const A=[
   p.ctr=Math.min(88,p.ctr+RI(22,30));
   p.cred=cl(p.cred-9);M(p,-16);
   say('<b>Premier rozwiązuje sejm.</b> Przedterminowe wybory, a serwer uznał to za ucieczkę.','bad');
-  G.week=G.weeks;
+  G.week=G.weeks;G.earlyElection=true;
   return `Sejm rozwiązany. Sława ${Math.round(f0)} spada do ${Math.round(p.fame)}, kontrowersja rośnie do ${Math.round(p.ctr)}.`}},
 /* Ustawa o kanałach poszła precz. Przewracała całą mapę wyborczą w środku
    kadencji — mandaty okręgowe rozdzielały się od nowa, przez co obecność

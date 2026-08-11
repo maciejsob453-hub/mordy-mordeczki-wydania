@@ -560,6 +560,9 @@ function nationalState(){
 }
 function nationalDayIndex(){
   if(!G)return 0;
+  /* W trybie ciagly godzina jest jedynym zrodlem prawdy. Liczenie z etykiet
+     term/week/day potrafilo cofnac cel przy granicy tygodnia lub po wczytaniu. */
+  if(Number.isFinite(Number(G.simHour)))return Math.max(0,Math.floor(Number(G.simHour)/24));
   const tyg=Math.max(1,Number(G.weeks)||12),term=Math.max(1,Number(G.term)||1),week=Math.max(1,Number(G.week)||1),day=Math.max(1,Number(G.dzienTygodnia)||1);
   return (term-1)*tyg*7+(week-1)*7+(day-1);
 }

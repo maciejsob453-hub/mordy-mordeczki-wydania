@@ -1,10 +1,10 @@
 {
- "wersja": "1.1.202",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/9876af7dd399e83d068daf1e5bc73734beccb98b",
+ "wersja": "1.1.203",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "5a809e4658a90017d0247eaeaad4584ae3d8cdea7f17e2e9ef6e41601cf7e5b3",
+   "sha": "e6f12d987a07f2f319ba8dc6a40d817cc0339aecf0139fbbe15865d9877081a1",
    "bajtow": 1979
   },
   {
@@ -14,7 +14,7 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "4c6201e7777d309788331130ca057b0f8162bf23e678dd27c64b9f087d8e9693",
+   "sha": "052b3dfb04bb5e1cd3d22799dd97c44e8d403329e80bbddb934ea5bdc01064fb",
    "bajtow": 531
   },
   {
@@ -29,18 +29,18 @@
   },
   {
    "sciezka": "gra/kod/moduly/02-actions-events.js",
-   "sha": "880b3f9de6bb2a6600b0def85a8cec7766bd99038bb82228a0bc35d9d1561cda",
-   "bajtow": 57134
+   "sha": "47b0408a53b9564902b8b248ade8907f2e3ca1c4bcb3fde03ba22b986f071f9c",
+   "bajtow": 57155
   },
   {
    "sciezka": "gra/kod/moduly/03-turn.js",
-   "sha": "6c06cf82ad5c80037cf9fa63da8281cd2d54bd372026dcbcbfec6c34539ca46a",
-   "bajtow": 31244
+   "sha": "9af7e2168fc74a949b794c3b4f92353dce4199d60a2931f00f55aadcd73898d6",
+   "bajtow": 32629
   },
   {
    "sciezka": "gra/kod/moduly/04-ai.js",
-   "sha": "af9c0ac1f07e1003116b7212324f51d80a8505021fdc33e7d0799ca4c797be9d",
-   "bajtow": 29015
+   "sha": "2de9ba11c701e837d33d4aab4ef41926978c97ce3bc8336ebd853e1376d9199b",
+   "bajtow": 29343
   },
   {
    "sciezka": "gra/kod/moduly/05-election-cycle.js",
@@ -69,8 +69,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "880a380c096e4363a30db755feb7c922e04ac51b1eec0ef4618825bc3a89e29c",
-   "bajtow": 124066
+   "sha": "e00d5870d67992055a3567ef5f9426b04aa969c77bf19fe9c67f24caf9a069bd",
+   "bajtow": 124818
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
@@ -94,23 +94,23 @@
   },
   {
    "sciezka": "gra/kod/moduly/15-governance.js",
-   "sha": "af715c04f2493e3afbdb1df3658cbb692d198aaa916f7f927fd4165902845f09",
-   "bajtow": 80118
+   "sha": "511af5fea84c9bbd257044290e0f337ded3d1fcef3c46034b02862c5d0fd9dda",
+   "bajtow": 80202
   },
   {
    "sciezka": "gra/kod/moduly/16-goals-panels.js",
-   "sha": "59bb0de95a604a60b47c39621b81c11bacd0f006aecc3c414ad885fd9cfcdcc9",
-   "bajtow": 122726
+   "sha": "00775ea850b7cef321c9cb18445f9cbad7a7b42f5a7f2fd3d1973be0cbb46ba9",
+   "bajtow": 122979
   },
   {
    "sciezka": "gra/kod/moduly/17-elections-endgame.js",
-   "sha": "1537e66acfcff0e68ba99422657be40b7ab42d6f3904c63f97596d10b55d0058",
-   "bajtow": 77634
+   "sha": "fb154a77a9638bebbef35680ea5a0641ae73cb8cd95ebf0276bbbb540e44fd17",
+   "bajtow": 77670
   },
   {
    "sciezka": "gra/kod/moduly/18-bootstrap.js",
-   "sha": "d03b1705727f19c66e375c4b3b17666163e972d5af39b09a5739506fa90d1910",
-   "bajtow": 21898
+   "sha": "8fa14e5301dd0359624ab2353b91f9fe6c67b5f04150fa1c393daea8b013d7db",
+   "bajtow": 21961
   },
   {
    "sciezka": "gra/muzyka/dyktator-i-krol.mp3",
@@ -1060,6 +1060,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "9876af7dd399e83d068daf1e5bc73734beccb98b"
+ }
 }
