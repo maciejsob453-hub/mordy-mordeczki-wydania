@@ -360,6 +360,36 @@ function actCards(list,fx){
     </button>`}).join('')||'<div class="note">Nic z tym skutkiem nie jest teraz dostępne.</div>';
 }
 /* ---- dział Premiera: rada ministrów, ustawy, decyzje rządowe ---- */
+/* Krótkie karty na głównym ekranie decyzji. Pełny opis trafia do inspektora,
+   żeby gracz nie musiał przebijać się przez katalog tekstu przed każdym kliknięciem. */
+function actState(a){
+  const f=fat(a.id),done=a.once&&G.once[a.id],usedT=a.term1&&(G.useTerm||{})[a.id];
+  const noShame=a.shame&&!shameAktywne(),limT=!!a.tydz2&&limit2Uzyte(a)>=2;
+  const kpC=Math.round(a.kp*sizeF(me()).kp*inflacja()),cdDo=(G.odnowy&&G.odnowy[a.id])||0,cd=cdDo>czasGlobalny();
+  const ok=G.ap>=a.ap&&G.kp>=kpC&&(a.en<0||G.en>=a.en)&&!done&&!usedT&&!limT&&!noShame&&!cd&&!(a.id==='rekr'&&rekrutacjaDni()>0);
+  const blok=done?'wykorzystane':usedT?'zużyte w tej kadencji':limT?'limit ostatnich 7 dni':cd?`odnowa za ${Math.max(1,Math.ceil((cdDo-czasGlobalny())/24))} dni`:noShame?'dostępne po wpadce':G.ap<a.ap?'za mało akcji':G.kp<kpC?'za mało kapitału':(a.en>0&&G.en<a.en)?'za mało energii':'';
+  return {ok,blok,kpC,f,cdDo};
+}
+function actOpen(id){if(!G||PROBA)return;const a=A.find(x=>x.id===id);if(!a)return;G.actFocus=id;render()}
+function actToggleAll(){if(!G)return;G.actAll=!G.actAll;render()}
+function actToggleFilters(){if(!G)return;G.actFiltersOpen=!G.actFiltersOpen;render()}
+function actShortCard(a){
+  const s=actState(a),col=CATCOL[a.cat]||'var(--line2)',effects=actFx(a.id).slice(0,2).map(x=>AFXN[x]&&AFXN[x][0]).join(' · ');
+  return `<button type="button" class="act-short ${G.actFocus===a.id?'selected':''} ${s.ok?'':'blocked'}" style="--ac:${col}" onclick="actOpen('${a.id}')"><span class="act-short-mark">${s.ok?'◆':'·'}</span><span class="act-short-main"><b>${a.n}</b><small>${effects||'decyzja sytuacyjna'}</small></span><span class="act-short-cost"><b>${a.kp?ikona('kapital','mini')+s.kpC:'bez kosztu'}</b><small>${czasOdnowy(a)?Math.ceil(czasOdnowy(a)/24)+' dni':'odnowa natychmiast'}</small></span></button>`;
+}
+function actInspector(a){
+  if(!a)return `<aside class="decision-inspector empty"><span>◆</span><h3>Wybierz decyzję</h3><p>Kliknij krótką kartę, żeby zobaczyć pełny opis, ryzyko i warunki.</p></aside>`;
+  const s=actState(a),effects=actFx(a.id).map(x=>AFXN[x]&&`<span style="--fc:${AFXN[x][1]}"><i></i>${AFXN[x][0]}</span>`).filter(Boolean).join('');
+  return `<aside class="decision-inspector"><div class="decision-inspector-top"><span>AKCJA · ${a.cat.toUpperCase()}</span><b>${s.ok?'DOSTĘPNA':'ZABLOKOWANA'}</b></div><h2>${a.n}</h2><p class="decision-lead">${a.d||'Decyzja wpływająca na układ partii i serwera.'}</p><div class="decision-effects">${effects||'<span><i></i>skutek sytuacyjny</span>'}</div><div class="decision-specs"><div><b>${a.ap}</b><small>AKCJE</small></div><div><b>${a.kp?s.kpC:'—'}</b><small>KAPITAŁ</small></div><div><b>${a.en>0?'−'+Math.round(a.en*.82*sizeF(me()).en):'+'+(-a.en)}</b><small>ENERGIA</small></div><div><b>${czasOdnowy(a)?Math.ceil(czasOdnowy(a)/24)+' d':'—'}</b><small>ODNOWA</small></div></div>${s.blok?`<div class="decision-block">${s.blok}</div>`:''}<div class="decision-detail"><b>Pełne warunki</b><span>${a.reg?'wybór okręgu · ':''}${a.tem?'wybór tematu · ':''}${a.tgt?'wybór celu · ':''}${a.seg?'wybór grupy':''}${!a.reg&&!a.tem&&!a.tgt&&!a.seg?'decyzja bez dodatkowego wyboru.':''}</span></div><button class="decision-run" ${s.ok?'':'disabled'} onclick="doAct('${a.id}')">${s.ok?'WYKONAJ DECYZJĘ →':'NIEDOSTĘPNA'}</button></aside>`;
+}
+function actDecisionBoard(list,cats,fx,dost){
+  const filtered=fx?A.filter(a=>actFx(a.id).includes(fx)&&cats.some(c=>c[0]===a.cat)):list;
+  const sorted=filtered.slice().sort((a,b)=>Number(actState(b).ok)-Number(actState(a).ok));
+  const recommended=sorted.slice(0,6),all=G.actAll?sorted:recommended;
+  const focus=A.find(a=>a.id===G.actFocus&&filtered.some(x=>x.id===a.id))||all[0]||filtered[0];
+  if(focus&&G.actFocus!==focus.id)G.actFocus=focus.id;
+  return `<div class="decision-desk"><div class="decision-list-pane"><div class="decision-list-head"><div><span class="eyebrow">${G.actAll?'WSZYSTKIE DECYZJE':'POLECANE TERAZ'}</span><h3>${G.actAll?sorted.length:recommended.length} kart</h3></div><div class="decision-list-tools"><button class="decision-tool ${G.actAll?'on':''}" onclick="actToggleAll()">${G.actAll?'POLECANE':'WSZYSTKIE'}</button><button class="decision-tool ${G.actFiltersOpen?'on':''}" onclick="actToggleFilters()">FILTRY</button></div></div>${G.actFiltersOpen?`<div class="decision-filters"><button class="fx ${fx?'':'on'}" onclick="setFx('')">wszystkie</button>${Object.keys(AFXN).filter(f=>dost.has(f)).map(f=>`<button class="fx ${fx===f?'on':''}" style="color:${AFXN[f][1]};border-color:${AFXN[f][1]}55" onclick="setFx('${f}')">${AFXN[f][0]}</button>`).join('')}</div>`:''}<div class="act-short-grid">${all.map(actShortCard).join('')||'<div class="note">Brak decyzji w tej kategorii.</div>'}</div></div>${actInspector(focus)}</div>`;
+}
 function premierTab(){
   lawsInit();radaInit();
   const g=G.gov,swoi=roster(me());
@@ -713,6 +743,16 @@ function actTab(){
   </div></div>
   ${agentBox()}`;
 }
+/* Nowy ekran decyzji: krótkie karty, rekomendacje i inspektor boczny. Stary
+   renderer zostaje wyżej jako bezpieczny fallback dla ekranów gabinetu. */
+function actTabCommand(){
+  const cats=CATS.filter(([c])=>c==='wla'?inGov():c==='prem'?isPM():c==='prz'?hasPrez():c==='opo'?!inGov():c==='prm'?hasLsd(G.me):true);
+  if(!cats.find(c=>c[0]===G.cat))G.cat='kam';
+  const fx=G.fx||'',activeList=A.filter(a=>a.cat===G.cat&&a.id!=='ustawa');
+  const dost=new Set();A.forEach(a=>{if(cats.some(c=>c[0]===a.cat))actFx(a.id).forEach(f=>dost.add(f))});
+  return `${stolTygodnia()}<div class="card"><div class="h"><h3>Decyzje dostępne teraz</h3><span class="n">${ikona('akcje','sm')}${Math.max(0,G.ap)}/${G.apMax} akcji · ${ikona('kapital','sm')}${Math.round(G.kp)} kapitału · ${ikona('energia','sm')}${Math.round(G.en)} energii</span></div><div class="b"><div class="cats">${cats.map(([c,n])=>`<button class="${!fx&&G.cat===c?'on':''} ${c==='prz'||c==='prem'?'roy':''}" onclick="setCat('${c}')">${n}</button>`).join('')}</div>${actDecisionBoard(activeList,cats,fx,dost)}<div class="note"><b>Każda decyzja ma własny termin odnowy.</b> Polecane pokazują sześć ruchów najbliższych sytuacji partii; „Wszystkie” odsłania resztę.</div></div></div>${agentBox()}`;
+}
+actTab=actTabCommand;
 function agentBox(){
   const wolni=AGENTS.filter(a=>agentFree(a.n)), moi=AGENTS.filter(a=>G.agents[a.n]===G.me);
   const zostalo=agenciZostalo();

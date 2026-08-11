@@ -4,6 +4,13 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.201':{data:'11 sierpnia 2026',zmiany:[
+  'Cele narodowe dostaly prawdziwe drzewko z widocznym rozwidleniem i panelem bocznym zamiast modala zaslaniajacego mape.',
+  'Concordia korzysta z nowych log celow: oko, pretraktacje, ksiega, pielegnacja potegi i zlot przyjazni.',
+  'Rozkwit wedle goracych psow i Roza spadajaca na slonce maja nowe, spojne emblematy generowane pod mape celow.',
+  'Decyzje pokazuja domyslnie szesc polecanych kart; pelny opis, warunki i wykonanie sa w inspektorze po prawej.',
+  'Skarbiec i czynniki u Krola rozciagaja sie teraz na pelna szerokosc, a ranking dworski zachowuje pionowy uklad.'
+ ]},
  '1.1.200':{data:'11 sierpnia 2026',zmiany:[
   'Akcje w toku maja teraz pasek postepu, a po ich zakonczeniu wraca normalny stol tygodnia z wolnymi ruchami.',
   'Zakladka Partie pokazuje plan i trzy priorytety kazdej partii sterowanej przez AI.',
