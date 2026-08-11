@@ -24,6 +24,7 @@ function simClockMigrate(){
   if(typeof G.simHour!=='number'||!isFinite(G.simHour))
     G.simHour=Math.max(0,((Math.max(1,G.term||1)-1)*(G.weeks||12)+(Math.max(1,G.week||1)-1))*168+(G.czasGodzTygodnia||0));
   if(typeof G.realCarry!=='number'||!isFinite(G.realCarry))G.realCarry=0;
+  if(typeof G.realPauseReason!=='string')G.realPauseReason=null;
   simClockSync();
 }
 function realClockInit(){
@@ -139,8 +140,12 @@ function realtimeBoundary(){
      przejście kadencji. Gracz nie wywołuje ich klawiszem ani przyciskiem; świat
      idzie dalej godzinami, a decyzje mają własne odnowy liczone w godzinach. */
   if(!G||G.phase!=='camp')return;
-  const nowTerm=G.term,nowWeek=G.week,oldWeek=nowWeek>1?nowWeek-1:G.weeks,oldTerm=nowWeek>1?nowTerm:Math.max(1,nowTerm-1);
-  const h=G.simHour;G.term=oldTerm;G.week=oldWeek;
+  const h=G.simHour;
+  /* Liczymy zakonczony odcinek z godziny zegara, zamiast zgadywac na podstawie
+     G.week, ktore simClockSync zdazyl juz ustawic na nastepny odcinek. */
+  const zakonczony=Math.max(0,Math.floor((h-1)/168));
+  G.term=Math.floor(zakonczony/(G.weeks||12))+1;
+  G.week=(zakonczony%(G.weeks||12))+1;
   endWeek(true);
   G.simHour=h;simClockSync();
 }
@@ -277,7 +282,9 @@ function endWeek(automatic=false){
   const p=me();
   const dateFrom=gameDate();
   ustawPlany();
-  ai();if(G.realTimeEconomy!==true)drift();aiGoals();aiAgents();aiTransfery();
+  /* W czasie ciaglym AI i wydarzenia sa juz rozliczane codziennie. Granica
+     tygodnia ma tylko zamknac rejestr, nie dawac botom drugi ruch. */
+  if(G.realTimeEconomy!==true){ai();drift();aiGoals();aiAgents();aiTransfery();}
   if(G.realTimeEconomy!==true){sitTick();scenWydarzeniaTydzien();}
   sprzatnijRade();   // po transferach i odejściach rada musi zgadzać się ze składami partii
   if(G.realTimeEconomy!==true)sadTydzien();      // zegar ciągły robi to codziennie
@@ -384,11 +391,13 @@ function endWeek(automatic=false){
   if(mialRuch)G.streak=(G.streak||0)+1;
   else G.streak=0;
   if(G.recCdAt===undefined&&G.recCd>0)G.recCd--;
-  aiProposeLaw();          // premier sterowany przez komputer też składa projekty
-  aiObsadzRade();          // i sam obsadza ministerstwa, zamiast trzymać puste krzesła
-  aiProponujMinistra();    // czasem prosi koalicjanta o własnego kandydata
-  aiRekonstrukcja();       // a niewygodnego koalicjanta potrafi wyrzucić
-  aiOpozycja();            // opozycja rozlicza rząd bez czekania na gracza
+  if(G.realTimeEconomy!==true){
+    aiProposeLaw();
+    aiObsadzRade();
+    aiProponujMinistra();
+    aiRekonstrukcja();
+    aiOpozycja();
+  }
   histPush();SFX.week();
   if(G.realTimeEconomy!==true){G.catUsed={};G.used2={};}
   G.lastCharge=null;G.stolPend=null;podgladCache={};   // niedokończone okno nie może przejść na kolejny tydzień

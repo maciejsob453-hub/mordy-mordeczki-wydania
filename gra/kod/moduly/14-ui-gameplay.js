@@ -448,8 +448,7 @@ function mogeZglosic(id){
   if(!G.gov||!G.pmOk||!G.gov.pm)return false;
   // kto nie ma ani jednego mandatu, ten nie ma prawa inicjatywy — nie miałby nawet jak zagłosować
   if(!me().seats)return false;
-  if(isPM())return true;
-  return !!(l.resort&&mojeResorty().includes(l.resort));
+  return typeof canLaw==='function'&&canLaw(G.me,l);
 }
 /* Sejm rozpatruje jeden projekt tygodniowo. Każda ustawa z osobna ma nadal swoje
    jedno podejście na kadencję — ten limit tylko rozkłada je w czasie, żeby nie

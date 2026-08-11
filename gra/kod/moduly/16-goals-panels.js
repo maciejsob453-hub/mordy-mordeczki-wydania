@@ -935,7 +935,7 @@ function ustawyPodglad(){
    To nie jest kolejna karta z liczbami. Mordepedia zbiera ślady kolejnych
    kadencji i pokazuje je dopiero po uchwaleniu własnej ustawy — dzięki temu
    odblokowanie ma sens fabularny, a stary zapis nie potrzebuje migracji. */
-function mordepediaTab(){
+function mordepediaTabLegacy(){
   const odblokowana=lawDone('mordepedia');
   if(!odblokowana)return `<div class="mordekran"><section class="mordelock">
     <span class="mordeyear">ARCHIWUM SERWERA · ZAMKNIĘTE</span><h2>Mordepedia</h2>

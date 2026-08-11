@@ -4,6 +4,14 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.199':{data:'11 sierpnia 2026',zmiany:[
+  'Jedna bramka uprawnien sprawdza teraz rzad, premiera, mandaty i resort przed kazda ustawa; opozycja bez gabinetu nie firmuje cudzych projektow.',
+  'Rozmowa o ministrze wymaga zatwierdzonego rzadu, a propozycja spoza swojej partii nie moze wejsc bokiem przez stary zapis lub klikniecie.',
+  'Zapis i wczytywanie czyszcza zawieszone decyzje, kolejki botow, duchy ministrow i uszkodzony gabinet zamiast zostawiac niewidzialna blokade.',
+  'Czas ciagly zamyka tydzien tylko na jego prawdziwej granicy godzinowej; wyborow nie da sie uruchomic po drodze ani przeskoczyc do trzynastego tygodnia.',
+  'Weto ma teraz prawdziwe glosowanie nad odrzuceniem: ustawa wchodzi tylko po przekroczeniu progu 3/5, a utrzymane weto czysci wszystkie slady ustawy.',
+  'AI dostaje te same sprawdzenia mandatu i resortu co gracz, wiec nie moze zlozyc ustawy z opozycji ani obsadzic fikcyjnego ministra.'
+ ]},
  '1.1.198':{data:'10 sierpnia 2026',zmiany:[
   'Cele narodowe maja teraz pionowe lancuchy po rozgalezieniu, wiec kolejne kroki czyta sie z gory na dol.',
   'Mordepedia pozostaje zamknieta do czasu ustawy i korzysta z tego samego, neutralnego ekranu blokady co Sad i Media.',

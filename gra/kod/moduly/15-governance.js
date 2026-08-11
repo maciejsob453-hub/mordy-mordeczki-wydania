@@ -213,7 +213,8 @@ function partiaOsoby(nick){
    a rozmowa bierze pod uwagę relację i realną kompetencję proponowanej osoby. */
 function premierRozmowa(id,nick){
   const pm=G.gov&&G.gov.pm, res=RESORTY.find(r=>r.id===id);
-  if(!pm||!res||pm===G.me||!G.gov.parties.includes(G.me))return;
+  if(!pm||!res||!G.pmOk||pm===G.me||!Array.isArray(G.gov.parties)||!G.gov.parties.includes(G.me))return;
+  if(!nick||!roster(me()).includes(nick)||Object.values(G.rada||{}).includes(nick))return;
   if(G.premierProposalTerm===G.term)return modal('Rozmowa z premierem','Limit propozycji wykorzystany',
     '<p>W tej kadencji złożyłeś już jedną propozycję obsady resortu. Premier nie przyjmie kolejnej kandydatury do następnych wyborów.</p>',
     [{l:'Rozumiem',f:close}],close);
@@ -232,7 +233,7 @@ function premierRozmowa(id,nick){
 function openResort(id){
   radaInit();
   const premier=!!(G.gov&&G.pmOk&&G.gov.pm===G.me);
-  const koalicjant=!!(G.gov&&G.gov.parties&&G.gov.parties.includes(G.me));
+  const koalicjant=!!(G.gov&&G.pmOk&&Array.isArray(G.gov.parties)&&G.gov.parties.includes(G.me));
   if(!premier&&!koalicjant)return modal('Rada ministrów','Brak uprawnień',
     '<p>Obsadzanie resortów należy do premiera. Z opozycji możesz tylko złożyć propozycję, gdy twoja partia jest w koalicji.</p>',
     [{l:'Wracam',f:close}],close);
@@ -275,11 +276,21 @@ function openResort(id){
        Jeśli zgarniesz całą radę dla siebie, policzą krzesła i to odbije się na relacjach.</p>`:''}`,opcje,close);
 }
 function obsadz(id,nick,zPartii,fromTalk){
-  if(!(G.gov&&G.pmOk&&G.gov.pm===G.me)&&!fromTalk){
+  const legalTalk=!!(fromTalk&&G.gov&&G.pmOk&&G.gov.pm&&Array.isArray(G.gov.parties)
+    &&G.gov.pm!==G.me&&G.gov.parties.includes(G.me));
+  if(!(G.gov&&G.pmOk&&G.gov.pm===G.me)&&!legalTalk){
     say('<b>Nie jesteś premierem.</b> Nominację może zatwierdzić tylko szef rządu.','bad');
     close();render();return;
   }
   radaInit();
+  if(nick){
+    const part=partiaOsoby(nick);
+    if(!part||Object.values(G.rada||{}).includes(nick)||(zPartii&&part!==zPartii)
+      ||(legalTalk&&part!==G.me))return;
+    /* Premier moĹĽe wskazaÄ‡ osobÄ™ spoza koalicji wprost (stare zapisy i
+       scenariusze tak robiÄ…), ale rozmowa koalicjanta przechodzi wyĹ‚Ä…cznie
+       przez legalTalk i wczeĹ›niejsze sprawdzenie przynaleĹĽnoĹ›ci. */
+  }
   const res=RESORTY.find(r=>r.id===id);
   if(!res)return;                       // resort mógł zniknąć razem z zapisem ze starszej wersji
   if(G)G.lastCharge=null;               // resort obsadzony — decyzja doszła do skutku
@@ -770,6 +781,28 @@ function lawsInit(){
   if(!G.law)G.law={};
   if(!G.lawTerm)G.lawTerm={};
 }
+/* Jedna bramka uprawnien ustawodawczych. Wczesniej ekran, AI i zapis mialy
+   wlasne wersje tego warunku, dlatego ten sam stan raz przepuszczal projekt,
+   a raz go blokowal. */
+function canLaw(actor,law){
+  if(!G||!G.gov||!G.pmOk||!G.gov.pm||!G.p||!G.p[G.gov.pm])return false;
+  if(!Array.isArray(G.gov.parties)||!G.gov.parties.includes(G.gov.pm))return false;
+  const k=actor||G.me,l=law||null;
+  /* Mandat jest częścią uprawnienia, nie tylko warunkiem przycisku. AI i stare
+     zapisy potrafiły wejść tu bokiem, gdy partia została bez miejsc w Sejmie. */
+  if(!k||!G.p[k]||G.p[k].dead||Number(G.p[k].seats||0)<=0||!G.gov.parties.includes(k))return false;
+  if(k===G.gov.pm)return true;
+  if(!l||!l.resort)return false;
+  radaInit();
+  const n=RESORTY.find(r=>r.id===l.resort);
+  const minister=n&&radaKto(n.id);
+  return !!minister&&partiaOsoby(minister)===k;
+}
+function canPoliticalState(action){
+  if(!G||!G.gov||!G.pmOk||!G.gov.pm||!G.p[G.gov.pm]||G.p[G.gov.pm].dead)return false;
+  if(!Array.isArray(G.gov.parties)||!G.gov.parties.includes(G.gov.pm)||Number(G.p[G.gov.pm].seats||0)<=0)return false;
+  return action==='law'||action==='minister'||action==='government';
+}
 const lawDone=id=>{lawsInit();return !!G.law[id]};
 const lawsToSign=()=>{lawsInit();return G.lawPend?[G.lawPend]:[]};
 function lawsPending(){
@@ -979,7 +1012,7 @@ function lawGlosy(w){return panelGlosowania(w)}
    Bez tego bycie samym prezydentem nie miałoby sensu: na biurko nigdy nic by nie trafiło. */
 function aiProposeLaw(){
   lawsInit();radaInit();
-  if(G.lawPend||!G.gov||!G.pmOk)return;
+  if(G.lawPend||!canPoliticalState('law'))return;
   const wolne=LAWS.filter(l=>!G.lawTerm[l.id]&&(!lawDone(l.id)||lawEdytowalna(l.id)));
   if(!wolne.length)return;
 
@@ -991,8 +1024,7 @@ function aiProposeLaw(){
     zglaszajacy.push({k:pmK,pula:wolne,rola:3,co:2});
   alive().forEach(k=>{
     if(k===G.me||k===pmK||!G.p[k]||G.p[k].dead)return;
-    const resorty=RESORTY.filter(r=>{const n=radaKto(r.id);return n&&partiaOsoby(n)===k}).map(r=>r.id);
-    const pula=G.gov.parties.includes(k)?wolne.filter(l=>l.resort&&resorty.includes(l.resort)):[];
+    const pula=wolne.filter(l=>canLaw(k,l));
     if(pula.length)zglaszajacy.push({k,pula,rola:2,co:3});
     /* Gdy premierem jest gracz i nie oddał resortów botom, sejm nadal żyje.
        Najsilniejsza partia opozycyjna może złożyć projekt poselski. */
@@ -1242,7 +1274,7 @@ function odrzucenieWeta(id,opcje,pmK,glosy){
   /* Weto prezydenta jest decyzją końcową. Stara wersja automatycznie robiła
      drugie głosowanie i potrafiła aktywować ustawę mimo komunikatu „weto”.
      Zostawiamy wynik głosów do kroniki, ale nie obchodzimy nim pałacu. */
-  const udalo=false;
+  const udalo=za>=potrzeba;
   const w={za,przeciw,wstrzym,by,potrzeba,rad:0,ok:udalo};
   if(udalo){
     G.lawTerm[id]=1;

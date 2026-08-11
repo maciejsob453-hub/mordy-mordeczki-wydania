@@ -19,6 +19,52 @@ function sprawdzZapis(s){
   return null;
 }
 if(typeof window!=='undefined')Object.assign(window,{realClockToggle,realClockSpeed,realClockStart,realClockInit});
+/* Zapis moze powstac w polowie procedury, ale zapisany ma byc stan gry, nie
+   pol otwartego modala. Ta normalizacja jest wspolna dla wczytywania i nowego
+   zapisu, zeby stare pliki nie odtwarzaly niewidzialnej blokady. */
+function sanitizeGameState(){
+  if(!G)return;
+  /* Zapis jest danymi wejĹ›ciowymi. Najpierw prostujemy gabinet, dopiero potem
+     sprzÄ…tamy decyzje: uszkodzony pm albo partia-duch nie moĹĽe otworzyÄ‡ ekranu
+     premiera ani zyskaÄ‡ prawa do ustaw. */
+  if(G.gov&&typeof G.gov==='object'){
+    const validParties=Array.isArray(G.gov.parties)
+      ?G.gov.parties.filter(k=>G.p[k]&&!G.p[k].dead&&Number(G.p[k].seats||0)>0)
+      :[];
+    if(!G.gov.pm||!validParties.includes(G.gov.pm)||!G.p[G.gov.pm]){
+      G.gov=null;G.pmOk=false;G.rada={};G.radaOd={};
+    }else{
+      G.gov.parties=validParties;
+      G.rada=G.rada&&typeof G.rada==='object'?G.rada:{};
+      G.radaOd=G.radaOd&&typeof G.radaOd==='object'?G.radaOd:{};
+      const seen=new Set();
+      Object.keys(G.rada).forEach(id=>{
+        const n=G.rada[id],part=n&&partiaOsoby(n);
+        if(!n||seen.has(n)||!part||!validParties.includes(part)){delete G.rada[id];delete G.radaOd[id]}
+        else seen.add(n);
+      });
+    }
+  }else if(G.gov!==null){G.gov=null;G.pmOk=false}
+  if(!Array.isArray(G.queue))G.queue=[];
+  G.queue=G.queue.filter(e=>e&&(!e.id||typeof BOT_EVENT_IDS==='undefined'||BOT_EVENT_IDS.has(e.id)));
+  if(G.stolPend&&!G.lastCharge)G.stolPend=null;
+  if(G.lawPend){
+    const l=typeof lawById==='function'?lawById(G.lawPend.id):null;
+    if(!l||!G.gov||!G.pmOk||!G.gov.pm){
+      G.lawPend=null;
+      if(G.lawTerm&&l)delete G.lawTerm[l.id];
+    }
+  }
+  if(Array.isArray(G.decisionLog)){
+    const active=Array.isArray(G.harmonogram)?new Set(G.harmonogram.map(x=>x&&x.seq)):new Set();
+    G.decisionLog.forEach(d=>{if(d&&d.status==='ACTIVE'&&!active.has(d.token)){d.status='CANCELLED';d.cancelledAt=czasGlobalny()}});
+    G.decisionLog=G.decisionLog.slice(-24);
+  }
+  const procedura=['elect','result','prez','pmvote','marszalek'].includes(G.phase)||G.prez2||G.prezState;
+  if(procedura||G.phase==='finalcamp'){G.realPaused=true;G.realPauseReason='procedure'}
+  else if(G.realPauseReason==='procedure'||G.realPauseReason==='election')G.realPauseReason=null;
+  if(typeof G.realPaused!=='boolean')G.realPaused=false;
+}
 function loadCode(code){
   const raw=b64d(String(code||'').trim().replace(/^MM/,''));
   if(!raw)throw new Error('nieczytelny kod — sprawdź, czy skopiowałeś go w całości');
@@ -86,6 +132,7 @@ function loadCode(code){
   if(typeof G.week!=='number'||G.week<1)G.week=1;
   if(G.week>G.weeks)G.week=G.weeks;      // stare zapisy potrafią mieć trzynasty tydzień
   simClockMigrate();
+  sanitizeGameState();
   if(!G.ptraits){G.ptraits={};if(G.traits&&G.traits.length)G.ptraits[G.p[G.me].lead]=G.traits.slice()}
   G.sejmPrez=null;G.mar=null;
   if(G.phase==='marszalek')G.phase='camp';
