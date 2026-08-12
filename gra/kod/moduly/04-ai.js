@@ -496,6 +496,14 @@ function govTickRealtime(){
     if(seats>=MAJ){g.minority=0;g.royal=0;say('<b>Rząd odzyskał większość.</b>','good')}
     else if((ch(.26*s)||g.appr<26)&&ch(.18*s)){collapseGov(`Rząd mniejszościowy ${G.p[g.pm].lead} (${seats}/${TOTAL_SEATS}) nie przetrwał głosowania.`);return;}}
   if(ch(.10*s)){const d=RI(4,11);APPR(-d*s);say(`<b>Wpadka rządu.</b> Poparcie −${fmt(d*s)}.` ,g.parties.includes(G.me)?'bad':'good')}
+  if(G.pmOk){
+    const total=Math.max(1,RESORTY.length);
+    g.parties.forEach(k=>{const q=G.p[k];if(!q||q.dead)return;const w=resortyPartii(k)/total;
+      if(g.appr>52){q.fame=cl(q.fame+(.7+w*1.4)*s);if(ch((.14+w*.3)*s)){const gt=drawFrom('polityka',1);q.comp.eli+=gt.eli;q.comp.int+=gt.int;q.comp.ser+=gt.ser;q.mem+=gt.eli+gt.int+gt.ser;}}
+      else if(g.appr<38){q.fame=cl(q.fame-.8*s);M(q,-s)}
+      if(k===g.pm){q.fame=cl(q.fame+2.6*s);q.act=cl(q.act+1.2*s);M(q,1.2*s)}
+    });
+  }
   radaTickRealtime();
 }
 function radaTickRealtime(){
