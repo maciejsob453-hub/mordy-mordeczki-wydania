@@ -288,6 +288,16 @@ function pusteResorty(){
   return wolni.length?puste:[];
 }
 function endWeek(automatic=false){
+  /* Stare narzędzia i zapisy mogą jeszcze wywołać „następny tydzień”. W zegarze
+     ciągłym nie wolno wtedy odpalać połowy tygodniowego rozliczenia ani zatrzymać
+     gry na wakacie w radzie: odpowiednikiem jest zwykłe 168 kroków godzinowych.
+     Automatyczna granica woła endWeek(true) niżej i nie wchodzi tutaj ponownie. */
+  if(G&&G.realTimeEconomy===true&&!automatic){
+    const wasPaused=!!G.realPaused;G.realPaused=false;
+    for(let h=0;h<168&&G.phase==='camp';h++)simClockStep();
+    G.realPaused=wasPaused;simClockSync();render();
+    return;
+  }
   const puste=pusteResorty();
   if(puste.length&&!automatic){
     G.tab='premier';

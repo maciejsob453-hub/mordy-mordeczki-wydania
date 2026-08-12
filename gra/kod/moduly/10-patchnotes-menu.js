@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.207':{data:'12 sierpnia 2026',zmiany:[
+  'Stary przycisk nastepnego tygodnia nie blokuje juz zegara ciaglego: wykonuje bezpieczny odcinek 168 godzin bez podwojnego rozliczenia.',
+  'AI i gospodarka pozostaja rozliczane dobowo, a granica tygodnia sluzy tylko do zamkniecia odcinka kalendarza.',
+  'Wakaty w radzie nie zatrzymuja automatycznego czasu; przy recznym przejsciu gra kieruje do nastepnego odcinka zamiast wisiec na pustym gabinecie.'
+ ]},
  '1.1.206':{data:'12 sierpnia 2026',zmiany:[
   'Boty dostaja dochod partii proporcjonalnie do dnia, wiec nie kupuja bezpartyjnych za siedem tygodni kapitalu w jeden tydzien.',
   'Zegar ciagly nie rozlicza rzadu drugi raz na granicy tygodnia, a kryzys bez gabinetu narasta rowno z uplywem dni.',
