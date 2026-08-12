@@ -60,6 +60,7 @@ function sanitizeGameState(){
     G.decisionLog.forEach(d=>{if(d&&d.status==='ACTIVE'&&!active.has(d.token)){d.status='CANCELLED';d.cancelledAt=czasGlobalny()}});
     G.decisionLog=G.decisionLog.slice(-24);
   }
+  if(typeof decyzjeSweep==='function')decyzjeSweep(czasGlobalny());
   const procedura=['elect','result','prez','pmvote','marszalek'].includes(G.phase)||G.prez2||G.prezState;
   if(procedura||G.phase==='finalcamp'){G.realPaused=true;G.realPauseReason='procedure'}
   else if(G.realPauseReason==='procedure'||G.realPauseReason==='election')G.realPauseReason=null;

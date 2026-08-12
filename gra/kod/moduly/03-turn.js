@@ -58,11 +58,29 @@ function realtimeDaily(){
     realtimeSituationTick();
     ai();aiGoals();aiAgents();aiTransfery();aiOpozycja();
     if(G.gov){govTickRealtime();govKontraktTick();aiProposeLaw();aiObsadzRade();aiProponujMinistra();aiRekonstrukcja()}
+    else realtimeNoGovernmentTick();
     if(Array.isArray(G.queue))G.queue=G.queue.filter(e=>e&&BOT_EVENT_IDS.has(e.id));
     if(!G.queue||!G.queue.length)G.queue=buildEvents();
   }
   /* Ostatnia doba jest jeszcze zwyklym tickiem; tygodniowy szum robi endWeek,
      zeby nie dodac go dwa razy na tej samej granicy. */
+}
+function realtimeNoGovernmentTick(){
+  if(!G||G.gov)return;
+  const s=1/7,prev=Number(G.bezRzadu)||0;
+  G.bezRzadu=prev+s;
+  const sila=Math.min(3.4,1+Math.max(0,prev)*.55);
+  alive().forEach(k=>{const q=G.p[k];
+    q.act=cl(q.act-1.8*sila*s);q.uni=cl(q.uni-1.1*sila*s);M(q,-1.5*sila*s);
+    if(prev>=3)q.cred=cl(q.cred-.9*(sila-1)*s);
+  });
+  G.kp=Math.max(0,G.kp-4*sila*s);
+  const stary=Math.floor(prev),nowy=Math.floor(G.bezRzadu);
+  if(stary!==nowy){
+    if(nowy===1)say('<b>Serwer bez rządu.</b> Kanały cichną, nikt nic nie ustala.','bad');
+    else if(nowy===3)say('<b>Trzeci tydzień bez rządu.</b> Aktywność i jedność lecą we wszystkich partiach.','bad');
+  }
+  if(typeof pkbCios==='function')pkbCios('paraliz',Math.min(5,1+G.bezRzadu*.55)*s,'Brak rządu zamroził decyzje i pieniądze',2);
 }
 
 /* Główne statystyki nie czekają już na sztuczną granicę tygodnia. Ten krok jest
@@ -316,16 +334,16 @@ function endWeek(automatic=false){
     say('<b>Era niestabilności.</b> Grudniowo-styczniowy chaos na serwerze ułatwia podbieranie ludzi z innych partii, i tobie, i botom. Potrwa do końca stycznia.','roy');}
   else if(!isEraNiestab()&&G.eraNiestab===1){G.eraNiestab=2;
     say('<b>Era niestabilności się kończy.</b> Werbunek wraca do normy.','roy');}
-  if(G.gov){govTick();govKontraktTick();}
+  if(G.gov&&G.realTimeEconomy!==true){govTick();govKontraktTick();}
   if(typeof pkbCios==='function'&&G.gov&&G.gov.appr<38)
     pkbCios('rząd',Math.min(4,(38-G.gov.appr)/5),'Niskie poparcie rządu zatrzymało inwestycje',3);
-  if(G.gov&&G.pmOk){
+  if(G.realTimeEconomy!==true&&G.gov&&G.pmOk){
     G.gov.parties.forEach(k=>{const q=G.p[k];
       const w=resortyPartii(k)/Math.max(1,RESORTY.length);
       if(G.gov.appr>52){q.fame=cl(q.fame+.7+w*1.4);if(ch(.14+w*.3)){const gt=drawFrom('polityka',1);q.comp.eli+=gt.eli;q.comp.int+=gt.int;q.comp.ser+=gt.ser;q.mem+=gt.eli+gt.int+gt.ser}}
       else if(G.gov.appr<38){q.fame=cl(q.fame-.8);M(q,-1)}
       if(k===G.gov.pm){q.fame=cl(q.fame+2.6);q.act=cl(q.act+1.2);M(q,1.2)}});
-  } else {
+  } else if(G.realTimeEconomy!==true) {
     /* Kryzys rządowy narasta. Pierwszy tydzień bez gabinetu to jeszcze normalne
        targi, ale każdy kolejny kosztuje coraz więcej: serwer przestaje wierzyć,
        że ktokolwiek to poskłada. Wcześniej brak rządu był praktycznie darmowy

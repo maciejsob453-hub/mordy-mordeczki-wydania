@@ -457,7 +457,7 @@ function switchIdentity(mode){
    muszą zachować wykonane cele partyjne, a Concordia dostaje nową, czasową
    ścieżkę bez kasowania historii. */
 const NATIONAL_GOALS={
- nplr_liberal:{avatar:'obrazki/cel-liberalizm.svg',emoji:'📖',n:'Liber? Libro? Liberalizm!',days:35,prev:null,logo:'LIB',
+ nplr_liberal:{avatar:'obrazki/cel-liber-libro.png',emoji:'📖',n:'Liber? Libro? Liberalizm!',days:35,prev:null,logo:'LIB',
   what:'Pierwszy krok Concordii: liberalizm przestaje być żartem z nazwy i staje się programem, który da się prowadzić przez kilka kadencji.',
   accessText:'Dostępne od początku rozgrywki.',
   cons:['Sława +6, wiarygodność +7 i aktywność +5.','Partia dostaje znacznik pierwszego liberalnego przełomu.'],
@@ -626,12 +626,14 @@ function nationalGoalReason(id){
   const g=NATIONAL_GOALS[id],s=nationalState();if(!g||!s)return '';
   if(g.route&&s.earlyBranch&&s.earlyBranch!==g.route)return 'Ta gałąź została zamknięta po wyborze innej drogi.';
   if(g.route&&!s.earlyBranch)return 'Najpierw wybierz drogę po pierwszym celu narodowym.';
-  if(g.branch==='progressive'&&s.earlyBranch&&s.earlyBranch!=='progressive')return 'Ta gałąź została zamknięta po wyborze innej drogi.';
-  if(g.branch==='progressive'&&!s.earlyBranch)return 'Najpierw wybierz drogę po pierwszym celu narodowym.';
   if(!g.branch&&id!=='nplr_liberal'&&!s.earlyBranch)return 'Najpierw wybierz drogę po pierwszym celu narodowym.';
-  if(g.branch&&g.branch!=='progressive'&&s.earlyBranch!=='liberal')return 'Ta gałąź wymaga drogi Partii Liberalnej.';
-  if(g.branch&&s.branch&&g.branch!==s.branch)return 'Ta galaz zostala zamknieta po wyborze innego rozwidlenia.';
-  if(g.branch&&!s.branch)return 'Najpierw wybierz jedno z dwóch rozwidleń.';
+  if(g.branch==='progressive'){
+    if(s.earlyBranch!=='progressive')return 'Ta gałąź została zamknięta po wyborze innej drogi.';
+  }else if(g.branch){
+    if(s.earlyBranch!=='liberal')return 'Ta gałąź wymaga drogi Partii Liberalnej.';
+    if(s.branch&&g.branch!==s.branch)return 'Ta gałąź została zamknięta po wyborze innego rozwidlenia.';
+    if(!s.branch)return 'Najpierw wybierz jedno z dwóch rozwidleń.';
+  }
   if(g.prev&&!s.done[g.prev])return 'Najpierw ukończ: '+NATIONAL_GOALS[g.prev].n+'.';
   if(!nationalGoalAccess(id))return g.accessText||'Warunek dostępu nie jest jeszcze spełniony.';
   if(g.optional&&!s.optional[id])return 'Cel opcjonalny: wybierz go, jeśli chcesz i masz spełnione warunki.';

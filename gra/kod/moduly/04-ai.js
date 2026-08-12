@@ -57,7 +57,12 @@ function aiPamietaj(k,typ,dane){
 /* Na co partia stawia w danym tygodniu. Na początku kadencji buduje zaplecze,
    pod koniec rzuca wszystko w obecność i sławę, bo to one liczą się przy urnach. */
 function aiWagi(k,p){
-  const c=charOf(k), t=G.week/Math.max(1,G.weeks);
+  const c=charOf(k);
+  const kadGodz=Math.max(1,Number(G.weeks)||12)*168;
+  const inKad=Number.isFinite(Number(G.simHour))
+    ?Math.max(0,Number(G.simHour))%kadGodz
+    :Math.max(0,Math.max(1,Number(G.week)||1)-1)*168;
+  const t=cl(inKad/kadGodz,0,1);
   const koniec=t>.62, start=t<.34;
   /* Zamiar na kadencję przechyla wagi: kto idzie po fotel premiera, ciśnie na mandaty,
      kto ratuje się przed progiem, zbiera ludzi i łata jedność. */
@@ -403,13 +408,12 @@ function aiTransfery(){
     if((!Number.isFinite(aiLast)||czasGlobalny()-aiLast>=168)&&ch(.04+(chetny?.05:0)+c.bud*.04)){
       const wolni=AGENTS.filter(a=>agentFree(a.n));
       if(wolni.length){
-        const a=pick(wolni), koszt=agentCost(a.n,1);
+        const a=pick(wolni), koszt=Math.round(agentCost(a.n,1)*1.15);
         if(p.bank===undefined)p.bank=0;
         if(p.mem>=6&&p.bank>=koszt&&ch(cl(.30+p.fame/220,0,.75))){
           if(!G.agents)G.agents={};
           p.bank-=koszt;
           G.agents[a.n]=k;p.comp[a.seg]++;p.mem++;
-          G.aiAgentAt=G.aiAgentAt||{};G.aiAgentAt[k]=czasGlobalny();
           G.aiAgentAt=G.aiAgentAt||{};G.aiAgentAt[k]=czasGlobalny();
           if(!p.bench.includes(a.n))p.bench.push(a.n);
           aiPamietaj(k,'transfer',{osoba:a.n,koszt});

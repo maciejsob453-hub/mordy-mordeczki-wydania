@@ -4,7 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
- '1.1.205':{data:'12 sierpnia 2026',zmiany:['Poprawka ladowania modułów po aktualizacji: gra nie korzysta juz ze starego cache WebView2.']},
+ '1.1.206':{data:'12 sierpnia 2026',zmiany:[
+  'Boty dostaja dochod partii proporcjonalnie do dnia, wiec nie kupuja bezpartyjnych za siedem tygodni kapitalu w jeden tydzien.',
+  'Zegar ciagly nie rozlicza rzadu drugi raz na granicy tygodnia, a kryzys bez gabinetu narasta rowno z uplywem dni.',
+  'Priorytety AI zmieniaja sie w trakcie kadencji, a wczytany zapis domyka przeterminowane akcje zamiast trzymac je w toku.'
+ ]},
+ '1.1.205':{data:'12 sierpnia 2026',zmiany:['Poprawka ladowania modulow po aktualizacji: gra nie korzysta juz ze starego cache WebView2.']},
  '1.1.204':{data:'12 sierpnia 2026',zmiany:[
   'Dodano nowe rozwidlenie po pierwszym celu Concordii: Partia Liberalna albo droga Postepowcow.',
   'Postepowcy maja trzy cele: Czas na Jaderka, Nowi starzy wszystko jedno oraz Bedac postepem warunkuje postep.',

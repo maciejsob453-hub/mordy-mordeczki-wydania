@@ -268,7 +268,9 @@ function aiAgents(){
     if(k===G.me)return;const p=G.p[k];
     const now=czasGlobalny(),last=Number(G.aiAgentAt&&G.aiAgentAt[k]);
     if(Number.isFinite(last)&&now-last<168)return;
-    p.bank=Math.min(260,(p.bank||0)+income(k).total);   // boty też nie zbierają w nieskończoność
+    /* Dochód income() jest tygodniowy. W zegarze ciągłym bot dostaje tylko
+       siódmą część przy każdym dobowym ticku, inaczej kupuje pulę za nic. */
+    p.bank=Math.min(260,(p.bank||0)+income(k).total/7);
     if(!ch(.18))return;
     const wolni=AGENTS.filter(a=>agentFree(a.n)).sort((a,b)=>b.kp-a.kp);
     const a=wolni.find(x=>p.bank>=Math.round(agentCost(x.n,1)*1.15));
