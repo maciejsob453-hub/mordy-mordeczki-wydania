@@ -469,7 +469,7 @@ const NATIONAL_GOALS={
   cons:['Prawe Jąderko dołącza do zaplecza programu.','Aktywność +5 i wiarygodność +3.'],
   access:()=>!!(G&&me()&&roster(me()).includes('Prawe Jąderko')&&Number(G.kp||0)>=100),
   run(){const p=me();p.nplrJaderko=1;p.act=cl(p.act+5);p.cred=cl(p.cred+3);M(p,4)}},
- nplr_post_people:{n:'Nowi, starzy, wszystko jedno',days:70,prev:'nplr_jaderko',branch:'progressive',logo:'POST',
+ nplr_post_people:{n:'Nowi, starzy, wszystko jedno',days:70,prev:'nplr_jaderko',branch:'progressive',logo:'POST',avatar:'obrazki/cel-nowi-starzy.png',
   what:'Ruch przestaje być kółkiem kilku znajomych. Liczy się masa ludzi gotowych wejść w nowy szyld.',
   accessText:'Partia musi mieć co najmniej 30 osób.',
   cons:['Jedność +3 i aktywność +6.','Postępowcy zyskują własny znacznik organizacyjny.'],
@@ -477,10 +477,22 @@ const NATIONAL_GOALS={
   run(){const p=me();p.nplrPostPeople=1;p.uni=cl(p.uni+3);p.act=cl(p.act+6);M(p,5)}},
  nplr_post_capital:{n:'Będąc postępem warunkuje postęp',days:70,prev:'nplr_post_people',branch:'progressive',logo:'POST',
   what:'Ostatni krok daje ruchowi własny szyld i środki, żeby nie skończył jako jednorazowa ciekawostka.',
-  accessText:'Kapitał partii musi wynosić co najmniej 250.',
+  accessText:'Kapitał partii musi wynosić co najmniej 250, a w składzie muszą być Sulejman i balon.',
   cons:['Powstają Postępowcy z fioletowym szyldem.','Sława +12, wiarygodność +10, aktywność +9 i jedność +5.'],
-  access:()=>!!(G&&me()&&Number(G.kp||0)>=250),
+  access:()=>!!(G&&me()&&Number(G.kp||0)>=250&&['Sulejman','balon'].every(n=>roster(me()).includes(n))),
   run(){const p=me();p.n='Postępowcy';p.ab='PST';p.c='#5b2d85';p.logo='POST';p.postMode=1;p.fame=cl(p.fame+12);p.cred=cl(p.cred+10);p.act=cl(p.act+9);p.uni=cl(p.uni+5);M(p,12)}},
+ nplr_post_movement:{n:'Ruchy do postępu',days:70,prev:'nplr_post_capital',branch:'progressive',logo:'POST',avatar:'obrazki/cel-ruch-postepowcow.png',
+  what:'Postępowcy przestają być tylko szyldem. Z ludzi, którzy zebrali się wokół Concordii, powstaje prawdziwy Ruch Postępowców.',
+  accessText:'W partii musi być Mnem, a partia musi mieć co najmniej 6 mandatów.',
+  cons:['Powstaje Ruch Postępowców z własnym znakiem i zapleczem.','Aktywność +8, wiarygodność +6 i relacje z młodym skrzydłem +10.'],
+  access:()=>!!(G&&me()&&roster(me()).includes('Mnem')&&Number(me().seats||0)>=6),
+  run(){const p=me();p.n='Ruch Postępowców';p.ab='RP';p.c='#5b2d85';p.logo='POST';p.postMode=1;p.ruchPostepu=1;p.act=cl(p.act+8);p.cred=cl(p.cred+6);p.fame=cl(p.fame+5);M(p,9)}},
+ nplr_lsd:{n:'Lewicowy Sojusz Demokratyczny',days:70,prev:'nplr_post_movement',branch:'progressive',logo:'LSD',avatar:'obrazki/cel-lsd.png',
+  what:'Ruch Postępowców łączy organizację, mandat i władzę w jeden szeroki sojusz. To już nie eksperyment — to Lewicowy Sojusz Demokratyczny.',
+  accessText:'Co najmniej 50 osób, premier albo prezydent, wynik ostatnich wyborów powyżej 20% oraz Sulejman, balon, Prawe Jąderko, Mnem i Aryati w partii.',
+  cons:['Powstaje Lewicowy Sojusz Demokratyczny z malinowym szyldem.','Sława +18, wiarygodność +14, aktywność +12 i jedność +6.'],
+  access:()=>!!(G&&me()&&Number(me().mem||0)>=50&&(isPM()||hasPrez())&&(ostatniWynik()||0)>20&&['Sulejman','balon','Prawe Jąderko','Mnem','Aryati'].every(n=>roster(me()).includes(n))),
+  run(){const p=me();p.n='Lewicowy Sojusz Demokratyczny';p.ab='LSD';p.c='#8e1e5e';p.logo='LSD';p.lsdMode=1;p.fame=cl(p.fame+18);p.cred=cl(p.cred+14);p.act=cl(p.act+12);p.uni=cl(p.uni+6);M(p,16)}},
  nplr_hotdog:{n:'Rozkwit wedle gorących psów',days:70,prev:'nplr_liberal',route:'liberal',logo:'LIB',avatar:'obrazki/16ca0d3b9eeb.webp',
   what:'Pan Hod_Dog zostaje twarzą rozkwitu: jego obecność ma przełożyć się na widoczność partii, a nie tylko na ozdobę w składzie.',
   accessText:'W partii musi być Pan Hod_Dog.',
@@ -557,7 +569,7 @@ const NATIONAL_GOALS={
 /* Dedykowane znaki celów: nigdy nie używamy herbu partii jako zastępczej grafiki. */
  [ ['nplr_liberal','obrazki/cel-liber-libro.png'],['nplr_jaderko','obrazki/32a907831366.webp'],['nplr_post_capital','obrazki/logo-postepowcy.png'],['nplr_hotdog','obrazki/16ca0d3b9eeb.webp'],['nplr_rose','obrazki/cel-roza-zolta.png'],['nplr_king','obrazki/0051a52917ef.webp'],['nplr_jewish','obrazki/cel-zydowskie-pretraktacje.png'],['nplr_star','obrazki/logo-alternatywa-zydowska.png'],['nplr_blue','obrazki/cel-niebieski-blask.png'],['nplr_diplomacy','obrazki/cel-ciaglosc-dyplomatyczna.png'],['nplr_council','obrazki/cel-rada-strofa.png'],['nplr_gloria','obrazki/a56a5574593a.webp'],['nplr_power','obrazki/cel-pielegnacja-potegi.png'],['nplr_friendship','obrazki/cel-zlot-przyjazni.png'],['nplr_aurea','obrazki/logo-aurea-libertas.png'] ].forEach(([id,avatar])=>{if(NATIONAL_GOALS[id])NATIONAL_GOALS[id].avatar=avatar});
 const NATIONAL_BASE_ORDER=['nplr_liberal'];
-const NATIONAL_EARLY_BRANCHES={liberal:{name:'Droga Partii Liberalnej',ids:['nplr_hotdog','nplr_rose','nplr_king','nplr_jewish','nplr_star']},progressive:{name:'Droga Postępowców',ids:['nplr_jaderko','nplr_post_people','nplr_post_capital']}};
+const NATIONAL_EARLY_BRANCHES={liberal:{name:'Droga Partii Liberalnej',ids:['nplr_hotdog','nplr_rose','nplr_king','nplr_jewish','nplr_star']},progressive:{name:'Droga Postępowców',ids:['nplr_jaderko','nplr_post_people','nplr_post_capital','nplr_post_movement','nplr_lsd']}};
 const NATIONAL_BRANCHES={republican:{name:'Droga republikańska',ids:['nplr_blue','nplr_diplomacy','nplr_council','nplr_gloria']},freedom:{name:'Droga Partia Libertas',ids:['nplr_power','nplr_friendship','nplr_aurea']}};
 const NATIONAL_ORDER=Object.keys(NATIONAL_GOALS);
 function nationalSequence(){const s=nationalState();if(!s||!s.earlyBranch)return NATIONAL_BASE_ORDER;const early=NATIONAL_EARLY_BRANCHES[s.earlyBranch]?.ids||[];if(s.earlyBranch!=='liberal')return NATIONAL_BASE_ORDER.concat(early);return NATIONAL_BASE_ORDER.concat(early,s.branch&&NATIONAL_BRANCHES[s.branch]?NATIONAL_BRANCHES[s.branch].ids:[])}
@@ -1529,7 +1541,8 @@ function goalsInspector(item){
   if(!item)return '';
   const g=item.g,req=item.type==='party'?reqOf(item.id):null;
   const conditions=item.type==='party'?req.map(r=>{const yes=r.ok()||item.done;return `<li class="${yes?'yes':'no'}"><span>${yes?'✓':'×'}</span><div><b>${typeof r.t==='function'?r.t():r.t}</b><small>${item.done?'spełnione':r.v()}</small></div></li>`}).join(''):
-    `<li class="${item.ready||item.done?'yes':'no'}"><span>${item.done?'✓':item.ready?'✓':'×'}</span><div><b>Warunek dostępu</b><small>${item.done?'cel wykonany':item.reason||g.accessText||'Poprzedni cel musi być ukończony.'}</small></div></li>`;
+    `<li class="${item.done||(!item.reason||item.reason===g.accessText)?'yes':'no'}"><span>${item.done?'✓':(!item.reason||item.reason===g.accessText)?'✓':'×'}</span><div><b>Ścieżka i poprzedni cel</b><small>${item.done?'cel wykonany':item.reason||'poprzedni cel ukończony'}</small></div></li>
+     <li class="${item.done||nationalGoalAccess(item.id)?'yes':'no'}"><span>${item.done||nationalGoalAccess(item.id)?'✓':'×'}</span><div><b>Warunki operacyjne</b><small>${item.done?'spełnione':g.accessText||'brak dodatkowych warunków'}</small></div></li>`;
   let action='';
   if(item.type==='party'&&!item.done)action=`<button class="goals-action primary" ${item.ready?'':'disabled'} onclick="doGoal('${esc(item.id)}')">${item.ready?'WYPEŁNIJ CEL':'WARUNKI JESZCZE NIE SPEŁNIONE'} <span>→</span></button>`;
   if(item.type==='national'&&g.optional&&!item.done&&!item.active&&item.opted===false&&nationalGoalAccess(item.id))action=`<button class="goals-action primary" onclick="chooseNationalOptional('${esc(item.id)}')">PODEJMIJ CEL OPCJONALNY <span>→</span></button>`;

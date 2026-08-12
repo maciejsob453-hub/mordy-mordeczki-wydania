@@ -4,6 +4,13 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.209':{data:'13 sierpnia 2026',zmiany:[
+  'Nowi, starzy, wszystko jedno dostalo osobne logo zgodne z droga Postepowcow.',
+  'Dodano cele Ruchy do postepu oraz Lewicowy Sojusz Demokratyczny z warunkami Mnem, mandatow, wladzy, wyniku i skladu partii.',
+  'Warunki operacyjne nowych celow sa widoczne przy kazdym wezle, nawet gdy gracz wybral druga galaz.',
+  'Rozwidlenia lacza sie teraz ciagla, zaokraglona linia bez urwanych przerywnikow.',
+  'Zegar symulacji dostal czytelniejszy panel z podpisem, statusem i mocniejsza data; zniknal podwojny wykrzyknik przy celach.'
+ ]},
  '1.1.208':{data:'12 sierpnia 2026',zmiany:[
   'Drzewko celow ma teraz linie prowadzone od konkretnego celu nadrzednego, a kolejne rozwidlenie nie odkleja sie od swojej galezi.',
   'Rozgalezienia sa gesciejsze i maja spokojniejsze wezly, dzieki czemu mapa wyglada jak jedna sciezka, a nie dwa osobne diagramy.',
@@ -1344,13 +1351,14 @@ function game(){
     </div>
     <div class="hudend">
       <div class="rtclock rtclock-command" title="Sterowanie czasem symulacji">
-        <button class="btn g sm" onclick="realClockToggle()">${G.realPaused?'▶ Czas':'⏸ Pauza'}</button>
+        <span class="rtclock-mode"><i>◉</i> ZEGAR SYMULACJI</span>
+        <div class="rtclock-controls"><button class="btn g sm" onclick="realClockToggle()">${G.realPaused?'▶ WZNÓW':'Ⅱ PAUZA'}</button>
         <select onchange="realClockSpeed(this.value)" aria-label="Tempo czasu rzeczywistego">
           ${[.5,1,2,3,4,5].map(v=>`<option value="${v}" ${G.realSpeed===v?'selected':''}>x${v}</option>`).join('')}
-        </select>
+        </select></div>
       </div>
       <button class="sndbtn" onclick="toggleMute()" title="${G.mute?'Włącz dźwięk':'Wycisz'}">${G.mute?'♪̸':'♪'}</button>
-      <div class="datechip" key="${G.simHour||0}"><b>${dateStr(gameDate())}</b><span class="clocktime">${timeStr(gameDate())}</span></div>
+      <div class="datechip" key="${G.simHour||0}"><span class="datechip-kicker">KALENDARZ</span><b>${dateStr(gameDate())}</b><span class="clocktime">${timeStr(gameDate())}</span></div>
       <button class="btn g sm" onclick="openSave()" title="Zapis i wczytanie">Zapis</button>
       <!-- wyjście do menu siedziało wcześniej dopiero w oknie zapisu i nikt go tam nie szukał -->
       <button class="btn g sm" onclick="doLobby()" title="Wyjście do menu głównego">Menu</button>
@@ -1380,7 +1388,7 @@ function game(){
        ['lider','Lider'+(leads(G.p[G.me]).some(n=>xpOs(n)>=35)?'<span class="badge">!</span>':'')],['krol','Król'+(kingFav(G.me)<0?'<span class="badge">!</span>':'')],['partie','Partie'],['sondaz','Sondaż']];
       const mg=typeof myPartyGoals==='function'?myPartyGoals():(typeof myGoals==='function'?myGoals():[]);
       const ng=typeof myNationalGoals==='function'?myNationalGoals():[];
-      if(mg.length||ng.length)nv.push(['cele',nazwa('cele',ng.length&&!mg.length?'Cele narodowe':mg.length>1?'Cele partyjne':'Cel partyjny')+(ng.length&&typeof nationalGoalReady==='function'&&nationalGoalReady()?'<span class="badge">!</span>':'')]);
+      if(mg.length||ng.length)nv.push(['cele',nazwa('cele',ng.length&&!mg.length?'Cele narodowe':mg.length>1?'Cele partyjne':'Cel partyjny')]);
       // urzędy mają własne działy zamiast kategorii schowanych w decyzjach
       if(isPM())nv.push(['premier',nazwa('premier','Premier')]);
       if(hasPrez())nv.push(['prezydent',nazwa('prezydent','Prezydent')]);

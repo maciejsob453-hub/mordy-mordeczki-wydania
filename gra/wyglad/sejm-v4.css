@@ -3581,3 +3581,27 @@ body:has(.hud) .widok[data-tab="akcje"]>.stol .mj{min-height:64px!important;padd
 body:has(.hud) .widok[data-tab="akcje"]>.stol .mj .pust svg{width:16px!important;height:16px!important;margin-bottom:2px!important}
 body:has(.hud) .widok[data-tab="akcje"]>.stol .mj .pust b{font-size:8px!important}
 @media(max-width:680px){body:has(.hud) .goal-branch-split{grid-template-columns:1fr!important;gap:24px!important;width:100%!important}body:has(.hud) .goal-branch-split::before{left:22%!important;right:22%!important}}
+
+/* 1.1.209: rozwidlenie jest jedną ścieżką, nie trzema odcinkami z przerwami. */
+body:has(.hud) .goals-map-grid .goal-branch-split{
+  gap:18px!important;margin:18px auto 0!important;padding-top:18px!important;
+  border-radius:14px!important;
+}
+body:has(.hud) .goals-map-grid .goal-branch-split::before{
+  left:18%!important;right:18%!important;top:0!important;height:2px!important;
+  border-radius:999px!important;background:var(--party-theme,#b896d8)!important;
+  box-shadow:0 0 9px color-mix(in srgb,var(--party-theme,#b896d8) 44%,transparent)!important;
+}
+body:has(.hud) .goals-map-grid .goal-branch-split::after{
+  top:-18px!important;height:18px!important;width:2px!important;left:50%!important;
+  border-radius:999px!important;background:var(--party-theme,#b896d8)!important;
+}
+body:has(.hud) .goals-map-grid .goal-branch-split .goal-branch-lane::before{
+  top:-18px!important;height:18px!important;width:2px!important;border-radius:999px!important;
+  background:var(--party-theme,#b896d8)!important;
+}
+body:has(.hud) .goals-map-grid .goal-branch-split.nested-split{
+  margin-top:10px!important;padding-top:16px!important;width:min(560px,100%)!important;
+}
+body:has(.hud) .goals-map-grid .goal-branch-split.nested-split::before{left:17%!important;right:17%!important}
+body:has(.hud) .goals-map-grid .goal-branch-split.nested-split::after{top:-16px!important;height:16px!important}

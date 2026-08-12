@@ -485,6 +485,10 @@ body:not(:has(.mg)):has(.hud) .hud .datechip{gap:9px;min-width:182px}
 body:not(:has(.mg)):has(.hud) .hud .datechip .clocktime{display:inline!important;padding-left:9px;border-left:1px solid rgba(217,171,69,.45);color:#b7c6b5;font:600 13px var(--m);letter-spacing:.08em;white-space:nowrap}
 body:not(:has(.mg)):has(.hud) .hud .rtclock{min-width:208px}
 body:not(:has(.mg)):has(.hud) .hud .rtclock select{min-width:56px}
+body:not(:has(.mg)):has(.hud) .hud .rtclock-mode{display:block;color:var(--party-theme,#d6aa58);font:700 8px var(--m);letter-spacing:.15em;padding-bottom:3px}
+body:not(:has(.mg)):has(.hud) .hud .rtclock-controls{display:flex;align-items:center;gap:6px}
+body:not(:has(.mg)):has(.hud) .hud .datechip{position:relative;padding:7px 12px!important;border:1px solid color-mix(in srgb,var(--party-theme,#b896d8) 76%,#806832)!important;border-radius:7px;background:linear-gradient(145deg,rgba(35,24,45,.98),rgba(7,13,10,.98))!important;box-shadow:inset 0 1px rgba(255,255,255,.08),0 0 20px -12px var(--party-theme,#b896d8)!important}
+body:not(:has(.mg)):has(.hud) .hud .datechip-kicker{display:block;color:var(--dim2);font:700 7px var(--m);letter-spacing:.18em}
 body:not(:has(.mg)):has(.hud) .goals-map-toolbar{display:flex;align-items:center;gap:6px;margin:0 0 9px;padding:6px 8px;border:1px solid #30443a;background:#0b1510;position:sticky;top:0;z-index:4}
 body:not(:has(.mg)):has(.hud) .goals-map-toolbar button{min-width:31px;height:27px;padding:0 8px;border:1px solid #536d5a;border-radius:3px;background:#132219;color:var(--tx);font:10px var(--m);cursor:pointer}
 body:not(:has(.mg)):has(.hud) .goals-map-toolbar button:hover{border-color:#d9ab45;color:#f0d48c}
