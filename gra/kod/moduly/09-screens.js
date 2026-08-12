@@ -813,7 +813,7 @@ function waznePozycje(){
     w.push({i:'✒',n:'Ustawa czeka na podpis',d:'Prezydent musi ją podpisać albo zawetować.',t:'prezydent',pilne:1});
   if(isPM()&&lawsPending())
     w.push({i:'§',n:'Możesz zgłosić ustawę',d:'Żadna nie jest w toku — sejm czeka.',t:'premier'});
-  if(goalReady())
+  if(typeof goalReady==='function'&&goalReady())
     w.push({i:'★',n:'Cel partyjny gotowy',d:'Warunki spełnione — możesz go odebrać.',t:'cele',pilne:1});
   if(typeof nationalGoalReady==='function'&&nationalGoalReady())
     w.push({i:'◆',n:'Cel narodowy w toku',d:'Dziennik przełomów odlicza dni. Otwórz zakładkę Celów, żeby zobaczyć warunek i postęp.',t:'cele'});

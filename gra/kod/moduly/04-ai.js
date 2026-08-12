@@ -399,7 +399,8 @@ function aiTransfery(){
     const p=G.p[k];if(p.dead)return;
     const c=charOf(k), chetny=p.plan==='rozbudowa'||p.plan==='przetrwanie';
     // bezpartyjny za kapitał
-    if(ch(.04+(chetny?.05:0)+c.bud*.04)){
+    const aiLast=Number(G.aiAgentAt&&G.aiAgentAt[k]);
+    if((!Number.isFinite(aiLast)||czasGlobalny()-aiLast>=168)&&ch(.04+(chetny?.05:0)+c.bud*.04)){
       const wolni=AGENTS.filter(a=>agentFree(a.n));
       if(wolni.length){
         const a=pick(wolni), koszt=agentCost(a.n,1);
@@ -408,6 +409,8 @@ function aiTransfery(){
           if(!G.agents)G.agents={};
           p.bank-=koszt;
           G.agents[a.n]=k;p.comp[a.seg]++;p.mem++;
+          G.aiAgentAt=G.aiAgentAt||{};G.aiAgentAt[k]=czasGlobalny();
+          G.aiAgentAt=G.aiAgentAt||{};G.aiAgentAt[k]=czasGlobalny();
           if(!p.bench.includes(a.n))p.bench.push(a.n);
           aiPamietaj(k,'transfer',{osoba:a.n,koszt});
           say(`<b>${p.ab}</b> podpisuje transfer: <b>${a.n}</b> za ${koszt} kapitału (${sn(a.seg)}).`);

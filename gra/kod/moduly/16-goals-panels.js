@@ -444,7 +444,7 @@ const IDENT_BRAND={
  cenMode:{n:'Partia Centrum',ab:'PC',c:'#1f7f86',logo:'CEN'},
  hegMode:{n:'Hegemonia Perspektywiczna',ab:'HP',c:'#c8952b',logo:'HEG'},
  azMode:{n:'Alternatywa Żydowska',ab:'AŻ',c:'#d46b9a',logo:'AZ'},
- aureaMode:{n:'Aurea Libertas',ab:'AL',c:'#d9b34a',logo:'ALT'},
+ aureaMode:{n:'Partia Libertas',ab:'LIB',c:'#d9b34a',logo:'ALT'},
 };
 const myIdentities=()=>{const p=G&&G.p[G.me];return p?Object.keys(IDENT_BRAND).filter(m=>p[m]):[]};
 function switchIdentity(mode){
@@ -462,32 +462,50 @@ const NATIONAL_GOALS={
   accessText:'Dostępne od początku rozgrywki.',
   cons:['Sława +6, wiarygodność +7 i aktywność +5.','Partia dostaje znacznik pierwszego liberalnego przełomu.'],
   access:()=>true,
-  run(){const p=me();p.nplrLiberal=1;p.fame=cl(p.fame+6);p.cred=cl(p.cred+7);p.act=cl(p.act+5);M(p,5)}},
- nplr_hotdog:{n:'Rozkwit wedle gorących psów',days:70,prev:'nplr_liberal',logo:'LIB',avatar:'obrazki/16ca0d3b9eeb.webp',
+ run(){const p=me();p.nplrLiberal=1;p.fame=cl(p.fame+6);p.cred=cl(p.cred+7);p.act=cl(p.act+5);M(p,5)}},
+ nplr_jaderko:{n:'Czas na Jąderka',days:35,prev:'nplr_liberal',branch:'progressive',logo:'POST',avatar:'obrazki/32a907831366.webp',
+  what:'Postępowcy zaczynają od człowieka, który potrafi nadać ruchowi własny rytm.',
+  accessText:'W partii musi być Prawe Jąderko, a kapitał partii musi wynosić co najmniej 100.',
+  cons:['Prawe Jąderko dołącza do zaplecza programu.','Aktywność +5 i wiarygodność +3.'],
+  access:()=>!!(G&&me()&&roster(me()).includes('Prawe Jąderko')&&Number(G.kp||0)>=100),
+  run(){const p=me();p.nplrJaderko=1;p.act=cl(p.act+5);p.cred=cl(p.cred+3);M(p,4)}},
+ nplr_post_people:{n:'Nowi, starzy, wszystko jedno',days:70,prev:'nplr_jaderko',branch:'progressive',logo:'POST',
+  what:'Ruch przestaje być kółkiem kilku znajomych. Liczy się masa ludzi gotowych wejść w nowy szyld.',
+  accessText:'Partia musi mieć co najmniej 30 osób.',
+  cons:['Jedność +3 i aktywność +6.','Postępowcy zyskują własny znacznik organizacyjny.'],
+  access:()=>!!(G&&me()&&Number(me().mem||0)>=30),
+  run(){const p=me();p.nplrPostPeople=1;p.uni=cl(p.uni+3);p.act=cl(p.act+6);M(p,5)}},
+ nplr_post_capital:{n:'Będąc postępem warunkuje postęp',days:70,prev:'nplr_post_people',branch:'progressive',logo:'POST',
+  what:'Ostatni krok daje ruchowi własny szyld i środki, żeby nie skończył jako jednorazowa ciekawostka.',
+  accessText:'Kapitał partii musi wynosić co najmniej 250.',
+  cons:['Powstają Postępowcy z fioletowym szyldem.','Sława +12, wiarygodność +10, aktywność +9 i jedność +5.'],
+  access:()=>!!(G&&me()&&Number(G.kp||0)>=250),
+  run(){const p=me();p.n='Postępowcy';p.ab='PST';p.c='#5b2d85';p.logo='POST';p.postMode=1;p.fame=cl(p.fame+12);p.cred=cl(p.cred+10);p.act=cl(p.act+9);p.uni=cl(p.uni+5);M(p,12)}},
+ nplr_hotdog:{n:'Rozkwit wedle gorących psów',days:70,prev:'nplr_liberal',route:'liberal',logo:'LIB',avatar:'obrazki/16ca0d3b9eeb.webp',
   what:'Pan Hod_Dog zostaje twarzą rozkwitu: jego obecność ma przełożyć się na widoczność partii, a nie tylko na ozdobę w składzie.',
   accessText:'W partii musi być Pan Hod_Dog.',
   cons:['Aktywność +8 i obecność +10.','Sława +4 oraz dodatkowy kapitał partii.'],
   access:()=>!!(G&&G.p[G.me]&&roster(G.p[G.me]).includes('Pan Hod_Dog')),
   run(){const p=me();p.nplrHotdog=1;p.act=cl(p.act+8);p.uni=cl(p.uni+4);p.fame=cl(p.fame+4);p.pres&&REG.forEach(r=>{p.pres[r.id]=cl(p.pres[r.id]+10)});M(p,7)}},
- nplr_rose:{n:'Róża spadająca na słońce',days:70,prev:'nplr_hotdog',logo:'PLIB',
+ nplr_rose:{n:'Róża spadająca na słońce',days:70,prev:'nplr_hotdog',route:'liberal',logo:'PLIB',
   what:'Concordia dojrzewa do własnego szyldu. Róża nie jest już obietnicą — staje się Partią Liberalną.',
   accessText:'Poprzedni cel narodowy musi być ukończony.',
   cons:['Powstaje Partia Liberalna z żółtą różą.','Sława +4, wiarygodność +3 i mały zastrzyk kapitału.'],
   access:()=>true,
   run(){const p=me();libBecome(G.me);p.nplrRose=1;p.fame=cl(p.fame+4);p.cred=cl(p.cred+3);p.uni=cl(p.uni+3);M(p,6)}},
- nplr_king:{n:'Mordeczko, pomóż nam!',days:70,prev:'nplr_rose',logo:'HAND',avatar:'obrazki/0051a52917ef.webp',
+ nplr_king:{n:'Mordeczko, pomóż nam!',days:70,prev:'nplr_rose',route:'liberal',logo:'HAND',avatar:'obrazki/0051a52917ef.webp',
   what:'Dwór ma dostać powód, żeby naprawdę sprzyjać tej partii. Nie przez darmowy bonus, tylko przez relację budowaną w czasie.',
   accessText:'Przychylność Króla musi wynosić co najmniej 50.',
   cons:['Przychylność Króla +8.','Wiarygodność +4 i autorytet partii +3.'],
   access:()=>!!(G&&typeof kingFav==='function'&&kingFav(G.me)>=50),
   run(){const p=me();kingRel(8,'Narodowy cel Concordii przekonał dwór, że warto dać jej szansę.');p.cred=cl(p.cred+4);p.fame=cl(p.fame+3);p.uni=cl(p.uni+3)}},
- nplr_jewish:{n:'Żydowskie pretraktacje',days:70,prev:'nplr_king',logo:'LIB',
+ nplr_jewish:{n:'Żydowskie pretraktacje',days:70,prev:'nplr_king',route:'liberal',logo:'LIB',
   what:'Rozmowy z PKD przestają być jednorazowym ruchem pod głosowanie. Concordia buduje kanał relacji, który zostaje po zakończeniu celu.',
   accessText:'Poprzedni cel narodowy musi być ukończony.',
   cons:['Relacja z PKD rośnie o 24 w obie strony.','Wiarygodność +6 i aktywność +3.'],
   access:()=>true,
   run(){const p=me(),a=G.rel&&G.rel[G.me],b=G.rel&&G.rel.PKD;if(a){a.PKD=cl((a.PKD||0)+24,-100,100)}if(b){b[G.me]=cl((b[G.me]||0)+24,-100,100)}p.cred=cl(p.cred+6);p.act=cl(p.act+3)}},
- nplr_star:{n:'Nie tylko na słońce, ale również na gwiazdę',days:35,prev:'nplr_jewish',logo:'AZ',
+ nplr_star:{n:'Nie tylko na słońce, ale również na gwiazdę',days:35,prev:'nplr_jewish',route:'liberal',logo:'AZ',
   what:'Ostatni przełom tworzy Alternatywę Żydowską: mały, wyspecjalizowany szyld z własnym miejscem na scenie.',
   accessText:'Relacja z PKD musi wynosić co najmniej +50.',
   cons:['Powstaje Alternatywa Żydowska (AŻ).','Wiarygodność +5, aktywność +4 i jedność +3.'],
@@ -529,32 +547,39 @@ const NATIONAL_GOALS={
   cons:['Sława +12 i wiarygodność +8.','Relacje z partiami wolnościowymi rosną o 12.'],
   access:()=>!!(G&&me()&&me().mem>=100&&['Supernes','Pan Hod_Dog','Bartek','Maciek'].every(n=>roster(me()).includes(n))),
   run(){const p=me();p.fame=cl(p.fame+12);p.cred=cl(p.cred+8);alive().filter(k=>k!==G.me).forEach(k=>{G.rel[G.me][k]=cl(G.rel[G.me][k]+12,-100,100);G.rel[k][G.me]=cl(G.rel[k][G.me]+12,-100,100)});M(p,12)}},
- nplr_aurea:{n:'Alternatywa całego bloku wolnościowego',days:70,prev:'nplr_friendship',branch:'freedom',logo:'ALT',
-  what:'Z przyjaźni powstaje własna marka: Aurea Libertas — mocna, złota alternatywa dla starego układu.',
+ nplr_aurea:{n:'Partia Libertas',days:70,prev:'nplr_friendship',branch:'freedom',logo:'ALT',
+  what:'Z przyjaźni powstaje własna marka: Partia Libertas — mocna, złota alternatywa dla starego układu.',
   accessText:'Poprzedni cel narodowy musi być ukończony.',
-  cons:['Powstaje Aurea Libertas z dużym, lecz mniejszym od Republikanów wzmocnieniem.','Sława +16, wiarygodność +11, aktywność +9 i jedność +5.'],
+  cons:['Powstaje Partia Libertas z dużym, lecz mniejszym od Republikanów wzmocnieniem.','Sława +16, wiarygodność +11, aktywność +9 i jedność +5.'],
   access:()=>true,
-  run(){const p=me();p.aureaMode=1;p.n='Aurea Libertas';p.ab='AL';p.c='#d9b34a';p.logo='ALT';p.fame=cl(p.fame+16);p.cred=cl(p.cred+11);p.act=cl(p.act+9);p.uni=cl(p.uni+5);M(p,14)}},
+  run(){const p=me();p.aureaMode=1;p.n='Partia Libertas';p.ab='LIB';p.c='#d9b34a';p.logo='ALT';p.fame=cl(p.fame+16);p.cred=cl(p.cred+11);p.act=cl(p.act+9);p.uni=cl(p.uni+5);M(p,14)}},
 };
 /* Dedykowane znaki celów: nigdy nie używamy herbu partii jako zastępczej grafiki. */
- [ ['nplr_liberal','obrazki/cel-liber-libro.png'],['nplr_hotdog','obrazki/16ca0d3b9eeb.webp'],['nplr_rose','obrazki/cel-roza-zolta.png'],['nplr_king','obrazki/0051a52917ef.webp'],['nplr_jewish','obrazki/cel-zydowskie-pretraktacje.png'],['nplr_star','obrazki/logo-alternatywa-zydowska.png'],['nplr_blue','obrazki/cel-niebieski-blask.png'],['nplr_diplomacy','obrazki/cel-ciaglosc-dyplomatyczna.png'],['nplr_council','obrazki/cel-rada-strofa.png'],['nplr_gloria','obrazki/a56a5574593a.webp'],['nplr_power','obrazki/cel-pielegnacja-potegi.png'],['nplr_friendship','obrazki/cel-zlot-przyjazni.png'],['nplr_aurea','obrazki/logo-aurea-libertas.png'] ].forEach(([id,avatar])=>{if(NATIONAL_GOALS[id])NATIONAL_GOALS[id].avatar=avatar});
-const NATIONAL_BASE_ORDER=['nplr_liberal','nplr_hotdog','nplr_rose','nplr_king','nplr_jewish','nplr_star'];
-const NATIONAL_BRANCHES={republican:{name:'Droga republikańska',ids:['nplr_blue','nplr_diplomacy','nplr_council','nplr_gloria']},freedom:{name:'Droga Aurea Libertas',ids:['nplr_power','nplr_friendship','nplr_aurea']}};
+ [ ['nplr_liberal','obrazki/cel-liber-libro.png'],['nplr_jaderko','obrazki/32a907831366.webp'],['nplr_post_capital','obrazki/logo-postepowcy.png'],['nplr_hotdog','obrazki/16ca0d3b9eeb.webp'],['nplr_rose','obrazki/cel-roza-zolta.png'],['nplr_king','obrazki/0051a52917ef.webp'],['nplr_jewish','obrazki/cel-zydowskie-pretraktacje.png'],['nplr_star','obrazki/logo-alternatywa-zydowska.png'],['nplr_blue','obrazki/cel-niebieski-blask.png'],['nplr_diplomacy','obrazki/cel-ciaglosc-dyplomatyczna.png'],['nplr_council','obrazki/cel-rada-strofa.png'],['nplr_gloria','obrazki/a56a5574593a.webp'],['nplr_power','obrazki/cel-pielegnacja-potegi.png'],['nplr_friendship','obrazki/cel-zlot-przyjazni.png'],['nplr_aurea','obrazki/logo-aurea-libertas.png'] ].forEach(([id,avatar])=>{if(NATIONAL_GOALS[id])NATIONAL_GOALS[id].avatar=avatar});
+const NATIONAL_BASE_ORDER=['nplr_liberal'];
+const NATIONAL_EARLY_BRANCHES={liberal:{name:'Droga Partii Liberalnej',ids:['nplr_hotdog','nplr_rose','nplr_king','nplr_jewish','nplr_star']},progressive:{name:'Droga Postępowców',ids:['nplr_jaderko','nplr_post_people','nplr_post_capital']}};
+const NATIONAL_BRANCHES={republican:{name:'Droga republikańska',ids:['nplr_blue','nplr_diplomacy','nplr_council','nplr_gloria']},freedom:{name:'Droga Partia Libertas',ids:['nplr_power','nplr_friendship','nplr_aurea']}};
 const NATIONAL_ORDER=Object.keys(NATIONAL_GOALS);
-function nationalSequence(){const s=nationalState();return NATIONAL_BASE_ORDER.concat(s&&s.branch&&NATIONAL_BRANCHES[s.branch]?NATIONAL_BRANCHES[s.branch].ids:[])}
+function nationalSequence(){const s=nationalState();if(!s||!s.earlyBranch)return NATIONAL_BASE_ORDER;const early=NATIONAL_EARLY_BRANCHES[s.earlyBranch]?.ids||[];if(s.earlyBranch!=='liberal')return NATIONAL_BASE_ORDER.concat(early);return NATIONAL_BASE_ORDER.concat(early,s.branch&&NATIONAL_BRANCHES[s.branch]?NATIONAL_BRANCHES[s.branch].ids:[])}
 /* Mechanika nadal idzie tylko wybrana galaz. Interfejs pokazuje jednak oba
    rozwidlenia od razu, jak drzewko HOI4, zeby gracz widzial konsekwencje wyboru. */
-function nationalDisplaySequence(){return NATIONAL_BASE_ORDER.concat(Object.values(NATIONAL_BRANCHES).reduce((all,b)=>all.concat(b.ids),[]))}
+function nationalDisplaySequence(){return NATIONAL_BASE_ORDER.concat(Object.values(NATIONAL_EARLY_BRANCHES).reduce((all,b)=>all.concat(b.ids),[]),Object.values(NATIONAL_BRANCHES).reduce((all,b)=>all.concat(b.ids),[]))}
 function nationalState(){
   if(!G)return null;
   if(!G.nationalGoals)G.nationalGoals={};
-  if(!G.nationalGoals.concordia||typeof G.nationalGoals.concordia!=='object')G.nationalGoals.concordia={active:null,started:{},done:{},completedAt:{},branch:null,waiting:null};
+  if(!G.nationalGoals.concordia||typeof G.nationalGoals.concordia!=='object')G.nationalGoals.concordia={active:null,started:{},done:{},completedAt:{},earlyBranch:null,branch:null,waiting:null};
   const s=G.nationalGoals.concordia;
   s.started=s.started&&typeof s.started==='object'?s.started:{};
   s.done=s.done&&typeof s.done==='object'?s.done:{};
   s.completedAt=s.completedAt&&typeof s.completedAt==='object'?s.completedAt:{};
   s.optional=s.optional&&typeof s.optional==='object'?s.optional:{};
   if(s.active===undefined)s.active=null;
+  if(s.earlyBranch===undefined)s.earlyBranch=null;
+  if(!s.earlyBranch){
+    if(s.done.nplr_jaderko||s.done.nplr_post_people||s.done.nplr_post_capital)s.earlyBranch='progressive';
+    else if(s.done.nplr_hotdog||s.done.nplr_rose||s.done.nplr_king||s.done.nplr_jewish||s.done.nplr_star)s.earlyBranch='liberal';
+  }
+  if(s.earlyBranch!==null&&!NATIONAL_EARLY_BRANCHES[s.earlyBranch])s.earlyBranch=null;
   if(s.branch!==null&&!NATIONAL_BRANCHES[s.branch])s.branch=null;
   return s;
 }
@@ -569,10 +594,16 @@ function nationalDayIndex(){
 function myNationalGoals(){return G&&G.me==='PLR'?nationalDisplaySequence():[]}
 function chooseNationalBranch(branch){
   if(!G||G.me!=='PLR'||!NATIONAL_BRANCHES[branch])return;
-  const s=nationalState();if(s.branch||!s.done.nplr_star)return;
+  const s=nationalState();if(s.branch||s.earlyBranch!=='liberal'||!s.done.nplr_star)return;
   s.branch=branch;s.waiting=null;
   say(`<b>Rozwidlenie celu narodowego.</b> Wybrano: ${NATIONAL_BRANCHES[branch].name}.`,'roy');
   render();
+}
+function chooseNationalEarlyBranch(branch){
+  if(!G||G.me!=='PLR'||!NATIONAL_EARLY_BRANCHES[branch])return;
+  const s=nationalState();if(s.earlyBranch||!s.done.nplr_liberal)return;
+  s.earlyBranch=branch;s.waiting=null;
+  say(`<b>Rozwidlenie po pierwszym przełomie.</b> Wybrano: ${NATIONAL_EARLY_BRANCHES[branch].name}.`,'roy');render();
 }
 function chooseNationalOptional(id){
   const g=NATIONAL_GOALS[id],s=nationalState();
@@ -593,6 +624,12 @@ function nationalGoalProgress(id){
 }
 function nationalGoalReason(id){
   const g=NATIONAL_GOALS[id],s=nationalState();if(!g||!s)return '';
+  if(g.route&&s.earlyBranch&&s.earlyBranch!==g.route)return 'Ta gałąź została zamknięta po wyborze innej drogi.';
+  if(g.route&&!s.earlyBranch)return 'Najpierw wybierz drogę po pierwszym celu narodowym.';
+  if(g.branch==='progressive'&&s.earlyBranch&&s.earlyBranch!=='progressive')return 'Ta gałąź została zamknięta po wyborze innej drogi.';
+  if(g.branch==='progressive'&&!s.earlyBranch)return 'Najpierw wybierz drogę po pierwszym celu narodowym.';
+  if(!g.branch&&id!=='nplr_liberal'&&!s.earlyBranch)return 'Najpierw wybierz drogę po pierwszym celu narodowym.';
+  if(g.branch&&g.branch!=='progressive'&&s.earlyBranch!=='liberal')return 'Ta gałąź wymaga drogi Partii Liberalnej.';
   if(g.branch&&s.branch&&g.branch!==s.branch)return 'Ta galaz zostala zamknieta po wyborze innego rozwidlenia.';
   if(g.branch&&!s.branch)return 'Najpierw wybierz jedno z dwóch rozwidleń.';
   if(g.prev&&!s.done[g.prev])return 'Najpierw ukończ: '+NATIONAL_GOALS[g.prev].n+'.';
@@ -614,7 +651,9 @@ function startNationalGoal(id){
   if(!G||PROBA||G.me!=='PLR')return;
   const g=NATIONAL_GOALS[id],s=nationalState();
   if(!g||!s||s.done[id]||s.active)return;
-  if(g.branch&&(!s.branch||g.branch!==s.branch))return;
+  if(g.route&&s.earlyBranch!==g.route)return;
+  if(g.branch==='progressive'&&s.earlyBranch!=='progressive')return;
+  if(g.branch&&g.branch!=='progressive'&&(!s.branch||g.branch!==s.branch||s.earlyBranch!=='liberal'))return;
   if(g.prev&&!s.done[g.prev])return;
   if(g.optional&&!s.optional[id])return;
   if(!nationalGoalAccess(id))return;
@@ -626,7 +665,8 @@ function startNationalGoal(id){
 function nationalGoalTick(){
   if(!G||PROBA||G.me!=='PLR')return;
   const s=nationalState(),today=nationalDayIndex();
-  if(s.done.nplr_star&&!s.branch){s.waiting='branch';return}
+  if(s.done.nplr_liberal&&!s.earlyBranch){s.waiting='earlyBranch';return}
+  if(s.earlyBranch==='liberal'&&s.done.nplr_star&&!s.branch){s.waiting='branch';return}
   for(const id of nationalSequence()){
     const g=NATIONAL_GOALS[id];if(s.done[id])continue;
     if(s.active&&s.active!==id)return;
@@ -789,8 +829,10 @@ function openPartyCouncil(){
   v.querySelector('#councilSave').onclick=()=>{const members=[...v.querySelectorAll('input:checked')].map(x=>choices[+x.dataset.i]);if(members.length!==5)return;G.partyCouncil=G.partyCouncil||{party:G.me};G.partyCouncil.party=G.me;G.partyCouncil.members=members;G.partyCouncil.chair=members[0];G.partyCouncil.primary=null;G.partyCouncil.primaryTerm=0;say(`<b>Rada Partyjna powołana.</b> Pięć osób przejmuje wspólne zaplecze partii.`,'roy');close();render()};
 }
 function nationalBranchSelector(){
-  const s=nationalState();if(!s||!s.done.nplr_star||s.branch)return '';
-  return `<div class="national-branch-choice card"><div class="h"><h3>Wybierz dalszą drogę</h3><span class="n">rozwidlenie po Alternatywie</span></div><div class="b"><p class="dim">Po tym wyborze jedna gałąź zostaje zamknięta. Republikanie i Aurea Libertas są dwiema osobnymi ciągłościami.</p><div class="branch-grid"><button class="opt" onclick="chooseNationalBranch('republican')"><b>Droga republikańska</b><span>Blask, dyplomacja, Rada Partyjna i Gloria Reipublicanis.</span></button><button class="opt" onclick="chooseNationalBranch('freedom')"><b>Droga wolnościowa</b><span>Pielęgnacja potęgi, przyjaźnie i Aurea Libertas.</span></button></div></div></div>`;
+  const s=nationalState();if(!s)return '';
+  if(s.done.nplr_liberal&&!s.earlyBranch)return `<div class="national-branch-choice card"><div class="h"><h3>Wybierz dalszą drogę</h3><span class="n">rozwidlenie po Liber? Libro? Liberalizm!</span></div><div class="b"><p class="dim">Wybierz Partię Liberalną albo drogę Postępowców. Po wyborze druga gałąź zostaje zamknięta.</p><div class="branch-grid"><button class="opt" onclick="chooseNationalEarlyBranch('liberal')"><b>Droga Partii Liberalnej</b><span>Hod_Dog, róża, Król, PKD i dalsze rozwidlenie ustrojowe.</span></button><button class="opt" onclick="chooseNationalEarlyBranch('progressive')"><b>Droga Postępowców</b><span>Prawe Jąderko, rozbudowa zaplecza i powstanie nowego ruchu.</span></button></div></div></div>`;
+  if(s.earlyBranch==='liberal'&&s.done.nplr_star&&!s.branch)return `<div class="national-branch-choice card"><div class="h"><h3>Wybierz dalszą drogę</h3><span class="n">rozwidlenie po Alternatywie Żydowskiej</span></div><div class="b"><p class="dim">Po tym wyborze jedna gałąź zostaje zamknięta. Republikanie i Partia Libertas są dwiema osobnymi ciągłościami.</p><div class="branch-grid"><button class="opt" onclick="chooseNationalBranch('republican')"><b>Droga republikańska</b><span>Blask, dyplomacja, Rada Partyjna i Gloria Reipublicanis.</span></button><button class="opt" onclick="chooseNationalBranch('freedom')"><b>Droga Partii Libertas</b><span>Pielęgnacja potęgi, przyjaźnie i nowy złoty szyld.</span></button></div></div></div>`;
+  return '';
 }
 function nationalGoalCard(id){
   const g=NATIONAL_GOALS[id],p=nationalGoalProgress(id),reason=nationalGoalReason(id),src=g.avatar||LOGOS[g.logo]||'';
@@ -802,7 +844,7 @@ function nationalGoalCard(id){
       <div class="national-goal-head"><img class="national-goal-logo" src="${src}" alt=""><div><p class="national-goal-what">${g.what}</p>
         <span class="pill ${p.done?'pos':p.active?'acc':''}">${p.done?'przełom osiągnięty':p.active?'aktywny cel narodowy':reason||'gotowy do uruchomienia'}</span></div></div>
       <div class="national-goal-timeline"><div class="trk"><i style="width:${p.pct}%"></i></div><b>${p.pct}%</b></div>
-      <div class="national-goal-meta"><span>${p.active?'Odliczanie trwa według kalendarza gry.':p.done?'Ukończono w dniu '+(nationalState().completedAt[id]??'—')+'.':reason||'Warunki są spełnione. Ty decydujesz, kiedy uruchomić cel.'}</span><span>${g.days} dni</span></div>
+      <div class="national-goal-meta"><span class="national-goal-meta-copy">${p.active?'Odliczanie trwa według kalendarza gry.':p.done?'Ukończono w dniu '+(nationalState().completedAt[id]??'—')+'.':reason||'Warunki są spełnione. Ty decydujesz, kiedy uruchomić cel.'}</span><span class="national-goal-days">${g.days} dni</span></div>
       <h4>Warunek dostępu</h4><div class="national-goal-access">${g.accessText||'Poprzedni cel musi być ukończony.'}</div>
       <h4>Konsekwencje</h4>${g.cons.map(c=>`<div class="national-goal-consequence">${c}</div>`).join('')}
       ${id==='nplr_council'&&p.done?`<div class="council-callout"><b>Rada Partyjna</b><span>${G.partyCouncil&&G.partyCouncil.members&&G.partyCouncil.members.length===5?'Skład zapisany · '+G.partyCouncil.members.join(', '):'Nie wybrano jeszcze pięciu członków.'}</span>${G.partyCouncil&&G.partyCouncil.members&&G.partyCouncil.members.length===5?'':'<button class="btn sm" onclick="openPartyCouncil()">Wybierz radę →</button>'}</div>`:''}
@@ -1459,16 +1501,24 @@ function goalsTreeBlock(label,sub,items,kind){
   if(!items.length)return '';
   const head=`<header><div><span class="eyebrow">${kind==='national'?'CELE NARODOWE':'PARTY DIRECTIVE'}</span><h3>${label}</h3><p>${sub}</p></div><b>${items.filter(x=>x.done).length}/${items.length}</b></header>`;
   if(kind!=='national')return `<section class="goals-tree-block ${kind}">${head}<div class="goal-tree-row">${items.map((x,i)=>goalNode(x,i,items.length)).join('')}</div></section>`;
-  const base=items.filter(x=>!x.g.branch);
-  const lanes=Object.entries(NATIONAL_BRANCHES).map(([key,b])=>{
+  const base=items.filter(x=>(!x.g.branch&&!x.g.route)||x.id==='nplr_liberal');
+  const laneMarkup=(groups,cls)=>Object.entries(groups).map(([key,b])=>{
     const lane=items.filter(x=>x.g.branch===key);if(!lane.length)return '';
-    return `<div class="goal-branch-lane ${key}"><div class="goal-branch-label">${b.name}</div><div class="goal-tree-row">${lane.map((x,i)=>goalNode(x,i,lane.length)).join('')}</div></div>`;
+    return `<div class="goal-branch-lane ${key} ${cls}"><div class="goal-branch-label">${b.name}</div><div class="goal-tree-row">${lane.map((x,i)=>goalNode(x,i,lane.length)).join('')}</div></div>`;
   }).join('');
-  return `<section class="goals-tree-block ${kind}">${head}<div class="goal-tree-row goal-tree-base">${base.map((x,i)=>goalNode(x,i,base.length)).join('')}</div><div class="goal-branch-split">${lanes}</div></section>`;
+  const early=Object.entries(NATIONAL_EARLY_BRANCHES).map(([key,b])=>{
+    const lane=items.filter(x=>x.g.route==='liberal'&&key==='liberal'||x.g.branch==='progressive'&&key==='progressive');
+    if(!lane.length)return '';
+    return `<div class="goal-branch-lane ${key} early"><div class="goal-branch-label">${b.name}</div><div class="goal-tree-row">${lane.map((x,i)=>goalNode(x,i,lane.length)).join('')}</div></div>`;
+  }).join('');
+  const late=laneMarkup(NATIONAL_BRANCHES,'late');
+  return `<section class="goals-tree-block ${kind}">${head}<div class="goal-tree-row goal-tree-base">${base.map((x,i)=>goalNode(x,i,base.length)).join('')}</div><div class="goal-branch-split early-split">${early}</div><div class="goal-branch-split late-split">${late}</div></section>`;
 }
 function goalsBranchPanel(){
-  const s=nationalState();if(!s||!s.done.nplr_star||s.branch)return '';
-  return `<div class="goals-branch-alert"><span class="goal-node-mark">◆</span><div><b>ROZWIDLENIE PO ALTERNATYWIE ŻYDOWSKIEJ</b><p>Wybierz jedną drogę. Decyzji nie można cofnąć w tej kampanii.</p></div><div class="goals-branch-actions"><button class="goals-action royal" onclick="chooseNationalBranch('republican')">REPUBLIKANIE</button><button class="goals-action freedom" onclick="chooseNationalBranch('freedom')">AUREA LIBERTAS</button></div></div>`;
+  const s=nationalState();if(!s)return '';
+  if(s.done.nplr_liberal&&!s.earlyBranch)return `<div class="goals-branch-alert"><span class="goal-node-mark">◆</span><div><b>ROZWIDLENIE PO LIBER? LIBRO? LIBERALIZM!</b><p>Wybierz Partię Liberalną albo drogę Postępowców. Decyzji nie można cofnąć.</p></div><div class="goals-branch-actions"><button class="goals-action royal" onclick="chooseNationalEarlyBranch('liberal')">PARTIA LIBERALNA</button><button class="goals-action freedom" onclick="chooseNationalEarlyBranch('progressive')">POSTĘPOWCY</button></div></div>`;
+  if(s.earlyBranch==='liberal'&&s.done.nplr_star&&!s.branch)return `<div class="goals-branch-alert"><span class="goal-node-mark">◆</span><div><b>ROZWIDLENIE PO ALTERNATYWIE ŻYDOWSKIEJ</b><p>Wybierz Republikę albo Partię Libertas. Decyzji nie można cofnąć.</p></div><div class="goals-branch-actions"><button class="goals-action royal" onclick="chooseNationalBranch('republican')">REPUBLIKA</button><button class="goals-action freedom" onclick="chooseNationalBranch('freedom')">PARTIA LIBERTAS</button></div></div>`;
+  return '';
 }
 function goalsInspector(item){
   if(!item)return '';
@@ -1513,3 +1563,4 @@ goalTab=()=>{
   const html=goalTabCompactBase();
   return myIdentities().length>=2&&html.indexOf('brand-switch-logo')<0?identSwitcher()+html:html;
 };
+if(typeof window!=='undefined')Object.assign(window,{buyTrait,goalReady,myGoals,myPartyGoals,applyGoals,hasAds,hasHeg,hasHor,hasRob,hasPer,chooseNationalEarlyBranch});

@@ -4,6 +4,15 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.205':{data:'12 sierpnia 2026',zmiany:['Poprawka ladowania modułów po aktualizacji: gra nie korzysta juz ze starego cache WebView2.']},
+ '1.1.204':{data:'12 sierpnia 2026',zmiany:[
+  'Dodano nowe rozwidlenie po pierwszym celu Concordii: Partia Liberalna albo droga Postepowcow.',
+  'Postepowcy maja trzy cele: Czas na Jaderka, Nowi starzy wszystko jedno oraz Bedac postepem warunkuje postep.',
+  'Partia Libertas zastapila nazwe Aurea Libertas w celu narodowym i szyldzie partii.',
+  'Kryteria celow sa widoczne przy kazdym wezle, a mapa ma wyrazniejsze, rowne linie rozwidlen.',
+  'Boty maja osobny tygodniowy cooldown zakupu bezpartyjnych, a koszt zakupu zostal lekko podniesiony.',
+  'Odnowiono karty decyzji i rozdzielono liczbe dni celu od opisu, zeby tekst nie nachodzil na badge.'
+ ]},
  '1.1.203':{data:'11 sierpnia 2026',zmiany:[
   'Zegar czasu ciaglego korzysta teraz z prawdziwego uplywu czasu, wiec predkosci x0.5-x5 nie zaleza od opoznionego interwalu przegladarki.',
   'Pauza, otwarte okno i wybory zeruja akumulator czasu; po wznowieniu gra nie nadrabia godzin, ktore mialy stac.',
@@ -1220,7 +1229,9 @@ function tryLoadFromSetup(){
 }
 
 function game(){
-  applyGoals();
+  /* Ekran może wyrenderować się zanim przeglądarka doczyta późniejszy moduł
+     celów; brak funkcji nie może blokować całego startu gry. */
+  if(typeof applyGoals==='function')applyGoals();
   /* Zapis nie moze otworzyc zamknietego kanalu po zmianie nawigacji. */
   if(G.tab==='media'&&!mediaJest())G.tab='mapa';
   if(G.tab==='sad'&&!lawDone('sady'))G.tab='mapa';
@@ -1244,8 +1255,8 @@ function game(){
     <div class="rgroup zasoby">
     ${(()=>{const skl=[];
       if(isPM())skl.push('premier +1');if(hasPrez())skl.push('prezydent +1');
-      if(hasAds(G.me))skl.push('Państwo Partyjne +2');if(hasHeg(G.me))skl.push('Hegemon +1');
-      if(hasHor(G.me))skl.push('Horda −1');
+      if(typeof hasAds==='function'&&hasAds(G.me))skl.push('Państwo Partyjne +2');if(typeof hasHeg==='function'&&hasHeg(G.me))skl.push('Hegemon +1');
+      if(typeof hasHor==='function'&&hasHor(G.me))skl.push('Horda −1');
       return `<div class="rs tip">${ikona('akcje')}<div class="rv"><b>${G.ap}<span class="of">/${G.apMax}</span></b><span>akcje</span></div>
       <div class="tipbox">
         <div class="tiptyt">Czym są akcje?</div>
@@ -1352,7 +1363,7 @@ function game(){
       const nazwa=(k,n)=>n+(wazne.has(k)?'<span class="badge">!</span>':'');
       const nv=[['mapa',nazwa('mapa','Mapa okręgów')],['akcje',nazwa('akcje','Decyzje')+(G.ap?`<span class="badge">${G.ap}</span>`:'')],
        ['lider','Lider'+(leads(G.p[G.me]).some(n=>xpOs(n)>=35)?'<span class="badge">!</span>':'')],['krol','Król'+(kingFav(G.me)<0?'<span class="badge">!</span>':'')],['partie','Partie'],['sondaz','Sondaż']];
-      const mg=typeof myPartyGoals==='function'?myPartyGoals():myGoals();
+      const mg=typeof myPartyGoals==='function'?myPartyGoals():(typeof myGoals==='function'?myGoals():[]);
       const ng=typeof myNationalGoals==='function'?myNationalGoals():[];
       if(mg.length||ng.length)nv.push(['cele',nazwa('cele',ng.length&&!mg.length?'Cele narodowe':mg.length>1?'Cele partyjne':'Cel partyjny')+(ng.length&&typeof nationalGoalReady==='function'&&nationalGoalReady()?'<span class="badge">!</span>':'')]);
       // urzędy mają własne działy zamiast kategorii schowanych w decyzjach

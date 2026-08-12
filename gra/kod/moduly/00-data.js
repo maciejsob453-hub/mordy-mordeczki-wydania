@@ -266,13 +266,17 @@ function aiAgents(){
   // boty też kupują, ale tylko te, które realnie mają z czego
   alive().forEach(k=>{
     if(k===G.me)return;const p=G.p[k];
+    const now=czasGlobalny(),last=Number(G.aiAgentAt&&G.aiAgentAt[k]);
+    if(Number.isFinite(last)&&now-last<168)return;
     p.bank=Math.min(260,(p.bank||0)+income(k).total);   // boty też nie zbierają w nieskończoność
     if(!ch(.18))return;
     const wolni=AGENTS.filter(a=>agentFree(a.n)).sort((a,b)=>b.kp-a.kp);
-    const a=wolni.find(x=>p.bank>=agentCost(x.n,1));
+    const a=wolni.find(x=>p.bank>=Math.round(agentCost(x.n,1)*1.15));
     if(!a)return;
-    const koszt=agentCost(a.n,1);
+    const koszt=Math.round(agentCost(a.n,1)*1.15);
+    if(p.bank<koszt)return;
     p.bank-=koszt;G.agents[a.n]=k;
+    G.aiAgentAt=G.aiAgentAt||{};G.aiAgentAt[k]=now;
     p.comp[a.seg]++;p.mem++;
     if(!p.bench.includes(a.n)&&p.bench.length<10)p.bench.push(a.n);
     say(`<b>${p.ab} pozyskuje ${a.n}</b> za ${koszt} kapitału (${sn(a.seg)}). Bezpartyjnych ubywa.`,'');
@@ -509,7 +513,7 @@ function kingFactors(k){
   const out=[
     {n:'Siła w sejmie',    v:p.seats+' / '+TOTAL_SEATS, w:p.seats*2.1, d:'Mandaty ważą najwięcej. Króla obchodzi, kto realnie utrzyma sejm.'},
     {n:'Zaplecze w partii',v:p.mem+' osób',      w:cl((p.mem-14)*.34,-6,14), d:'Duża partia to gwarancja, że rząd nie rozpadnie się po tygodniu.'},
-    {n:'Wiarygodność',     v:Math.round(p.cred), w:(p.cred-45)*.42*(me2&&hasPer(G.me)?2:1), d:'Król nie desygnuje ludzi, którym nikt nie wierzy.'},
+     {n:'Wiarygodność',     v:Math.round(p.cred), w:(p.cred-45)*.42*(me2&&typeof hasPer==='function'&&hasPer(G.me)?2:1), d:'Król nie desygnuje ludzi, którym nikt nie wierzy.'},
     {n:'Aktywność',        v:Math.round(p.act),  w:(p.act-45)*.34,  d:'Martwa partia nie utrzyma rządu.'},
     {n:'Kontrowersja',     v:Math.round(p.ctr),  w:-p.ctr*.26,      d:'Skandale przeszkadzają, ale Król widział już gorsze rzeczy.'},
     {n:'Stosunki z dworem',v:me2?Math.round(G.king.rel):50, w:me2?(G.king.rel-50)*.34:0, d:'To, co ustaliliście na osobności, przez ustawy, daninę i przysługi.'},
@@ -539,14 +543,14 @@ function income(k){
   // stawki składek: domyślne albo takie, jakie ustawił sejm ustawą ekonomiczną
   const u=G&&G.law?G.law.ekon:null, st=(u&&typeof u==='object')?u:null;
   const sEli=st?st.eli:2.6, sInt=st?st.int:0.95;
-  const sSer=st?st.ser:(hasRob(k||G.me)?0.36:0.18);
+  const sSer=st?st.ser:(typeof hasRob==='function'&&hasRob(k||G.me)?0.36:0.18);
   // gdy stawki są nastawione ręcznie, one same są nagrodą — premia za uchwałę
   // należy się tylko wtedy, gdy nikt przy nich nie kręcił
   const domyslne=!st||(st.eli===2.6&&st.int===0.95);
   const podnies=u&&domyslne?1.2:1;
   // Przewagi się nakładają, ale nie mnożą bez końca: najmocniejsza działa w pełni,
   // każda kolejna już tylko w części. Inaczej trzy bonusy dawały ośmiokrotność bazy.
-  const bonusy=[(hasAds(k||G.me)?2.1:1),(hasHeg(k||G.me)?1.45:1),podnies].filter(x=>x>1).sort((a,b)=>b-a);
+  const bonusy=[(typeof hasAds==='function'&&hasAds(k||G.me)?2.1:1),(typeof hasHeg==='function'&&hasHeg(k||G.me)?1.45:1),podnies].filter(x=>x>1).sort((a,b)=>b-a);
   const mnoznik=bonusy.reduce((a,x,i)=>a*(i?1+(x-1)*.45:x),1);
   // Ustawa o podatkach: przy progresji bogaty skład dokłada się za resztę,
   // przy stawce równej każdy płaci tyle samo, co zawsze.

@@ -319,7 +319,7 @@ function sidebar(p,q){
     <div class="hint">${leads(p).length>1?'Statystyki to średnia całego składu sterów. ':''}Kto prowadzi partię, ustawiasz
       w <b>Decyzjach → Specjalne → Układ sterów</b>${G.useTerm.stery?' <span class="bad">(zużyte w tej kadencji)</span>':''}.</div>
   </div></details>
-  ${feed()}
+  <!-- Serwerowy Kurier usuniety: kronika pozostaje jedynym zrodlem wydarzen. -->
   <details class="card skl sidefold" ${sideAttr('skl')}><summary><h3>Skład partii</h3><span class="n">${p.mem} ${pl(p.mem,'osoba','osoby','osób')}</span></summary><div class="b">
     <div style="display:flex;height:11px;border-radius:4px;overflow:hidden;margin-bottom:10px">
       ${SEG.map(s=>`<i style="display:block;height:100%;width:${p.mem?p.comp[s.id]/p.mem*100:0}%;background:${s.c}"></i>`).join('')}</div>

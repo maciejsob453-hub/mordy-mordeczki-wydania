@@ -3535,3 +3535,23 @@ body:has(.hud) .decision-inspector h2{font-family:var(--fd)!important;letter-spa
 body:has(.hud) .decision-specs>div{background:rgba(3,10,7,.62)!important;border-color:rgba(105,137,107,.26)!important}
 body:has(.hud) .decision-run{border-radius:4px!important;background:linear-gradient(180deg,color-mix(in srgb,var(--ac,var(--party-theme,var(--acc))) 78%,#fff 8%),color-mix(in srgb,var(--ac,var(--party-theme,var(--acc))) 48%,#10180f))!important;border-color:color-mix(in srgb,var(--ac,var(--party-theme,var(--acc))) 78%,#fff 8%)!important;color:#10170e!important;font-weight:800!important}
 @media(max-width:900px){body:has(.hud) .goals-command:has(.goals-inspector) .goals-command-layout-maponly{grid-template-columns:1fr!important}body:has(.hud) .goals-command:has(.goals-inspector) .goals-command-layout-maponly>.goals-inspector{grid-column:1!important;grid-row:auto!important}body:has(.hud) .decision-inspector{position:relative!important;top:auto;max-height:none}}
+
+/* 1.1.204: drzewko ma czytelny punkt rozdziału, a nie przypadkowe kreski
+   między kartami. Stały kontrast i brak skalowania bitmapy ograniczają też
+   migotanie oraz rozmycie mapy przy zegarze czasu ciągłego. */
+body:has(.hud) .goal-branch-split{isolation:isolate!important;padding-top:26px!important;margin-top:34px!important}
+body:has(.hud) .goal-branch-split::before{left:12%!important;right:12%!important;top:0!important;height:2px!important;background:linear-gradient(90deg,transparent,var(--party-theme,var(--gc-gold)) 12%,var(--party-theme,var(--gc-gold)) 88%,transparent)!important;opacity:.9!important}
+body:has(.hud) .goal-branch-split::after{top:-20px!important;height:20px!important;width:2px!important;background:var(--party-theme,var(--gc-gold))!important;box-shadow:0 0 12px color-mix(in srgb,var(--party-theme,var(--gc-gold)) 55%,transparent)!important}
+body:has(.hud) .goal-branch-lane::before{top:0!important;height:26px!important;width:2px!important;background:linear-gradient(var(--party-theme,var(--gc-gold)),transparent)!important}
+body:has(.hud) .goal-branch-split.early-split{margin-top:42px!important}
+body:has(.hud) .goal-branch-split.late-split{margin-top:52px!important}
+body:has(.hud) .goal-node-wrap{contain:layout paint!important}
+body:has(.hud) .goal-node-icon img,body:has(.hud) .goal-inspector-seal img{image-rendering:auto!important;backface-visibility:hidden!important;transform:translateZ(0)!important}
+body:has(.hud) .goals-map-canvas{transform-origin:top center!important;backface-visibility:hidden!important;will-change:transform!important}
+body:has(.hud) .national-goal-meta{display:grid!important;grid-template-columns:minmax(0,1fr) max-content!important;align-items:center!important;gap:16px!important}
+body:has(.hud) .national-goal-days{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:76px!important;padding:5px 9px!important;border-left:1px solid color-mix(in srgb,var(--party-theme,var(--gc-gold)) 42%,#30443a)!important;color:var(--acc)!important;white-space:nowrap!important}
+body:has(.hud) .national-goal-meta-copy{min-width:0!important;line-height:1.35!important}
+body:has(.hud) .decision-list-pane{background:linear-gradient(155deg,rgba(21,36,25,.98),rgba(5,12,8,.99)),url("../obrazki/ui-action-desk.webp") center/cover!important;background-blend-mode:normal,multiply!important}
+body:has(.hud) .act-short{transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease!important}
+body:has(.hud) .act-short::after{content:'';position:absolute;inset:5px;pointer-events:none;border:1px solid rgba(255,255,255,.035);border-radius:4px}
+body:has(.hud) .act-short{position:relative!important;overflow:hidden!important}
