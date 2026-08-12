@@ -3555,3 +3555,29 @@ body:has(.hud) .decision-list-pane{background:linear-gradient(155deg,rgba(21,36,
 body:has(.hud) .act-short{transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease!important}
 body:has(.hud) .act-short::after{content:'';position:absolute;inset:5px;pointer-events:none;border:1px solid rgba(255,255,255,.035);border-radius:4px}
 body:has(.hud) .act-short{position:relative!important;overflow:hidden!important}
+
+/* 1.1.208: parent-child lines for focus goals, compact action table and calmer maps. */
+body:has(.hud) .goal-branch-split{
+  position:relative!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:clamp(18px,3vw,42px)!important;margin:28px auto 0!important;padding-top:22px!important;width:min(680px,100%)!important
+}
+body:has(.hud) .goal-branch-split::before{left:25%!important;right:25%!important;top:0!important;height:1px!important;background:linear-gradient(90deg,transparent,var(--party-theme,#b896d8) 18%,var(--party-theme,#b896d8) 82%,transparent)!important;opacity:.78!important}
+body:has(.hud) .goal-branch-split::after{top:-18px!important;left:50%!important;width:1px!important;height:18px!important;background:var(--party-theme,#b896d8)!important;box-shadow:0 0 8px color-mix(in srgb,var(--party-theme,#b896d8) 40%,transparent)!important}
+body:has(.hud) .goal-branch-split.nested-split{margin-top:20px!important;width:min(610px,100%)!important}
+body:has(.hud) .goal-branch-split.nested-split::before{left:22%!important;right:22%!important}
+body:has(.hud) .goal-branch-lane{padding-top:8px!important}
+body:has(.hud) .goal-branch-lane::before{top:-18px!important;height:18px!important;background:var(--party-theme,#b896d8)!important}
+body:has(.hud) .goal-branch-label{margin:0 0 7px!important;letter-spacing:.09em!important;color:color-mix(in srgb,var(--party-theme,#b896d8) 82%,#fff 8%)!important}
+body:has(.hud) .goal-branch-lane .goal-tree-row{gap:0!important;padding-bottom:16px!important}
+body:has(.hud) .goal-branch-lane .goal-node-wrap{padding-bottom:38px!important}
+body:has(.hud) .goal-branch-lane .goal-node-wrap:not(.last)::after{bottom:10px!important;height:24px!important;width:1px!important;background:linear-gradient(180deg,var(--party-theme,#b896d8),rgba(111,143,119,.22))!important}
+body:has(.hud) .mapwrap .hex polygon:nth-of-type(3){stroke-width:3!important;stroke-opacity:.92!important}
+body:has(.hud) .mapwrap .hex polygon:nth-of-type(4){stroke-width:1.5!important;stroke-opacity:.62!important}
+body:has(.hud) .mapwrap .hex polygon:nth-of-type(5){stroke-width:1.5!important;stroke-opacity:.68!important}
+body:has(.hud) .sejm-sala .hemi-scena .hemi{min-height:0!important}
+body:has(.hud) .widok[data-tab="akcje"]>.stol{padding:10px 12px!important;margin-bottom:12px!important}
+body:has(.hud) .widok[data-tab="akcje"]>.stol .stolh{margin-bottom:7px!important}
+body:has(.hud) .widok[data-tab="akcje"]>.stol .mj{min-height:64px!important;padding:8px 10px!important}
+body:has(.hud) .widok[data-tab="akcje"]>.stol .mj .pust svg{width:16px!important;height:16px!important;margin-bottom:2px!important}
+body:has(.hud) .widok[data-tab="akcje"]>.stol .mj .pust b{font-size:8px!important}
+@media(max-width:680px){body:has(.hud) .goal-branch-split{grid-template-columns:1fr!important;gap:24px!important;width:100%!important}body:has(.hud) .goal-branch-split::before{left:22%!important;right:22%!important}}

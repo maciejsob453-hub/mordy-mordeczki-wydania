@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.208':{data:'12 sierpnia 2026',zmiany:[
+  'Drzewko celow ma teraz linie prowadzone od konkretnego celu nadrzednego, a kolejne rozwidlenie nie odkleja sie od swojej galezi.',
+  'Rozgalezienia sa gesciejsze i maja spokojniejsze wezly, dzieki czemu mapa wyglada jak jedna sciezka, a nie dwa osobne diagramy.',
+  'Okregi maja spokojniejsze obrysy drugiej partii, a stol ruchow zajmuje mniej miejsca i szybciej pokazuje decyzje.'
+ ]},
  '1.1.207':{data:'12 sierpnia 2026',zmiany:[
   'Stary przycisk nastepnego tygodnia nie blokuje juz zegara ciaglego: wykonuje bezpieczny odcinek 168 godzin bez podwojnego rozliczenia.',
   'AI i gospodarka pozostaja rozliczane dobowo, a granica tygodnia sluzy tylko do zamkniecia odcinka kalendarza.',

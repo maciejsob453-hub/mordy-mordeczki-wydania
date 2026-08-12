@@ -1511,10 +1511,13 @@ function goalsTreeBlock(label,sub,items,kind){
   const early=Object.entries(NATIONAL_EARLY_BRANCHES).map(([key,b])=>{
     const lane=items.filter(x=>x.g.route==='liberal'&&key==='liberal'||x.g.branch==='progressive'&&key==='progressive');
     if(!lane.length)return '';
-    return `<div class="goal-branch-lane ${key} early"><div class="goal-branch-label">${b.name}</div><div class="goal-tree-row">${lane.map((x,i)=>goalNode(x,i,lane.length)).join('')}</div></div>`;
+    /* Późniejsze rozwidlenie należy do ostatniego celu tej konkretnej gałęzi.
+       Wcześniej było rodzeństwem całego drzewa, więc pozioma kreska zaczynała
+       się od osi ekranu zamiast od „Nie tylko na słońce...”. */
+    const childSplit=key==='liberal'?`<div class="goal-branch-split late-split nested-split">${laneMarkup(NATIONAL_BRANCHES,'late')}</div>`:'';
+    return `<div class="goal-branch-lane ${key} early"><div class="goal-branch-label">${b.name}</div><div class="goal-tree-row">${lane.map((x,i)=>goalNode(x,i,lane.length)).join('')}</div>${childSplit}</div>`;
   }).join('');
-  const late=laneMarkup(NATIONAL_BRANCHES,'late');
-  return `<section class="goals-tree-block ${kind}">${head}<div class="goal-tree-row goal-tree-base">${base.map((x,i)=>goalNode(x,i,base.length)).join('')}</div><div class="goal-branch-split early-split">${early}</div><div class="goal-branch-split late-split">${late}</div></section>`;
+  return `<section class="goals-tree-block ${kind}">${head}<div class="goal-tree-row goal-tree-base">${base.map((x,i)=>goalNode(x,i,base.length)).join('')}</div><div class="goal-branch-split early-split">${early}</div></section>`;
 }
 function goalsBranchPanel(){
   const s=nationalState();if(!s)return '';

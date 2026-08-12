@@ -1,10 +1,10 @@
 {
- "wersja": "1.1.207",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/897f0b557f626b6665bd31f05f561e2794d1c080",
+ "wersja": "1.1.208",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "dc6b96ab9f1b50832bfa58918c5972d23402627d4071526328de7d1aa1daf130",
+   "sha": "9b606651fe60a0f010e3ad31403919f990b8fa22a45cd8beef24536bc8df822b",
    "bajtow": 1979
   },
   {
@@ -14,7 +14,7 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "cf8fab8af490ce45c9dd8153cd0e7b50de13700a05ff73c339762e133a32a683",
+   "sha": "aafcecd4d12ed437094ecc474371ea8cb17aa1e10672ca25b491e928c66f91ad",
    "bajtow": 737
   },
   {
@@ -69,8 +69,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "82cb9c8c220da268ddaa8a62a52dd79c21505bfff756090b7940cb01afe15214",
-   "bajtow": 126800
+   "sha": "a6f70ab54b930a3ad2c0ce8cf461470305da0984a1129c0a0906565b9ecad2da",
+   "bajtow": 127235
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
@@ -99,8 +99,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/16-goals-panels.js",
-   "sha": "d39b567cd293d3d1e7b16ecd982ea5c6b5653035636d26cd9d81c7120bc23c01",
-   "bajtow": 129166
+   "sha": "148ccb3ba56cef5163247c1212c8f1155394a8498536c08643042058a3c298b1",
+   "bajtow": 129458
   },
   {
    "sciezka": "gra/kod/moduly/17-elections-endgame.js",
@@ -1039,8 +1039,8 @@
   },
   {
    "sciezka": "gra/wyglad/sejm-v4.css",
-   "sha": "c69f043a1296cabea68c61cd068251f79f6cb7d29db2910e8c7e925abcdc0f40",
-   "bajtow": 262464
+   "sha": "0e3395ebbe834338505d7e0ae228748e6cad9e782073fd0c14b7663263e54a6f",
+   "bajtow": 265433
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -1065,6 +1065,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "897f0b557f626b6665bd31f05f561e2794d1c080"
+ }
 }
