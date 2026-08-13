@@ -4,6 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.212':{data:'13 sierpnia 2026',zmiany:[
+  'Decyzje dostaly nowy pulpit: rowne karty akcji, mocniejszy panel szczegolow i czytelny przycisk wykonania.',
+  'Kafelki decyzji pokazują teraz mniej chaosu, ale wiecej hierarchii: nazwa, skrot efektow, koszt i odnowa maja stale miejsca.',
+  'Drzewko celow ma rowne kafle o stalej szerokosci i odleglosci, a pierwszy cel nie odjezdza juz od rozwidlenia.',
+  'Rozwidlenia celow korzystaja z tej samej siatki na obu galeziach i nie potykaja sie o siebie.'
+ ]},
  '1.1.211':{data:'13 sierpnia 2026',zmiany:[
   'Cele partyjne i narodowe maja wieksze wezly, mocniejsze loga i czytelniejsze nazwy zamiast miniaturowych kafelkow.',
   'Drzewko celow wykorzystuje teraz glowna szerokosc ekranu, a panel szczegolow pozostaje obok jako boczny inspektor.',

@@ -3701,6 +3701,49 @@ body:has(.hud) .goals-command-compact .goals-inspector h2{font-size:24px!importa
 body:has(.hud) .goals-command-compact .goal-inspector-seal{width:82px!important;height:82px!important}
 body:has(.hud) .goals-command-compact .goal-inspector-seal img{width:74px!important;height:74px!important}
 @media(max-width:900px){body:has(.hud) .goals-command-compact .goals-command-layout-maponly{grid-template-columns:1fr!important}body:has(.hud) .goals-command-compact .goals-inspector{position:relative!important;top:auto!important}}
+
+/* 1.1.212: finalny rytm decyzji i celow. Kafle maja jedna geometrie, a
+   panel decyzji przypomina pulpit operacyjny zamiast katalogu linkow. */
+body:has(.hud) .widok[data-tab="akcje"] .decision-desk{
+  grid-template-columns:minmax(0,1fr) 360px!important;gap:14px!important;align-items:start!important
+}
+body:has(.hud) .widok[data-tab="akcje"] .decision-list-pane{
+  padding:18px!important;border-radius:7px!important;border:1px solid color-mix(in srgb,var(--party-theme,var(--acc)) 48%,#30443a)!important;
+  background:linear-gradient(145deg,rgba(19,37,26,.98),rgba(4,12,8,.99)),url("../obrazki/ui-action-desk.webp") center/cover!important;
+  box-shadow:0 18px 36px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.06)!important
+}
+body:has(.hud) .widok[data-tab="akcje"] .decision-list-head{min-height:62px;align-items:center!important;padding:0 2px 14px!important;margin-bottom:14px!important}
+body:has(.hud) .widok[data-tab="akcje"] .decision-list-head h3{font:700 24px var(--fd)!important;color:#f0e3c2!important}
+body:has(.hud) .widok[data-tab="akcje"] .act-short-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+body:has(.hud) .widok[data-tab="akcje"] .act-short{
+  min-height:118px!important;padding:14px 15px!important;border-left:4px solid var(--ac)!important;border-radius:7px!important;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--ac) 17%,rgba(21,39,27,.98)),rgba(4,12,8,.99))!important;
+  box-shadow:0 10px 22px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.05)!important
+}
+body:has(.hud) .widok[data-tab="akcje"] .act-short-main b{font-size:15px!important;color:#f0e4c8!important}
+body:has(.hud) .widok[data-tab="akcje"] .act-short-main small{font-size:10px!important;color:#aab8ac!important}
+body:has(.hud) .widok[data-tab="akcje"] .act-short-cost{margin-top:auto!important;padding-top:9px!important;border-top:1px solid rgba(196,154,75,.16)!important}
+body:has(.hud) .widok[data-tab="akcje"] .decision-inspector{position:sticky!important;top:10px!important;min-height:470px!important;padding:20px!important;border-radius:7px!important}
+body:has(.hud) .widok[data-tab="akcje"] .decision-inspector h2{font-size:25px!important;line-height:1.12!important;color:#f2e5c5!important}
+body:has(.hud) .widok[data-tab="akcje"] .decision-run{min-height:44px!important;font-size:12px!important;letter-spacing:.08em!important}
+body:has(.hud) .widok[data-tab="akcje"]>.stol{margin-bottom:14px!important;border-radius:7px!important;background:linear-gradient(145deg,rgba(15,29,20,.96),rgba(4,12,8,.98)),url("../obrazki/ui-action-desk.webp") center/cover!important}
+body:has(.hud) .widok[data-tab="akcje"]>.stol .mj{min-height:74px!important;border-radius:6px!important;background:rgba(4,12,8,.56)!important}
+
+body:has(.hud) .goals-command-compact .goals-map-canvas{padding:26px 22px 80px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goals-tree-block{max-width:980px!important;margin:0 auto!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-tree-row{grid-template-columns:repeat(2,minmax(270px,1fr))!important;gap:34px 42px!important;justify-items:center!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-node-wrap{width:270px!important;padding-bottom:46px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-node{
+  width:270px!important;height:176px!important;min-height:176px!important;box-sizing:border-box!important
+}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-node-wrap:not(.last)::after{bottom:13px!important;height:32px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-branch-split{width:min(760px,100%)!important;gap:42px!important;margin-top:24px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-branch-lane{width:270px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-branch-lane .goal-tree-row{grid-template-columns:1fr!important;gap:0!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-branch-lane .goal-node-wrap{width:270px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-tree-base{display:flex!important;justify-content:center!important;grid-template-columns:none!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-tree-base .goal-node-wrap{width:270px!important}
+@media(max-width:760px){body:has(.hud) .widok[data-tab="akcje"] .act-short-grid{grid-template-columns:1fr!important}body:has(.hud) .goals-command-compact .goals-map-grid .goal-tree-row{grid-template-columns:1fr!important}.goals-command-compact .goals-map-grid .goal-node-wrap,.goals-command-compact .goals-map-grid .goal-node{width:min(270px,100%)!important}}
 @media(max-width:1080px){
   body:has(.hud) .widok[data-tab="sejm"]>.card>.b{grid-template-columns:1fr!important}
   body:has(.hud) .widok[data-tab="sejm"] .sejm-sala,body:has(.hud) .widok[data-tab="sejm"] .wladza{grid-column:1;grid-row:auto}
