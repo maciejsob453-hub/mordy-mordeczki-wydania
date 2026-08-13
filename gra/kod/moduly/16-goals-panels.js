@@ -1473,7 +1473,11 @@ function goalOpen(id){
 function goalsMapApply(){
   const c=document.querySelector('[data-goals-canvas]'),o=document.getElementById('goalsZoomValue');
   if(!c||!G)return;
-  const z=cl(Number(G.goalZoom)||1,.55,1.8),x=Number(G.goalPanX)||0,y=Number(G.goalPanY)||0;
+  /* Stare zapisy mialy zoom 55%, przez co nowe drzewko wygladalo jak miniatura.
+     Przy pierwszym otwarciu podnosimy tylko ten zbyt maly odczyt; reczne
+     ustawienia gracza powyzej tej granicy zostaja bez zmian. */
+  if(Number(G.goalZoom)>0&&Number(G.goalZoom)<.8)G.goalZoom=1.12;
+  const z=cl(Number(G.goalZoom)||1.12,.7,1.8),x=Number(G.goalPanX)||0,y=Number(G.goalPanY)||0;
   c.style.transform=`translate(${x}px,${y}px) scale(${z})`;
   if(o)o.textContent=Math.round(z*100)+'%';
 }
@@ -1483,7 +1487,7 @@ function goalsZoom(delta){
 }
 function goalsMapReset(){
   if(!G)return;
-  G.goalZoom=1;G.goalPanX=0;G.goalPanY=0;goalsMapApply();
+  G.goalZoom=1.12;G.goalPanX=0;G.goalPanY=0;goalsMapApply();
 }
 function initGoalsMap(){
   const frame=document.querySelector('[data-goals-map]'),canvas=document.querySelector('[data-goals-canvas]');

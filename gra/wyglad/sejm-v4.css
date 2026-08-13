@@ -3667,6 +3667,40 @@ body:has(.hud) .widok[data-tab="sejm"] .sejmgrid>.card{min-height:230px;border-r
 body:has(.hud) .widok[data-tab="sejm"] .sejmgrid>.card>.b{max-height:270px;overflow:auto}
 body:has(.hud) .widok[data-tab="sejm"] .sejm-partietabela{grid-column:1/-1;grid-row:3;margin-top:0!important}
 body:has(.hud) .widok[data-tab="sejm"] .sejm-partietabela[open] .sejm-partieb{max-height:340px;overflow:auto}
+
+/* 1.1.211: cele strategiczne dostaja skale planszy, nie miniatury w pustym
+   polu. Inspektor zostaje kontekstowy, ale drzewko ma pierwszenstwo. */
+body:has(.hud) .goals-command-compact .goals-command-layout-maponly{
+  grid-template-columns:minmax(0,1fr) 350px!important;gap:16px!important;align-items:start!important
+}
+body:has(.hud) .goals-command-compact .goals-command-main{min-width:0!important}
+body:has(.hud) .goals-command-compact .goals-map-frame{
+  min-height:calc(100vh - 290px)!important;max-height:none!important;overflow:auto!important;
+  border:1px solid color-mix(in srgb,var(--party-theme,#b896d8) 40%,#30443a)!important;
+  border-radius:6px!important;background:radial-gradient(ellipse at 50% 10%,rgba(47,75,54,.18),rgba(2,8,5,.82) 70%)!important
+}
+body:has(.hud) .goals-command-compact .goals-map-canvas{min-width:100%;padding:20px 18px 70px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid{width:100%!important;max-width:none!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goals-tree-block{width:100%!important;padding:6px 0 30px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-node-wrap{width:min(300px,100%)!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-node{
+  min-height:172px!important;padding:14px 12px!important;border-radius:7px!important;
+  border:1px solid color-mix(in srgb,var(--party-theme,#b896d8) 42%,#30443a)!important;
+  background:linear-gradient(145deg,rgba(21,38,27,.94),rgba(5,13,8,.98))!important;
+  box-shadow:0 12px 24px rgba(0,0,0,.26),inset 0 1px rgba(255,255,255,.05)!important
+}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-node-icon{width:92px!important;height:92px!important;border-width:2px!important;background:rgba(3,11,7,.9)!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-node-icon img{width:82px!important;height:82px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-node-copy b{font-size:14px!important;line-height:1.2!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-node-copy em{font-size:9px!important;color:color-mix(in srgb,var(--party-theme,#b896d8) 75%,#fff)!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-node-copy small{display:block!important;font-size:10px!important;margin-top:3px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-branch-split{width:min(900px,100%)!important;gap:28px!important;margin:32px auto 0!important;padding-top:28px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-branch-lane .goal-tree-row{gap:0!important}
+body:has(.hud) .goals-command-compact .goals-inspector{position:sticky!important;top:10px!important;min-height:460px!important;border-radius:6px!important;background:linear-gradient(160deg,rgba(23,37,27,.98),rgba(5,12,8,.99)),url("../obrazki/ui-briefing-room.webp") center/cover!important}
+body:has(.hud) .goals-command-compact .goals-inspector h2{font-size:24px!important;line-height:1.12!important}
+body:has(.hud) .goals-command-compact .goal-inspector-seal{width:82px!important;height:82px!important}
+body:has(.hud) .goals-command-compact .goal-inspector-seal img{width:74px!important;height:74px!important}
+@media(max-width:900px){body:has(.hud) .goals-command-compact .goals-command-layout-maponly{grid-template-columns:1fr!important}body:has(.hud) .goals-command-compact .goals-inspector{position:relative!important;top:auto!important}}
 @media(max-width:1080px){
   body:has(.hud) .widok[data-tab="sejm"]>.card>.b{grid-template-columns:1fr!important}
   body:has(.hud) .widok[data-tab="sejm"] .sejm-sala,body:has(.hud) .widok[data-tab="sejm"] .wladza{grid-column:1;grid-row:auto}

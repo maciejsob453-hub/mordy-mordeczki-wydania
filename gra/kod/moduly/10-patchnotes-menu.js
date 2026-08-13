@@ -4,6 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.211':{data:'13 sierpnia 2026',zmiany:[
+  'Cele partyjne i narodowe maja wieksze wezly, mocniejsze loga i czytelniejsze nazwy zamiast miniaturowych kafelkow.',
+  'Drzewko celow wykorzystuje teraz glowna szerokosc ekranu, a panel szczegolow pozostaje obok jako boczny inspektor.',
+  'Pierwszy zoom mapy celow zostal podniesiony, ale nadal mozna go recznie zmniejszac i przesuwac.',
+  'Sejm i Wladza dostaly druga korekte ukladu: mniej pustej przestrzeni, mocniejsza hierarchia sali i kart wladzy.'
+ ]},
  '1.1.210':{data:'13 sierpnia 2026',zmiany:[
   'Sejm i Wladza dostaly nowy uklad centrum dowodzenia: sala obrad, pulpit urzedow i zaplecze ustaw sa teraz osobnymi strefami.',
   'Sala parlamentarna nie zabiera juz calego ekranu, a wynik mandatow i partie sa czytelnie oddzielone od mapy miejsc.',
