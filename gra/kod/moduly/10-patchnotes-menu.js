@@ -4,6 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.214':{data:'13 sierpnia 2026',zmiany:[
+  'HUD nie zaslania juz tytulu ani tresci: belka ma wlasna wysokosc w przeplywie strony.',
+  'Decyzje zmienily komponent z duzych pustych kart na zwarte wiersze z kosztem, energia i odnowa.',
+  'Drzewko celow dostalo minimalna szerokosc swiata dla galezi, zeby dwa poddrzewa nie przecinaly sie.',
+  'Dodano kontrole developerska kolizji wezlow, ktora zapisuje liczbe nachodzacych kafli do window.__goalsLayout.'
+ ]},
  '1.1.213':{data:'13 sierpnia 2026',zmiany:[
   'HUD zostal zlozony w jeden spojny modul: statystyki, zegar, data, pauza, predkosc, zapis i menu maja wspolny rytm.',
   'Pasek czasu kadencji korzysta teraz z tej samej szerokosci i powierzchni co reszta interfejsu.',

@@ -375,7 +375,7 @@ function actToggleAll(){if(!G)return;G.actAll=!G.actAll;render()}
 function actToggleFilters(){if(!G)return;G.actFiltersOpen=!G.actFiltersOpen;render()}
 function actShortCard(a){
   const s=actState(a),col=CATCOL[a.cat]||'var(--line2)',effects=actFx(a.id).slice(0,2).map(x=>AFXN[x]&&AFXN[x][0]).join(' · ');
-  return `<button type="button" class="act-short ${G.actFocus===a.id?'selected':''} ${s.ok?'':'blocked'}" style="--ac:${col}" onclick="actOpen('${a.id}')"><span class="act-short-mark">${s.ok?'◆':'·'}</span><span class="act-short-main"><b>${a.n}</b><small>${effects||'decyzja sytuacyjna'}</small></span><span class="act-short-cost"><b>${a.kp?ikona('kapital','mini')+s.kpC:'bez kosztu'}</b><small>${czasOdnowy(a)?Math.ceil(czasOdnowy(a)/24)+' dni':'odnowa natychmiast'}</small></span></button>`;
+  return `<button type="button" class="act-short ${G.actFocus===a.id?'selected':''} ${s.ok?'':'blocked'}" style="--ac:${col}" onclick="actOpen('${a.id}')"><span class="act-short-mark">${s.ok?'◆':'·'}</span><span class="act-short-main"><b>${a.n}</b><small>${effects||'decyzja sytuacyjna'}</small></span><span class="act-short-meta"><span>${a.kp?ikona('kapital','mini')+s.kpC:'bez kosztu'}</span><span>⚡ ${a.en>0?'−'+Math.round(a.en*.82*sizeF(me()).en):'+'+(-a.en)}</span><span>↻ ${czasOdnowy(a)?Math.ceil(czasOdnowy(a)/24)+' dni':'natychmiast'}</span></span></button>`;
 }
 function actInspector(a){
   if(!a)return `<aside class="decision-inspector empty"><span>◆</span><h3>Wybierz decyzję</h3><p>Kliknij krótką kartę, żeby zobaczyć pełny opis, ryzyko i warunki.</p></aside>`;

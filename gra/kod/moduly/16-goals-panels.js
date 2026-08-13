@@ -1499,6 +1499,21 @@ function initGoalsMap(){
   frame.addEventListener('pointerup',stop);frame.addEventListener('pointercancel',stop);frame.addEventListener('pointerleave',e=>{if(drag&&!e.buttons)stop()});
   frame.addEventListener('wheel',e=>{e.preventDefault();goalsZoom(e.deltaY<0?.08:-.08)},{passive:false});
   goalsMapApply();
+  requestAnimationFrame(()=>goalsCheckCollisions());
+}
+/* Kontrola developerska: po kazdym otwarciu mapy sprawdzamy, czy kafle nie
+   nachodza na siebie. Nie zmienia gry; zapisuje tylko wynik do window, zeby
+   smoke test lub konsola mogly od razu wykryc wadliwy layout. */
+function goalsCheckCollisions(){
+  const nodes=[...document.querySelectorAll('[data-goals-map] .goal-node')];
+  const boxes=nodes.map((el,i)=>{const r=el.getBoundingClientRect();return {i,l:r.left,t:r.top,r:r.right,b:r.bottom}});
+  const overlaps=[];
+  for(let i=0;i<boxes.length;i++)for(let j=i+1;j<boxes.length;j++){
+    const a=boxes[i],b=boxes[j];
+    if(a.l<b.r&&a.r>b.l&&a.t<b.b&&a.b>b.t)overlaps.push([a.i,b.i]);
+  }
+  window.__goalsLayout={nodes:boxes.length,overlaps};
+  return overlaps;
 }
 function goalsAllViews(party,national){
   return party.map(partyGoalView).concat(national.map(nationalGoalView)).filter(Boolean);

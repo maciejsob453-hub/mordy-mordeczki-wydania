@@ -3792,6 +3792,50 @@ body:has(.hud) .goals-command-compact .goals-map-grid .goal-node.ready:hover{bor
 body:has(.hud) .goals-command-compact .goals-map-grid .goal-node.active{border-color:var(--party-theme,#b896d8)!important;background:linear-gradient(145deg,color-mix(in srgb,var(--party-theme,#b896d8) 19%,rgba(21,38,27,.96)),rgba(5,13,8,.98))!important}
 @media(max-width:1250px){body:has(.hud) .hud{grid-template-columns:190px minmax(0,1fr)!important}.hudend{grid-column:1/-1!important;justify-content:flex-end!important}.hudcenter .rgroup.polityka{flex-basis:180px!important}}
 @media(max-width:800px){body:has(.hud) .hud{grid-template-columns:1fr!important}.hudcenter{order:2!important;overflow-x:auto!important}.hudend{order:3!important;justify-content:flex-start!important;flex-wrap:wrap!important}.hudcenter .rgroup.polityka{flex-basis:200px!important}.hudend .datechip{order:-1!important}}
+
+/* 1.1.214: HUD wraca do normalnego przeplywu dokumentu. Sticky header
+   powodowal chowanie tytulu widoku pod belka i udawal problem z marginesem. */
+body:has(.hud) .hud{position:relative!important;top:auto!important;z-index:3!important;margin-bottom:12px!important}
+body:has(.hud) .wrap>.hud{grid-column:1/-1!important;grid-row:auto!important}
+body:has(.hud) .wrap>.nav~.hud{grid-column:2!important}
+body:has(.hud) .wrap>.hud+.nav{grid-row:auto!important}
+body:has(.hud) .hudend .rtclock-command{grid-template-columns:auto auto!important;min-width:190px!important}
+body:has(.hud) .hudend .datechip{min-width:180px!important}
+
+/* Decyzje sa teraz renderuja jako zwarte wiersze, nie szesc billboardow. */
+body:has(.hud) .widok[data-tab="akcje"] .act-short-grid{display:flex!important;flex-direction:column!important;gap:6px!important}
+body:has(.hud) .widok[data-tab="akcje"] .act-short{
+  display:grid!important;grid-template-columns:30px minmax(180px,1fr) auto!important;align-items:center!important;
+  min-height:58px!important;height:58px!important;padding:8px 12px!important;border:0!important;border-left:3px solid var(--ac)!important;
+  border-radius:4px!important;background:rgba(4,13,8,.55)!important;box-shadow:inset 0 1px rgba(255,255,255,.035)!important;text-align:left!important
+}
+body:has(.hud) .widok[data-tab="akcje"] .act-short:hover,body:has(.hud) .widok[data-tab="akcje"] .act-short.selected{transform:none!important;background:color-mix(in srgb,var(--ac) 13%,rgba(8,20,12,.9))!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ac) 48%,transparent)!important}
+body:has(.hud) .widok[data-tab="akcje"] .act-short-mark{width:22px!important;height:22px!important;font-size:13px!important}
+body:has(.hud) .widok[data-tab="akcje"] .act-short-main{min-width:0!important}
+body:has(.hud) .widok[data-tab="akcje"] .act-short-main b{display:block!important;font-size:14px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+body:has(.hud) .widok[data-tab="akcje"] .act-short-main small{display:block!important;margin-top:2px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+body:has(.hud) .widok[data-tab="akcje"] .act-short-meta{display:flex!important;align-items:center!important;gap:12px!important;color:#a8b9aa!important;font:10px var(--m)!important;white-space:nowrap!important}
+body:has(.hud) .widok[data-tab="akcje"] .act-short-meta span:first-child{color:var(--acc)!important}
+body:has(.hud) .widok[data-tab="akcje"] .decision-list-pane{padding:14px!important}
+body:has(.hud) .widok[data-tab="akcje"] .decision-inspector{min-height:0!important;max-height:calc(100vh - 190px)!important;padding:16px!important}
+body:has(.hud) .widok[data-tab="akcje"] .decision-inspector .decision-specs{gap:0!important}
+body:has(.hud) .widok[data-tab="akcje"] .decision-inspector .decision-specs>div{padding:8px 5px!important}
+@media(max-width:700px){body:has(.hud) .widok[data-tab="akcje"] .act-short{grid-template-columns:28px minmax(0,1fr)!important;height:auto!important;min-height:56px!important}.widok[data-tab="akcje"] .act-short-meta{grid-column:2!important;justify-content:flex-start!important;margin-top:3px!important;gap:9px!important}}
+
+/* 1.1.214: galezie maja geometryczna szerokosc swiata, nie szerokosc
+   pojedynczego kafla. To eliminuje przecinanie sie lewego i prawego subtree. */
+body:has(.hud) .goals-command-compact .goals-map-frame{overflow:auto!important}
+body:has(.hud) .goals-command-compact .goals-map-canvas{min-width:980px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-branch-split{
+  display:grid!important;grid-template-columns:270px 270px!important;justify-content:center!important;
+  width:max-content!important;min-width:660px!important;gap:120px!important;margin-left:auto!important;margin-right:auto!important
+}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-branch-split>.goal-branch-lane{width:270px!important;min-width:270px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-branch-split.nested-split{grid-template-columns:270px 270px!important;min-width:660px!important;gap:120px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-branch-split::before{left:calc(50% - 330px)!important;right:calc(50% - 330px)!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-branch-split .goal-tree-row{width:270px!important;min-width:270px!important}
+body:has(.hud) .goals-command-compact .goals-map-grid .goal-branch-split .goal-node-wrap{flex:none!important}
+@media(max-width:900px){body:has(.hud) .goals-command-compact .goals-map-canvas{min-width:0!important}body:has(.hud) .goals-command-compact .goals-map-grid .goal-branch-split{grid-template-columns:270px 270px!important;gap:42px!important;min-width:582px!important}}
 @media(max-width:1080px){
   body:has(.hud) .widok[data-tab="sejm"]>.card>.b{grid-template-columns:1fr!important}
   body:has(.hud) .widok[data-tab="sejm"] .sejm-sala,body:has(.hud) .widok[data-tab="sejm"] .wladza{grid-column:1;grid-row:auto}
