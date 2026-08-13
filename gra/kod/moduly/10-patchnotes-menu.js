@@ -4,6 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.213':{data:'13 sierpnia 2026',zmiany:[
+  'HUD zostal zlozony w jeden spojny modul: statystyki, zegar, data, pauza, predkosc, zapis i menu maja wspolny rytm.',
+  'Pasek czasu kadencji korzysta teraz z tej samej szerokosci i powierzchni co reszta interfejsu.',
+  'Cele dostaly stabilniejsza siatke i zwarty punkt rozwidlenia, a stany aktywny i dostepny sa widoczne po wygladzie.',
+  'Decyzje maja gestszy pulpit: mniejsze puste przestrzenie, rowniejsze karty i proporcjonalny panel szczegolow.'
+ ]},
  '1.1.212':{data:'13 sierpnia 2026',zmiany:[
   'Decyzje dostaly nowy pulpit: rowne karty akcji, mocniejszy panel szczegolow i czytelny przycisk wykonania.',
   'Kafelki decyzji pokazują teraz mniej chaosu, ale wiecej hierarchii: nazwa, skrot efektow, koszt i odnowa maja stale miejsca.',

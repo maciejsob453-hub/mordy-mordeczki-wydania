@@ -1,10 +1,10 @@
 {
- "wersja": "1.1.212",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/2954a514956d44c780270e0b05e35793040ff1a8",
+ "wersja": "1.1.213",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/main",
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "a57b8330621b144abf984b63118835cea7c66c4eba9467cf16dae067b7057543",
+   "sha": "90eec853028266b88bb4d4be6eaeecd6817e6a4d1be07be0f27bb987c45d9cd3",
    "bajtow": 1979
   },
   {
@@ -14,7 +14,7 @@
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "af877627d13267bbb6e83abc81d85fc69b4d40e698c6cadff1ef54d3b1b30a56",
+   "sha": "8d96d55b3477e7c9d2b23ed24d96c04806c3f8b1f7e2cdf0a082bd8d13674734",
    "bajtow": 737
   },
   {
@@ -69,8 +69,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "131c8b75116f51e559023ddf42528389929042992df9c15c0854c3d81138d60b",
-   "bajtow": 129413
+   "sha": "a040b98907dd11aca570592e49dcfedc8411801bd9b728ebbefe425f2c5d9847",
+   "bajtow": 129917
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
@@ -1054,8 +1054,8 @@
   },
   {
    "sciezka": "gra/wyglad/sejm-v4.css",
-   "sha": "da5af668784aa83fb7fb6d4d065eca86f14be158d6c67e0741c0acff72734a3f",
-   "bajtow": 280324
+   "sha": "539d7bd70098b7bd7ccfe77d790b3119188b7a233876a6f403a51c9c1d195e3b",
+   "bajtow": 286723
   },
   {
    "sciezka": "gra/wyglad/style.css",
@@ -1080,6 +1080,5 @@
   "sha": "00a1c598f35f0bda5c3ac397b92d29dd687e67c19fc671acbe1b41f4b732392f",
   "bajtow": 12140389,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.70/Mordy.Mordeczki.Launcher-00a1c598f35f.exe"
- },
- "commit": "2954a514956d44c780270e0b05e35793040ff1a8"
+ }
 }
