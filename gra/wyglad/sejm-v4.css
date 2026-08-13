@@ -3605,3 +3605,74 @@ body:has(.hud) .goals-map-grid .goal-branch-split.nested-split{
 }
 body:has(.hud) .goals-map-grid .goal-branch-split.nested-split::before{left:17%!important;right:17%!important}
 body:has(.hud) .goals-map-grid .goal-branch-split.nested-split::after{top:-16px!important;height:16px!important}
+
+/* 1.1.210: Sejm i wladza jako centrum dowodzenia.
+   Dotad cala karta byla jednym pionowym blokiem: ogromna sala zabierala
+   przestrzen, a gabinet, rada i ustawy ginely dopiero pod mapa. Nie zmieniamy
+   danych ani akcji; zmieniamy tylko hierarchie sceny na: sala -> wladza ->
+   zaplecze. */
+body:has(.hud) .widok[data-tab="sejm"]>.card{
+  border:0!important;background:transparent!important;box-shadow:none!important;
+  overflow:visible!important;padding:0!important
+}
+body:has(.hud) .widok[data-tab="sejm"]>.card>.h{
+  min-height:58px;display:flex;align-items:center;padding:13px 18px!important;
+  margin:0 0 12px;border:1px solid color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 55%,rgba(196,154,75,.35));
+  border-left:4px solid var(--party-theme,var(--atlas-brass));border-radius:5px;
+  background:linear-gradient(105deg,rgba(30,39,34,.98),rgba(9,16,13,.96)),url("../obrazki/ui-ledger-header.webp") center/cover;
+  box-shadow:0 12px 28px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.06)
+}
+body:has(.hud) .widok[data-tab="sejm"]>.card>.h h3{font-size:22px!important;letter-spacing:.035em;color:#f0e4c5}
+body:has(.hud) .widok[data-tab="sejm"]>.card>.h .n{margin-left:auto}
+body:has(.hud) .widok[data-tab="sejm"]>.card>.b{
+  display:grid!important;grid-template-columns:minmax(0,1.52fr) minmax(300px,.78fr);gap:14px!important;
+  padding:0!important;align-items:start
+}
+body:has(.hud) .widok[data-tab="sejm"] .sejm-sala{
+  grid-column:1;grid-row:1;margin:0!important;padding:14px 16px 12px!important;
+  min-width:0;max-height:none;border-radius:6px!important;
+  background:linear-gradient(180deg,rgba(5,13,9,.32),rgba(4,10,7,.88)),url("../obrazki/ui-sejm-hemicycle.webp") center/cover!important;
+  border:1px solid color-mix(in srgb,var(--party-theme,var(--atlas-brass)) 44%,rgba(196,154,75,.3));
+  box-shadow:0 18px 38px rgba(0,0,0,.36),inset 0 1px rgba(255,255,255,.06)
+}
+body:has(.hud) .widok[data-tab="sejm"] .hemi-filtry{margin:0 auto 10px!important;justify-content:flex-start!important}
+body:has(.hud) .widok[data-tab="sejm"] .hemi-scena{
+  max-width:none!important;padding:6px 8px 3px!important;border-radius:4px;
+  background:radial-gradient(ellipse at 50% 42%,rgba(71,104,79,.22),rgba(2,8,5,.6) 72%);
+  border:1px solid rgba(196,154,75,.2)
+}
+body:has(.hud) .widok[data-tab="sejm"] .hemi-scena .hemi{max-height:390px!important;object-fit:contain}
+body:has(.hud) .widok[data-tab="sejm"] .hemipod{margin-top:8px!important;max-width:none!important;grid-template-columns:repeat(3,minmax(0,1fr));font-size:12px}
+body:has(.hud) .widok[data-tab="sejm"] .sejmleg{max-height:84px;overflow:auto;margin-top:10px!important;padding:8px!important;gap:6px!important;justify-content:flex-start!important;border-radius:4px;background:rgba(2,8,5,.54)}
+body:has(.hud) .widok[data-tab="sejm"] .sejmleg .sl{min-height:29px;padding:5px 8px;border-radius:4px;font-size:11px}
+body:has(.hud) .widok[data-tab="sejm"] .wladza{
+  grid-column:2;grid-row:1;display:grid!important;grid-template-columns:1fr!important;gap:9px!important;
+  align-content:start;padding:0!important
+}
+body:has(.hud) .widok[data-tab="sejm"] .wladza .wcard{
+  min-height:0!important;padding:12px 13px;border-radius:5px!important;border-left:3px solid var(--wc,var(--atlas-brass));
+  background:linear-gradient(145deg,rgba(22,36,28,.97),rgba(7,14,10,.98)),url("../obrazki/ui-civic-ledger.webp") center/cover;
+  box-shadow:0 10px 22px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.045)
+}
+body:has(.hud) .widok[data-tab="sejm"] .wladza .wcard-zbiorczy{grid-column:auto!important;opacity:.8}
+body:has(.hud) .widok[data-tab="sejm"] .wlab{font-size:10px;letter-spacing:.13em;color:color-mix(in srgb,var(--wc,var(--atlas-brass)) 72%,#e8dfc5);text-transform:uppercase}
+body:has(.hud) .widok[data-tab="sejm"] .wbody{gap:10px;margin-top:8px}
+body:has(.hud) .widok[data-tab="sejm"] .wbody>b{font:700 16px var(--fd);color:#eee2c1}
+body:has(.hud) .widok[data-tab="sejm"] .wbody>span{font-size:11px;color:#9eafa2}
+body:has(.hud) .widok[data-tab="sejm"] .sejmgrid{
+  grid-column:1/-1;grid-row:2;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:12px!important;margin-top:1px
+}
+body:has(.hud) .widok[data-tab="sejm"] .sejmgrid>.card{min-height:230px;border-radius:5px!important;background:linear-gradient(150deg,rgba(20,34,26,.97),rgba(7,14,10,.99)),url("../obrazki/ui-civic-ledger.webp") center/cover!important}
+body:has(.hud) .widok[data-tab="sejm"] .sejmgrid>.card>.b{max-height:270px;overflow:auto}
+body:has(.hud) .widok[data-tab="sejm"] .sejm-partietabela{grid-column:1/-1;grid-row:3;margin-top:0!important}
+body:has(.hud) .widok[data-tab="sejm"] .sejm-partietabela[open] .sejm-partieb{max-height:340px;overflow:auto}
+@media(max-width:1080px){
+  body:has(.hud) .widok[data-tab="sejm"]>.card>.b{grid-template-columns:1fr!important}
+  body:has(.hud) .widok[data-tab="sejm"] .sejm-sala,body:has(.hud) .widok[data-tab="sejm"] .wladza{grid-column:1;grid-row:auto}
+  body:has(.hud) .widok[data-tab="sejm"] .wladza{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:720px){
+  body:has(.hud) .widok[data-tab="sejm"] .wladza,body:has(.hud) .widok[data-tab="sejm"] .sejmgrid{grid-template-columns:1fr!important}
+  body:has(.hud) .widok[data-tab="sejm"] .hemi-scena .hemi{max-height:300px!important}
+}

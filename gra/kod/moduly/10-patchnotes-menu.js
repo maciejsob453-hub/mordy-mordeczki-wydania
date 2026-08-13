@@ -4,6 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.210':{data:'13 sierpnia 2026',zmiany:[
+  'Sejm i Wladza dostaly nowy uklad centrum dowodzenia: sala obrad, pulpit urzedow i zaplecze ustaw sa teraz osobnymi strefami.',
+  'Sala parlamentarna nie zabiera juz calego ekranu, a wynik mandatow i partie sa czytelnie oddzielone od mapy miejsc.',
+  'Gabinet, Rada ministrow i Ustawy maja rowne karty, wspolne tlo i wlasne przewijanie tylko wewnatrz dlugich list.',
+  'Układ jest responsywny: na wezszym ekranie urzedy skladaja sie pod sala bez ucietych kart i bez zmiany mechaniki.'
+ ]},
  '1.1.209':{data:'13 sierpnia 2026',zmiany:[
   'Nowi, starzy, wszystko jedno dostalo osobne logo zgodne z droga Postepowcow.',
   'Dodano cele Ruchy do postepu oraz Lewicowy Sojusz Demokratyczny z warunkami Mnem, mandatow, wladzy, wyniku i skladu partii.',
