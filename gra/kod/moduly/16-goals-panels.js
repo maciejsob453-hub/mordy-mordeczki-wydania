@@ -1493,19 +1493,61 @@ function initGoalsMap(){
   const frame=document.querySelector('[data-goals-map]'),canvas=document.querySelector('[data-goals-canvas]');
   if(!frame||!canvas||frame.dataset.ready==='1'){goalsMapApply();return}
   frame.dataset.ready='1';let drag=null;
+  canvas.style.setProperty('position','relative','important');
+  canvas.style.setProperty('transform-origin','0 0','important');
   frame.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;drag={x:e.clientX,y:e.clientY,px:Number(G.goalPanX)||0,py:Number(G.goalPanY)||0};frame.setPointerCapture?.(e.pointerId);frame.classList.add('dragging')});
   frame.addEventListener('pointermove',e=>{if(!drag)return;G.goalPanX=drag.px+e.clientX-drag.x;G.goalPanY=drag.py+e.clientY-drag.y;goalsMapApply()});
   const stop=()=>{drag=null;frame.classList.remove('dragging')};
   frame.addEventListener('pointerup',stop);frame.addEventListener('pointercancel',stop);frame.addEventListener('pointerleave',e=>{if(drag&&!e.buttons)stop()});
   frame.addEventListener('wheel',e=>{e.preventDefault();goalsZoom(e.deltaY<0?.08:-.08)},{passive:false});
   goalsMapApply();
-  requestAnimationFrame(()=>goalsCheckCollisions());
+  requestAnimationFrame(()=>{goalsWireFrame();goalsCheckCollisions()});
+}
+/* Linie drzewa liczymy z faktycznych środków kafelków. Dzięki temu rodzic
+   zawsze oddaje gałąź ze swojego środka, niezależnie od szerokości ekranu,
+   zoomu czy długości nazwy celu. */
+function goalsWireFrame(debug=false){
+  const frame=document.querySelector('[data-goals-map]'),canvas=document.querySelector('[data-goals-canvas]');
+  if(!frame||!canvas)return;
+  if(!document.getElementById('goals-geometry-style')){
+    const style=document.createElement('style');style.id='goals-geometry-style';
+    style.textContent='.goals-geometry-live{position:relative!important}.goal-geometry-layer{position:absolute!important;inset:0!important;z-index:0!important;pointer-events:none!important;overflow:visible!important}.goals-geometry-live .goal-node-wrap,.goals-geometry-live .goal-node{position:relative!important;z-index:1!important}body:has(.hud) [data-goals-canvas].goals-geometry-live .goals-tree-block.national .goal-node-wrap::after,body:has(.hud) [data-goals-canvas].goals-geometry-live .goals-tree-block.national .goal-branch-split::before,body:has(.hud) [data-goals-canvas].goals-geometry-live .goals-tree-block.national .goal-branch-split::after,body:has(.hud) [data-goals-canvas].goals-geometry-live .goals-tree-block.national .goal-branch-lane::before{display:none!important}';
+    document.head.appendChild(style);
+  }
+  let layer=canvas.querySelector(':scope > .goal-geometry-layer');
+  if(layer)layer.remove();
+  layer=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  layer.classList.add('goal-geometry-layer'); layer.setAttribute('aria-hidden','true');
+  const width=Math.max(canvas.scrollWidth,canvas.offsetWidth,1),height=Math.max(canvas.scrollHeight,canvas.offsetHeight,1);
+  layer.setAttribute('viewBox',`0 0 ${width} ${height}`);layer.setAttribute('width',width);layer.setAttribute('height',height);
+  const z=Math.max(.01,Number(G&&G.goalZoom)||1),cr=canvas.getBoundingClientRect();
+  const nodes=[...frame.querySelectorAll('.goal-node[data-goal-id][data-goal-kind="national"]')].map(el=>{
+    const r=el.getBoundingClientRect();
+    return {el,id:el.dataset.goalId,parent:el.closest('.goal-node-wrap')?.dataset.goalParent||'',
+      cx:(r.left+r.width/2-cr.left)/z,top:(r.top-cr.top)/z,bottom:(r.bottom-cr.top)/z,
+      left:(r.left-cr.left)/z,right:(r.right-cr.left)/z,height:r.height/z,width:r.width/z};
+  });
+  const byParent=new Map();nodes.forEach(n=>{if(n.parent){if(!byParent.has(n.parent))byParent.set(n.parent,[]);byParent.get(n.parent).push(n)}});
+  const color='var(--party-theme,#b896d8)';
+  const path=(d,cls='')=>{const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',d);p.setAttribute('class',cls);p.setAttribute('fill','none');p.setAttribute('stroke',color);p.setAttribute('stroke-width','2');p.setAttribute('stroke-linecap','round');p.setAttribute('stroke-linejoin','round');layer.appendChild(p)};
+  byParent.forEach((children,parentId)=>{
+    const parent=nodes.find(n=>n.id===parentId);if(!parent||!children.length)return;
+    if(children.length===1){path(`M ${parent.cx} ${parent.bottom} L ${children[0].cx} ${children[0].top}`);return}
+    const mid=Math.max(parent.bottom+18,Math.min(...children.map(c=>c.top))-18);
+    const xs=children.map(c=>c.cx),min=Math.min(...xs),max=Math.max(...xs);
+    path(`M ${parent.cx} ${parent.bottom} L ${parent.cx} ${mid} M ${min} ${mid} L ${max} ${mid}`);
+    children.forEach(c=>path(`M ${c.cx} ${mid} L ${c.cx} ${c.top}`));
+  });
+  if(debug){
+    nodes.forEach(n=>{const r=document.createElementNS('http://www.w3.org/2000/svg','rect');r.setAttribute('x',n.left);r.setAttribute('y',n.top);r.setAttribute('width',n.width);r.setAttribute('height',n.height);r.setAttribute('fill','none');r.setAttribute('stroke','#f44');r.setAttribute('stroke-width','1');layer.appendChild(r);const l=document.createElementNS('http://www.w3.org/2000/svg','line');l.setAttribute('x1',n.cx);l.setAttribute('x2',n.cx);l.setAttribute('y1',n.top);l.setAttribute('y2',n.bottom);l.setAttribute('stroke','#f44');l.setAttribute('stroke-width','1');layer.appendChild(l)});
+  }
+  canvas.insertBefore(layer,canvas.firstChild);canvas.classList.add('goals-geometry-live');
 }
 /* Kontrola developerska: po kazdym otwarciu mapy sprawdzamy, czy kafle nie
    nachodza na siebie. Nie zmienia gry; zapisuje tylko wynik do window, zeby
    smoke test lub konsola mogly od razu wykryc wadliwy layout. */
 function goalsCheckCollisions(){
-  const nodes=[...document.querySelectorAll('[data-goals-map] .goal-node')];
+  const nodes=[...document.querySelectorAll('[data-goals-map] .goal-node[data-goal-kind="national"]')];
   const boxes=nodes.map((el,i)=>{const r=el.getBoundingClientRect();return {i,l:r.left,t:r.top,r:r.right,b:r.bottom}});
   const overlaps=[];
   for(let i=0;i<boxes.length;i++)for(let j=i+1;j<boxes.length;j++){
@@ -1518,13 +1560,13 @@ function goalsCheckCollisions(){
 function goalsAllViews(party,national){
   return party.map(partyGoalView).concat(national.map(nationalGoalView)).filter(Boolean);
 }
-function goalNode(item,index,total){
+function goalNode(item,index,total,parentId){
   const active=item.active,selected=G.goalFocus===item.id;
   const state=item.done?'done':active?'active':item.ready?'ready':'locked';
   const mark=item.done?'✓':active?'●':item.ready?'◆':'·';
   const pct=item.type==='national'?`${item.progress}%`:`${item.progress}%`;
-  return `<div class="goal-node-wrap ${index===total-1?'last':''}">
-    <button class="goal-node ${state} ${selected?'selected':''}" onclick="goalOpen('${esc(item.id)}')" aria-label="${esc(item.name)}">
+  return `<div class="goal-node-wrap ${index===total-1?'last':''}" data-goal-id="${esc(item.id)}" data-goal-parent="${esc(parentId||'')}" data-goal-kind="${item.type}">
+    <button class="goal-node ${state} ${selected?'selected':''}" data-goal-id="${esc(item.id)}" data-goal-kind="${item.type}" onclick="goalOpen('${esc(item.id)}')" aria-label="${esc(item.name)}">
       <span class="goal-node-mark">${mark}</span><span class="goal-node-icon">${item.icon?`<img src="${item.icon}" alt="">`:item.g.emoji?`<span class="goal-node-emoji">${item.g.emoji}</span>`:'<i>✦</i>'}</span>
       <span class="goal-node-copy"><em>${item.type==='national'?'CEL NARODOWY':'CEL PARTYJNY'}</em><b>${item.name}</b><small>${item.done?'UKOŃCZONY':item.active?'W TOKU · '+pct:item.ready?'DOSTĘPNY':'ZABLOKOWANY'}</small></span>
     </button>
@@ -1533,11 +1575,13 @@ function goalNode(item,index,total){
 function goalsTreeBlock(label,sub,items,kind){
   if(!items.length)return '';
   const head=`<header><div><span class="eyebrow">${kind==='national'?'CELE NARODOWE':'PARTY DIRECTIVE'}</span><h3>${label}</h3><p>${sub}</p></div><b>${items.filter(x=>x.done).length}/${items.length}</b></header>`;
-  if(kind!=='national')return `<section class="goals-tree-block ${kind}">${head}<div class="goal-tree-row">${items.map((x,i)=>goalNode(x,i,items.length)).join('')}</div></section>`;
+  if(kind!=='national')return `<section class="goals-tree-block ${kind}">${head}<div class="goal-tree-row">${items.map((x,i)=>goalNode(x,i,items.length,i?items[i-1].id:'')).join('')}</div></section>`;
   const base=items.filter(x=>(!x.g.branch&&!x.g.route)||x.id==='nplr_liberal');
+  const baseParent=base.length?base[base.length-1].id:'';
   const laneMarkup=(groups,cls)=>Object.entries(groups).map(([key,b])=>{
     const lane=items.filter(x=>x.g.branch===key);if(!lane.length)return '';
-    return `<div class="goal-branch-lane ${key} ${cls}"><div class="goal-branch-label">${b.name}</div><div class="goal-tree-row">${lane.map((x,i)=>goalNode(x,i,lane.length)).join('')}</div></div>`;
+    const source=items.find(x=>x.id==='nplr_star')?.id||baseParent;
+    return `<div class="goal-branch-lane ${key} ${cls}"><div class="goal-branch-label">${b.name}</div><div class="goal-tree-row">${lane.map((x,i)=>goalNode(x,i,lane.length,i?(lane[i-1].id):source)).join('')}</div></div>`;
   }).join('');
   const early=Object.entries(NATIONAL_EARLY_BRANCHES).map(([key,b])=>{
     const lane=items.filter(x=>x.g.route==='liberal'&&key==='liberal'||x.g.branch==='progressive'&&key==='progressive');
@@ -1546,9 +1590,9 @@ function goalsTreeBlock(label,sub,items,kind){
        Wcześniej było rodzeństwem całego drzewa, więc pozioma kreska zaczynała
        się od osi ekranu zamiast od „Nie tylko na słońce...”. */
     const childSplit=key==='liberal'?`<div class="goal-branch-split late-split nested-split">${laneMarkup(NATIONAL_BRANCHES,'late')}</div>`:'';
-    return `<div class="goal-branch-lane ${key} early"><div class="goal-branch-label">${b.name}</div><div class="goal-tree-row">${lane.map((x,i)=>goalNode(x,i,lane.length)).join('')}</div>${childSplit}</div>`;
+    return `<div class="goal-branch-lane ${key} early"><div class="goal-branch-label">${b.name}</div><div class="goal-tree-row">${lane.map((x,i)=>goalNode(x,i,lane.length,i?(lane[i-1].id):baseParent)).join('')}</div>${childSplit}</div>`;
   }).join('');
-  return `<section class="goals-tree-block ${kind}">${head}<div class="goal-tree-row goal-tree-base">${base.map((x,i)=>goalNode(x,i,base.length)).join('')}</div><div class="goal-branch-split early-split">${early}</div></section>`;
+  return `<section class="goals-tree-block ${kind}">${head}<div class="goal-tree-row goal-tree-base">${base.map((x,i)=>goalNode(x,i,base.length,i?base[i-1].id:'')).join('')}</div><div class="goal-branch-split early-split">${early}</div></section>`;
 }
 function goalsBranchPanel(){
   const s=nationalState();if(!s)return '';

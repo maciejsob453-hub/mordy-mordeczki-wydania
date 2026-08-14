@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.215':{data:'14 sierpnia 2026',zmiany:[
+  'Linie w drzewku celow narodowych sa liczone z rzeczywistych srodkow wezlow, wiec kazde rozwidlenie startuje dokladnie od rodzica.',
+  'Lancuch jednego celu ma pionowe polaczenie, a dwa cele dostaja wspolna pozioma galez wyprowadzona z centrum rodzica.',
+  'Usunieto stare, stale laczniki CSS tylko dla mapy celow; zoom i przesuwanie nie rozjezdzaja juz geometrii.'
+ ]},
  '1.1.214':{data:'13 sierpnia 2026',zmiany:[
   'HUD nie zaslania juz tytulu ani tresci: belka ma wlasna wysokosc w przeplywie strony.',
   'Decyzje zmienily komponent z duzych pustych kart na zwarte wiersze z kosztem, energia i odnowa.',
