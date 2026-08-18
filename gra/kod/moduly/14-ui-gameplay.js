@@ -60,12 +60,11 @@ function hemi(order,w,mode){
     const x=cx-p.r*Math.cos(p.t), y=cy-p.r*Math.sin(p.t)*yScale;
     const mine=k===G.me, b=blocOf(k), wRzadzie=rzad.includes(k);
     return `<g class="seat ${mine?'mine':''}" data-p="${k}" style="--sd:${Math.min(i*6,240)}ms">
-      <circle cx="${x.toFixed(1)}" cy="${(y+1.2).toFixed(1)}" r="${rad}" fill="rgba(0,0,0,.55)"/>
-      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rad}" fill="${colOf(k)}"
+      <rect x="${(x-rad).toFixed(1)}" y="${(y-rad*.68+1.2).toFixed(1)}" width="${(rad*2).toFixed(1)}" height="${(rad*1.36).toFixed(1)}" rx="${Math.max(2,rad*.32).toFixed(1)}" fill="rgba(0,0,0,.55)"/>
+      <rect x="${(x-rad).toFixed(1)}" y="${(y-rad*.68).toFixed(1)}" width="${(rad*2).toFixed(1)}" height="${(rad*1.36).toFixed(1)}" rx="${Math.max(2,rad*.32).toFixed(1)}" fill="${colOf(k)}"
         stroke="${mine?'#f0d489':wRzadzie?'rgba(255,255,255,.58)':'rgba(255,255,255,.34)'}"
-        stroke-width="${mine?3:wRzadzie?1.8:1.5}"/>
-      <circle cx="${(x-rad*.3).toFixed(1)}" cy="${(y-rad*.34).toFixed(1)}" r="${(rad*.34).toFixed(1)}"
-        fill="#fff" opacity=".26"/>
+        stroke-width="${mine?2.5:wRzadzie?1.5:1.2}"/>
+      <rect x="${(x-rad*.62).toFixed(1)}" y="${(y-rad*.48).toFixed(1)}" width="${(rad*1.24).toFixed(1)}" height="${Math.max(1.5,rad*.22).toFixed(1)}" rx="${Math.max(1,rad*.1).toFixed(1)}" fill="#fff" opacity=".22"/>
       <title>${G.p[k].n}${b?' · '+b.name:''} — ${G.p[k].seats} ${pl(G.p[k].seats,'mandat','mandaty','mandatów')}${wRzadzie?' · w rządzie':''}</title>
     </g>`}).join('');
 

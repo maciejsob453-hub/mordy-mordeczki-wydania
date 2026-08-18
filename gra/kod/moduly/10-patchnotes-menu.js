@@ -4,6 +4,12 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.216':{data:'18 sierpnia 2026',zmiany:[
+  'Cele narodowe maja zwarte, symetryczne drzewko z wyraznym korzeniem, kolumnami galezi i mniejszymi kartami ikon.',
+  'Sejm i Wladza dostaly nowy pulpit: sala parlamentu jest glownym punktem, a wladza, rzad i ministrowie maja jeden spokojny uklad.',
+  'Mandaty w sali sa teraz pokazane jako zwarte miejsca, nie jako przypadkowe kolorowe kropki.',
+  'Mordepedia jest galeria ludzi i wyborow: osobne zakladki pokazuja premierow, prezydentow albo wyniki urn.'
+ ]},
  '1.1.215':{data:'14 sierpnia 2026',zmiany:[
   'Linie w drzewku celow narodowych sa liczone z rzeczywistych srodkow wezlow, wiec kazde rozwidlenie startuje dokladnie od rodzica.',
   'Lancuch jednego celu ma pionowe polaczenie, a dwa cele dostaja wspolna pozioma galez wyprowadzona z centrum rodzica.',
