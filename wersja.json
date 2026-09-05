@@ -1076,11 +1076,11 @@
   "znacznik": "342e6c7231daf3b9c292979015346d27872b1e69359b658105dbbfab6aa950fe"
  },
  "launcher": {
-  "version": "3.0.0",
+  "version": "3.0.1",
   "nazwa": "Mordy Mordeczki Launcher.exe",
-  "sha": "6f4809398dba45d9a988d0f3c1c2031a84027094624cb2de80f776957ee12601",
-  "bajtow": 22841445,
-  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/launcher-v3.0.0/Mordy.Mordeczki.Launcher-6f4809398dba.exe"
+  "sha": "eb75bd6bd2cbcb20686bad6eed2edd910dc776cdbbd375b8b36e1ae3b2b08b39",
+  "bajtow": 22847730,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/launcher-v3.0.1/Mordy.Mordeczki.Launcher-eb75bd6bd2cb.exe"
  },
  "commit": "e2e8f0112fb407346a98434f015d642459385497"
 }

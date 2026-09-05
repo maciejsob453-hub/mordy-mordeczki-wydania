@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "gameId": "mm2",
   "title": "Mordy Mordeczki 2",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "exe": "Mordy Mordeczki 2.exe",
   "archive": {
-    "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/mm2-v1.0.0/Mordy-Mordeczki-2-v1.0.0-Windows.zip",
-    "sha256": "0ddfc8c61ac5cbb22beefa141636f4c6836292f74ff0d218cfe730c047792c3a",
-    "bytes": 24905809
+    "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/mm2-v1.0.1/Mordy-Mordeczki-2-v1.0.1-Windows.zip",
+    "sha256": "2202e1b5a4ebe70606a580c7f8096ef1c0c7606be1cfecac7f85294a5072fde6",
+    "bytes": 24913804
   },
   "files": [
     {
@@ -303,7 +303,7 @@
     {
       "path": "_internal/base_library.zip",
       "bytes": 1394480,
-      "sha256": "dd97181602bcc5a9988920c0885c171a337582528c97184e8cc1a5b3ad137698"
+      "sha256": "a80cddf5a23dd9afb4134e23d8a14983fbdf7f00a1345d5f701d0c910ffb2399"
     },
     {
       "path": "_internal/clr_loader/ffi/dlls/amd64/ClrLoader.dll",
@@ -1563,7 +1563,7 @@
     {
       "path": "_internal/web/ui.js",
       "bytes": 74962,
-      "sha256": "8d4bbb6b0f9ca8750c2fa44ed5f87f7e571378747fa660942ce2173d005c7508"
+      "sha256": "75f3c5f58eee14452675f0efebde1359890cd7ed6162f38987752ab65a43b3ba"
     },
     {
       "path": "_internal/webview/__init__.py",
@@ -1872,16 +1872,17 @@
     },
     {
       "path": "Mordy Mordeczki 2.exe",
-      "bytes": 6047487,
-      "sha256": "91c6b7163bba2ced59f4726aecfea2731e7a7f1b453b6d3c353335588a3c919f"
+      "bytes": 6054160,
+      "sha256": "1cfd06d1e37cfe3e7e544b4d9fe6ac64833626421f1719f41ce6232ee09acbce"
     },
     {
       "path": "VERSION",
       "bytes": 5,
-      "sha256": "92521fc3cbd964bdc9f584a991b89fddaa5754ed1cc96d6d42445338669c1305"
+      "sha256": "d51e6ec94058554a84558a5b402ee6ef5fdf5455e35c902feda61cda8752943a"
     }
   ],
   "notes": [
+    "Naprawione uruchamianie gry przy działającym launcherze (1.0.1).",
     "Nowa gra: 13 partii, 67 postaci i pełne kadencje.",
     "Koalicje z obietnicami, ustawy, media i sąd.",
     "Osobne zapisy, kopie zapasowe i eksport pliku."
