@@ -1,20 +1,20 @@
 {
- "wersja": "1.1.216",
- "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/e2e8f0112fb407346a98434f015d642459385497",
+ "wersja": "1.1.217",
+ "zrodlo": "https://raw.githubusercontent.com/maciejsob453-hub/mordy-mordeczki-wydania/a14423af29a5fa3b923ec74722f39f3d8e2c4158",
  "pliki": [
   {
    "sciezka": "gra/index.html",
-   "sha": "eddafd5650e7f963438fc1726e6bea7ceec24244fb606f6c70ba2267f26b1fcb",
+   "sha": "db072d4f5b3575b78757c479e7eb6e55679f4f7c88eb9e91428179a6ff7c2459",
    "bajtow": 1979
   },
   {
    "sciezka": "gra/kod/desktop.js",
-   "sha": "cd5f71dd3790dc38352312a927f695e80dada9761e6d6ec6f9af3dda05acf44c",
-   "bajtow": 12919
+   "sha": "70db6bc23b1c740fe7eb257ee708ef87a7d1f9e465083d1d145c445120b224f6",
+   "bajtow": 13936
   },
   {
    "sciezka": "gra/kod/game.js",
-   "sha": "773b82b65fbd236f4598c48050cb0998db6abecfecd76e5f33f57abbf7d69f95",
+   "sha": "cd5725c8a9770b798522e866d2b7aa6d196c4081458205cbc787e5c9a2e49191",
    "bajtow": 737
   },
   {
@@ -69,8 +69,8 @@
   },
   {
    "sciezka": "gra/kod/moduly/10-patchnotes-menu.js",
-   "sha": "2358b7c6d68652c90ee4aeb8c665da320ac31d4f2e06616df8523ca2b11200cb",
-   "bajtow": 131306
+   "sha": "813a5def99b30ed7548adbb1cdcdad0c094845c5e73e678d81071b3fa51d3e5f",
+   "bajtow": 131610
   },
   {
    "sciezka": "gra/kod/moduly/11-economy.js",
@@ -1065,15 +1065,15 @@
  ],
  "exe": {
   "nazwa": "Mordy Mordeczki.exe",
-  "sha": "1bc721769d3a095236ef8058390db03c2dcee03093f48ed973c1169f5bb9006f",
-  "bajtow": 6080550,
-  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.80/Mordy.Mordeczki.exe"
+  "sha": "4065a9386415c552927d8cd313d8f31b034d812714d3b4c0679f480c3d935294",
+  "bajtow": 6094916,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.217/Mordy.Mordeczki-4065a9386415.exe"
  },
  "runtime": {
-  "sha": "c66999d9cac04310db8c6ccbc9c7b99b543f458cb4acf18f715ae9f86c112a7e",
-  "bajtow": 13703747,
-  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.80/biblioteki-1.1.80.zip",
-  "znacznik": "342e6c7231daf3b9c292979015346d27872b1e69359b658105dbbfab6aa950fe"
+  "sha": "0e7f653f720a53050538a0a6aee236b47893d4ee8e1b62eea8de65868a9748e2",
+  "bajtow": 14774450,
+  "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/v1.1.217/biblioteki-1.1.217.zip",
+  "znacznik": "a67d5ac336ff587d24096993c2ce8f826712bc976fafd17770357c2878e8c36f"
  },
  "launcher": {
   "version": "3.0.2",
@@ -1082,5 +1082,5 @@
   "bajtow": 22859766,
   "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/launcher-v3.0.2/Mordy.Mordeczki.Launcher-1bc9d1a69151.exe"
  },
- "commit": "e2e8f0112fb407346a98434f015d642459385497"
+ "commit": "a14423af29a5fa3b923ec74722f39f3d8e2c4158"
 }

@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "gameId": "mm2",
   "title": "Mordy Mordeczki 2",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "exe": "Mordy Mordeczki 2.exe",
   "archive": {
-    "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/mm2-v1.0.1/Mordy-Mordeczki-2-v1.0.1-Windows.zip",
-    "sha256": "2202e1b5a4ebe70606a580c7f8096ef1c0c7606be1cfecac7f85294a5072fde6",
-    "bytes": 24913804
+    "url": "https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/mm2-v1.0.2/Mordy-Mordeczki-2-v1.0.2-Windows.zip",
+    "sha256": "88b54b793ec73a93c9307d6a377577e0617e2fcae4a262b0494e2b2d4b96bf78",
+    "bytes": 24959255
   },
   "files": [
     {
@@ -303,7 +303,7 @@
     {
       "path": "_internal/base_library.zip",
       "bytes": 1394480,
-      "sha256": "a80cddf5a23dd9afb4134e23d8a14983fbdf7f00a1345d5f701d0c910ffb2399"
+      "sha256": "202276f61869ef7667606faf9ae392628fe19f0686c03b61639cccb1fbc98b07"
     },
     {
       "path": "_internal/clr_loader/ffi/dlls/amd64/ClrLoader.dll",
@@ -1537,8 +1537,13 @@
     },
     {
       "path": "_internal/web/index.html",
-      "bytes": 795,
-      "sha256": "d74d5e53e6a0e8b9e666ade5135a0c60029a7fee22984edccc07b8c4d60a410a"
+      "bytes": 833,
+      "sha256": "5d5ce7ef9c9139a04e01ee931ae3b5f0c860527f7d8980d81e69abd4216f33c9"
+    },
+    {
+      "path": "_internal/web/presence.js",
+      "bytes": 3695,
+      "sha256": "75757e336da1a73fb8d1727c83438b47df216db0b0fc3f1a6861fe418fa1cd56"
     },
     {
       "path": "_internal/web/src/content.js",
@@ -1562,8 +1567,8 @@
     },
     {
       "path": "_internal/web/ui.js",
-      "bytes": 74962,
-      "sha256": "75f3c5f58eee14452675f0efebde1359890cd7ed6162f38987752ab65a43b3ba"
+      "bytes": 74998,
+      "sha256": "6d38613a05960f128754d17e9987a052c78e7350431d75073a3e4f9ca64c8fe9"
     },
     {
       "path": "_internal/webview/__init__.py",
@@ -1867,22 +1872,23 @@
     },
     {
       "path": "CZYTAJ MNIE.txt",
-      "bytes": 305,
-      "sha256": "4b341e67db8c7e1511ef6340cc5383e2b12744b1fdef3f79beff968779ae4f78"
+      "bytes": 450,
+      "sha256": "2ac14cf68c3a545f71e1e8944a314027d225135897859ebd1bc8ea570fb70147"
     },
     {
       "path": "Mordy Mordeczki 2.exe",
-      "bytes": 6054160,
-      "sha256": "1cfd06d1e37cfe3e7e544b4d9fe6ac64833626421f1719f41ce6232ee09acbce"
+      "bytes": 6096981,
+      "sha256": "a98989483756e20b6798d17ab058c3df1d4332772fe8b9eaf7a8b8ef29778a96"
     },
     {
       "path": "VERSION",
       "bytes": 5,
-      "sha256": "d51e6ec94058554a84558a5b402ee6ef5fdf5455e35c902feda61cda8752943a"
+      "sha256": "bfec2e34583ada7e6af2cb73993fb75a3f7147a6c943e5ff5f5c4294fc577b90"
     }
   ],
   "notes": [
-    "Naprawione uruchamianie gry przy działającym launcherze (1.0.1).",
+    "Discord Rich Presence: grafika, herb partii, kadencja i mandaty (1.0.2).",
+    "Automatyczne łączenie z Discordem, także uruchomionym po grze.",
     "Nowa gra: 13 partii, 67 postaci i pełne kadencje.",
     "Koalicje z obietnicami, ustawy, media i sąd.",
     "Osobne zapisy, kopie zapasowe i eksport pliku."
