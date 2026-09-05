@@ -1,6 +1,6 @@
 # Mordy Mordeczki — dwie gry, jedna biblioteka
 
-[Pobierz launcher 3.0.1](https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/launcher-v3.0.1/Mordy.Mordeczki.Launcher-eb75bd6bd2cb.exe) i wybierz część, którą chcesz uruchomić.
+[Pobierz launcher 3.0.2](https://github.com/maciejsob453-hub/mordy-mordeczki-wydania/releases/download/launcher-v3.0.2/Mordy.Mordeczki.Launcher-1bc9d1a69151.exe) i wybierz część, którą chcesz uruchomić.
 
 - **Mordy Mordeczki — Sejm 1.1.216**: oryginalna gra.
 - **Mordy Mordeczki 2 — 1.0.1**: osobna gra z nowym silnikiem, kampanią, koalicjami z obietnicami i własnymi zakończeniami.
@@ -16,3 +16,5 @@ Windows 10/11, Microsoft Edge WebView2 Runtime. Gotowe aplikacje zawierają potr
 Repozytorium zawiera gotowe pliki oraz metadane aktualizacji. Źródła projektu pozostają oddzielne. Autorzy świata i oryginału: Maciek i Balon.
 
 Wydania 3.0.1 / 1.0.1 naprawiają kolizję lokalnych serwerów przy jednoczesnym działaniu launchera i gry.
+
+Od 3.0.2 launcher aktualizuje się automatycznie przy starcie. Czeka na koniec pobierania lub uruchomionej gry i uruchamia nową wersję po zweryfikowaniu pliku. Wersje 3.0.0/3.0.1 wymagają jednorazowego użycia dotychczasowego przycisku aktualizacji.
