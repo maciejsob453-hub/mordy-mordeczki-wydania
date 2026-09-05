@@ -182,7 +182,9 @@ let dirty = false;
 const origRender = window.render;
 window.render = function () {
   dirty = true;                          // każdy przerysowany ekran to zmiana stanu
-  return origRender.apply(this, arguments);
+  const result = origRender.apply(this, arguments);
+  void wyslijStatus();
+  return result;
 };
 
 setInterval(() => {
@@ -200,39 +202,38 @@ setInterval(() => {
 
 /* ---------- status na Discordzie ---------- */
 
-/* Discord przyjmuje jedną zmianę na 15 sekund, więc melduje się tu rzadziej
-   niż przerysowuje ekran. Treść składamy z tego, co i tak widać na panelu. */
+/* Treść pochodzi ze stanu gry; transport w Pythonie ogranicza częstotliwość
+   i ponawia połączenie, gdy Discord zostanie uruchomiony później. */
 let ostatniStatus = "";
+let statusWTrakcie = false;
 
 function statusGry() {
   const g = G();
-  if (!g) return { opis: "W menu głównym", stan: "Wybiera partię" };
+  const p = g && g.p && g.p[g.me];
+  if (!p) return { opis: "Mordy Mordeczki I · Sejm", stan: "Menu główne · Wybiera partię" };
 
-  const p = g.p[g.me];
-  const ludzie = p.mem + " " + odmiana(p.mem, "osoba", "osoby", "osób");
-  const mandaty = p.seats + " " + odmiana(p.seats, "mandat", "mandaty", "mandatów");
-
-  // urzędy najpierw, bo to najciekawsze, co można o kimś powiedzieć
+  const seats = Number.isFinite(p.seats) ? p.seats : 0;
+  const mandaty = seats + " " + odmiana(seats, "mandat", "mandaty", "mandatów");
   const tytuly = [];
   if (g.gov && g.gov.pm === g.me && g.pmOk) tytuly.push("premier");
   if (g.prez && g.prez.party === g.me) tytuly.push("prezydent");
   if (g.sejmPrez && g.sejmPrez.marszalek === g.me) tytuly.push("marszałek");
   if (!tytuly.length) {
-    tytuly.push(g.gov && g.gov.parties && g.gov.parties.includes(g.me) ? "koalicja" : "opozycja");
+    tytuly.push(g.gov && Array.isArray(g.gov.parties) && g.gov.parties.includes(g.me) ? "koalicja" : "opozycja");
   }
 
-  const sondaz = (typeof g.lastPoll === "number")
+  const sondaz = Number.isFinite(g.lastPoll)
     ? ", sondaż " + g.lastPoll.toFixed(1).replace(".", ",") + "%" : "";
-
-  const faza = g.phase === "finalcamp" ? "Finałowa kampania"
-             : g.phase === "elect" ? "Dzień wyborów"
-             : g.phase === "pmvote" ? "Sejm wybiera premiera"
-             : g.phase === "prez" ? "Wybory prezydenckie"
-             : "Kadencja " + g.term + ", tydzień " + g.week + "/" + g.weeks;
-
+  const fazy = {
+    finalcamp: "Finałowa kampania", elect: "Dzień wyborów",
+    result: "Wyniki wyborów", pmvote: "Sejm wybiera premiera",
+    marszalek: "Sejm wybiera marszałka", prez: "Wybory prezydenckie",
+    dead: "Koniec rozgrywki",
+  };
+  const faza = fazy[g.phase] || "Kadencja " + g.term + ", tydzień " + g.week + "/" + g.weeks;
   return {
-    opis: p.n + " · " + ludzie + ", " + mandaty,
-    stan: faza + " · " + tytuly.join(" i ") + sondaz,
+    opis: "Mordy Mordeczki I · " + (p.ab || p.n || "Partia") + " · " + mandaty,
+    stan: faza + (g.phase === "dead" ? "" : " · " + tytuly.join(" i ") + sondaz),
   };
 }
 
@@ -242,15 +243,31 @@ function odmiana(n, a, b, c) {
   return (d >= 2 && d <= 4 && (s < 10 || s >= 20)) ? b : c;
 }
 
-setInterval(() => {
+async function wyslijStatus() {
+  if (statusWTrakcie) return false;
   const a = api();
-  if (!a || !a.discord) return;
+  if (!a || typeof a.discord !== "function") return false;
   const s = statusGry();
-  const podpis = s.opis + "|" + s.stan;
-  if (podpis === ostatniStatus) return;     // bez zmian nie ma po co zawracać głowy
-  ostatniStatus = podpis;
-  try { a.discord(s.opis, s.stan); } catch (e) { /* status to dodatek */ }
-}, 15000);
+  const podpis = JSON.stringify(s);
+  if (podpis === ostatniStatus) return true;
+  statusWTrakcie = true;
+  try {
+    // Most zwraca Promise. Zapamiętujemy dopiero przyjęcie do kolejki,
+    // a odrzucony Promise nie blokuje następnej próby ani gry.
+    const przyjeto = await a.discord(s.opis, s.stan);
+    if (przyjeto === true) ostatniStatus = podpis;
+    return przyjeto === true;
+  } catch (e) {
+    return false;
+  } finally {
+    statusWTrakcie = false;
+  }
+}
+
+window.MM1Presence = Object.freeze({ snapshot: statusGry, refresh: wyslijStatus });
+window.addEventListener("pywebviewready", () => { void wyslijStatus(); });
+setInterval(() => { void wyslijStatus(); }, 15000);
+void wyslijStatus();
 
 /* ---------- wznowienie ostatniej gry ---------- */
 

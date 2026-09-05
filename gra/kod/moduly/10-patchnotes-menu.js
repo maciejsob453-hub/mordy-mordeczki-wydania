@@ -4,6 +4,11 @@
    zobaczy, a nie co zmieniło się w kodzie. Okno pokazuje się raz na wersję,
    przy pierwszym odpaleniu, i da się do niego wrócić z ekranu startowego. */
 const PATCHNOTE={
+ '1.1.217':{data:'5 września 2026',zmiany:[
+  'Discord pokazuje teraz część gry, partię, mandaty oraz etap kadencji.',
+  'Aktywność pojawia się również w menu i wraca po ponownym uruchomieniu Discorda.',
+  'Brak Discorda nie przeszkadza w grze, a zamknięcie gry kończy jej aktywność.'
+ ]},
  '1.1.216':{data:'18 sierpnia 2026',zmiany:[
   'Cele narodowe maja zwarte, symetryczne drzewko z wyraznym korzeniem, kolumnami galezi i mniejszymi kartami ikon.',
   'Sejm i Wladza dostaly nowy pulpit: sala parlamentu jest glownym punktem, a wladza, rzad i ministrowie maja jeden spokojny uklad.',
